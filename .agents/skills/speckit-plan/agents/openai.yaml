@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spec Kit Plan"
+  short_description: "从规格生成技术设计与实施计划"
+  default_prompt: "使用 $speckit-plan 为当前功能生成实现计划与设计工件。"
+
+policy:
+  allow_implicit_invocation: false

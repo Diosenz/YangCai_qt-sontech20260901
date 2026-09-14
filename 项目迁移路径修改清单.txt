@@ -1,0 +1,239 @@
+项目迁移路径修改清单（当前电脑）
+================================
+
+适用电脑：当前这台电脑
+项目目录：H:\YangCai_Code\YangCai_qt-sontech20260901
+最后验证日期：2026-09-03
+验证结果：Debug 全量编译成功，PASS 20 / FAIL 0
+
+
+一、当前电脑的软件实际路径
+--------------------------
+
+| 软件/目录                  | 当前电脑路径                                                     |
+|----------------------------|------------------------------------------------------------------|
+| Qt 6.7.3 MSVC 2022 x64     | D:/QT/6.7.3/msvc2022_64                                          |
+| Qt DLL                     | D:/QT/6.7.3/msvc2022_64/bin                                      |
+| vcpkg 根目录               | C:/vcpkg                                                        |
+| vcpkg CMake 工具链         | C:/vcpkg/scripts/buildsystems/vcpkg.cmake                       |
+| OpenCV CMake 配置目录      | E:/Libs/OPENCV3/opencv/build/x64/vc15/lib                       |
+| OpenCV DLL                 | E:/Libs/OPENCV3/opencv/build/x64/vc15/bin                       |
+| CMake                      | D:/cmake/bin                                                    |
+| Allied Vision Vimba X      | C:/Program Files/Allied Vision/Vimba X                          |
+| Allied Vision DLL          | C:/Program Files/Allied Vision/Vimba X/api/bin                  |
+| VS2022                     | D:/vs2022                                                       |
+| 项目本地 vcpkg 依赖目录    | ${sourceDir}/vcpkg_installed                                    |
+
+
+二、必须修改：CMakePresets.json
+--------------------------------
+
+文件：项目根目录\CMakePresets.json
+
+序号 | 配置项                     | 原来的值                                                           | 修改后的值
+-----|----------------------------|----------------------------------------------------------------------|---------------------------------------------------------------
+1    | CMAKE_PREFIX_PATH          | $env{QTDIR}                                                          | D:/QT/6.7.3/msvc2022_64
+2    | CMAKE_TOOLCHAIN_FILE       | $env{I2R_RLC_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake            | C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+3    | VCPKG_INSTALLED_DIR        | $env{I2R_RLC_VCPKG_INSTALLED_DIR}                                    | ${sourceDir}/vcpkg_installed
+4    | VCPKG_MANIFEST_INSTALL     | OFF                                                                  | ON
+5    | environment.QTDIR          | 原来没有此项                                                         | D:/QT/6.7.3/msvc2022_64
+6    | environment.VCPKG_ROOT     | $env{I2R_RLC_VCPKG_ROOT}                                             | C:/vcpkg
+7    | environment.VIMBA_X_HOME   | 原来没有此项                                                         | C:/Program Files/Allied Vision/Vimba X
+8    | VCPKG_OVERLAY_PORTS        | ${sourceDir}/vcpkg-ports                                              | 删除此项
+9    | X_VCPKG_ASSET_SOURCES      | clear;x-script,powershell.exe -NoProfile -ExecutionPolicy Bypass      | clear;x-script,curl.exe --ssl-no-revoke --retry 8
+     |                            | -File C:/Tools/vcpkg-download-asset.ps1 {url} {dst}                   | --retry-all-errors --retry-delay 5 -L {url} --output {dst}
+10   | environment.PATH           | C:/Windows/System32;$env{I2R_RLC_CMAKE_ROOT}/bin;                    | D:/cmake/bin;D:/QT/6.7.3/msvc2022_64/bin;
+     |                            | $env{I2R_RLC_7ZIP_ROOT};$env{QTDIR}/bin;$penv{PATH}                  | E:/Libs/OPENCV3/opencv/build/x64/vc15/bin;
+     |                            |                                                                      | C:/Program Files/Allied Vision/Vimba X/api/bin;$penv{PATH}
+11   | qt-debug.OpenCV_DIR        | $env{OpenCV_DIR}                                                      | E:/Libs/OPENCV3/opencv/build/x64/vc15/lib
+12   | qt-release.OpenCV_DIR      | $env{OpenCV_DIR}                                                      | E:/Libs/OPENCV3/opencv/build/x64/vc15/lib
+
+修改后的公共配置关键部分应为：
+
+    "cacheVariables": {
+      "CMAKE_PREFIX_PATH": "D:/QT/6.7.3/msvc2022_64",
+      "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "VCPKG_TARGET_TRIPLET": "x64-windows",
+      "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed",
+      "VCPKG_MANIFEST_INSTALL": "ON"
+    }
+
+qt-debug 和 qt-release 中的 OpenCV 配置应为：
+
+    "OpenCV_DIR": "E:/Libs/OPENCV3/opencv/build/x64/vc15/lib"
+
+
+三、必须修改：CMakeUserPresets.json
+------------------------------------
+
+文件：项目根目录\CMakeUserPresets.json
+
+Qt-Debug 和 Qt-Release 两处都要修改，不能只改一处。
+
+序号 | 配置项                    | 原来的值                                                   | 修改后的值
+-----|---------------------------|--------------------------------------------------------------|---------------------------------------------------------------
+1    | CMAKE_PREFIX_PATH         | $env{QTDIR}                                                  | D:/QT/6.7.3/msvc2022_64
+2    | CMAKE_TOOLCHAIN_FILE      | $env{I2R_RLC_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake    | C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+3    | VCPKG_INSTALLED_DIR       | $env{I2R_RLC_VCPKG_INSTALLED_DIR}                            | ${sourceDir}/vcpkg_installed
+4    | VCPKG_MANIFEST_INSTALL    | OFF                                                          | ON
+5    | OpenCV_DIR                | $env{OpenCV_DIR}                                             | E:/Libs/OPENCV3/opencv/build/x64/vc15/lib
+6    | environment.QTDIR         | $penv{QTDIR}                                                 | D:/QT/6.7.3/msvc2022_64
+7    | environment.VCPKG_ROOT    | $env{I2R_RLC_VCPKG_ROOT}                                     | C:/vcpkg
+8    | X_VCPKG_ASSET_SOURCES     | 使用 C:/Tools/vcpkg-download-asset.ps1 的命令                | 使用 curl.exe 的命令，内容同第二节第 9 项
+9    | environment.PATH          | 由 I2R_RLC_CMAKE_ROOT、I2R_RLC_7ZIP_ROOT 等环境变量拼接      | 使用第二节第 10 项中的完整 PATH
+10   | 6.7.3_msvc2022_64.QTDIR   | $penv{QTDIR}                                                 | D:/QT/6.7.3/msvc2022_64
+
+说明：CMakeUserPresets.json 已在 .gitignore 中忽略，它本来就是机器本地配置文件。
+
+
+四、建议修改：scripts\build_vs2022_qt.ps1
+------------------------------------------------
+
+文件：项目根目录\scripts\build_vs2022_qt.ps1
+
+1. Qt 自动探测
+
+原来：
+
+    if (-not [string]::IsNullOrWhiteSpace($env:QT_MSVC2022_64)) {
+        $QtPrefixPath = $env:QT_MSVC2022_64
+    } else {
+        $QtPrefixPath = "C:\Qt\6.7.3\msvc2022_64"
+    }
+
+改为：
+
+    if (-not [string]::IsNullOrWhiteSpace($env:QT_MSVC2022_64)) {
+        $QtPrefixPath = $env:QT_MSVC2022_64
+    } elseif (Test-Path -LiteralPath "D:\QT\6.7.3\msvc2022_64" -PathType Container) {
+        $QtPrefixPath = "D:\QT\6.7.3\msvc2022_64"
+    } else {
+        $QtPrefixPath = "C:\Qt\6.7.3\msvc2022_64"
+    }
+
+2. OpenCV 自动探测
+
+在读取 OPENCV_DIR 和 OpenCV_DIR 环境变量的代码后增加：
+
+    } elseif (Test-Path -LiteralPath "E:\Libs\OPENCV3\opencv\build\x64\vc15\lib\OpenCVConfig.cmake" -PathType Leaf) {
+        $OpenCV_DIR = "E:\Libs\OPENCV3\opencv\build\x64\vc15\lib"
+
+3. vcpkg 自动探测
+
+原来只读取：
+
+    $env:VCPKG_ROOT
+
+改为环境变量为空时继续检查：
+
+    elseif (Test-Path -LiteralPath "C:\vcpkg\scripts\buildsystems\vcpkg.cmake" -PathType Leaf) {
+        $VcpkgRoot = "C:\vcpkg"
+    }
+
+4. 修正旧项目变量名
+
+原来：
+
+    -DNEWSONTECH_ENABLE_OPENCV=ON/OFF
+
+改为：
+
+    -DI2R_RLC_ENABLE_OPENCV=ON/OFF
+
+
+五、README.md 中修正的旧说明
+------------------------------
+
+序号 | 原来的说明/命令                                      | 修改后的说明/命令
+-----|--------------------------------------------------------|--------------------------------------------------
+1    | qt-debug-opencv                                        | qt-debug
+2    | OpenCV_DIR=C:/opencv/build/x64/vc15/lib                | OpenCV_DIR=E:/Libs/OPENCV3/opencv/build/x64/vc15/lib
+3    | OpenCV bin=C:/opencv/build/x64/vc15/bin                | OpenCV bin=E:/Libs/OPENCV3/opencv/build/x64/vc15/bin
+4    | C:/Qt/6.7.3/msvc2022_64                                | D:/QT/6.7.3/msvc2022_64
+5    | cmake --preset qt-debug-opencv                         | cmake --preset qt-debug
+6    | out/build/qt-debug-opencv                              | out/build/qt-debug
+
+
+六、每次从其他电脑迁移到当前电脑后的操作顺序
+------------------------------------------------
+
+1. 将项目复制到当前电脑。
+
+2. 不要复制以下目录；如果已经复制过来，应先关闭 Visual Studio，再删除：
+
+    .vs
+    out
+    build
+    vcpkg_installed
+
+这些目录包含原电脑的绝对路径、CMake 缓存、编译器路径和第三方库安装信息。
+
+3. 按本清单第二节修改 CMakePresets.json。
+
+4. 按本清单第三节修改 CMakeUserPresets.json。
+
+5. 如需使用项目构建脚本，按第四节修改 build_vs2022_qt.ps1。
+
+6. 确认以下文件真实存在：
+
+    D:\QT\6.7.3\msvc2022_64\lib\cmake\Qt6\Qt6Config.cmake
+    C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+    E:\Libs\OPENCV3\opencv\build\x64\vc15\lib\OpenCVConfig.cmake
+    C:\Program Files\Allied Vision\Vimba X\api\bin\VmbCPP.dll
+
+7. 使用 Visual Studio 2022 打开项目根目录。
+
+8. 在配置下拉框中选择：
+
+    qt-debug
+
+9. 等待首次 CMake 配置和 vcpkg 安装完成。首次安装会创建：
+
+    项目根目录\vcpkg_installed\x64-windows
+
+10. 执行“全部生成”。
+
+11. 正常情况下主程序生成在：
+
+    项目根目录\out\build\qt-debug\UI\i2r_rlc.exe
+
+
+七、命令行备用编译方法
+----------------------
+
+在项目根目录打开 PowerShell，执行：
+
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\build_vs2022_qt.ps1 -BuildDir out/build/qt-debug -Configuration Debug
+
+成功时最后应显示：
+
+    [PASS] CMake configure: exit code 0
+    [PASS] CMake build: exit code 0
+    PASS: 20  FAIL: 0
+
+
+八、原始报错的直接原因
+----------------------
+
+迁移后，项目所需的本机环境变量全部为空，导致 CMake 实际得到：
+
+    CMAKE_TOOLCHAIN_FILE=/scripts/buildsystems/vcpkg.cmake
+    OpenCV_DIR=
+    VCPKG_INSTALLED_DIR=
+    VCPKG_MANIFEST_INSTALL=OFF
+
+其中 /scripts/buildsystems/vcpkg.cmake 并不存在，而且又关闭了 vcpkg manifest 自动安装，
+因此 CMake 无法生成完整构建系统，更不可能进入正常编译。
+
+
+九、注意事项
+------------
+
+1. 路径写入 JSON 时统一使用正斜杠“/”，不要使用未转义的单个反斜杠“\”。
+2. OpenCV_DIR 必须指向包含 OpenCVConfig.cmake 的 lib 目录，不能只写 OpenCV 根目录。
+3. QTDIR/CMAKE_PREFIX_PATH 必须指向 msvc2022_64 根目录，不能指向其 bin 目录。
+4. VCPKG_ROOT 必须指向 C:/vcpkg，而不是 C:/vcpkg/scripts。
+5. 当前配置使用 OpenCV 3.4.x，不要直接换成 OpenCV 4.x。
+6. 当前 Debug 构建需要 opencv_world345d.dll；当前电脑上已经存在。
+7. CMake 的 CMP0144/FLANN 提示是开发者警告，不影响本次配置和编译成功。
+

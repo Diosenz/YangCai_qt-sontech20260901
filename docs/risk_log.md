@@ -1,0 +1,32 @@
+# 迁移风险记录
+
+| ID | 风险描述 | 影响 | 建议处理方式 | 是否阻塞下一阶段 |
+| --- | --- | --- | --- | --- |
+| R1 | Confirmed dual-camera architecture: Vimba/AVT is the primary camera for weld tracking and digital-twin line-structured-light images; Basler/Pylon is the external camera for IBVS. HALCON framegrabber is not the preferred acquisition path. | Implementing one ambiguous camera layer would hide different timing, calibration, and feature requirements. | Model separate backends: `VimbaTrackingCameraBackend`, `BaslerIbvsCameraBackend`, and `OfflineImageCameraBackend`. Keep `HalconCameraBackend` only as an optional legacy adapter when a specific old algorithm or data format requires it. Prefer OpenCV for image processing. | No for skeleton; yes for real camera integration. |
+| R2 | `RobotCtrl` inherits `CButton` but actually owns TCP communication and mutates global robot/process state. | Direct reuse would bring MFC/UI coupling and hidden side effects into Qt. | Rewrite as UI-free RobotComm service; extract protocol parser/serializer first. | No for skeleton; yes for robot integration. |
+| R3 | `RStdAfx.h/.cpp` contains many globals for camera, robot, online correction, IBVS, calibration, file paths, and process state. | Hidden coupling, race conditions, difficult testing, hard-to-reproduce bugs. | Replace with explicit models and session-owned state; migrate one group at a time. | No, but blocks reliable feature migration. |
+| R4 | `PicCapture.cpp` has documented include conflict risk around HALCON/newmat/`SwMySensor.h`/`robotleadingDlg.h`. HALCON is no longer a priority acquisition dependency, but old algorithms may still force compatibility work. | Build may break when legacy algorithm code is moved or include order changes. | Keep HALCON/newmat compatibility behind narrow optional adapter boundaries; use OpenCV-first implementations when possible. | No for skeleton; yes for legacy algorithm compatibility. |
+| R5 | Runtime data paths are hard-coded in code, including `data/Robotleadingdata`, `data/IBVS`, `output`, `.onnx`, `.weldment`, and JBI names. | Application behavior depends on working directory; deployment and tests become fragile. | Introduce `ConfigRepository` and `AppPaths`; separate input configuration, models, jobs, logs, and outputs; validate all required files at startup. | No for skeleton; yes for usable workflow. |
+| R6 | Legacy digital twin depends on OpenCascade/PCL/VTK and larger legacy app context such as `g_IC`. In the new project, localization owns PCL-based point-cloud solving while digital twin is a RobotSim facade. | Pulling OCCT/VTK viewer and RobotSim internals into the Qt app would slow delivery and blur ownership. | Keep `DigitalTwinService` as RobotSim IPC/virtual-reference boundary; keep PCL point-cloud registration inside `localization` without exposing PCL types in public interfaces. | No. |
+| R7 | IBVS uses the Basler external camera and is not a full first-release target. Some weld tracking workflows may still need IBVS-shaped data or service boundaries. | Risk of mixing normal weld tracking with visual servo control and unsafe motion logic. | Define `IbvsService`/`IbvsController` interface, state types, and mock/no-op behavior first. Connect the real Basler/Pylon and IBVS solver later. | No for skeleton; yes for real IBVS. |
+| R8 | Thread exit mechanism is unclear in legacy code: raw handles, `while(true)`, global flags, incomplete cleanup. | Qt app could hang on exit or leave devices active if copied. | Use worker objects with idempotent stop, cancellation, bounded thread quit/wait, and no widget access from workers. | No for docs/skeleton; yes for any worker implementation. |
+| R9 | UI handlers currently perform device startup, workflow transitions, file IO, and direct state mutation. | Direct Qt port would block UI and recreate legacy monolith. | Keep `MainWidget` thin; route commands through `UiController` and services. | No. |
+| R10 | The robot controller is Yaskawa DX200, but protocol field semantics are still unclear. Legacy strings and global flags (`P`, `O`, `S`, `C`, `J`, `N`, received `D`) are not enough to authorize live motion. | Incorrect parser, unit mapping, or timing could create unsafe robot behavior. | Design `DX200RobotClient` as parser/transport interface only until recorded protocol samples and user authorization are available. Build parser/serializer tests before any real command send. | No for Qt skeleton; yes before real DX200 access. |
+| R11 | Units are mixed across code: micrometers, millimeters, meters, degrees, scaled encoder values, and pixels. | Subtle control errors and unsafe corrections. | Encode units in model names and conversion functions; represent calibration values with explicit units such as m, deg, and pixel. | No for skeleton; yes for control. |
+| R12 | Many algorithms depend on mutable globals like `cv_image`, `pose_TinB`, `curx`, `VirtualLaserSensor`, and point deques. | Algorithms cannot be tested or run deterministically. | Extract pure functions with explicit inputs; create replay fixtures from legacy images and text files. | No for skeleton; yes for algorithm migration. |
+| R13 | Resource lifecycle is incomplete: raw pointers, `HANDLE`, `FILE*`, SDK handles, and simulation objects are manually managed. | Memory/resource leaks and shutdown failures. | Use RAII wrappers, smart pointers, and worker-owned resources. | No for skeleton; yes for integration. |
+| R14 | `OnInitDialog()` 当前启动副作用很重。 | Qt 构造函数如果照做会变慢、脆弱且难恢复。 | 改为分阶段服务初始化，并提供可见的 ready/error 状态。 | 不阻塞。 |
+| R15 | Legacy UI layout contains hidden controls and experiment/test controls mixed with production workflow. | Recreating the layout exactly may expose confusing or obsolete operations. | Build a task-oriented UI and keep experimental features behind explicit debug settings if needed. | No. |
+| R16 | 机器人 dry-run/mock 模式是强制要求，但仍需持续确保默认启用。新应用必须默认 `RobotComm dry-run`，不能默认发送 live DX200 命令。 | 如果没有安全默认值，早期集成都可能误发真实运动命令。 | 将 dry-run 作为默认配置。启用真实 `DX200RobotClient` 前必须满足显式配置、UI 状态和用户授权。 | 任何可发送命令的机器人 worker 实现前阻塞；文档/骨架不阻塞。 |
+
+## 近期确认项
+
+- 已关闭：相机架构是双相机，Vimba/AVT 用于焊缝跟踪和数字孪生线结构光图像，Basler/Pylon 用于 IBVS，HALCON 仅作为可选 legacy adapter。
+- 已关闭：首版优先焊缝跟踪主流程；数字孪生和 IBVS 只保留 interface/mock/no-op。
+- 已关闭：运行时数据布局可由新项目重新设计，且不能依赖当前工作目录。
+- 已关闭：机器人控制器族为 Yaskawa DX200，新应用必须默认 mock/dry-run。
+- 已关闭：`SENSORPARA.txt` 是需要记录并后续解析的 legacy 标定文件。
+- 仍未关闭：DX200 协议字段语义和记录消息样本。
+- 仍未关闭：是否存在 DX200 simulator、示教器侧测试模式或其他 dry-run 环境。
+- 仍未关闭：`SENSORPARA.txt` 中 `pose_CinT[6]` 的完整字段语义。
+- 仍未关闭：哪些 legacy 算法确实必须依赖 HALCON 而不是 OpenCV。

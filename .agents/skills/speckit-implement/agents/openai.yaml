@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spec Kit Implement"
+  short_description: "按功能任务清单推进实现与验证"
+  default_prompt: "使用 $speckit-implement 执行当前功能 tasks.md 中尚未完成的任务。"
+
+policy:
+  allow_implicit_invocation: false

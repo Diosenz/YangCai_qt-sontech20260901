@@ -1,0 +1,104 @@
+diff --git a/io/src/ascii_io.cpp b/io/src/ascii_io.cpp
+index 1a23d75..f6917ee 100644
+--- a/io/src/ascii_io.cpp
++++ b/io/src/ascii_io.cpp
+@@ -98,7 +98,7 @@ pcl::ASCIIReader::readHeader (const std::string& file_name,
+     PCL_ERROR ("[%s] File %s does not exist.\n", name_.c_str (), file_name.c_str ());
+     return (-1);
+   }
+-  if (boost::filesystem::extension (fpath) != extension_)
++  if (fpath.extension ().string () != extension_)
+   {
+     PCL_ERROR ("[%s] File does not have %s extension. \n", name_.c_str(), extension_.c_str());
+     return -1;
+diff --git a/io/src/image_grabber.cpp b/io/src/image_grabber.cpp
+index 2b3a3e6..90b9fe4 100644
+--- a/io/src/image_grabber.cpp
++++ b/io/src/image_grabber.cpp
+@@ -314,9 +314,9 @@ pcl::ImageGrabberBase::ImageGrabberImpl::loadDepthAndRGBFiles (const std::strin
+   for (boost::filesystem::directory_iterator itr (dir); itr != end_itr; ++itr)
+   {
+ #if BOOST_FILESYSTEM_VERSION == 3
+-    extension = boost::algorithm::to_upper_copy (boost::filesystem::extension (itr->path ()));
++    extension = boost::algorithm::to_upper_copy (itr->path ().extension ().string ());
+     pathname = itr->path ().string ();
+-    basename = boost::filesystem::basename (itr->path ());
++    basename = itr->path ().stem ().string ();
+ #else
+     extension = boost::algorithm::to_upper_copy (boost::filesystem::extension (itr->leaf ()));
+     pathname = itr->path ().filename ();
+@@ -363,9 +363,9 @@ pcl::ImageGrabberBase::ImageGrabberImpl::loadDepthAndRGBFiles (const std::strin
+   for (boost::filesystem::directory_iterator itr (depth_dir); itr != end_itr; ++itr)
+   {
+ #if BOOST_FILESYSTEM_VERSION == 3
+-    extension = boost::algorithm::to_upper_copy (boost::filesystem::extension (itr->path ()));
++    extension = boost::algorithm::to_upper_copy (itr->path ().extension ().string ());
+     pathname = itr->path ().string ();
+-    basename = boost::filesystem::basename (itr->path ());
++    basename = itr->path ().stem ().string ();
+ #else
+     extension = boost::algorithm::to_upper_copy (boost::filesystem::extension (itr->leaf ()));
+     pathname = itr->path ().filename ();
+@@ -384,9 +384,9 @@ pcl::ImageGrabberBase::ImageGrabberImpl::loadDepthAndRGBFiles (const std::strin
+   for (boost::filesystem::directory_iterator itr (rgb_dir); itr != end_itr; ++itr)
+   {
+ #if BOOST_FILESYSTEM_VERSION == 3
+-    extension = boost::algorithm::to_upper_copy (boost::filesystem::extension (itr->path ()));
++    extension = boost::algorithm::to_upper_copy (itr->path ().extension ().string ());
+     pathname = itr->path ().string ();
+-    basename = boost::filesystem::basename (itr->path ());
++    basename = itr->path ().stem ().string ();
+ #else
+     extension = boost::algorithm::to_upper_copy (boost::filesystem::extension (itr->leaf ()));
+     pathname = itr->path ().filename ();
+@@ -431,9 +431,9 @@ pcl::ImageGrabberBase::ImageGrabberImpl::loadPCLZFFiles (const std::string &dir
+   for (boost::filesystem::directory_iterator itr (dir); itr != end_itr; ++itr)
+   {
+ #if BOOST_FILESYSTEM_VERSION == 3
+-    extension = boost::algorithm::to_upper_copy (boost::filesystem::extension (itr->path ()));
++    extension = boost::algorithm::to_upper_copy (itr->path ().extension ().string ());
+     pathname = itr->path ().string ();
+-    basename = boost::filesystem::basename (itr->path ());
++    basename = itr->path ().stem ().string ();
+ #else
+     extension = boost::algorithm::to_upper_copy (boost::filesystem::extension (itr->leaf ()));
+     pathname = itr->path ().filename ();
+@@ -500,8 +500,9 @@ pcl::ImageGrabberBase::ImageGrabberImpl::getTimestampFromFilepath (
+ {
+   // For now, we assume the file is of the form frame_[22-char POSIX timestamp]_*
+   char timestamp_str[256];
+-  int result = std::sscanf (boost::filesystem::basename (filepath).c_str (), 
+-                            "frame_%22s_%*s",
++  const std::string frame_basename = boost::filesystem::path (filepath).stem ().string ();
++  int result = std::sscanf (frame_basename.c_str (),
++                            "frame_%22s_%*s",
+                             timestamp_str);
+   if (result > 0)
+   {
+@@ -1052,7 +1053,7 @@ pcl::ImageGrabberBase::getCurrentDepthFileName () const
+     pathname = impl_->depth_pclzf_files_[impl_->cur_frame_];
+   else
+     pathname = impl_->depth_image_files_[impl_->cur_frame_];
+-  std::string basename = boost::filesystem::basename (pathname);
++  std::string basename = boost::filesystem::path (pathname).stem ().string ();
+   return (basename);
+ }
+ //////////////////////////////////////////////////////////////////////////////////////////
+@@ -1064,7 +1065,7 @@ pcl::ImageGrabberBase::getPrevDepthFileName () const
+     pathname = impl_->depth_pclzf_files_[impl_->cur_frame_-1];
+   else
+     pathname = impl_->depth_image_files_[impl_->cur_frame_-1];
+-  std::string basename = boost::filesystem::basename (pathname);
++  std::string basename = boost::filesystem::path (pathname).stem ().string ();
+   return (basename);
+ }
+     
+@@ -1077,7 +1078,7 @@ pcl::ImageGrabberBase::getDepthFileNameAtIndex (size_t idx) const
+     pathname = impl_->depth_pclzf_files_[idx];
+   else
+     pathname = impl_->depth_image_files_[idx];
+-  std::string basename = boost::filesystem::basename (pathname);
++  std::string basename = boost::filesystem::path (pathname).stem ().string ();
+   return (basename);
+ }
+ 

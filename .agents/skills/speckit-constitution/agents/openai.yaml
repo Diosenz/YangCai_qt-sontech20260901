@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spec Kit Constitution"
+  short_description: "创建或更新项目工程治理章程"
+  default_prompt: "使用 $speckit-constitution 根据本项目现有规则建立工程治理章程。"
+
+policy:
+  allow_implicit_invocation: false

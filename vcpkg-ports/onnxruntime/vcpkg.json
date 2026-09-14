@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "onnxruntime",
+  "version": "1.23.2",
+  "port-version": 1,
+  "description": "Project overlay port that installs Microsoft's official prebuilt ONNX Runtime CPU package for Windows x64.",
+  "homepage": "https://onnxruntime.ai/",
+  "license": "MIT",
+  "supports": "windows & x64"
+}

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spec Kit Checklist"
+  short_description: "生成并维护需求质量检查清单"
+  default_prompt: "使用 $speckit-checklist 为当前功能生成需求质量检查清单。"
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spec Kit Specify"
+  short_description: "将功能需求转化为可验证规格"
+  default_prompt: "使用 $speckit-specify 为以下需求创建功能规格：<需求描述>。"
+
+policy:
+  allow_implicit_invocation: false

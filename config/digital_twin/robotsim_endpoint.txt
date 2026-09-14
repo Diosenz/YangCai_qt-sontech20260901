@@ -1,0 +1,10 @@
+# RobotSim 当前把 ZeroMQ 服务绑定到随机端口，并在控制台打印：
+# COMMServer Port: <port>
+# 启动 RobotSim 后，把打印出的端口填到这里。
+host=127.0.0.1
+port=63028
+connect_timeout_ms=1000
+request_timeout_ms=1000
+# 三维激光线和焊缝点的参考对象 ID；0 表示省略该参数并使用世界坐标。
+# 更换场景时，把它改成目标坐标系对应的正整数对象 ID。
+reference_object_id=1046

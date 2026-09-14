@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spec Kit Clarify"
+  short_description: "澄清当前功能规格中的关键缺口"
+  default_prompt: "使用 $speckit-clarify 澄清当前功能 spec 中最重要的未决问题。"
+
+policy:
+  allow_implicit_invocation: false

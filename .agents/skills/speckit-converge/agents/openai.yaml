@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spec Kit Converge"
+  short_description: "检查实现与功能工件的收敛差距"
+  default_prompt: "使用 $speckit-converge 对照当前功能的 spec、plan 和 tasks 检查遗留工作。"
+
+policy:
+  allow_implicit_invocation: false

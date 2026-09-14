@@ -1,0 +1,111 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "hidden": true,
+      "name": "Qt",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "D:/QT/6.7.3/msvc2022_64",
+        "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed",
+        "VCPKG_MANIFEST_INSTALL": "ON",
+        "VCPKG_INSTALL_OPTIONS": "--clean-buildtrees-after-build;--clean-packages-after-build",
+        "I2R_RLC_ENABLE_TESTS": "OFF"
+      },
+      "environment": {
+        "QTDIR": "D:/QT/6.7.3/msvc2022_64",
+        "VCPKG_ROOT": "C:/vcpkg",
+        "VCPKG_FORCE_SYSTEM_BINARIES": null,
+        "VIMBA_X_HOME": "C:/Program Files/Allied Vision/Vimba X",
+        "X_VCPKG_ASSET_SOURCES": "clear;x-script,curl.exe --ssl-no-revoke --retry 8 --retry-all-errors --retry-delay 5 -L {url} --output {dst}",
+        "PATH": "D:/cmake/bin;D:/QT/6.7.3/msvc2022_64/bin;E:/Libs/OPENCV3/opencv/build/x64/vc15/bin;C:/Program Files/Allied Vision/Vimba X/api/bin;$penv{PATH}"
+      },
+      "vendor": {
+        "qt-project.org/Qt": {
+          "checksum": "wVa86FgEkvdCTVp1/nxvrkaemJc="
+        }
+      }
+    },
+    {
+      "name": "qt-debug",
+      "displayName": "Qt Debug (OpenCV + Allied)",
+      "description": "Configure Debug using local environment paths; Basler remains opt-in because pylon is not portable with the project.",
+      "inherits": "Qt",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/qt-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "OpenCV_DIR": "E:/Libs/OPENCV3/opencv/build/x64/vc15/lib",
+        "I2R_RLC_ENABLE_OPENCV": "ON",
+        "I2R_RLC_ENABLE_CAMERA_ALLIED": "ON",
+        "I2R_RLC_ENABLE_CAMERA_BASLER": "OFF",
+        "I2R_RLC_ENABLE_VENDOR_CAMERAS": "OFF",
+        "I2R_RLC_ENABLE_ONNX_RUNTIME": "OFF",
+        "I2R_RLC_ENABLE_TESTS": "ON"
+      }
+    },
+    {
+      "name": "qt-release",
+      "displayName": "Qt Release (OpenCV + Allied)",
+      "description": "Configure Release using local environment paths; Basler remains opt-in because pylon is not portable with the project.",
+      "inherits": "Qt",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/qt-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "OpenCV_DIR": "E:/Libs/OPENCV3/opencv/build/x64/vc15/lib",
+        "I2R_RLC_ENABLE_OPENCV": "ON",
+        "I2R_RLC_ENABLE_CAMERA_ALLIED": "ON",
+        "I2R_RLC_ENABLE_CAMERA_BASLER": "OFF",
+        "I2R_RLC_ENABLE_VENDOR_CAMERAS": "OFF",
+        "I2R_RLC_ENABLE_ONNX_RUNTIME": "OFF"
+      }
+    },
+    {
+      "name": "qt-debug-no-opencv",
+      "displayName": "Qt Debug without optional vision SDKs",
+      "description": "Portable Debug configuration that needs only QTDIR, VCPKG_ROOT, MSVC, and Ninja.",
+      "inherits": "Qt",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/qt-debug-no-opencv",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "I2R_RLC_ENABLE_OPENCV": "OFF",
+        "I2R_RLC_ENABLE_CAMERA_ALLIED": "OFF",
+        "I2R_RLC_ENABLE_CAMERA_BASLER": "OFF",
+        "I2R_RLC_ENABLE_VENDOR_CAMERAS": "OFF",
+        "I2R_RLC_ENABLE_ONNX_RUNTIME": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "qt-debug",
+      "displayName": "Build Qt Debug",
+      "configurePreset": "qt-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "qt-release",
+      "displayName": "Build Qt Release",
+      "configurePreset": "qt-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "qt-debug-no-opencv",
+      "displayName": "Build Qt Debug without OpenCV",
+      "configurePreset": "qt-debug-no-opencv",
+      "configuration": "Debug"
+    }
+  ],
+  "vendor": {
+    "qt-project.org/Presets": {
+      "checksum": "67SmY24ZeVbebyKD0fGfIzb/bGI="
+    }
+  }
+}

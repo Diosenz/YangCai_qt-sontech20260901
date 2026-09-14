@@ -1,0 +1,19 @@
+﻿# 旧式“当前工件”下拉框配置。
+#
+# 格式：
+# id|界面显示名|weldment模型路径|全局定位JBI|在线纠偏JBI(InitType)|在线纠偏JBI(GlobalCorrection)|在线纠偏JBI(IBVSStart)|离线纠偏扫描JBI|在线纠偏示教轨迹基名|离线纠偏示教轨迹基名
+#
+# 修改说明：
+# 1. 新增工件：复制一行并修改 10 个字段；id 必须唯一，建议只使用英文、数字、下划线或短横线。
+# 2. 在线纠偏和离线纠偏的配置文件不是同一套时，分别修改最后两列。
+#    两列都只写基名，不要写 _W.txt 或 _T.txt。
+#    程序会自动读取 data/WorkPiece/<在线纠偏示教轨迹基名>_W.txt / _T.txt，
+#    以及 data/WorkPiece/<离线纠偏示教轨迹基名>_W.txt / _T.txt。
+# 3. 三个在线纠偏 JBI 分别对应 UI 的起始点定位方式下拉框：
+#    InitType（反向扫描）、GlobalCorrection（全局定位修正后反向扫描）、IBVSStart（IBVS 起始点）。
+#    如果三种方式暂时共用同一控制柜程序，可以填同一个 JBI 名；若控制柜程序不同，只改对应列。
+# 4. JBI 名会通过旧 J 协议发送给机器人控制柜，不能包含空格或逗号。
+# 5. 旧工程中暂未启用的“中集波纹板工件”“端板工件”没有写入默认列表；
+#    若需要启用，请按本文件格式新增条目。
+
+chufengkou_zheng20|出风口小（正20mm）|models/weldment/fengjikechukou20_zheng.weldment|20240516CHUFENGKOUXIAOLOC|20260914CFKONTEST|20260914CFKONTEST|20260405CHUFENGKOULIUCHENGTEST|20260906CHUKENGKOUTEST00|20260404CHUFENGKOU1|20260404CHUFENGKOU1

@@ -1,0 +1,100 @@
+./vcpkg.json
+    $schema 字段和 features 字段是干啥的，希望教学使用方法。
+    
+./CMakePresets.json
+./CMakeUserPreset.json
+    希望只留下 debug 和 release 两个配置，同时希望 opencv 能够通过 vcpkg 管理。
+    除非项目不使用 opencv 或 onnx 也能编译运行，此时允许保留 without opencv 或 without onnx 的配置。
+    另外注意到 onnx 在 vcpkg 上也有，希望尽量使用 vcpkg 管理。
+    
+./CMakeLists.txt
+    这个文件作为整个大项目的 CMake 配置文件，不应该在此处进行 find package，同时也不希望在此处 add_executable，main.cpp 需要放入 ui 子项目。
+    大项目不应该有构建目标，而应该是由且仅由多个子项目组成，每个子项目都有一个构建目标。
+    CMakeLists 编写实例可以参考《环境配置 India》的测试三。
+    
+./out/
+    这个文件夹不用上传，写进 .gitignore 谢谢。
+    
+./resource/
+    如果这个文件夹是构建 qt 目标的资源文件夹，那么应该放入 ui 子项目的文件夹中，不应该暴露给其他子项目。
+    
+./src/
+    把 main.cpp 放进 ui 模块，然后删除 src 文件夹，将每个子项目直接放在 ./。
+    
+./src/camera/CMakeLists.txt
+    注意到你的 target_include_directories 是 PUBLIC 的，所以才需要在 include 文件夹里再建与当前项目的同名文件夹，但是这个 include 套文件夹的设计很不好，有两个解决方案：一是保持 PUBLIC 但是当前子项目所有文件增加一个前缀，这个前缀可能是子项目名全称或缩写，从而避免与其他项目的文件重名；二是改为 PRIVATE，当前项目仍然能直接 include，但是跨项目的 include 就需要写相对路径 ../../camera/include/CameraFrame.h 了。
+    或者你可以看下网上有没有更好的案例。
+    然后，这个子项目应该没有窗口这种用户界面吧，如果没有，不允许使用 qt。我们尽量把 qt 只限制在 ui 子模块。
+    
+./src/camera/
+    希望子项目名可以使用大驼峰，Camera、DigitalTwin、IBVS、UI 等等。
+    
+./src/camera/include/camera/
+    删除 camera 文件夹，.h 直接放 include 文件夹。
+    
+./src/camera/include/camera/ICameraDevice.h
+    接口类的名称我们都不要加 I 前缀好不好，感觉丑爆了。建议改为 CameraDeviceIntf，其中 Intf 是 interface 的缩写。
+    ICameraDevice 作为基类，如果不允许创建 ICameraDevice，那么应该构造和析构都是 protected 的，然后补充 explicit ICameraDevice() = defualt 即可。
+    虚析构好评，default 好评，尽量使用 default 而不是一个空的构造/析构函数。
+    如果 ICameraDevice 及其所有派生类不允许移动或复制，那么应该显式地写出 public 的：
+        ICameraDevice(const ICameraDevice&) = delete;
+        ICameraDevice(ICameraDevice&&) = delete;
+        ICameraDevice& operator=(const ICameraDevice&) = delete;
+        ICameraDevice& operator=(ICameraDevice&&) = delete;
+    通常来讲相机应该不允许复制吧，如果你希望他支持移动，那么改成：
+        ICameraDevice(ICameraDevice&&) = default;
+        ICameraDevice& operator=(ICameraDevice&&) = default;
+    这一串东西在基类写就行了，派生类不用写。
+    
+./src/camera/include/camera/CameraFrame.h
+    QDateTime 试下 std::chrono，QImage 试下 cv::Mat，QString 用 std::string。为了实验室长长长久发展，尽量不要用 qt 的东西。
+    使用 enum class 而非 enum 好评，枚举名建议使用全大写 + 下划线分隔。
+    qint64 这种不要用，尽量使用标准库，int64_t uint64_t 好像叫这个。
+    
+./src/camera/include/camera/CameraService.h
+    ifndef define endif 三板斧保护好评，遵循 “I2R_RLC_模块名_文件名” 的格式好评。推荐在 #ifndef 之前再加上 #pragma once，当然不加也行，这个是 MSVC 支持的 “只包含一次”。
+    头文件顺序按照：标准库、第三方库、自己的 .h 分为三大类，每一类再按字母序排序。尽量使用 C++ 标准库而非 C 标准库，除了一些跟硬件交互的地方需要使用 C 标准库。
+    namespace i2r_rlc::camera 包装好评，顺带一提这个写法是 C++17 的。
+    class CameraService 加了 final 好评。
+    loadOfflineImageDirectory 失败时返回 void 并修改传入的 errorMessage 指针的内容，这个设计推荐使用 C++23 的 std::expected，改为 std::expected<void, std::string> loadOfflineImageDirectory(const std::string& directoryPath)，调用案例：
+        if (const auto& result = loadOfflineImageDirectory(path))
+        {
+            // 成功
+        }
+        else
+        {
+            // 失败时打印错误信息
+            std::cout << result.error() << std::endl;
+        }
+    这一套在 CommCamera 项目中被广泛应用且经过了初步验证，可以学习一下。
+    注意到在这个 .h 文件中，对 ICameraDevice 的使用仅限于：
+        void setDevice(ICameraDevice* device);
+        ICameraDevice* m_device = nullptr;
+    都是指针或引用形式，那么此时并不需要 #include "camera/ICameraDevice.h"，而是在 namespace i2r_rlc::camera 中前向声明 class ICameraDevice 即可，从而减少依赖。
+    
+./src/camera/include/camera/CameraService.cpp
+    .cpp 内部可以直接 using namespace i2r_rlc; using namespace i2r_rlc::camera; 
+    
+./src/camera/include/camera/OfflineImageCameraDevice.h
+    QFileInfoList 和 QStringList 不要使用，这个子项目不应该依赖 qt。
+    OfflineImageFrameResult 可以删除了，使用 std::expected<CameraFrame, std::string> 完美代替。
+    OfflineImageCameraDevice 的命名应该改为 CameraDeviceOfflineImage，这样在文件名排序上能跟 CameraDeviceIntf 排在一块儿。同时 CameraDeviceIntf 的其他派生类也以 CameraDevice 作为前缀。
+    OfflineImageCameraDevice 析构函数也需要显式地写出 = defualt。
+    然后关于在一个类的内部，是先写成员函数还是先写成员变量，这在 C++ 社区内部是没有共识的，其中先写成员函数是多数派，但是我个人是支持先写成员变量的，其结构如下：
+    class 一个类
+    {
+        // 可选 qt 宏
+        // 友元声明
+        // 前向声明
+        struct 一个结构体
+        {
+            可能类需要用结构体，同时不希望这个结构体暴露，所以写在类内部
+        }
+        成员变量：public protected private 顺序
+        构造函数与析构函数
+        其他成员函数：public protected private 顺序
+    }
+    void start() override; override 好评，任何需要覆写基类虚函数的函数都应该加上 override。
+    
+./src/camera/include/camera/OfflineImageCameraDevice.cpp
+    挺好的，主要是希望能够用上 std::expected。

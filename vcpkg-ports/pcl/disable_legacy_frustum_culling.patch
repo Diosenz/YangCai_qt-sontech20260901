@@ -1,0 +1,27 @@
+diff --git a/filters/CMakeLists.txt b/filters/CMakeLists.txt
+index 6a9a099..a23bdf5 100644
+--- a/filters/CMakeLists.txt
++++ b/filters/CMakeLists.txt
+@@ -31,6 +31,5 @@ if(build)
+         src/voxel_grid_covariance.cpp
+ 	    src/voxel_grid_label.cpp
+-        src/frustum_culling.cpp
+         src/covariance_sampling.cpp
+         src/median_filter.cpp
+         src/uniform_sampling.cpp
+@@ -72,7 +71,6 @@ if(build)
+         "include/pcl/${SUBSYS_NAME}/convolution_3d.h"
+         "include/pcl/${SUBSYS_NAME}/voxel_grid_label.h"
+         "include/pcl/${SUBSYS_NAME}/voxel_grid_occlusion_estimation.h"
+-        "include/pcl/${SUBSYS_NAME}/frustum_culling.h"
+         "include/pcl/${SUBSYS_NAME}/covariance_sampling.h"
+         "include/pcl/${SUBSYS_NAME}/median_filter.h"
+         "include/pcl/${SUBSYS_NAME}/uniform_sampling.h"
+@@ -109,7 +107,6 @@ if(build)
+        "include/pcl/${SUBSYS_NAME}/impl/convolution.hpp"
+        "include/pcl/${SUBSYS_NAME}/impl/convolution_3d.hpp"
+        "include/pcl/${SUBSYS_NAME}/impl/voxel_grid_occlusion_estimation.hpp"
+-        "include/pcl/${SUBSYS_NAME}/impl/frustum_culling.hpp"
+         "include/pcl/${SUBSYS_NAME}/impl/covariance_sampling.hpp"
+         "include/pcl/${SUBSYS_NAME}/impl/median_filter.hpp"
+         "include/pcl/${SUBSYS_NAME}/impl/uniform_sampling.hpp"

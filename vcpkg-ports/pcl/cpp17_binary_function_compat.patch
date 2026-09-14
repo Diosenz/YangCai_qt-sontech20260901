@@ -1,0 +1,49 @@
+diff --git a/registration/include/pcl/registration/correspondence_sorting.h b/registration/include/pcl/registration/correspondence_sorting.h
+index 675bb92..f8302af 100644
+--- a/registration/include/pcl/registration/correspondence_sorting.h
++++ b/registration/include/pcl/registration/correspondence_sorting.h
+@@ -54,7 +54,7 @@ namespace pcl
+       * \author Dirk Holz
+       * \ingroup registration
+       */
+-    struct sortCorrespondencesByQueryIndex : public std::binary_function<pcl::Correspondence, pcl::Correspondence, bool>
++    struct sortCorrespondencesByQueryIndex
+     {
+       bool
+       operator()( pcl::Correspondence a, pcl::Correspondence b)
+@@ -67,7 +67,7 @@ namespace pcl
+       * \author Dirk Holz
+       * \ingroup registration
+       */
+-    struct sortCorrespondencesByMatchIndex : public std::binary_function<pcl::Correspondence, pcl::Correspondence, bool>
++    struct sortCorrespondencesByMatchIndex
+     {
+       bool 
+       operator()( pcl::Correspondence a, pcl::Correspondence b)
+@@ -80,7 +80,7 @@ namespace pcl
+       * \author Dirk Holz
+       * \ingroup registration
+       */
+-    struct sortCorrespondencesByDistance : public std::binary_function<pcl::Correspondence, pcl::Correspondence, bool>
++    struct sortCorrespondencesByDistance
+     {
+       bool 
+       operator()( pcl::Correspondence a, pcl::Correspondence b)
+@@ -93,7 +93,7 @@ namespace pcl
+       * \author Dirk Holz
+       * \ingroup registration
+       */
+-    struct sortCorrespondencesByQueryIndexAndDistance : public std::binary_function<pcl::Correspondence, pcl::Correspondence, bool>
++    struct sortCorrespondencesByQueryIndexAndDistance
+     {
+       inline bool 
+       operator()( pcl::Correspondence a, pcl::Correspondence b)
+@@ -110,7 +110,7 @@ namespace pcl
+       * \author Dirk Holz
+       * \ingroup registration
+       */
+-    struct sortCorrespondencesByMatchIndexAndDistance : public std::binary_function<pcl::Correspondence, pcl::Correspondence, bool>
++    struct sortCorrespondencesByMatchIndexAndDistance
+     {
+       inline bool 
+       operator()( pcl::Correspondence a, pcl::Correspondence b)

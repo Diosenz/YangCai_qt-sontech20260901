@@ -1,0 +1,41 @@
+diff --git a/common/include/pcl/PCLPointCloud2.h b/common/include/pcl/PCLPointCloud2.h
+index 0a96f7c..ec46e96 100644
+--- a/common/include/pcl/PCLPointCloud2.h
++++ b/common/include/pcl/PCLPointCloud2.h
+@@ -8,7 +8,14 @@
+ #include <string>
+ #include <vector>
+ #include <ostream>
+-#include <boost/detail/endian.hpp>
++#include <boost/predef/other/endian.h>
++
++#if defined(BOOST_ENDIAN_BIG_BYTE_AVAILABLE)
++#  define BOOST_BIG_ENDIAN
++#endif
++#if defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
++#  define BOOST_LITTLE_ENDIAN
++#endif
+ 
+ // Include the correct Header path here
+ #include <pcl/PCLHeader.h>
+diff --git a/io/include/pcl/io/ply/byte_order.h b/io/include/pcl/io/ply/byte_order.h
+index b3a331b..1ab7f2e 100644
+--- a/io/include/pcl/io/ply/byte_order.h
++++ b/io/include/pcl/io/ply/byte_order.h
+@@ -40,7 +40,15 @@
+ #ifndef PCL_IO_PLY_BYTE_ORDER_H
+ #define PCL_IO_PLY_BYTE_ORDER_H
+ 
+-#include <boost/detail/endian.hpp>
++#include <algorithm>
++#include <boost/predef/other/endian.h>
++
++#if defined(BOOST_ENDIAN_BIG_BYTE_AVAILABLE)
++#  define BOOST_BIG_ENDIAN
++#endif
++#if defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
++#  define BOOST_LITTLE_ENDIAN
++#endif
+ 
+ namespace pcl
+ {

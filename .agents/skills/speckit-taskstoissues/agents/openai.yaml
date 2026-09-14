@@ -1,0 +1,7 @@
+interface:
+  display_name: "Spec Kit Tasks to Issues"
+  short_description: "将功能任务转换为 GitHub Issues"
+  default_prompt: "使用 $speckit-taskstoissues 将当前功能的 tasks.md 转换为 GitHub Issues。"
+
+policy:
+  allow_implicit_invocation: false

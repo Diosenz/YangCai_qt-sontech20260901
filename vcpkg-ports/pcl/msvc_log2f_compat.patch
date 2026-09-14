@@ -1,0 +1,13 @@
+diff --git a/common/include/pcl/pcl_macros.h b/common/include/pcl/pcl_macros.h
+index 12af442..6a57950 100644
+--- a/common/include/pcl/pcl_macros.h
++++ b/common/include/pcl/pcl_macros.h
+@@ -171,7 +171,7 @@ pcl_round (float number)
+ #endif
+ 
+ 
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(_MSC_VER)
+ __inline float
+ log2f (float x)
+ {

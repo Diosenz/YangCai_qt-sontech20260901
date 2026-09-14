@@ -1,0 +1,28 @@
+.vs/
+out/
+build/
+vcpkg_installed/
+
+CMakeUserPresets.json
+*.user
+
+logs/
+output/
+data/
+Data/*
+!Data/
+!Data/.gitkeep
+!Data/CALID/
+Data/CALID/*
+!Data/CALID/4 TWO_STEP/
+Data/CALID/4 TWO_STEP/*
+!Data/CALID/4 TWO_STEP/.gitkeep
+*.log
+
+*.pdb
+*.ilk
+
+oldproject/
+RobotSim/
+ppt/
+Testing/
