@@ -67,6 +67,12 @@ constexpr int kRobotSimManualPollIntervalMs = 100;
 constexpr int kOfflinePreflightTimeoutMs = 3000;
 constexpr int kOfflineB040GraceMs = 2000;
 constexpr int kOfflineRobotAckTimeoutMs = 10000;
+constexpr int kOnlineInitialDetectionTimeoutMs = 120000;
+constexpr int kOnlineTeachPointTimeoutMs = 15000;
+constexpr int kOnlineInitialApproachTimeoutMs = 90000;
+constexpr int kOnlineStartTimeoutMs = 10000;
+constexpr int kOnlineFinishHandshakeTimeoutMs = 10000;
+constexpr int kOnlineProgramStopTimeoutMs = 120000;
 
 Eigen::Matrix4d robotSimPoseToMatrix(
     const digital_twin::DigitalTwinPose6D &pose)
@@ -706,6 +712,12 @@ bool CRobotCommWorkerAdapter::ensureOfflineLaserEnabled()
 
 bool CRobotCommWorkerAdapter::ensureOnlineCorrectionReady()
 {
+    if (m_state.offline == 4 || m_offlineSignal == 4) {
+        emit statusChanged(QStringLiteral(
+            "RobotComm 在线预检失败：机器人端仍有未完成的 O 示教点批次（offline=4）"));
+        return false;
+    }
+
     m_trackerEnabled = 1;
     m_laserEnabled = 1;
     m_firstDetectionSucceeded = 0;
@@ -779,14 +791,35 @@ void CRobotCommWorkerAdapter::updateDetectionStatus(
 void CRobotCommWorkerAdapter::sendCorrectionCommand(
     const robot_comm::RobotCorrectionCommand &command)
 {
+    const bool payloadIsComplete =
+        command.pointCount > 0
+        && command.pointCount
+            == static_cast<int>(command.teachPoints.size())
+        && command.pointCount
+            == static_cast<int>(command.stationAxes.size())
+        && std::all_of(
+            command.teachPoints.cbegin(),
+            command.teachPoints.cend(),
+            [](const robot_comm::TeachPointUpdateCommand &point) {
+                return point.valid;
+            })
+        && std::all_of(
+            command.stationAxes.cbegin(),
+            command.stationAxes.cend(),
+            [](const robot_comm::StationAxisUpdateCommand &axis) {
+                return axis.valid;
+            });
     if (!command.valid || !command.requestTeachPointUpdate
+        || !payloadIsComplete
         || !m_transport->isConnected()) {
         emit statusChanged(QStringLiteral("RobotComm 示教点命令无效或未连接"));
         robot_comm::RobotCommandReceipt receipt;
         receipt.type = robot_comm::RobotCommandType::TeachPointUpdate;
         receipt.pointIndex = 0;
-        receipt.error = robot_comm::RobotCommandError::NotConnected;
-        receipt.message = "RobotComm teach point command invalid or disconnected";
+        receipt.error = m_transport->isConnected()
+            ? robot_comm::RobotCommandError::InvalidResponse
+            : robot_comm::RobotCommandError::NotConnected;
+        receipt.message = "RobotComm teach point batch invalid or disconnected";
         emit commandReceiptReady(receipt, m_state);
         return;
     }
@@ -795,20 +828,32 @@ void CRobotCommWorkerAdapter::sendCorrectionCommand(
     context.offlineSignal = command.offlineSignal;
     m_offlineSignal = command.offlineSignal;
     for (int index = 0; index < command.pointCount; ++index) {
-        if (index >= static_cast<int>(command.teachPoints.size())) {
-            break;
-        }
-        robot_comm::StationAxisUpdateCommand stationAxis;
-        if (index < static_cast<int>(command.stationAxes.size())) {
-            stationAxis = command.stationAxes[index];
-        }
         const std::string request = robot_comm::CRobotProtocolCodec::encodeTeachPointUpdate(
-            context, command.pointCount, command.teachPoints[index], stationAxis);
-        const auto receipt = m_transport->transact(
+            context,
+            command.pointCount,
+            command.teachPoints[index],
+            command.stationAxes[index]);
+        auto receipt = m_transport->transact(
             robot_comm::RobotCommandType::TeachPointUpdate,
             request,
             index,
             &m_state);
+        const bool transactionSucceeded = receipt.sent
+            && receipt.responseReceived
+            && receipt.error == robot_comm::RobotCommandError::None;
+        const bool finalPoint = index + 1 == command.pointCount;
+        const int expectedOffline = finalPoint ? 5 : 4;
+        if (transactionSucceeded && m_state.offline != expectedOffline) {
+            receipt.completed = false;
+            receipt.error = robot_comm::RobotCommandError::InvalidResponse;
+            receipt.message = QStringLiteral(
+                "O 示教点批次失步：第 %1/%2 点期望 D.offline=%3，实际为 %4；已停止发送后续点。")
+                                  .arg(index + 1)
+                                  .arg(command.pointCount)
+                                  .arg(expectedOffline)
+                                  .arg(m_state.offline)
+                                  .toStdString();
+        }
         emit commandReceiptReady(receipt, m_state);
         recordDiagnostics(receipt);
         if (receipt.sent
@@ -1156,6 +1201,7 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
     triggerInput.testStart = m_options.testStart;
     triggerInput.robotState = m_robotState;
     triggerInput.virtualStatus = m_options.virtualStatus;
+    triggerInput.requireDetectionWindow = m_options.requireDetectionWindow;
     const control::TrackingTriggerDecision decision =
         control::CTrackingTriggerPolicy::evaluate(triggerInput);
     if (!decision.shouldStartTracking) {
@@ -2395,6 +2441,8 @@ COnlineCorrectionWorkerAdapter::COnlineCorrectionWorkerAdapter(QObject *parent)
 void COnlineCorrectionWorkerAdapter::configure(
     const RuntimeOnlineCorrectionConfiguration &configuration)
 {
+    ++m_phaseTimeoutGeneration;
+    m_timeoutPhase = control::OnlineCorrectionPhase::Idle;
     m_configuration = configuration;
     const auto trajectory =
         control::COnlineCorrectionTrajectoryPlanner::loadTrajectory(
@@ -2402,6 +2450,7 @@ void COnlineCorrectionWorkerAdapter::configure(
     const auto calibration =
         vision::CPositionerCalibrationParser::parseFile(
             configuration.rbcalibFile);
+    m_positionerCalibration = calibration;
     m_controller.configure(configuration.options, trajectory, calibration);
     emit statusChanged(QString::fromStdString(m_controller.state().message));
 }
@@ -2409,21 +2458,70 @@ void COnlineCorrectionWorkerAdapter::configure(
 bool COnlineCorrectionWorkerAdapter::configureForStart(
     const RuntimeOnlineCorrectionConfiguration &configuration)
 {
+    if (m_runRecorder.isActive()) {
+        m_runRecorder.finishSession(
+            QStringLiteral("restarted"),
+            QStringLiteral("新的在线纠偏启动请求已替代上一轮会话。"));
+    }
+
     configure(configuration);
     const control::OnlineCorrectionSessionState &state = m_controller.state();
-    return state.phase == control::OnlineCorrectionPhase::Idle
+    const bool configured = state.phase == control::OnlineCorrectionPhase::Idle
         && state.onlineTeachTrajectoryInitialized
         && state.positionerCalibrationInitialized;
+
+    const QString recordingRoot =
+        QString::fromStdString(m_configuration.diagnosticOutputDirectory);
+    if (recordingRoot.trimmed().isEmpty()) {
+        return configured;
+    }
+
+    QString recordingError;
+    if (!m_runRecorder.beginSession(
+            recordingRoot,
+            m_configuration,
+            &recordingError)) {
+        emit statusChanged(QStringLiteral("在线纠偏记录初始化失败：%1")
+                               .arg(recordingError));
+        return false;
+    }
+    emit statusChanged(QStringLiteral("在线纠偏运行记录：%1")
+                           .arg(m_runRecorder.sessionDirectory()));
+
+    if (!configured) {
+        m_runRecorder.finishSession(
+            QStringLiteral("error"),
+            QString::fromStdString(state.message));
+    }
+    return configured;
 }
 
 void COnlineCorrectionWorkerAdapter::startInitialDetection()
 {
+    const QString recordingRoot =
+        QString::fromStdString(m_configuration.diagnosticOutputDirectory);
+    if (!m_runRecorder.isActive() && !recordingRoot.trimmed().isEmpty()) {
+        QString recordingError;
+        if (!m_runRecorder.beginSession(
+                recordingRoot,
+                m_configuration,
+                &recordingError)) {
+            failSynchronization(QStringLiteral("在线纠偏记录初始化失败：%1")
+                                    .arg(recordingError));
+            return;
+        }
+        emit statusChanged(QStringLiteral("在线纠偏运行记录：%1")
+                               .arg(m_runRecorder.sessionDirectory()));
+    }
     publishUpdate(m_controller.startInitialDetection());
 }
 
 void COnlineCorrectionWorkerAdapter::updateRobotState(const robot_comm::RobotState &state)
 {
     m_robotState = state;
+    if (!m_runRecorder.recordRobotState(state, m_controller.state().phase)) {
+        reportRecordingFailure(QStringLiteral("机器人实际路径"));
+    }
     publishUpdate(m_controller.onRobotStateChanged(state));
 }
 
@@ -2435,12 +2533,19 @@ void COnlineCorrectionWorkerAdapter::handleRobotCommandReceipt(
         && receipt.type != robot_comm::RobotCommandType::RealtimeCorrection) {
         return;
     }
+    if (!m_runRecorder.recordCommandReceipt(
+            receipt, state, m_controller.state().phase)) {
+        reportRecordingFailure(QStringLiteral("机器人命令回执"));
+    }
     publishUpdate(m_controller.onRobotCommandReceipt(receipt, state));
 }
 
 void COnlineCorrectionWorkerAdapter::appendTrackingResult(
     const RuntimeTrackingResult &result)
 {
+    if (!m_runRecorder.recordTrackingResult(result, m_controller.state().phase)) {
+        reportRecordingFailure(QStringLiteral("视觉与实时修正输入"));
+    }
     if (!result.valid || !result.sample.point.valid) {
         emit statusChanged(QStringLiteral("tracking result ignored: %1").arg(result.message));
         return;
@@ -2468,28 +2573,29 @@ void COnlineCorrectionWorkerAdapter::finishOnlineSegment()
 
 void COnlineCorrectionWorkerAdapter::failSynchronization(const QString &message)
 {
-    // controller 没有独立的外部同步错误事件。先执行其既有 reset，确保样本、
-    // path follower 和待发命令全部清空；随后只修改要发布的值快照为 Error。
-    // controller 内部保持可再次启动的 Idle，Error 快照本身不携带任何 O/P。
-    control::OnlineCorrectionUpdate update = m_controller.reset();
-    update.succeeded = false;
-    update.phase = control::OnlineCorrectionPhase::Error;
-    update.state.phase = control::OnlineCorrectionPhase::Error;
-    update.state.trackerActive = false;
-    update.state.message = message.toStdString();
-    update.stopTracking = true;
-    update.message = update.state.message;
-    publishUpdate(update);
+    publishUpdate(m_controller.fail(message.toStdString()));
 }
 
 void COnlineCorrectionWorkerAdapter::reset()
 {
+    if (!m_runRecorder.finishSession(
+            QStringLiteral("reset"),
+            QStringLiteral("在线纠偏在终态前被复位。"))) {
+        reportRecordingFailure(QStringLiteral("会话复位状态"));
+    }
     publishUpdate(m_controller.reset());
 }
 
 void COnlineCorrectionWorkerAdapter::publishUpdate(
     const control::OnlineCorrectionUpdate &update)
 {
+    if (update.phase != m_timeoutPhase) {
+        m_timeoutPhase = update.phase;
+        armPhaseTimeout(update.phase);
+    }
+    if (!m_runRecorder.recordUpdate(update, m_positionerCalibration)) {
+        reportRecordingFailure(QStringLiteral("在线纠偏计算结果"));
+    }
     emit onlineCorrectionUpdated(update);
     if (update.command.valid) {
         emit robotCommandReady(update.command);
@@ -2511,6 +2617,87 @@ void COnlineCorrectionWorkerAdapter::publishUpdate(
         configure(next);
         publishUpdate(m_controller.startInitialDetection());
     }
+
+    if (update.phase == control::OnlineCorrectionPhase::Completed
+        || update.phase == control::OnlineCorrectionPhase::Error) {
+        const QString resultText =
+            update.phase == control::OnlineCorrectionPhase::Completed
+                ? QStringLiteral("completed")
+                : QStringLiteral("error");
+        if (!m_runRecorder.finishSession(
+                resultText,
+                QString::fromStdString(update.message))) {
+            reportRecordingFailure(QStringLiteral("会话最终状态"));
+        }
+    }
+}
+
+void COnlineCorrectionWorkerAdapter::armPhaseTimeout(
+    const control::OnlineCorrectionPhase phase)
+{
+    ++m_phaseTimeoutGeneration;
+    int timeoutMs = 0;
+    QString waitDescription;
+    switch (phase) {
+    case control::OnlineCorrectionPhase::InitialDetectionRunning:
+    case control::OnlineCorrectionPhase::WaitingForReverseCompletion:
+        timeoutMs = kOnlineInitialDetectionTimeoutMs;
+        waitDescription = QStringLiteral("反向检测完成信号");
+        break;
+    case control::OnlineCorrectionPhase::SendingInitialTeachPoints:
+    case control::OnlineCorrectionPhase::WaitingInitialTeachPointAck:
+        timeoutMs = kOnlineTeachPointTimeoutMs;
+        waitDescription = QStringLiteral("O(P001)写入确认");
+        break;
+    case control::OnlineCorrectionPhase::WaitingForInitialApproach:
+        timeoutMs = kOnlineInitialApproachTimeoutMs;
+        waitDescription = QStringLiteral("P001后的ENDDETPRG");
+        break;
+    case control::OnlineCorrectionPhase::WaitingForOnlineStart:
+        timeoutMs = kOnlineStartTimeoutMs;
+        waitDescription = QStringLiteral("STARTCOR");
+        break;
+    case control::OnlineCorrectionPhase::SegmentFinishing:
+    case control::OnlineCorrectionPhase::WaitingForDetectionReset:
+        timeoutMs = kOnlineFinishHandshakeTimeoutMs;
+        waitDescription = QStringLiteral("在线段结束握手");
+        break;
+    case control::OnlineCorrectionPhase::WaitingForRobotProgramStop:
+        timeoutMs = kOnlineProgramStopTimeoutMs;
+        waitDescription = QStringLiteral("机器人主程序停止");
+        break;
+    default:
+        return;
+    }
+
+    const quint64 generation = m_phaseTimeoutGeneration;
+    QTimer::singleShot(
+        timeoutMs,
+        this,
+        [this, generation, phase, timeoutMs, waitDescription]() {
+            if (generation != m_phaseTimeoutGeneration
+                || m_controller.state().phase != phase) {
+                return;
+            }
+            const QString message = QStringLiteral(
+                "在线纠偏超时：等待%1超过%2秒。"
+                "当前sStart=%3, corflag=%4, detflag=%5, offline=%6, JBI行=%7。")
+                                        .arg(waitDescription)
+                                        .arg(timeoutMs / 1000)
+                                        .arg(m_robotState.sStart)
+                                        .arg(m_robotState.corflag)
+                                        .arg(m_robotState.detflag)
+                                        .arg(m_robotState.offline)
+                                        .arg(m_robotState.usJobLine);
+            failSynchronization(message);
+        });
+}
+
+void COnlineCorrectionWorkerAdapter::reportRecordingFailure(
+    const QString &context)
+{
+    emit statusChanged(QStringLiteral("在线纠偏记录失败（%1）：%2")
+                           .arg(context, m_runRecorder.lastError()));
 }
 
 COfflineCorrectionWorkerAdapter::COfflineCorrectionWorkerAdapter(QObject *parent)

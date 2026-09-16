@@ -14,7 +14,7 @@
  * @file        OnlineCorrectionTrajectoryPlanner.cpp
  * @brief       在线纠偏轨迹修正服务实现
  * @details     使用标准 C++ 和显式单位实现旧 OnlineCor change 主线中的轨迹读取、
- *              起点对齐和示教点命令生成。
+ *              起点对齐、参考轨迹平移和整段示教点命令生成。
  *
  * @version     1.1
  * @author      LT
@@ -28,13 +28,13 @@
  * </table>
  *
  ******************************************************************************/
+#include "OnlineCorrectionTrajectoryPlanner.h"
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <limits>
 #include <sstream>
-
-#include "OnlineCorrectionTrajectoryPlanner.h"
 
 namespace i2r_rlc::control {
 namespace {
@@ -137,14 +137,19 @@ bool isCommentOrEmpty(const std::string &line)
     return first == std::string::npos || line[first] == '#' || line[first] == '*';
 }
 
+
 } // namespace
 
 std::vector<OnlineCorrectionPoint> COnlineCorrectionTrajectoryPlanner::readPathPoints(
     const std::string &path,
-    double minDistanceMm)
+    double minDistanceMm,
+    std::vector<OnlineCorrectionPose> &poses,
+    std::vector<OnlineCorrectionStationAxis> &axes)
 {
     std::ifstream input(path);
     std::vector<OnlineCorrectionPoint> points;
+    poses.clear();
+    axes.clear();
     if (!input) {
         return points;
     }
@@ -164,7 +169,19 @@ std::vector<OnlineCorrectionPoint> COnlineCorrectionTrajectoryPlanner::readPathP
 
         if (points.empty() || minDistanceMm <= 0.0
             || distanceMm(points.back(), point) >= minDistanceMm) {
+            OnlineCorrectionPose pose;
+            OnlineCorrectionStationAxis axis;
+            pose.xMm = point.xMm;
+            pose.yMm = point.yMm;
+            pose.zMm = point.zMm;
+            if (stream >> pose.rxDeg >> pose.ryDeg >> pose.rzDeg
+                >> axis.s1Deg >> axis.s2Deg) {
+                pose.valid = true;
+                axis.valid = true;
+            }
             points.push_back(point);
+            poses.push_back(pose);
+            axes.push_back(axis);
         }
     }
 
@@ -176,17 +193,20 @@ std::vector<OnlineCorrectionPoint> COnlineCorrectionTrajectoryPlanner::readPathP
  * @param path 文件路径。
  * @param poses 输出示教位姿，位置单位 mm，姿态单位 deg。
  * @param axes 输出变位机轴角，单位 deg。
+ * @param segments 输出模板分段编号，缺省为 0。
  * @return 至少读取到一个有效位姿时返回 true。
  */
 bool COnlineCorrectionTrajectoryPlanner::readTeachPoses(
     const std::string &path,
     std::vector<OnlineCorrectionPose> &poses,
-    std::vector<OnlineCorrectionStationAxis> &axes)
+    std::vector<OnlineCorrectionStationAxis> &axes,
+    std::vector<int> &segments)
 {
     //打开文件
     std::ifstream input(path);
     poses.clear();
     axes.clear();
+    segments.clear();
     if (!input) {
         return false;
     }
@@ -210,8 +230,11 @@ bool COnlineCorrectionTrajectoryPlanner::readTeachPoses(
             axis.valid = true;
         }
 
+        int segment = 0;
+        stream >> segment;
         poses.push_back(pose);
         axes.push_back(axis);
+        segments.push_back(segment);
     }
 
     return !poses.empty();
@@ -254,8 +277,14 @@ OnlineCorrectionPlannedTrajectory COnlineCorrectionTrajectoryPlanner::loadTrajec
 {
     OnlineCorrectionPlannedTrajectory result;
     result.segmentIndex = request.segmentIndex;
-    result.allPathPoints = readPathPoints(request.workPathFile, request.minPathPointDistanceMm);
-    if (!readTeachPoses(request.teachPoseFile, result.teachPoses, result.stationAxes)) {
+    result.allPathPoints = readPathPoints(
+        request.workPathFile,
+        request.minPathPointDistanceMm,
+        result.allPathPoses,
+        result.allPathStationAxes);
+    std::vector<int> teachSegments;
+    if (!readTeachPoses(request.teachPoseFile, result.teachPoses,
+                       result.stationAxes, teachSegments)) {
         result.message = "teach pose file is missing or empty";
         return result;
     }
@@ -265,12 +294,21 @@ OnlineCorrectionPlannedTrajectory COnlineCorrectionTrajectoryPlanner::loadTrajec
     }
 
     const int poseCount = static_cast<int>(result.teachPoses.size());
+    const auto segmentBegin = std::find(
+        teachSegments.begin(), teachSegments.end(), request.segmentIndex);
     result.startTeachIndex = request.startTeachIndex >= 0
         ? request.startTeachIndex
-        : std::max(0, request.segmentIndex * 2);
+        : static_cast<int>(segmentBegin - teachSegments.begin());
     result.endTeachIndex = request.endTeachIndex >= 0
         ? request.endTeachIndex
-        : std::min(result.startTeachIndex + 1, poseCount - 1);
+        : result.startTeachIndex;
+    if (request.endTeachIndex < 0 && result.startTeachIndex < poseCount) {
+        while (result.endTeachIndex + 1 < poseCount
+               && teachSegments[result.endTeachIndex + 1]
+                   == teachSegments[result.startTeachIndex]) {
+            ++result.endTeachIndex;
+        }
+    }
 
     if (result.startTeachIndex < 0 || result.endTeachIndex < result.startTeachIndex
         || result.endTeachIndex >= poseCount) {
@@ -303,11 +341,20 @@ OnlineCorrectionPlannedTrajectory COnlineCorrectionTrajectoryPlanner::loadTrajec
         std::swap(startPathIndex, endPathIndex);
     }
 
+    result.segmentStartPathIndex = startPathIndex;
+    result.segmentEndPathIndex = endPathIndex;
+
     result.segmentPathPoints.assign(
         result.allPathPoints.begin() + startPathIndex,
         result.allPathPoints.begin() + endPathIndex + 1);
     result.allMatchedPathPoints = result.allPathPoints;
-    for (int teachIndex = 0; teachIndex + 1 < poseCount; teachIndex += 2) {
+    int teachIndex = 0;
+    while (teachIndex < poseCount) {
+        int segmentEndIndex = teachIndex;
+        while (segmentEndIndex + 1 < poseCount
+               && teachSegments[segmentEndIndex + 1] == teachSegments[teachIndex]) {
+            ++segmentEndIndex;
+        }
         const OnlineCorrectionPoint segmentStart{
             result.teachPoses[teachIndex].xMm,
             result.teachPoses[teachIndex].yMm,
@@ -315,9 +362,9 @@ OnlineCorrectionPlannedTrajectory COnlineCorrectionTrajectoryPlanner::loadTrajec
             true
         };
         const OnlineCorrectionPoint segmentEnd{
-            result.teachPoses[teachIndex + 1].xMm,
-            result.teachPoses[teachIndex + 1].yMm,
-            result.teachPoses[teachIndex + 1].zMm,
+            result.teachPoses[segmentEndIndex].xMm,
+            result.teachPoses[segmentEndIndex].yMm,
+            result.teachPoses[segmentEndIndex].zMm,
             true
         };
         int begin = findNearestPointIndex(
@@ -330,6 +377,7 @@ OnlineCorrectionPlannedTrajectory COnlineCorrectionTrajectoryPlanner::loadTrajec
             static_cast<int>(result.allPathPoints.size()),
             result.allPathPoints,
             segmentEnd);
+        teachIndex = segmentEndIndex + 1;
         if (begin < 0 || end < 0) {
             continue;
         }
@@ -363,6 +411,7 @@ OnlineCorrectionTrajectoryPlanResult COnlineCorrectionTrajectoryPlanner::planIni
     }
 
     OnlineCorrectionPoint initialPoint;
+    std::vector<OnlineCorrectionPoint> detectionPoints;
     if (options.startMode == OnlineCorrectionStartMode::IBVSStart) {
         const auto stationPose = vision::CPositionerKinematics::robotPoseToStationPose(
             vision::PositionerPose{
@@ -386,10 +435,27 @@ OnlineCorrectionTrajectoryPlanResult COnlineCorrectionTrajectoryPlanner::planIni
             result.message = "initial detection points are empty";
             return result;
         }
-        initialPoint = state.initialDetectionSamples.back().point;
+        detectionPoints.reserve(state.initialDetectionSamples.size());
+        for (const auto &sample : state.initialDetectionSamples) {
+            if (!sample.point.valid) {
+                continue;
+            }
+            OnlineCorrectionPoint point = sample.point;
+            // 视觉重建点以变位机 TCP 为原点，而 `_W/_T` 以变位机当前坐标系为原点。
+            point.xMm += positionerCalibration.toolTcpInLastLinkMm.x();
+            point.yMm += positionerCalibration.toolTcpInLastLinkMm.y();
+            point.zMm += positionerCalibration.toolTcpInLastLinkMm.z();
+            detectionPoints.push_back(point);
+        }
+        if (detectionPoints.empty()) {
+            result.message = "initial detection points are invalid";
+            return result;
+        }
+        initialPoint = detectionPoints.back();
     }
 
-    if (!initialPoint.valid) {
+    if (!initialPoint.valid || !std::isfinite(initialPoint.xMm)
+        || !std::isfinite(initialPoint.yMm) || !std::isfinite(initialPoint.zMm)) {
         result.message = "initial point is invalid";
         return result;
     }
@@ -422,6 +488,8 @@ OnlineCorrectionTrajectoryPlanResult COnlineCorrectionTrajectoryPlanner::planIni
         return result;
     }
 
+    // 与旧 correctTeachTraj 一致：以检测起点对齐当前参考段首点，
+    // 保留完整参考段，不用旧装夹轨迹的空间最近点重新定义圆周相位。
     const OnlineCorrectionPoint &segmentFirst = correctedSegment.front();
     const double dx = initialPoint.xMm - segmentFirst.xMm;
     const double dy = initialPoint.yMm - segmentFirst.yMm;
@@ -431,59 +499,70 @@ OnlineCorrectionTrajectoryPlanResult COnlineCorrectionTrajectoryPlanner::planIni
         point.xMm += dx;
         point.yMm += dy;
         point.zMm += dz;
+        if (!point.valid || !std::isfinite(point.xMm)
+            || !std::isfinite(point.yMm) || !std::isfinite(point.zMm)) {
+            result.message = "corrected reference path contains invalid points";
+            return result;
+        }
     }
 
     robot_comm::RobotCorrectionCommand command;
     command.requestTeachPointUpdate = true;
     command.offlineSignal = 4;
 
-    for (int index = trajectory.startTeachIndex; index <= trajectory.endTeachIndex; ++index) {
-        if (index >= static_cast<int>(trajectory.stationAxes.size())
-            || !trajectory.stationAxes[index].valid) {
-            result.message = "teach pose is missing valid positioner axis angles";
-            return result;
-        }
+    const int initialTeachIndex = trajectory.startTeachIndex;
+    const int finalTeachIndex = trajectory.endTeachIndex;
+    if (initialTeachIndex < 0 || finalTeachIndex < initialTeachIndex
+        || finalTeachIndex >= static_cast<int>(correctedPoses.size())
+        || finalTeachIndex >= static_cast<int>(trajectory.stationAxes.size())) {
+        result.message = "initial teach index range or positioner axes are invalid";
+        return result;
     }
 
-    for (int index = trajectory.startTeachIndex; index <= trajectory.endTeachIndex; ++index) {
+    // 与旧 correctTeachPts 一致：_T 使用自己的段首点计算平移。
+    // _W 段首点可能有采样误差，不能直接复用其偏差来移动 _T。
+    const auto &templateStart = correctedPoses[initialTeachIndex];
+    const double teachDx = initialPoint.xMm - templateStart.xMm;
+    const double teachDy = initialPoint.yMm - templateStart.yMm;
+    const double teachDz = initialPoint.zMm - templateStart.zMm;
+    for (int index = initialTeachIndex; index <= finalTeachIndex; ++index) {
         OnlineCorrectionPose pose = correctedPoses[index];
-        pose.xMm += dx;
-        pose.yMm += dy;
-        pose.zMm += dz;
+        const OnlineCorrectionStationAxis &axis = trajectory.stationAxes[index];
+        pose.xMm += teachDx;
+        pose.yMm += teachDy;
+        pose.zMm += teachDz;
+        if (!pose.valid || !axis.valid
+            || !std::isfinite(pose.xMm) || !std::isfinite(pose.yMm)
+            || !std::isfinite(pose.zMm) || !std::isfinite(pose.rxDeg)
+            || !std::isfinite(pose.ryDeg) || !std::isfinite(pose.rzDeg)
+            || !std::isfinite(axis.s1Deg) || !std::isfinite(axis.s2Deg)) {
+            result.message = "teach template contains invalid pose or positioner angles";
+            return result;
+        }
 
-        const auto &axis = trajectory.stationAxes[index];
+        // 各点保留模板外轴角度，分别换算机器人目标，避免把基坐标平移
+        // 直接复制到不同外轴角度下；全部转换成功后才返回可发送批次。
         const auto robotPose = vision::CPositionerKinematics::stationPoseToRobotPose(
             vision::PositionerPose{
-                pose.xMm,
-                pose.yMm,
-                pose.zMm,
-                pose.rxDeg,
-                pose.ryDeg,
-                pose.rzDeg,
-                pose.valid},
+                pose.xMm, pose.yMm, pose.zMm,
+                pose.rxDeg, pose.ryDeg, pose.rzDeg, pose.valid},
             axis.s1Deg,
             axis.s2Deg,
             positionerCalibration);
-        if (!robotPose.valid) {
-            result.message = "failed to transform teach pose from positioner to robot base";
+        if (!robotPose.valid
+            || !std::isfinite(robotPose.xMm) || !std::isfinite(robotPose.yMm)
+            || !std::isfinite(robotPose.zMm) || !std::isfinite(robotPose.rxDeg)
+            || !std::isfinite(robotPose.ryDeg) || !std::isfinite(robotPose.rzDeg)) {
+            result.message = "failed to transform teach template to robot base";
             return result;
         }
 
         command.teachPoints.push_back(robot_comm::TeachPointUpdateCommand{
-            toUm(robotPose.xMm),
-            toUm(robotPose.yMm),
-            toUm(robotPose.zMm),
-            toDeg10000(robotPose.rxDeg),
-            toDeg10000(robotPose.ryDeg),
-            toDeg10000(robotPose.rzDeg),
-            robotPose.valid
-        });
-
+            toUm(robotPose.xMm), toUm(robotPose.yMm), toUm(robotPose.zMm),
+            toDeg10000(robotPose.rxDeg), toDeg10000(robotPose.ryDeg),
+            toDeg10000(robotPose.rzDeg), true});
         command.stationAxes.push_back(robot_comm::StationAxisUpdateCommand{
-            toDeg10000(axis.s1Deg),
-            toDeg10000(axis.s2Deg),
-            axis.valid
-        });
+            toDeg10000(axis.s1Deg), toDeg10000(axis.s2Deg), true});
     }
 
     command.pointCount = static_cast<int>(command.teachPoints.size());
@@ -494,7 +573,13 @@ OnlineCorrectionTrajectoryPlanResult COnlineCorrectionTrajectoryPlanner::planIni
     result.initialPoint = initialPoint;
     result.correctedSegmentPath = std::move(correctedSegment);
     result.command = std::move(command);
-    result.message = result.valid ? "initial correction planned" : result.command.message;
+    if (!result.valid) {
+        result.message = result.command.message;
+        return result;
+    }
+
+    result.message = "initial point aligned; reference path and teach template corrected; points="
+        + std::to_string(result.command.pointCount);
     return result;
 }
 

@@ -86,9 +86,9 @@ public:
     OnlineCorrectionUpdate onDetectionFinished(const robot_comm::RobotState &robotState);
 
     /**
-     * @brief 输入机器人状态变化，处理反向检测完成信号。
+     * @brief 输入机器人状态变化，推进反扫、P001、STARTCOR 和程序停止门禁。
      * @param robotState 当前机器人状态。
-     * @return 状态更新结果。
+     * @return 状态更新结果；仅确认 STARTCOR 后才请求启动在线 Vision tracking。
      */
     OnlineCorrectionUpdate onRobotStateChanged(const robot_comm::RobotState &robotState);
 
@@ -105,6 +105,13 @@ public:
     OnlineCorrectionUpdate finishOnlineSegment();
     OnlineCorrectionUpdate finishOnlineSegment(
         OnlineCorrectionSegmentEndKind kind);
+
+    /**
+     * @brief 以不可继续的错误结束当前会话，不生成任何机器人命令。
+     * @param message 供 UI、运行记录和现场诊断显示的错误原因。
+     * @return Error 状态更新，并请求停止 Vision tracking。
+     */
+    OnlineCorrectionUpdate fail(const std::string &message);
 
     /**
      * @brief 重置会话状态，保留 configure 设置的选项。

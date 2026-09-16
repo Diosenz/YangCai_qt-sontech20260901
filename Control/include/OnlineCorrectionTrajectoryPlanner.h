@@ -47,9 +47,9 @@ struct OnlineCorrectionTrajectoryRequest {
     std::string teachPoseFile;
     /// @brief 当前轨迹分段索引。
     int segmentIndex = 0;
-    /// @brief 起始示教点索引，负数表示按 segmentIndex 自动推断。
+    /// @brief 起始示教点索引，负数表示按 _T 第九列分段编号选择。
     int startTeachIndex = -1;
-    /// @brief 结束示教点索引，负数表示按 startTeachIndex 自动推断。
+    /// @brief 结束示教点索引，负数表示选择所在模板段的末点。
     int endTeachIndex = -1;
     /// @brief 工作轨迹点最小保留间距，单位为 mm，0 表示不抽稀。
     double minPathPointDistanceMm = 0.0;
@@ -67,8 +67,16 @@ struct OnlineCorrectionPlannedTrajectory {
     int startTeachIndex = 0;
     /// @brief 当前分段结束示教点索引。
     int endTeachIndex = 0;
+    /// @brief 当前分段起点在完整 `_W` 轨迹中的零基索引。
+    int segmentStartPathIndex = 0;
+    /// @brief 当前分段终点在完整 `_W` 轨迹中的零基索引。
+    int segmentEndPathIndex = 0;
     /// @brief 全部工作轨迹点，坐标单位为 mm。
     std::vector<OnlineCorrectionPoint> allPathPoints;
+    /// @brief 与 allPathPoints 对应的 `_W` 位姿；旧三列文件中的元素无效。
+    std::vector<OnlineCorrectionPose> allPathPoses;
+    /// @brief 与 allPathPoints 对应的 `_W` 变位机轴；旧三列文件中的元素无效。
+    std::vector<OnlineCorrectionStationAxis> allPathStationAxes;
     /// @brief 当前分段轨迹点，坐标单位为 mm。
     std::vector<OnlineCorrectionPoint> segmentPathPoints;
     /// @brief 旧 AllTpMatched 等价轨迹，坐标单位为 mm。
@@ -91,6 +99,8 @@ struct OnlineCorrectionTrajectoryPlanResult {
     bool valid = false;
     /// @brief 本次纠偏使用的初始点，单位为 mm。
     OnlineCorrectionPoint initialPoint;
+    /// @brief 保留旧匹配诊断接口；首点对齐流程不执行最近点匹配，保持无效。
+    OnlineCorrectionInitialPathMatch initialPathMatch;
     /// @brief 平移或全局变换后的当前分段轨迹，单位为 mm。
     std::vector<OnlineCorrectionPoint> correctedSegmentPath;
     /// @brief 生成给机器人通信层的示教点更新命令。
@@ -103,7 +113,9 @@ struct OnlineCorrectionTrajectoryPlanResult {
  * @brief 在线纠偏轨迹修正服务。
  *
  * 本类承接旧 `OnlineTeachTrajectoryInitial`、`OnlineReverseDetectMatch`、
- * `correctTeachTraj` 和 `correctTeachPts` 中已经进入 change 主线的计算语义。
+ * `correctTeachTraj` 和 `correctTeachPts` 的数据边界。检测起点分别对齐
+ * `_W` 参考段和 `_T` 示教段的首点，修正整段并保留模板外轴角度。
+ * IBVSStart 保持独立的最终起点来源。
  */
 class COnlineCorrectionTrajectoryPlanner final {
 public:
@@ -158,23 +170,29 @@ private:
      * @brief 读取工作轨迹点文本文件。
      * @param path 文件路径。
      * @param minDistanceMm 最小保留间距，单位为 mm。
+     * @param poses 输出与点对应的可选 `_W` 姿态。
+     * @param axes 输出与点对应的可选 `_W` 变位机轴。
      * @return 有效轨迹点集合，坐标单位为 mm。
      */
     static std::vector<OnlineCorrectionPoint> readPathPoints(
         const std::string &path,
-        double minDistanceMm);
+        double minDistanceMm,
+        std::vector<OnlineCorrectionPose> &poses,
+        std::vector<OnlineCorrectionStationAxis> &axes);
 
     /**
      * @brief 读取示教位姿和可选变位机轴角。
      * @param path 文件路径。
      * @param poses 输出示教位姿，位置单位 mm，姿态单位 deg。
      * @param axes 输出变位机轴角，单位 deg。
+     * @param segments 输出各点的模板段编号；无第九列的文件视为第 0 段。
      * @return 至少读取到一个有效位姿时返回 true。
      */
     static bool readTeachPoses(
         const std::string &path,
         std::vector<OnlineCorrectionPose> &poses,
-        std::vector<OnlineCorrectionStationAxis> &axes);
+        std::vector<OnlineCorrectionStationAxis> &axes,
+        std::vector<int> &segments);
 };
 
 } // namespace i2r_rlc::control

@@ -78,6 +78,7 @@ OnlineCorrectionUpdate COnlineCorrectionController::startInitialDetection()
     m_state.initialDetectionSamples.clear();
     m_state.onlineDetectionSamples.clear();
     m_state.correctedSegmentPath.clear();
+    m_state.initialPathMatch = OnlineCorrectionInitialPathMatch{};
     m_state.initialDetectionFinished = false;
     m_state.reverseCompletionArmed =
         m_robotState.onlineReverseCompleteFlag == 0;
@@ -97,8 +98,7 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
         m_state.phase == OnlineCorrectionPhase::InitialDetectionRunning
         || m_state.phase == OnlineCorrectionPhase::WaitingForReverseCompletion;
     const bool onlinePhase =
-        m_state.phase == OnlineCorrectionPhase::OnlineRunning
-        || m_state.phase == OnlineCorrectionPhase::SegmentFinishing;
+        m_state.phase == OnlineCorrectionPhase::OnlineRunning;
     if (!initialPhase && !onlinePhase) {
         return makeUpdate(false, "detection event is not accepted in current phase");
     }
@@ -202,6 +202,7 @@ OnlineCorrectionUpdate COnlineCorrectionController::onDetectionFinished(
     }
 
     m_state.correctedSegmentPath = planResult.correctedSegmentPath;
+    m_state.initialPathMatch = planResult.initialPathMatch;
     m_state.teachPointSendIndex = 0;
     m_state.initialTeachPointCount = planResult.command.pointCount;
     m_state.trackerActive = false;
@@ -216,9 +217,33 @@ OnlineCorrectionUpdate COnlineCorrectionController::onDetectionFinished(
 OnlineCorrectionUpdate COnlineCorrectionController::onRobotStateChanged(
     const robot_comm::RobotState &robotState)
 {
+    const bool robotProgramStopped =
+        m_robotState.sStart != 0 && robotState.sStart == 0;
     m_robotState = robotState;
     if (robotState.sIsAlarm != 0 || robotState.sHold != 0) {
         setPhase(OnlineCorrectionPhase::Error, "robot alarm or hold is active");
+        OnlineCorrectionUpdate update = makeUpdate(false, m_state.message);
+        update.stopTracking = true;
+        return update;
+    }
+    const bool sessionIsActive =
+        m_state.phase != OnlineCorrectionPhase::Idle
+        && m_state.phase != OnlineCorrectionPhase::Completed
+        && m_state.phase != OnlineCorrectionPhase::Error;
+    const bool finalSegmentIsEnding =
+        m_state.pendingSegmentEndKind
+            == OnlineCorrectionSegmentEndKind::Final
+        && (m_state.phase == OnlineCorrectionPhase::SegmentFinishing
+            || m_state.phase
+                == OnlineCorrectionPhase::WaitingForDetectionReset);
+    const bool robotProgramStopIsExpected =
+        m_state.phase == OnlineCorrectionPhase::WaitingForRobotProgramStop
+        || finalSegmentIsEnding;
+    if (robotProgramStopped && sessionIsActive
+        && !robotProgramStopIsExpected) {
+        setPhase(
+            OnlineCorrectionPhase::Error,
+            "robot program stopped before online correction completed");
         OnlineCorrectionUpdate update = makeUpdate(false, m_state.message);
         update.stopTracking = true;
         return update;
@@ -240,9 +265,30 @@ OnlineCorrectionUpdate COnlineCorrectionController::onRobotStateChanged(
         && m_state.initialTeachPointCount > 0
         && m_state.teachPointSendIndex >= m_state.initialTeachPointCount
         && robotState.offline == 5) {
+        m_state.trackerActive = false;
+        setPhase(OnlineCorrectionPhase::WaitingForInitialApproach,
+                 "teach points confirmed; waiting for robot to reach P001");
+        return makeUpdate(true, m_state.message);
+    }
+    // 当前在线 JBI 在 MOVL P001 后和 SMOVC 结束后都会调用 ENDDET。
+    // 只有先观察到 STARTCOR，后续 ENDDET 才具有“在线段结束”语义。
+    const bool onlineStartObserved =
+        robotState.corflag == 1 && robotState.detflag == 1;
+    const bool preOnlineDetectionEndObserved =
+        (robotState.corflag == 2 && robotState.detflag == 2)
+        || (robotState.corflag == 3 && robotState.detflag == 3);
+    if (m_state.phase == OnlineCorrectionPhase::WaitingForInitialApproach) {
+        if (preOnlineDetectionEndObserved) {
+            setPhase(OnlineCorrectionPhase::WaitingForOnlineStart,
+                     "P001 approach completed; waiting for STARTCOR");
+            return makeUpdate(true, m_state.message);
+        }
+    }
+    if (m_state.phase == OnlineCorrectionPhase::WaitingForOnlineStart
+        && onlineStartObserved) {
         m_state.trackerActive = true;
         setPhase(OnlineCorrectionPhase::OnlineRunning,
-                 "teach points confirmed; online correction started");
+                 "STARTCOR observed; online correction started");
         OnlineCorrectionUpdate update = makeUpdate(true, m_state.message);
         update.startTracking = true;
         return update;
@@ -274,7 +320,21 @@ OnlineCorrectionUpdate COnlineCorrectionController::onRobotStateChanged(
             return update;
         }
         m_state.pendingSegmentEndKind.reset();
-        setPhase(OnlineCorrectionPhase::Completed, "online correction completed");
+        // 最终 ENDDET 只关闭在线检测窗口；退出段仍可能继续运动。保持会话和
+        // 实际轨迹记录，直到控制柜明确报告主程序停止。
+        if (robotState.sStart == 0) {
+            setPhase(OnlineCorrectionPhase::Completed,
+                     "online correction completed after robot program stopped");
+            return makeUpdate(true, m_state.message);
+        }
+        setPhase(OnlineCorrectionPhase::WaitingForRobotProgramStop,
+                 "online correction ended; waiting for robot program to stop");
+        return makeUpdate(true, m_state.message);
+    }
+    if (m_state.phase == OnlineCorrectionPhase::WaitingForRobotProgramStop
+        && robotState.sStart == 0) {
+        setPhase(OnlineCorrectionPhase::Completed,
+                 "online correction completed after robot program stopped");
         return makeUpdate(true, m_state.message);
     }
     return makeUpdate(true, "robot state accepted");
@@ -289,7 +349,8 @@ OnlineCorrectionUpdate COnlineCorrectionController::onRobotCommandReceipt(
         && receipt.type != robot_comm::RobotCommandType::RealtimeCorrection) {
         return makeUpdate(true, "robot status receipt ignored");
     }
-    if (!receipt.sent || !receipt.responseReceived) {
+    if (!receipt.sent || !receipt.responseReceived
+        || receipt.error != robot_comm::RobotCommandError::None) {
         const std::string message =
             receipt.message.empty() ? "robot command failed" : receipt.message;
         setPhase(OnlineCorrectionPhase::Error, message);
@@ -307,12 +368,10 @@ OnlineCorrectionUpdate COnlineCorrectionController::onRobotCommandReceipt(
             m_state.initialTeachPointCount > 0
             && receipt.pointIndex + 1 >= m_state.initialTeachPointCount;
         if (finalTeachPointReceived && receipt.completed && robotState.offline == 5) {
-            m_state.trackerActive = true;
-            setPhase(OnlineCorrectionPhase::OnlineRunning,
-                     "teach points confirmed; online correction started");
-            OnlineCorrectionUpdate update = makeUpdate(true, m_state.message);
-            update.startTracking = true;
-            return update;
+            m_state.trackerActive = false;
+            setPhase(OnlineCorrectionPhase::WaitingForInitialApproach,
+                     "teach points confirmed; waiting for robot to reach P001");
+            return makeUpdate(true, m_state.message);
         }
     }
     if (receipt.type == robot_comm::RobotCommandType::RealtimeCorrection
@@ -336,6 +395,7 @@ OnlineCorrectionUpdate COnlineCorrectionController::finishOnlineSegment(
     }
     m_state.pendingSegmentEndKind = kind;
     m_state.segmentEndLatched = true;
+    m_state.trackerActive = false;
     setPhase(OnlineCorrectionPhase::SegmentFinishing, "online segment finish requested");
     OnlineCorrectionUpdate update = makeUpdate(true, m_state.message);
     update.realtimeCommand.valid = true;
@@ -345,12 +405,25 @@ OnlineCorrectionUpdate COnlineCorrectionController::finishOnlineSegment(
         kind == OnlineCorrectionSegmentEndKind::Intermediate
         ? "intermediate segment final correction command"
         : "final online correction command";
+    // ENDDET 已关闭本段检测窗口，立即停止 Vision，避免迟到帧生成普通 P 并
+    // 覆盖已排队的 Online_endflag=1 收尾命令。
+    update.stopTracking = true;
     return update;
 }
 
 OnlineCorrectionUpdate COnlineCorrectionController::finishOnlineSegment()
 {
     return finishOnlineSegment(OnlineCorrectionSegmentEndKind::Final);
+}
+
+OnlineCorrectionUpdate COnlineCorrectionController::fail(
+    const std::string &message)
+{
+    m_state.trackerActive = false;
+    setPhase(OnlineCorrectionPhase::Error, message);
+    OnlineCorrectionUpdate update = makeUpdate(false, m_state.message);
+    update.stopTracking = true;
+    return update;
 }
 
 OnlineCorrectionUpdate COnlineCorrectionController::reset()

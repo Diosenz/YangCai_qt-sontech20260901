@@ -1,8 +1,9 @@
 # RobotSim 场景对象 ID。更换场景后只需修改本文件。
 scene_name=test2
 robot_id=1001
-positioner_id=1045
+positioner_id=1062
 sensor_id=1013
-# test2 场景中的待定位工件及其直接父级（变位机末端）。
+tcp_id=1011
 workpiece_id=1044
-workpiece_parent_id=1046
+# 当前 test2.xml 中工件 1044 的父级、变位机末端参考对象为 1063。
+workpiece_parent_id=1063

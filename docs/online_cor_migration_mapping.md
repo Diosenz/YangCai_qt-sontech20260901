@@ -14,6 +14,13 @@
 `ReadStationPosition()` 从 `RBCALIB.DAT` 的 `////SRANG` 读取六维标定；
 `RobotPos2StationPos()` 和 `StationPos2RobotPos()` 使用变位机两轴角动态转换坐标系。
 
+旧 `OnlineReverseDetectMatch()` 将 `initPtMatchType` 硬编码为 0，活动路径只返回
+`D_initdata` 最后一点；随后 `correctTeachTraj()` 和 `correctTeachPts()` 用该点减去
+当前示教分段首点，并把差值平移到整段轨迹与全部示教点。旧文件中虽保留
+`initPtMatchType==1` 的 ICP 试验分支，但该分支未启用，且注释已经指出扫描到其他
+焊缝点时可能错误匹配。本次不恢复该试验分支，而是在新规划器内采用当前 `_T`
+分段约束、折线连续投影和反向方向校验。
+
 ## 新工程映射
 
 | 旧职责 | 新工程承接 | 分类 |
@@ -67,6 +74,20 @@ D 必须包含 32 个字段。O 按原索引逐点发送，只有最终点发送
 - 异常处理器只承接已确认的活动 ICP 边界，不迁移旧调试文件和未启用分支。
 - 自动测试使用 fake transport 覆盖 N/O/P、完整 D 状态语义、`offline==5`、
   P 最新值覆盖和分段结束闭环；真实控制柜联调仍需在设备环境执行。
+- 初始反扫匹配仅解决 `_W` 进度与局部位置残差。JBI 中从检测结束位姿到首个动态
+  P 点的安全接近路径和控制柜碰撞灵敏度仍需独立验证。
+- 2026-09-14 实机记录确认：`offline==5` 时机器人仍在前往 P001；P001 后的首次
+  `ENDDET` 位于 `STARTCOR` 之前，不能解释为在线段最终结束。当前状态机增加
+  `WaitingForInitialApproach` 和 `WaitingForOnlineStart`，只有观察到
+  `corflag/detflag==1/1` 才启动在线 KCF；STARTCOR 后的 ENDDET 才发送最终 P。
+- 最终 P 和 detflag 复位只关闭 KCF，不再立即结束会话。实际路径继续记录到
+  `sStart==0`，从而保留 JBI 退出段或报警/保持状态。当前 JBI 后续固定 C 点与
+  动态 P001 的几何连续性仍是实机验证边界，本次不修改机器人程序。
+- 2026-09-14 的 JBI 与运行记录进一步确认：首次 `ENDDETPRG`
+  在 `STARTCOR` 之前把 `traflag` 复位为 0，且 SMOVC 在线段不再重新置 1。
+  Runtime 现在只在初始反扫要求 `traflag==1`；观察到 STARTCOR 后，
+  用 `OnlineRunning` 锁存授权后续在线帧。暂停检测时恢复实时相机画面，
+  不再把结束阶段误显示为“等待首个完整检测帧”。
 # 2026-06-23 OnlineCor / OpenCV 闭环补全
 
 - `_W/_T` 统一按当前变位机坐标系、mm 保存；生成 O 前通过

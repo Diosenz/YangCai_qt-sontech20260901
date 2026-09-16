@@ -98,6 +98,8 @@ struct CorrectionRunSession {
     CorrectionPurpose purpose = CorrectionPurpose::None;
     bool active = false;
     bool visionTrackingActive = false;
+    /// @brief STARTCOR 已确认且在线 KCF 窗口正在运行。
+    bool onlineControlWindowActive = false;
     int consecutiveSyncFailures = 0;
     QString lastSyncError;
 };
@@ -126,7 +128,9 @@ enum class CorrectionSyncState {
     Cleared = 5,
     StoppedAfterFailures = 6,
     /// @brief 离线扫描窗口结束；停止 KCF 并恢复实时图像，会话保留至 ICP/O 完成。
-    OfflineSeamWindowClosed = 7
+    OfflineSeamWindowClosed = 7,
+    /// @brief 在线 KCF 检测窗口已暂停；会话保留且 UI 恢复实时图像。
+    TrackingPaused = 8
 };
 
 /**
@@ -205,6 +209,8 @@ struct RuntimeTrackingOptions {
     bool enableGapDetection = false;
     /// @brief true 表示使用全局定位专用“整条激光线提取”链路（Gabor+Steger），而非在线纠偏 KCF 单点。
     bool globalLocateLineExtraction = false;
+    /// @brief true 表示 Vision 必须在 traflag==1 的 STARTDETPRG 窗口内跟踪。
+    bool requireDetectionWindow = true;
     /// @brief SENSORPARA.txt 解析后的旧投影参数。
     vision::WeldSensorCalibration sensorCalibration;
     /// @brief 自动加载的 RBCALIB 变位机标定。
@@ -218,6 +224,8 @@ struct RuntimeOnlineCorrectionConfiguration {
     control::OnlineCorrectionOptions options;
     control::OnlineCorrectionTrajectoryRequest trajectoryRequest;
     std::string rbcalibFile;
+    /// @brief 在线纠偏会话记录根目录；生产路径使用 `output/online_correction`。
+    std::string diagnosticOutputDirectory;
 };
 
 /**

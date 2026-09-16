@@ -1,0 +1,19 @@
+Calib_Method 4
+f/m  0.0122589
+Kappa  -2523.73
+sx/m 3.7514e-06
+sy/m 3.75e-06
+cx 645.5
+cy 481.5
+a  -0.252084
+b  12.6868
+c  -4.71982
+pose_CinT[0]/m  -0.00493156
+pose_CinT[1]/m  -0.0827658
+pose_CinT[2]/m  -0.221874
+pose_CinT[3]/deg  351.122
+pose_CinT[4]/deg  3.52432
+pose_CinT[5]/deg  0.522005
+pose_CinT[6]  0
+More Info Please refer to data CalibResult.txt
+2026-03-29_11:59:35

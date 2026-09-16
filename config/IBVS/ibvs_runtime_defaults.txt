@@ -27,24 +27,52 @@ base_channel_sigmas_px=0.55,0.38,0.55,0.38
 lambda_f=1.0
 damping_kappa=0.2
 min_damping=1e-4
-max_velocity_mps=0.05
+max_velocity_mps=0.15
 lvs_task_scale_min=200.0
 lvs_task_scale_max=5000.0
 
 [lvs_constraint]
 lambda_d=1.0
-alpha_lvs=1.0
-omega_lvs=1.0
+# SontechWorks_IBVS 实际联调值：相机任务保持基准权重，LVS 使用 alpha/omega/beta 加权。
+alpha_lvs=0.4
+omega_lvs=15.0
 beta_lvs=1.0
 use_axis_weights=0
 axis_weights=1.0,1.0,1.0
 
 [ibvs_control]
 lambda=1.0
-stop_threshold_px=1e-3
+stop_threshold_px=1.0
 damping_kappa=0.2
 min_damping=1e-4
-max_camera_velocity_mps=0.5
+max_camera_velocity_mps=0.15
+max_camera_acceleration_mps2=0.65
+velocity_filter_alpha=0.55
+control_dt_s=0.02
+min_motion_for_jacobian_update_m=5e-5
+min_feature_delta_for_jacobian_update_px=0.3
+max_control_duration_s=500.0
+converged_frame_count=5
+max_missing_feature_frames=100
+# 使用单位切向投影后的 LVS 贴缝误差小于 50 mm，或图像误差小于 150 px 后接入 LVS；
+# 停止时图像误差和贴缝误差仍需同时满足，1 mm 兼顾贴缝质量和现场噪声。
+stop_lvs_threshold_mm=1.0
+lvs_activation_distance_mm=50.0
+enable_terminal_lvs_priority=1
+terminal_camera_error_enter_px=10.0
+terminal_camera_error_exit_px=15.0
+lvs_primary_camera_error_px=5.0
+terminal_lvs_target_mm=0.1
+terminal_lvs_release_mm=0.8
+terminal_camera_scale=0.20
+# 图像误差进入 10 px 末段后，相机任务缩放至 0.20，LVS 仍使用 omega=15；
+# beta 由观测可信度渐入/失效衰减。以下动态权重参数仅保留配置兼容。
+enable_terminal_dynamic_weights=1
+terminal_dynamic_weight_min_share=0.25
+terminal_dynamic_weight_max_share=0.75
+terminal_dynamic_weight_filter_alpha=0.20
+# 旧版末段权重参数，仅为配置兼容保留，当前公式不使用。
+lvs_satisfied_omega=3.0
 use_channelwise_r=0
 channel_sigmas_px=0.55,0.38,0.55,0.38
 

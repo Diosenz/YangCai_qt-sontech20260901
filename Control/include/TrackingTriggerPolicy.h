@@ -55,6 +55,8 @@ struct TrackingTriggerInput {
     robot_comm::RobotState robotState;
     /// @brief 旧虚拟状态。
     TrackingVirtualStatus virtualStatus = TrackingVirtualStatus::None;
+    /// @brief true 表示当前跟踪阶段必须位于 STARTDETPRG/traflag 窗口。
+    bool requireDetectionWindow = true;
 };
 
 /**

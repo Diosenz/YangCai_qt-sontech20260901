@@ -28,6 +28,7 @@ legacy_type_aliases=4
 legacy_name=fengjikechukou20_zheng
 display_name=small_air_outlet_20mm
 shape=curve
+localization_sliding_window_frames=100
 safety_mm=640.0,1000.0,-250.0,70.0,-257.5,200.0
 feature_geometry_h1_mm=21.0
 feature_geometry_h2_mm=24.0

@@ -50,7 +50,7 @@ TrackingTriggerDecision CTrackingTriggerPolicy::evaluate(const TrackingTriggerIn
     if (input.testStart == 1) {
         return reject("test_start_active", "testStart is active");
     }
-    if (state.traflag != 1) {
+    if (input.requireDetectionWindow && state.traflag != 1) {
         return reject("traflag_not_ready", "traflag is not 1");
     }
     if (state.sMode != 2) {

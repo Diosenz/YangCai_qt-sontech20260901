@@ -310,12 +310,18 @@ QString onlineCorrectionPhaseToText(i2r_rlc::control::OnlineCorrectionPhase phas
         return QStringLiteral("正在发送示教点");
     case i2r_rlc::control::OnlineCorrectionPhase::WaitingInitialTeachPointAck:
         return QStringLiteral("等待示教点确认");
+    case i2r_rlc::control::OnlineCorrectionPhase::WaitingForInitialApproach:
+        return QStringLiteral("正在前往动态起点P001");
+    case i2r_rlc::control::OnlineCorrectionPhase::WaitingForOnlineStart:
+        return QStringLiteral("已到达P001，等待STARTCOR");
     case i2r_rlc::control::OnlineCorrectionPhase::OnlineRunning:
-        return QStringLiteral("在线纠偏运行中");
+        return QStringLiteral("KCF在线纠偏中");
     case i2r_rlc::control::OnlineCorrectionPhase::SegmentFinishing:
         return QStringLiteral("当前分段收尾中");
     case i2r_rlc::control::OnlineCorrectionPhase::WaitingForDetectionReset:
         return QStringLiteral("等待检测复位");
+    case i2r_rlc::control::OnlineCorrectionPhase::WaitingForRobotProgramStop:
+        return QStringLiteral("纠偏结束，等待机器人程序停止");
     case i2r_rlc::control::OnlineCorrectionPhase::Completed:
         return QStringLiteral("已完成");
     case i2r_rlc::control::OnlineCorrectionPhase::Error:
@@ -501,6 +507,8 @@ QString correctionSyncStateToText(CorrectionSyncState state)
         return QStringLiteral("连续 3 帧失败，已停止");
     case CorrectionSyncState::OfflineSeamWindowClosed:
         return QStringLiteral("焊缝采集已关闭，侧面扫描中");
+    case CorrectionSyncState::TrackingPaused:
+        return QStringLiteral("检测窗口已暂停");
     }
     return QStringLiteral("未知");
 }
@@ -1448,6 +1456,10 @@ void UiController::onOnlineCorrectionConfigurationSelected(
     configuration.trajectoryRequest.teachPoseFile = teachPoseInfo.absoluteFilePath().toStdString();
     configuration.rbcalibFile =
         m_configRepository.paths().rbcalibFilePath().toStdString();
+    configuration.diagnosticOutputDirectory =
+        m_configRepository.paths().outputDir()
+            .filePath(QStringLiteral("online_correction"))
+            .toStdString();
     configuration.options.startMode = m_onlineCorrectionStartMode;
 
     const auto trajectory =
@@ -4525,6 +4537,14 @@ void UiController::handleCorrectionSyncUpdate(
         m_view.setDigitalTwinStateText(
             QStringLiteral("仿真：焊缝采集窗口已关闭\n已停止纠偏逐帧查询"));
         renderOfflineCorrectionState();
+        break;
+    case CorrectionSyncState::TrackingPaused:
+        state->pendingFrameId = -1;
+        state->acceptingFrames = false;
+        clearCorrectionFrameDisplay();
+        m_view.setDigitalTwinStateText(
+            QStringLiteral("仿真：纠偏检测窗口已暂停\n%1")
+                .arg(update.message));
         break;
     }
     state->stateText = correctionSyncStateToText(update.state);

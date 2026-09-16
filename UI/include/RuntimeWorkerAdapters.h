@@ -45,6 +45,7 @@
 #include "JobCommand.h"
 #include "LocalizationApplicationService.h"
 #include "OfflineCorrectionController.h"
+#include "OnlineCorrectionRunRecorder.h"
 #include "OnlineCorrectionController.h"
 #include "IRobotSimTransport.h"
 #include "RobotCommandTransport.h"
@@ -508,10 +509,18 @@ signals:
 
 private:
     void publishUpdate(const control::OnlineCorrectionUpdate &update);
+    /// @brief 为必须收到机器人握手的等待阶段设置一次性超时保护。
+    void armPhaseTimeout(control::OnlineCorrectionPhase phase);
+    void reportRecordingFailure(const QString &context);
 
     control::COnlineCorrectionController m_controller;
     robot_comm::RobotState m_robotState;
     RuntimeOnlineCorrectionConfiguration m_configuration;
+    vision::PositionerCalibration m_positionerCalibration;
+    COnlineCorrectionRunRecorder m_runRecorder;
+    control::OnlineCorrectionPhase m_timeoutPhase =
+        control::OnlineCorrectionPhase::Idle;
+    quint64 m_phaseTimeoutGeneration = 0;
 };
 
 /**

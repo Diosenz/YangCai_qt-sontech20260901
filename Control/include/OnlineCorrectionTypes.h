@@ -47,7 +47,7 @@ namespace i2r_rlc::control {
  * 对应旧 `COnlineCor::correctStartPtType`，后续 UI 可直接映射为下拉选项。
  */
 enum class OnlineCorrectionStartMode {
-    /// @brief 由视觉初始检测点对齐示教轨迹起点。
+    /// @brief 用反向扫描确定 `_W` 进度，并生成局部修正后的粗起点。
     InitType,
     /// @brief 对示教轨迹应用全局刚性修正矩阵。
     GlobalCorrection,
@@ -71,12 +71,18 @@ enum class OnlineCorrectionPhase {
     SendingInitialTeachPoints,
     /// @brief 等待控制柜以 offline==5 确认示教点更新完成。
     WaitingInitialTeachPointAck,
+    /// @brief O 点已确认，等待机器人到达动态起点 P001。
+    WaitingForInitialApproach,
+    /// @brief 已收到 P001 后的首次 ENDDET，等待控制柜进入 STARTCOR。
+    WaitingForOnlineStart,
     /// @brief 在线纠偏运行中。
     OnlineRunning,
     /// @brief 当前在线分段正在收尾。
     SegmentFinishing,
     /// @brief 结束 P 已确认，等待机器人 detflag 复位到 0。
     WaitingForDetectionReset,
+    /// @brief 在线检测已结束，继续记录直到机器人主程序停止。
+    WaitingForRobotProgramStop,
     /// @brief 全流程完成。
     Completed,
     /// @brief 流程出现错误。
@@ -115,6 +121,31 @@ struct OnlineCorrectionPoint {
     double zMm = 0.0;
     /// @brief 坐标是否有效。
     bool valid = false;
+};
+
+/**
+ * @brief 初始反向扫描在当前 `_W` 分段上的匹配结果。
+ *
+ * 该值只描述轨迹进度和局部位置残差，不声明最终焊接起点的所有权。
+ * `IBVSStart` 模式由视觉伺服结果接管最终起点时不会生成该匹配。
+ */
+struct OnlineCorrectionInitialPathMatch {
+    /// @brief true 表示反向扫描已在当前 `_W` 分段内获得可信匹配。
+    bool valid = false;
+    /// @brief 匹配线段起点在完整 `_W` 轨迹中的零基索引。
+    int matchedPathPointIndex = -1;
+    /// @brief 匹配点在线段起点到终点之间的比例，范围为 [0, 1]。
+    double segmentFraction = 0.0;
+    /// @brief `_W` 上的连续投影点，单位 mm。
+    OnlineCorrectionPoint referencePoint;
+    /// @brief 检测终点减去 referencePoint 的局部位置残差，单位 mm。
+    OnlineCorrectionPoint correctionOffset;
+    /// @brief 检测终点到 `_W` 投影点的距离，单位 mm。
+    double distanceMm = 0.0;
+    /// @brief 反向扫描方向与 `_W` 正向切线反方向的余弦值。
+    double reverseDirectionCosine = 0.0;
+    /// @brief true 表示扫描跨度足够，已执行方向一致性校验。
+    bool directionValidated = false;
 };
 
 /**
@@ -183,7 +214,7 @@ struct OnlineCorrectionDetectionEvent {
  * @brief 在线纠偏配置。
  */
 struct OnlineCorrectionOptions {
-    /// @brief 在线纠偏起点模式，兼容旧 correctStartPtType。
+    /// @brief 在线纠偏起点来源与初始化策略，兼容旧 correctStartPtType。
     OnlineCorrectionStartMode startMode = OnlineCorrectionStartMode::InitType;
     /// @brief true 表示初始检测样本必须携带 gap 宽度。
     bool enableGapDetection = false;
@@ -200,6 +231,16 @@ struct OnlineCorrectionOptions {
     long maxCorrectionIncrementUm = 80;
     /// @brief 相邻实时增量允许跳变，单位 um。
     long maxCorrectionJumpUm = 60;
+    /// @brief 初始检测终点到当前 `_W` 分段的最大允许距离，单位 mm。
+    double initialPathMatchMaxDistanceMm = 15.0;
+    /// @brief 用于估计反向扫描方向的末尾样本数量。
+    int initialPathMatchDirectionSampleCount = 32;
+    /// @brief 启用方向校验所需的最小扫描跨度，单位 mm。
+    double initialPathMatchMinScanSpanMm = 2.0;
+    /// @brief 反扫方向与 `_W` 反向切线之间允许的最小余弦值。
+    double initialPathMatchMinReverseDirectionCosine = 0.25;
+    /// @brief 匹配点之后必须保留的最短在线纠偏路径，单位 mm。
+    double initialPathMatchMinRemainingLengthMm = 10.0;
     /// @brief 行主序 4x4 全局修正矩阵，长度固定为 16，坐标单位为 mm。
     std::array<double, 16> globalCorrectionRowMajor = {
         1.0, 0.0, 0.0, 0.0,
@@ -243,6 +284,8 @@ struct OnlineCorrectionSessionState {
     std::vector<OnlineCorrectionDetectionSample> onlineDetectionSamples;
     /// @brief 初始修正后的当前分段轨迹，单位 mm。
     std::vector<OnlineCorrectionPoint> correctedSegmentPath;
+    /// @brief 本轮反向扫描在 `_W` 上的进度匹配与局部残差。
+    OnlineCorrectionInitialPathMatch initialPathMatch;
     /// @brief 已发送的首批示教点数量。
     int teachPointSendIndex = 0;
     /// @brief 首批示教点总数，用于只接受最终 O 命令的 offline==5 确认。

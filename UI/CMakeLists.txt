@@ -9,6 +9,7 @@ add_library(i2r_rlc_ui STATIC
     src/CorrectionRobotStartGate.cpp
     src/Logger.cpp
     src/MainWidget.cpp
+    src/OnlineCorrectionRunRecorder.cpp
     src/OnlineCorrectionWorkflow.cpp
     src/RobotSimVirtualReferenceCache.cpp
     src/RuntimeCoordinator.cpp
@@ -23,6 +24,7 @@ add_library(i2r_rlc_ui STATIC
     include/CorrectionRobotStartGate.h
     include/Logger.h
     include/MainWidget.h
+    include/OnlineCorrectionRunRecorder.h
     include/OnlineCorrectionWorkflow.h
     include/RobotSimVirtualReferenceCache.h
     include/RuntimeCoordinator.h

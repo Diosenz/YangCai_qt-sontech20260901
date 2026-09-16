@@ -628,6 +628,11 @@ void CRuntimeCoordinator::startOnlineCorrectionJob(
             "在线纠偏启动失败：机器人状态已在门禁通过后变化，要求 sStart=0、sMode=2、sServoPower=1。"));
         return;
     }
+    if (m_latestRobotState.offline == 4) {
+        failOnlineCorrectionStart(QStringLiteral(
+            "在线纠偏启动失败：机器人端存在未完成的 O 示教点批次（offline=4），为避免 P001/P002 错位，未发送 JBI。"));
+        return;
+    }
     if (!m_robotSimConnected || m_robotSimManualModeRequested) {
         failOnlineCorrectionStart(QStringLiteral(
             "在线纠偏启动失败：RobotSim 真实场景未连接或仍处于手动仿真模式。"));
@@ -659,6 +664,7 @@ void CRuntimeCoordinator::cancelOnlineCorrectionStart()
         return;
     }
 
+    const QString message = QStringLiteral("在线纠偏启动事务已取消。");
     const quint64 sessionId = m_onlineCorrectionStartSessionId;
     clearOnlineCorrectionStart();
     const bool ownsOnlineSession = sessionId != 0
@@ -666,7 +672,7 @@ void CRuntimeCoordinator::cancelOnlineCorrectionStart()
         && m_correctionSession.sessionId == sessionId
         && m_correctionSession.purpose == CorrectionPurpose::OnlineCorrection;
     if (ownsOnlineSession) {
-        invalidateCorrectionSession(QStringLiteral("在线纠偏启动事务已取消。"));
+        invalidateCorrectionSession(message);
         if (m_visionWorker != nullptr) {
             QMetaObject::invokeMethod(
                 m_visionWorker, "stopTracking", Qt::QueuedConnection);
@@ -676,6 +682,14 @@ void CRuntimeCoordinator::cancelOnlineCorrectionStart()
                 m_robotWorker,
                 [worker = m_robotWorker]() {
                     worker->setTrackingRequested(false);
+                },
+                Qt::QueuedConnection);
+        }
+        if (m_onlineCorrectionWorker != nullptr) {
+            QMetaObject::invokeMethod(
+                m_onlineCorrectionWorker,
+                [worker = m_onlineCorrectionWorker, message]() {
+                    worker->failSynchronization(message);
                 },
                 Qt::QueuedConnection);
         }
@@ -696,6 +710,11 @@ void CRuntimeCoordinator::beginOnlineCorrectionArm()
         || m_robotSimManualModeRequested) {
         failOnlineCorrectionStart(QStringLiteral(
             "在线纠偏启动失败：相机就绪时机器人或 RobotSim 条件已变化，未发送 JBI。"));
+        return;
+    }
+    if (m_latestRobotState.offline == 4) {
+        failOnlineCorrectionStart(QStringLiteral(
+            "在线纠偏启动失败：机器人端 O 示教点批次在相机预检期间变为未完成状态（offline=4），未发送 JBI。"));
         return;
     }
 
@@ -865,6 +884,11 @@ void CRuntimeCoordinator::handleOnlineProtocolReady(
         || m_latestRobotState.sServoPower != 1) {
         failOnlineCorrectionStart(QStringLiteral(
             "在线纠偏启动失败：协议预检后机器人状态不再满足 sStart=0、PLAY、SERVO ON，未发送 JBI。"));
+        return;
+    }
+    if (m_latestRobotState.offline == 4) {
+        failOnlineCorrectionStart(QStringLiteral(
+            "在线纠偏启动失败：协议预检发现机器人端仍有未完成的 O 示教点批次（offline=4），未发送 JBI。"));
         return;
     }
 
@@ -1075,6 +1099,14 @@ void CRuntimeCoordinator::failOnlineCorrectionStart(const QString &message)
                 m_robotWorker,
                 [worker = m_robotWorker]() {
                     worker->setTrackingRequested(false);
+                },
+                Qt::QueuedConnection);
+        }
+        if (m_onlineCorrectionWorker != nullptr) {
+            QMetaObject::invokeMethod(
+                m_onlineCorrectionWorker,
+                [worker = m_onlineCorrectionWorker, message]() {
+                    worker->failSynchronization(message);
                 },
                 Qt::QueuedConnection);
         }
@@ -1525,9 +1557,29 @@ void CRuntimeCoordinator::connectWorkers()
         &COnlineCorrectionWorkerAdapter::onlineCorrectionUpdated,
         this,
         [this](const control::OnlineCorrectionUpdate &update) {
+            if (m_correctionSession.active
+                && m_correctionSession.purpose
+                    == CorrectionPurpose::OnlineCorrection) {
+                // STARTCOR 是在线 SMOVC 窗口的权威门禁。当前实机 JBI
+                // 会在 STARTCOR 前执行 ENDDETPRG，因此在线阶段 traflag=0
+                // 不能被继续解释为“禁止跟踪”。
+                m_correctionSession.onlineControlWindowActive =
+                    update.phase
+                    == control::OnlineCorrectionPhase::OnlineRunning;
+            }
             emit onlineCorrectionUpdated(update);
             if (update.phase == control::OnlineCorrectionPhase::Completed
                 || update.phase == control::OnlineCorrectionPhase::Error) {
+                // Vision 的阶段性暂停不能清除机器人侧 tracker 许可。
+                // 只有整次在线纠偏终止后，才退出机器人 STARTCOR 门禁。
+                if (m_robotWorker != nullptr) {
+                    QMetaObject::invokeMethod(
+                        m_robotWorker,
+                        [worker = m_robotWorker]() {
+                            worker->setTrackingRequested(false);
+                        },
+                        Qt::QueuedConnection);
+                }
                 invalidateCorrectionSession(
                     QString::fromStdString(update.message));
             }
@@ -1551,11 +1603,22 @@ void CRuntimeCoordinator::connectWorkers()
                 m_trackingPurpose = RuntimeTrackingPurpose::OnlineCorrection;
                 setCorrectionVisionTrackingActive(true);
                 resetVisionFrameDispatch();
+                emitCorrectionSyncState(
+                    CorrectionSyncState::Idle,
+                    -1,
+                    m_correctionSession.onlineControlWindowActive
+                        ? QStringLiteral(
+                              "STARTCOR 已确认，等待首个在线 KCF 完整帧。")
+                        : QStringLiteral(
+                              "初始检测窗口已启动，等待首个完整帧。"));
                 if (m_visionWorker != nullptr) {
+                    RuntimeTrackingOptions options = m_trackingOptions;
+                    options.requireDetectionWindow =
+                        !m_correctionSession.onlineControlWindowActive;
                     QMetaObject::invokeMethod(
                         m_visionWorker,
                         [worker = m_visionWorker,
-                         options = m_trackingOptions,
+                         options,
                          projectionContext = m_trackingProjectionContext,
                          state = m_latestRobotState,
                          hasState = m_hasLatestRobotState]() {
@@ -1585,16 +1648,20 @@ void CRuntimeCoordinator::connectWorkers()
                 // 这些阶段仍属于同一次正式纠偏，不得更换或失效 sessionId。
                 setCorrectionVisionTrackingActive(false);
                 resetVisionFrameDispatch();
+                if (m_correctionSession.active
+                    && m_correctionSession.purpose
+                        == CorrectionPurpose::OnlineCorrection) {
+                    emitCorrectionSyncState(
+                        CorrectionSyncState::TrackingPaused,
+                        -1,
+                        QStringLiteral(
+                            "在线 Vision tracking 已暂停，已恢复实时相机画面。"));
+                }
                 if (m_visionWorker != nullptr) {
                     QMetaObject::invokeMethod(
                         m_visionWorker, "stopTracking", Qt::QueuedConnection);
                 }
             });
-    connect(m_onlineCorrectionWorker, &COnlineCorrectionWorkerAdapter::stopTrackingRequested,
-            m_robotWorker, [worker = m_robotWorker]() {
-                worker->setTrackingRequested(false);
-            },
-            Qt::QueuedConnection);
     connect(m_onlineCorrectionWorker, &COnlineCorrectionWorkerAdapter::statusChanged,
             this, &CRuntimeCoordinator::statusMessage);
 
@@ -2017,10 +2084,16 @@ void CRuntimeCoordinator::dispatchPendingVisionFrame()
                 : QStringLiteral("RobotSim 真实场景未连接，未发起纠偏逐帧查询。"));
         return;
     }
+    const bool requiresDetectionWindow =
+        current.purpose != RuntimeTrackingPurpose::OnlineCorrection
+        || !m_correctionSession.onlineControlWindowActive;
     if (isCorrection
         && (current.robotState.sStart != 1
-            || current.robotState.traflag != 1)) {
-        // 机器人尚未进入 JBI 的正式检测区，跳过当前帧。
+            || (requiresDetectionWindow
+                && current.robotState.traflag != 1))) {
+        // 初始扫描和离线纠偏只在 STARTDETPRG 窗口采帧。
+        // 在线 SMOVC 由已锁存的 STARTCOR 状态授权，兼容该窗口
+        // 期间 traflag 保持 0 的控制柜 JBI。
         m_currentVisionFrame.reset();
         m_visionFrameInFlight = false;
         dispatchPendingVisionFrame();
@@ -2210,6 +2283,7 @@ void CRuntimeCoordinator::invalidateCorrectionSession(
     // 随后到达的旧 RobotSim/Vision 结果也无法通过会话匹配。
     m_correctionSession.active = false;
     m_correctionSession.visionTrackingActive = false;
+    m_correctionSession.onlineControlWindowActive = false;
     m_pendingOfflineCorrectionJobName.clear();
     if (m_trackingPurpose == RuntimeTrackingPurpose::OnlineCorrection
         || m_trackingPurpose == RuntimeTrackingPurpose::OfflineCorrection) {
