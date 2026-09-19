@@ -337,16 +337,15 @@ OnlineCorrectionPlannedTrajectory COnlineCorrectionTrajectoryPlanner::loadTrajec
         result.message = "failed to locate segment in work path";
         return result;
     }
-    if (startPathIndex > endPathIndex) {
-        std::swap(startPathIndex, endPathIndex);
-    }
 
     result.segmentStartPathIndex = startPathIndex;
     result.segmentEndPathIndex = endPathIndex;
 
-    result.segmentPathPoints.assign(
-        result.allPathPoints.begin() + startPathIndex,
-        result.allPathPoints.begin() + endPathIndex + 1);
+    if (startPathIndex <= endPathIndex) {
+        result.segmentPathPoints.assign(
+            result.allPathPoints.begin() + startPathIndex,
+            result.allPathPoints.begin() + endPathIndex + 1);
+    }
     result.allMatchedPathPoints = result.allPathPoints;
     int teachIndex = 0;
     while (teachIndex < poseCount) {
@@ -381,12 +380,11 @@ OnlineCorrectionPlannedTrajectory COnlineCorrectionTrajectoryPlanner::loadTrajec
         if (begin < 0 || end < 0) {
             continue;
         }
-        if (begin > end) {
-            std::swap(begin, end);
+        if (begin <= end) {
+            result.pathSegments.emplace_back(
+                result.allPathPoints.begin() + begin,
+                result.allPathPoints.begin() + end + 1);
         }
-        result.pathSegments.emplace_back(
-            result.allPathPoints.begin() + begin,
-            result.allPathPoints.begin() + end + 1);
     }
     if (result.pathSegments.empty()) {
         result.pathSegments.push_back(result.segmentPathPoints);
@@ -531,7 +529,7 @@ OnlineCorrectionTrajectoryPlanResult COnlineCorrectionTrajectoryPlanner::planIni
         pose.xMm += teachDx;
         pose.yMm += teachDy;
         pose.zMm += teachDz;
-        if (!pose.valid || !axis.valid
+        if (!pose.valid
             || !std::isfinite(pose.xMm) || !std::isfinite(pose.yMm)
             || !std::isfinite(pose.zMm) || !std::isfinite(pose.rxDeg)
             || !std::isfinite(pose.ryDeg) || !std::isfinite(pose.rzDeg)

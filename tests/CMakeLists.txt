@@ -169,6 +169,18 @@ target_link_libraries(i2r_rlc_online_correction_tests
 )
 i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_correction_tests)
 
+i2r_rlc_add_test(i2r_rlc_online_correction_regression_tests
+    test_online_correction_regression.cpp
+)
+target_compile_definitions(i2r_rlc_online_correction_regression_tests
+    PRIVATE
+        I2R_RLC_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+)
+target_link_libraries(i2r_rlc_online_correction_regression_tests
+    PRIVATE
+        i2r_rlc_control
+)
+
 i2r_rlc_add_test(i2r_rlc_tracking_trigger_policy_tests
     test_tracking_trigger_policy.cpp
 )

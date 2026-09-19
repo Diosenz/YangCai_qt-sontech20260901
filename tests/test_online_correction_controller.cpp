@@ -246,7 +246,7 @@ bool testReverseCompletionRequiresFreshEdge()
     return ok;
 }
 
-bool testTeachPointBatchRejectsMissingStationAxes()
+bool testTeachPointBatchKeepsLegacyMissingStationAxes()
 {
     auto trajectory = makeTrajectory();
     trajectory.stationAxes[1].valid = false;
@@ -263,8 +263,9 @@ bool testTeachPointBatchRejectsMissingStationAxes()
             robotState,
             makePositionerCalibration());
     return expectTrue(
-        !plan.valid && plan.command.teachPoints.empty(),
-        "one missing positioner axis should reject the whole O batch");
+        plan.valid && plan.command.teachPoints.size() == 2
+            && plan.command.stationAxes.size() == 2,
+        "legacy O generation should continue with zero-valued missing positioner axes");
 }
 
 bool testPositionerRoundTrip()
@@ -732,7 +733,7 @@ int main()
     ok &= testControllerStateFlow();
     ok &= testControllerRejectsMissingCalibration();
     ok &= testReverseCompletionRequiresFreshEdge();
-    ok &= testTeachPointBatchRejectsMissingStationAxes();
+    ok &= testTeachPointBatchKeepsLegacyMissingStationAxes();
     ok &= testPositionerRoundTrip();
     ok &= testRbcalibGoldenTranslation();
     ok &= testExceptionProcessorUsesSeamIndexAndIcp();
