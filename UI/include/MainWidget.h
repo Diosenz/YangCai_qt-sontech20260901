@@ -248,6 +248,8 @@ public slots:
 
     /// @brief 更新流程状态文本。
     void setOnlineCorrectionStateText(const QString& text);
+    /// @brief 更新在线纠偏最终 P001 的独立诊断文本。
+    void setOnlineCorrectionP001Text(const QString& text);
 
     /**
      * @brief 更新离线纠偏逐帧同步的独立状态、最近确认帧和最近错误。
@@ -355,6 +357,7 @@ private:
     QLabel* m_calibrationStateLabel = nullptr;
     QLabel* m_offlineCorrectionStateLabel = nullptr;
     QLabel* m_onlineCorrectionStateLabel = nullptr;
+    QLabel* m_onlineCorrectionP001Label = nullptr;
     QLabel* m_offlineCorrectionSyncStateLabel = nullptr;
     QLabel* m_offlineCorrectionConsumedFrameLabel = nullptr;
     QLabel* m_offlineCorrectionSyncErrorLabel = nullptr;

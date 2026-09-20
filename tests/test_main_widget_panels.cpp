@@ -106,6 +106,19 @@ bool testLegacyStatusAndDeviceControlPanel()
                          && findLabel(widget, "onlineCorrectionStateLabel")->parent()
                                 != statusGroup,
                      "online correction status label should not be inside status monitor");
+    ok &= expectTrue(findLabel(widget, "onlineCorrectionP001Label") != nullptr
+                         && findLabel(widget, "onlineCorrectionP001Label")->parent()
+                                != statusGroup,
+                     "online correction P001 label should be in its feature panel");
+    ok &= expectTrue(
+        findLabel(widget, "onlineCorrectionP001Label")->text()
+            == QStringLiteral("P001：未计算"),
+        "online correction P001 must not show zero coordinates before generation");
+    widget.setOnlineCorrectionP001Text(QStringLiteral("P001 test text"));
+    ok &= expectTrue(
+        findLabel(widget, "onlineCorrectionP001Label")->text()
+            == QStringLiteral("P001 test text"),
+        "online correction P001 label should expose its view update interface");
     ok &= expectTrue(findLabel(widget, "visionStateLabel") != nullptr
                          && findLabel(widget, "visionStateLabel")->parent()
                                 != statusGroup,

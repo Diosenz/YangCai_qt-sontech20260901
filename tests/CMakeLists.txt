@@ -169,6 +169,14 @@ target_link_libraries(i2r_rlc_online_correction_tests
 )
 i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_correction_tests)
 
+i2r_rlc_add_test(i2r_rlc_online_correction_p001_presentation_tests
+    test_online_correction_p001_presentation.cpp
+)
+target_link_libraries(i2r_rlc_online_correction_p001_presentation_tests
+    PRIVATE
+        i2r_rlc_ui
+)
+
 i2r_rlc_add_test(i2r_rlc_online_correction_regression_tests
     test_online_correction_regression.cpp
 )

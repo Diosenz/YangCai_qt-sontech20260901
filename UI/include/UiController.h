@@ -22,6 +22,7 @@
 #include "NullDigitalTwinService.h"
 #include "OfflineCorrectionTypes.h"
 #include "OfflineImageCameraDevice.h"
+#include "OnlineCorrectionP001Presentation.h"
 #include "OnlineCorrectionTypes.h"
 #include "OnlineCorrectionWorkflow.h"
 #include "RobotSimVirtualReferenceCache.h"
@@ -391,6 +392,7 @@ private:
     bool m_hasRobotSimReference = false;
     CorrectionSyncPresentationState m_onlineCorrectionSyncState;
     CorrectionSyncPresentationState m_offlineCorrectionSyncState;
+    COnlineCorrectionP001Presentation m_onlineCorrectionP001Presentation;
     RobotSimVirtualReferenceCache m_lastRobotSimReference;
     QTimer* m_automaticCalibrationLaserTimer = nullptr;
 };

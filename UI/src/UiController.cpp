@@ -942,6 +942,9 @@ void UiController::initialize()
     appendInfo(QString::fromStdString(m_ibvsService.start().message));
     m_view.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：%1").arg(
         onlineCorrectionPhaseToText(i2r_rlc::control::OnlineCorrectionPhase::Idle)));
+    m_onlineCorrectionP001Presentation.clear();
+    m_view.setOnlineCorrectionP001Text(
+        m_onlineCorrectionP001Presentation.text());
     m_view.setIbvsStateText(QStringLiteral("视觉伺服：%1\n%2")
                                 .arg(ibvsServiceStateToText(m_ibvsService.state()))
                                 .arg(QString::fromStdString(
@@ -1589,6 +1592,9 @@ void UiController::onStartWeldTrackingRequested()
         showLegacyWarningPrompt(QStringLiteral("提示!"), message);
         return;
     }
+    m_onlineCorrectionP001Presentation.clear();
+    m_view.setOnlineCorrectionP001Text(
+        m_onlineCorrectionP001Presentation.text());
     m_onlineAutoGlobalLocalizationScanPoints.clear();
     m_onlineAutoGlobalLocalizationVirtualPoints.clear();
     m_onlineAutoCorrectionRunConfiguration =
@@ -1917,6 +1923,9 @@ void UiController::onOnlineCorrectionFeaturePanelClosed()
     m_trackingOverlayActive = false;
     m_runtimeCoordinator.stopOnlineTracking();
     m_view.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：空闲"));
+    m_onlineCorrectionP001Presentation.clear();
+    m_view.setOnlineCorrectionP001Text(
+        m_onlineCorrectionP001Presentation.text());
     m_view.setVisionStateText(QStringLiteral("视觉：空闲"));
     if (m_hasLatestFrame) {
         m_view.showFrame(m_latestFrame);
@@ -3467,6 +3476,9 @@ void UiController::onStopRequested()
     m_view.resetFeaturePanelsAfterStop();
     m_view.setOfflineCorrectionStateText(QStringLiteral("离线纠偏：空闲"));
     m_view.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：空闲"));
+    m_onlineCorrectionP001Presentation.clear();
+    m_view.setOnlineCorrectionP001Text(
+        m_onlineCorrectionP001Presentation.text());
     m_view.setTeachTrajectoryStateText(QStringLiteral("未开始"));
     showLocalizationUpdate(m_localizationService.clear());
     m_view.setGlobalLocateRobotSimConnectionText(
@@ -3877,6 +3889,9 @@ void UiController::renderOfflineCorrectionState()
 
 void UiController::showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorrectionUpdate& update)
 {
+    m_onlineCorrectionP001Presentation.update(update);
+    m_view.setOnlineCorrectionP001Text(
+        m_onlineCorrectionP001Presentation.text());
     if (m_pendingCorrectionRobotStartKind == CorrectionRobotStartKind::OnlineGlobalLocate
         || m_pendingCorrectionRobotStartKind == CorrectionRobotStartKind::OnlineCorrection) {
         renderPendingCorrectionRobotStart();

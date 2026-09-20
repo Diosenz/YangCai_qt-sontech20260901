@@ -252,3 +252,17 @@ C++ 修改必须遵守以下最小硬约束：
 检查 legacy 后，如果没有发现需要长期保留的新约束，不要为了证明已经检查过 legacy 而创建新的文档。必要时只需在任务结果中简要说明检查结论。
 
 涉及定位、视觉伺服、数字孪生或 RobotSim 对接时，应先阅读 `docs/localization_visual_servo_digital_twin_scope.md`，再根据当前任务需要结合旧项目代码、`oldproject/sontech-works-version-storage/AGENTS.md` 和当前架构文档继续分析。
+
+## 跨平台编辑与 Windows 验证
+
+本仓库允许在 macOS/Linux 环境中进行源码编辑、代码审查和非平台相关的静态分析，但 Windows + Visual Studio 2022 / MSVC 是当前生产代码的最终构建与运行验证环境。
+
+在非 Windows 环境修改代码时：
+
+- 不得因为当前执行环境是 macOS/Linux 而引入 POSIX 专属 API 或改变 Windows/Qt 的既有实现策略；
+- 不得提交本机绝对路径、构建目录或平台专属临时配置；
+- include、文件名和 CMake 路径的大小写必须与仓库实际文件完全一致；
+- 保持仓库规定的 UTF-8 编码和换行策略；
+- 非 Windows 环境中的编译结果只能作为辅助验证，不能替代 MSVC 验证。
+
+涉及 `.h`、`.cpp`、CMake 或 Qt 运行行为的修改，最终以 Windows 上 Visual Studio 2022 / MSVC 的构建、测试和必要的运行验证结果为准。

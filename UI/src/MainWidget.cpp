@@ -476,6 +476,8 @@ MainWidget::MainWidget(QWidget* parent)
         tr("起始点定位方式："), onlineDetailsWidget));
     m_onlineCorrectionStateLabel = makeHintLabel(tr("在线纠偏：空闲"), onlineDetailsWidget);
     m_onlineCorrectionStateLabel->setObjectName(QStringLiteral("onlineCorrectionStateLabel"));
+    m_onlineCorrectionP001Label = makeHintLabel(tr("P001：未计算"), onlineDetailsWidget);
+    m_onlineCorrectionP001Label->setObjectName(QStringLiteral("onlineCorrectionP001Label"));
     m_onlineStartModeComboBox = new QComboBox(onlineDetailsWidget);
     m_onlineStartModeComboBox->setObjectName(QStringLiteral("onlineStartModeComboBox"));
     m_onlineStartModeComboBox->addItem(tr("反向扫描"));
@@ -485,6 +487,7 @@ MainWidget::MainWidget(QWidget* parent)
     m_startTrackingButton =
         makeButton(tr("启动在线纠偏"), onlineCorrectionPage, "startTrackingButton", 130);
     onlineDetailsLayout->addWidget(m_onlineCorrectionStateLabel);
+    onlineDetailsLayout->addWidget(m_onlineCorrectionP001Label);
     m_onlineCorrectionSyncStateLabel = makeHintLabel(
         tr("逐帧同步：空闲"), onlineDetailsWidget);
     m_onlineCorrectionSyncStateLabel->setObjectName(
@@ -1071,6 +1074,13 @@ void MainWidget::setOnlineCorrectionStateText(const QString& text)
 {
     if (m_onlineCorrectionStateLabel != nullptr) {
         m_onlineCorrectionStateLabel->setText(text);
+    }
+}
+
+void MainWidget::setOnlineCorrectionP001Text(const QString& text)
+{
+    if (m_onlineCorrectionP001Label != nullptr) {
+        m_onlineCorrectionP001Label->setText(text);
     }
 }
 
