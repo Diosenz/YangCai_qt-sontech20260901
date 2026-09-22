@@ -314,6 +314,8 @@ struct OnlineCorrectionUpdate {
     robot_comm::RobotCorrectionCommand command;
     /// @brief 可选实时 P 命令，仅 valid 时发送。
     robot_comm::RobotRealtimeCorrectionCommand realtimeCommand;
+    /// @brief 本次实时命令使用的 `_W` 示教点索引，供运行诊断和回归测试使用。
+    int taughtPointIndex = -1;
     /// @brief true 表示 runtime 应启动 Vision tracking。
     bool startTracking = false;
     /// @brief true 表示 runtime 应停止 Vision tracking。

@@ -41,6 +41,8 @@ namespace i2r_rlc::control {
 struct OnlineCorrectionFollowResult {
     bool valid = false;
     bool completed = false;
+    /// @brief 本次实时计算使用的 `_W` 示教点索引，供运行诊断和回归测试使用。
+    int taughtPointIndex = -1;
     robot_comm::RobotRealtimeCorrectionCommand command;
     std::string message;
 };
@@ -87,6 +89,7 @@ private:
     long m_lastDxUm = 0;
     long m_lastDyUm = 0;
     long m_lastDzUm = 0;
+    int m_teachPointCursor = -1;
 };
 
 } // namespace i2r_rlc::control

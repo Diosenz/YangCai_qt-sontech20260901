@@ -459,6 +459,106 @@ bool testPathFollowerKeepsDirectionReversalLikeLegacyActiveCode()
     return ok;
 }
 
+bool testPathFollowerKeepsForwardTeachCursor()
+{
+    i2r_rlc::control::COnlineCorrectionPathFollower follower;
+    std::vector<i2r_rlc::control::OnlineCorrectionPoint> teachTrajectory;
+    for (int index = 0; index <= 150; ++index) {
+        teachTrajectory.push_back({ static_cast<double>(index), 0.0, 0.0, true });
+    }
+    for (int index = 149; index >= 0; --index) {
+        teachTrajectory.push_back({ static_cast<double>(index), 0.0, 0.0, true });
+    }
+
+    i2r_rlc::robot_comm::RobotState robotState;
+    robotState.curx_r = 90000;
+    robotState.cury_r = 0;
+    robotState.curz_r = 0;
+    auto firstSamples = makeFollowerSamples(91.0, 1.0);
+    const auto first = follower.update(
+        robotState,
+        i2r_rlc::control::OnlineCorrectionOptions{},
+        makePositionerCalibration(),
+        teachTrajectory,
+        &firstSamples,
+        false);
+
+    robotState.curx_r = 11000;
+    std::vector<i2r_rlc::control::OnlineCorrectionDetectionSample> secondSamples{
+        { { 10.0, 1.0, 0.0, true }, std::nullopt, 0 },
+        { { 0.0, 1.0, 0.0, true }, std::nullopt, 0 },
+        { { -10.0, 1.0, 0.0, true }, std::nullopt, 0 },
+        { { -20.0, 1.0, 0.0, true }, std::nullopt, 0 }
+    };
+    const auto second = follower.update(
+        robotState,
+        i2r_rlc::control::OnlineCorrectionOptions{},
+        makePositionerCalibration(),
+        teachTrajectory,
+        &secondSamples,
+        false);
+
+    bool ok = true;
+    ok &= expectTrue(first.valid && second.valid,
+                     "forward teach cursor scenario should generate commands");
+    ok &= expectTrue(first.taughtPointIndex >= 80 && first.taughtPointIndex <= 100,
+                     "first teach match should be near the current forward branch");
+    ok &= expectTrue(second.taughtPointIndex >= first.taughtPointIndex,
+                     "teach match should not jump back to an earlier branch");
+    return ok;
+}
+
+bool testControllerUsesLegacyOnlineDirectionReference()
+{
+    auto trajectory = makeTrajectory();
+    i2r_rlc::control::COnlineCorrectionController controller;
+    i2r_rlc::control::OnlineCorrectionOptions options;
+    controller.configure(options, trajectory, makePositionerCalibration());
+    controller.startInitialDetection();
+
+    i2r_rlc::control::OnlineCorrectionDetectionEvent initial;
+    initial.samples.push_back({ { 100.0, 0.0, 0.0, true }, std::nullopt });
+    initial.detectionFinished = true;
+    controller.appendDetectionEvent(initial);
+
+    i2r_rlc::robot_comm::RobotState robotState;
+    robotState.onlineReverseCompleteFlag = 1;
+    auto update = controller.onRobotStateChanged(robotState);
+    i2r_rlc::robot_comm::RobotCommandReceipt receipt;
+    receipt.type = i2r_rlc::robot_comm::RobotCommandType::TeachPointUpdate;
+    receipt.sent = true;
+    receipt.responseReceived = true;
+    receipt.completed = true;
+    receipt.pointIndex = 1;
+    robotState.offline = 5;
+    controller.onRobotCommandReceipt(receipt, robotState);
+
+    robotState.corflag = 2;
+    robotState.detflag = 2;
+    controller.onRobotStateChanged(robotState);
+    robotState.corflag = 1;
+    robotState.detflag = 1;
+    update = controller.onRobotStateChanged(robotState);
+
+    i2r_rlc::control::OnlineCorrectionDetectionEvent online;
+    online.samples = {
+        { { 101.0, 1.0, 0.0, true }, std::nullopt, 0 },
+        { { 111.0, 1.0, 0.0, true }, std::nullopt, 0 },
+        { { 121.0, 1.0, 0.0, true }, std::nullopt, 0 },
+        { { 131.0, 1.0, 0.0, true }, std::nullopt, 0 }
+    };
+    robotState.curx_r = 100000;
+    controller.onRobotStateChanged(robotState);
+    update = controller.appendDetectionEvent(online);
+
+    bool ok = true;
+    ok &= expectTrue(update.phase == i2r_rlc::control::OnlineCorrectionPhase::OnlineRunning,
+                     "controller should be online before tracking reference check");
+    ok &= expectTrue(update.taughtPointIndex == 2,
+                     "online direction should use the original AllTpMatched-equivalent segment");
+    return ok;
+}
+
 bool testPathFollowerLimitsOutputJump()
 {
     i2r_rlc::control::COnlineCorrectionPathFollower follower;
@@ -739,6 +839,8 @@ int main()
     ok &= testExceptionProcessorUsesSeamIndexAndIcp();
     ok &= testPathFollowerRemovesRepeatedTarget();
     ok &= testPathFollowerKeepsDirectionReversalLikeLegacyActiveCode();
+    ok &= testPathFollowerKeepsForwardTeachCursor();
+    ok &= testControllerUsesLegacyOnlineDirectionReference();
     ok &= testPathFollowerLimitsOutputJump();
     ok &= testRealtimePathFollowerLimitsAndGapSpeed();
     ok &= testPathFollowerControlMethodTwoIsLegacyNoop();

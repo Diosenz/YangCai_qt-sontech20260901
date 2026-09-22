@@ -151,12 +151,13 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
         m_robotState,
         m_options,
         m_positionerCalibration,
-        m_state.correctedSegmentPath,
+        m_trajectory.segmentPathPoints,
         &m_state.onlineDetectionSamples,
         false);
 
     OnlineCorrectionUpdate update = makeUpdate(follow.valid, follow.message);
     update.realtimeCommand = follow.command;
+    update.taughtPointIndex = follow.taughtPointIndex;
     if (event.detectionFinished) {
         setPhase(OnlineCorrectionPhase::SegmentFinishing, "online segment is finishing");
         update = makeUpdate(true, m_state.message);

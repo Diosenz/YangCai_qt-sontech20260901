@@ -82,16 +82,25 @@ Eigen::Vector3d projectOnLine(
     return lineStart + t * direction;
 }
 
-Eigen::Vector3d taughtDirectionAt(
+struct TaughtDirectionResult {
+    Eigen::Vector3d direction = Eigen::Vector3d::Zero();
+    int index = -1;
+};
+
+TaughtDirectionResult taughtDirectionAt(
     const std::vector<OnlineCorrectionPoint> &teachTrajectory,
-    const OnlineCorrectionPoint &current)
+    const OnlineCorrectionPoint &current,
+    int *cursor)
 {
-    if (teachTrajectory.size() < 2U) {
-        return Eigen::Vector3d::Zero();
+    if (cursor == nullptr || teachTrajectory.size() < 2U) {
+        return {};
     }
-    int nearest = 0;
+    const int pointCount = static_cast<int>(teachTrajectory.size());
+    const int searchBegin = std::clamp(*cursor, 0, pointCount - 1);
+    const int searchEnd = std::min(pointCount, searchBegin + 100);
+    int nearest = searchBegin;
     double best = std::numeric_limits<double>::max();
-    for (int index = 0; index < static_cast<int>(teachTrajectory.size()); ++index) {
+    for (int index = searchBegin; index < searchEnd; ++index) {
         if (!isValid(teachTrajectory[static_cast<std::size_t>(index)])) {
             continue;
         }
@@ -103,7 +112,8 @@ Eigen::Vector3d taughtDirectionAt(
             nearest = index;
         }
     }
-    const int next = std::min(nearest + 3, static_cast<int>(teachTrajectory.size()) - 1);
+    *cursor = nearest;
+    const int next = std::min(nearest + 3, pointCount - 1);
     const int previous = std::max(nearest - 3, 0);
     Eigen::Vector3d direction =
         vectorOf(teachTrajectory[static_cast<std::size_t>(next)])
@@ -113,7 +123,9 @@ Eigen::Vector3d taughtDirectionAt(
             vectorOf(teachTrajectory[static_cast<std::size_t>(nearest + 1)])
             - vectorOf(teachTrajectory[static_cast<std::size_t>(nearest)]);
     }
-    return direction.norm() <= 1.0e-9 ? Eigen::Vector3d::Zero() : direction.normalized();
+    return {
+        direction.norm() <= 1.0e-9 ? Eigen::Vector3d::Zero() : direction.normalized(),
+        nearest};
 }
 
 float gapAtCurrentPose(
@@ -289,7 +301,10 @@ OnlineCorrectionFollowResult COnlineCorrectionPathFollower::update(
 
     const Eigen::Vector3d footOnDetection =
         projectOnLine(vectorOf(current), vectorOf(firstPoint), vectorOf(thirdPoint));
-    const Eigen::Vector3d taughtDirection = taughtDirectionAt(teachTrajectory, current);
+    const TaughtDirectionResult taught = taughtDirectionAt(
+        teachTrajectory, current, &m_teachPointCursor);
+    const Eigen::Vector3d &taughtDirection = taught.direction;
+    result.taughtPointIndex = taught.index;
     const Eigen::Vector3d predictedTeach =
         vectorOf(current) + taughtDirection * options.stepTcpVelocityMmPerSecond
             * options.controlCycleSecond;
@@ -454,6 +469,7 @@ void COnlineCorrectionPathFollower::reset()
     m_lastDxUm = 0;
     m_lastDyUm = 0;
     m_lastDzUm = 0;
+    m_teachPointCursor = -1;
 }
 
 } // namespace i2r_rlc::control
