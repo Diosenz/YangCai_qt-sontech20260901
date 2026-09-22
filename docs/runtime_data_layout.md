@@ -70,7 +70,7 @@
 | `data/replay/` | 离线图像、记录帧、机器人状态 trace 和开发/测试 fixture。 | 测试/replay 输入。 |
 | `logs/` | 运行日志、诊断文本、协议 trace、worker 生命周期日志。 | 运行时输出。 |
 | `Data/CALID/` | 自动标定运行时输出根目录，包含 two-step 采集子目录。 | 运行时输出。 |
-| `Data/CALID/4 TWO_STEP/` | 标定数据采集输出，兼容旧 `CALID` 命名，包含 `CalibPose_new.txt`、`CalibOriginData.txt`、`image_01.png` 到 `image_19.png`，以及与后 4 张板图同编号配对的 `image_16L.png` 到 `image_19L.png`。 | 运行时输出。 |
+| `Data/CALID/4 TWO_STEP/` | 标定数据采集输出，兼容旧 `CALID` 命名，包含 `CalibPose_new.txt`、`CalibOriginData.txt`、按 `image_01.png` 到 `image_19.png` 顺序记录 TCP 六数组的 `CalibResult.txt`，以及与后 4 张板图同编号配对的 `image_16L.png` 到 `image_19L.png`。 | 运行时输出。 |
 | `output/images/` | 保存的调试图像、overlay 和处理后帧。 | 运行时输出。 |
 | `output/point_clouds/` | 生成的点云或导出的数字孪生数据。 | 运行时输出。 |
 | `output/traces/` | 跟踪 trace、机器人 dry-run 命令 trace 和纠偏 trace。 | 运行时输出。 |

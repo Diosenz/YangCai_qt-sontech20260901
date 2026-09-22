@@ -229,6 +229,11 @@ CalibrationCaptureUpdate CCalibrationCaptureController::onRobotStateChanged(
 CalibrationCaptureUpdate CCalibrationCaptureController::finishCapture()
 {
     if (isCaptureComplete()) {
+        std::string errorMessage;
+        if (!writeCalibrationResult(&errorMessage)) {
+            return makeError(errorMessage);
+        }
+
         setPhase(CalibrationCapturePhase::Completed, "calibration capture completed");
         CalibrationCaptureUpdate update = makeUpdate(true, m_state.message);
         update.requestedExposureUs = kFinalExposureUs;
@@ -373,6 +378,78 @@ bool CCalibrationCaptureController::appendOriginDataLine(
     return true;
 }
 
+bool CCalibrationCaptureController::writeCalibrationResult(
+    std::string *errorMessage) const
+{
+    std::vector<const CalibrationCaptureSample *> boardSamples;
+    boardSamples.reserve(static_cast<std::size_t>(totalBoardImageCount()));
+    for (const auto &sample : m_state.samples) {
+        if (!sample.laserImage) {
+            boardSamples.push_back(&sample);
+        }
+    }
+
+    if (static_cast<int>(boardSamples.size()) != totalBoardImageCount()) {
+        if (errorMessage) {
+            *errorMessage = "failed to write CalibResult.txt: board sample count mismatch";
+        }
+        return false;
+    }
+
+    for (std::size_t index = 0; index < boardSamples.size(); ++index) {
+        const std::string expectedName =
+            "image_" + twoDigit(static_cast<int>(index) + 1) + ".png";
+        const std::string actualName =
+            std::filesystem::path(boardSamples[index]->imagePath).filename().string();
+        if (actualName != expectedName) {
+            if (errorMessage) {
+                *errorMessage = "failed to write CalibResult.txt: pose/image order mismatch at "
+                    + expectedName;
+            }
+            return false;
+        }
+    }
+
+    if (!ensureOutputDirectory(errorMessage)) {
+        return false;
+    }
+
+    const std::filesystem::path resultPath =
+        methodDirectoryPath(m_options) / "CalibResult.txt";
+    std::ofstream output(resultPath, std::ios::trunc);
+    if (!output) {
+        if (errorMessage) {
+            *errorMessage = "failed to open CalibResult.txt";
+        }
+        return false;
+    }
+
+    auto writeArray = [&](const char *name, long CalibrationCaptureSample::*field) {
+        output << name << "[] = {";
+        for (const auto *sample : boardSamples) {
+            output << (sample->*field) << ',';
+        }
+        output << "};\n";
+    };
+
+    output << "CalibResult\n\nRobotPos\n";
+    writeArray("cx", &CalibrationCaptureSample::xUm);
+    writeArray("cy", &CalibrationCaptureSample::yUm);
+    writeArray("cz", &CalibrationCaptureSample::zUm);
+    writeArray("crx", &CalibrationCaptureSample::rxDeg10000);
+    writeArray("cry", &CalibrationCaptureSample::ryDeg10000);
+    writeArray("crz", &CalibrationCaptureSample::rzDeg10000);
+    output << '\n';
+
+    if (!output) {
+        if (errorMessage) {
+            *errorMessage = "failed to write CalibResult.txt";
+        }
+        return false;
+    }
+    return true;
+}
+
 bool CCalibrationCaptureController::saveImage(
     const cv::Mat &image,
     const std::string &fileName,
@@ -457,6 +534,9 @@ CalibrationCaptureUpdate CCalibrationCaptureController::captureSample(
     }
 
     if (isCaptureComplete()) {
+        if (!writeCalibrationResult(&errorMessage)) {
+            return makeError(errorMessage);
+        }
         setPhase(CalibrationCapturePhase::Completed, "calibration capture completed");
     } else if (m_state.mode == CalibrationCaptureMode::Automatic) {
         if (isPairedLaserImagePending()) {

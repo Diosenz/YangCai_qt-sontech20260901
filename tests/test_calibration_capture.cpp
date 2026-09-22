@@ -124,6 +124,8 @@ bool testManualCapture(void)
     const fs::path methodDir = root / "CALID" / "4 TWO_STEP";
     ok &= expectTrue(fs::exists(methodDir / "CalibOriginData.txt"),
         "CalibOriginData.txt should exist");
+    ok &= expectTrue(fs::exists(methodDir / "CalibResult.txt"),
+        "CalibResult.txt should exist");
     ok &= expectTrue(fs::exists(methodDir / "image_01.png"), "image_01.png should exist");
     ok &= expectTrue(fs::exists(methodDir / "image_15.png"), "image_15.png should exist");
     ok &= expectTrue(fs::exists(methodDir / "image_16.png"), "image_16.png should exist");
@@ -137,6 +139,24 @@ bool testManualCapture(void)
         "first robot pose should be written in legacy integer units");
     ok &= expectTrue(lines.size() > 19 && lines[19] == "100019 200019 300019 10019 20019 30019",
         "last origin pose should come from paired board image, not laser image");
+
+    const std::vector<std::string> resultLines =
+        readLines(methodDir / "CalibResult.txt");
+    ok &= expectTrue(resultLines.size() == 10,
+        "CalibResult.txt should keep the external calibration format");
+    const std::vector<std::string> expectedArrays{
+        "cx[] = {100001,100002,100003,100004,100005,100006,100007,100008,100009,100010,100011,100012,100013,100014,100015,100016,100017,100018,100019,};",
+        "cy[] = {200001,200002,200003,200004,200005,200006,200007,200008,200009,200010,200011,200012,200013,200014,200015,200016,200017,200018,200019,};",
+        "cz[] = {300001,300002,300003,300004,300005,300006,300007,300008,300009,300010,300011,300012,300013,300014,300015,300016,300017,300018,300019,};",
+        "crx[] = {10001,10002,10003,10004,10005,10006,10007,10008,10009,10010,10011,10012,10013,10014,10015,10016,10017,10018,10019,};",
+        "cry[] = {20001,20002,20003,20004,20005,20006,20007,20008,20009,20010,20011,20012,20013,20014,20015,20016,20017,20018,20019,};",
+        "crz[] = {30001,30002,30003,30004,30005,30006,30007,30008,30009,30010,30011,30012,30013,30014,30015,30016,30017,30018,30019,};"};
+    for (std::size_t index = 0; index < expectedArrays.size(); ++index) {
+        ok &= expectTrue(
+            resultLines.size() > index + 3
+                && resultLines[index + 3] == expectedArrays[index],
+            "CalibResult pose arrays should match image_01 through image_19");
+    }
     return ok;
 }
 

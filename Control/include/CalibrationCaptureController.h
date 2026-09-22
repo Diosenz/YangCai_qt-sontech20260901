@@ -176,6 +176,14 @@ private:
         std::string *errorMessage);
 
     /**
+     * @brief 按外部标定软件格式写出本次会话的 CalibResult.txt。
+     * @param errorMessage 可选错误输出。
+     * @return 19 张标定板图与 TCP 位姿一一对应并写入成功时返回 true。
+     * @note 激光图与后 4 张标定板图共用位姿，不单独写入数组。
+     */
+    bool writeCalibrationResult(std::string *errorMessage) const;
+
+    /**
      * @brief 保存一张标定图像。
      * @param image 输入图像，所有权由调用方持有。
      * @param fileName 文件名，不含目录。
