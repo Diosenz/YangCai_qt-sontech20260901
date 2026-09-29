@@ -555,10 +555,19 @@ OnlineCorrectionTrajectoryPlanResult COnlineCorrectionTrajectoryPlanner::planIni
             return result;
         }
 
-        command.teachPoints.push_back(robot_comm::TeachPointUpdateCommand{
+        robot_comm::TeachPointUpdateCommand teachPoint{
             toUm(robotPose.xMm), toUm(robotPose.yMm), toUm(robotPose.zMm),
             toDeg10000(robotPose.rxDeg), toDeg10000(robotPose.ryDeg),
-            toDeg10000(robotPose.rzDeg), true});
+            toDeg10000(robotPose.rzDeg), true};
+        if (index == initialTeachIndex
+            && options.startMode != OnlineCorrectionStartMode::IBVSStart) {
+            // 反扫完成时的 D 回包已包含 RobotBase 焊枪姿态；仅首个 O 点
+            // 继承该姿态，避免把 RobotBase 欧拉角误当作 _T 变位机坐标。
+            teachPoint.rxDeg10000 = robotState.curRx_r;
+            teachPoint.ryDeg10000 = robotState.curRy_r;
+            teachPoint.rzDeg10000 = robotState.curRz_r;
+        }
+        command.teachPoints.push_back(teachPoint);
         command.stationAxes.push_back(robot_comm::StationAxisUpdateCommand{
             toDeg10000(axis.s1Deg), toDeg10000(axis.s2Deg), true});
     }

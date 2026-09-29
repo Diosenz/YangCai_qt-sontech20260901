@@ -90,6 +90,7 @@ bool testTrajectoryParsingAndCommandUnits()
 
     i2r_rlc::robot_comm::RobotState robotState;
     robotState.onlineReverseCompleteFlag = 1;
+    robotState.curRx_r = 120000;
 
     auto plan = i2r_rlc::control::COnlineCorrectionTrajectoryPlanner::planInitialCorrection(
         trajectory, options, state, robotState);
@@ -100,8 +101,88 @@ bool testTrajectoryParsingAndCommandUnits()
     ok &= expectTrue(plan.command.teachPoints[0].xUm == 10000, "x should convert mm to um");
     ok &= expectTrue(plan.command.teachPoints[0].yUm == 20000, "y should convert mm to um");
     ok &= expectTrue(plan.command.teachPoints[0].zUm == 30000, "z should convert mm to um");
-    ok &= expectTrue(plan.command.teachPoints[0].rxDeg10000 == 10000, "rx should convert deg to deg10000");
+    ok &= expectTrue(plan.command.teachPoints[0].rxDeg10000 == robotState.curRx_r,
+                     "P001 rx should use the reverse-completion robot pose");
     ok &= expectTrue(plan.command.stationAxes[0].s1Deg10000 == 0, "s1 should convert deg to deg10000");
+    return ok;
+}
+
+bool testReverseP001OrientationChangesOnlyFirstTeachPoint()
+{
+    auto trajectory = makeTrajectory();
+    trajectory.stationAxes[0] = { 12.0, -34.0, true };
+    trajectory.stationAxes[1] = { 12.0, 46.0, true };
+    auto calibration = makePositionerCalibration();
+    calibration.stationBaseInRobotBase = Eigen::Affine3d(
+        Eigen::AngleAxisd(0.2, Eigen::Vector3d::UnitZ()).toRotationMatrix());
+
+    i2r_rlc::control::OnlineCorrectionSessionState state;
+    state.initialDetectionSamples.push_back(
+        { { 10.0, 20.0, 30.0, true }, std::nullopt });
+    i2r_rlc::robot_comm::RobotState firstFeedback;
+    firstFeedback.curRx_r = -1501234;
+    firstFeedback.curRy_r = 234567;
+    firstFeedback.curRz_r = -456789;
+    auto secondFeedback = firstFeedback;
+    secondFeedback.curRx_r = -1400000;
+    secondFeedback.curRy_r = 123456;
+    secondFeedback.curRz_r = 345678;
+
+    bool ok = true;
+    for (const auto startMode : {
+             i2r_rlc::control::OnlineCorrectionStartMode::InitType,
+             i2r_rlc::control::OnlineCorrectionStartMode::GlobalCorrection }) {
+        i2r_rlc::control::OnlineCorrectionOptions options;
+        options.startMode = startMode;
+        if (startMode == i2r_rlc::control::OnlineCorrectionStartMode::GlobalCorrection) {
+            options.globalCorrectionRowMajor = {
+                0.0, -1.0, 0.0, 10.0,
+                1.0,  0.0, 0.0, 20.0,
+                0.0,  0.0, 1.0, 30.0,
+                0.0,  0.0, 0.0, 1.0
+            };
+        }
+        const auto firstPlan =
+            i2r_rlc::control::COnlineCorrectionTrajectoryPlanner::planInitialCorrection(
+                trajectory, options, state, firstFeedback, calibration);
+        const auto secondPlan =
+            i2r_rlc::control::COnlineCorrectionTrajectoryPlanner::planInitialCorrection(
+                trajectory, options, state, secondFeedback, calibration);
+        ok &= expectTrue(firstPlan.valid && secondPlan.valid,
+                         "both reverse P001 plans should be valid");
+        if (!firstPlan.valid || !secondPlan.valid) {
+            continue;
+        }
+
+        const auto &first = firstPlan.command.teachPoints.front();
+        const auto &second = secondPlan.command.teachPoints.front();
+        ok &= expectTrue(first.rxDeg10000 == firstFeedback.curRx_r
+                             && first.ryDeg10000 == firstFeedback.curRy_r
+                             && first.rzDeg10000 == firstFeedback.curRz_r,
+                         "P001 RobotBase orientation should equal first feedback");
+        ok &= expectTrue(second.rxDeg10000 == secondFeedback.curRx_r
+                             && second.ryDeg10000 == secondFeedback.curRy_r
+                             && second.rzDeg10000 == secondFeedback.curRz_r,
+                         "P001 RobotBase orientation should follow changed feedback");
+        ok &= expectTrue(first.xUm == second.xUm
+                             && first.yUm == second.yUm
+                             && first.zUm == second.zUm,
+                         "P001 position should not depend on feedback orientation");
+        ok &= expectTrue(firstPlan.command.stationAxes[0].s1Deg10000
+                             == secondPlan.command.stationAxes[0].s1Deg10000
+                             && firstPlan.command.stationAxes[0].s2Deg10000
+                                 == secondPlan.command.stationAxes[0].s2Deg10000,
+                         "P001 target station axes should not depend on feedback orientation");
+        const auto &laterFirst = firstPlan.command.teachPoints[1];
+        const auto &laterSecond = secondPlan.command.teachPoints[1];
+        ok &= expectTrue(laterFirst.xUm == laterSecond.xUm
+                             && laterFirst.yUm == laterSecond.yUm
+                             && laterFirst.zUm == laterSecond.zUm
+                             && laterFirst.rxDeg10000 == laterSecond.rxDeg10000
+                             && laterFirst.ryDeg10000 == laterSecond.ryDeg10000
+                             && laterFirst.rzDeg10000 == laterSecond.rzDeg10000,
+                         "later teach point should retain template behavior");
+    }
     return ok;
 }
 
@@ -221,6 +302,7 @@ bool testReverseCompletionRequiresFreshEdge()
 
     i2r_rlc::robot_comm::RobotState state;
     state.onlineReverseCompleteFlag = 1;
+    state.curRx_r = 110000;
     controller.onRobotStateChanged(state);
     auto update = controller.startInitialDetection();
 
@@ -236,13 +318,19 @@ bool testReverseCompletionRequiresFreshEdge()
         "stale reverse completion high level must not finish a new cycle");
 
     state.onlineReverseCompleteFlag = 0;
+    state.curRx_r = 220000;
     controller.onRobotStateChanged(state);
     state.onlineReverseCompleteFlag = 1;
+    state.curRx_r = 330000;
     update = controller.onRobotStateChanged(state);
     ok &= expectTrue(
         update.phase
             == i2r_rlc::control::OnlineCorrectionPhase::SendingInitialTeachPoints,
         "fresh reverse completion rising edge should finish initial detection");
+    ok &= expectTrue(update.command.valid
+                         && update.command.teachPoints.front().rxDeg10000
+                             == state.curRx_r,
+                     "P001 should use orientation from the fresh reverse-completion state");
     return ok;
 }
 
@@ -677,6 +765,7 @@ bool testIbvsStartModeUsesRobotState()
     robotState.curx_r = 21000;
     robotState.cury_r = 22000;
     robotState.curz_r = 23000;
+    robotState.curRx_r = 120000;
 
     auto plan = i2r_rlc::control::COnlineCorrectionTrajectoryPlanner::planInitialCorrection(
         trajectory, options, state, robotState);
@@ -686,6 +775,8 @@ bool testIbvsStartModeUsesRobotState()
     ok &= expectTrue(plan.command.teachPoints[0].xUm == 21000, "IBVS x should come from robot state");
     ok &= expectTrue(plan.command.teachPoints[0].yUm == 22000, "IBVS y should come from robot state");
     ok &= expectTrue(plan.command.teachPoints[0].zUm == 23000, "IBVS z should come from robot state");
+    ok &= expectTrue(plan.command.teachPoints[0].rxDeg10000 == 10000,
+                     "IBVS orientation should retain its existing template source");
     return ok;
 }
 
@@ -830,6 +921,7 @@ int main()
 {
     bool ok = true;
     ok &= testTrajectoryParsingAndCommandUnits();
+    ok &= testReverseP001OrientationChangesOnlyFirstTeachPoint();
     ok &= testControllerStateFlow();
     ok &= testControllerRejectsMissingCalibration();
     ok &= testReverseCompletionRequiresFreshEdge();
