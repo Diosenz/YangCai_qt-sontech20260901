@@ -707,6 +707,34 @@ i2r_rlc_apply_common_options(<target>)
 
 不要在单个源文件里绕过这个问题。
 
+### Ninja 漏记 MSVC 头文件依赖
+
+`/showIncludes` 的输出语言必须与 Ninja 的 `msvc_deps_prefix` 一致。
+如果配置时识别的是中文前缀，而实际编译输出英文，Ninja 可能记录零个头文件依赖。
+随后修改按值成员类型时，入口对象未重新编译，可能与新库的对象布局不一致，
+并在构造或“选择工件”清理状态时发生内存访问错误。
+
+根 CMake 为 MSVC + Ninja 的每次编译固定 `VSLANG=1033`，并同步设置英文依赖前缀。
+该设置同时覆盖既有 build tree 的旧探测结果。首次应用会因编译命令变化重新编译；
+无需删除构建目录。不要仅手改生成的 `rules.ninja`，也不要只在配置 shell 设置语言。
+
+在已配置的 Developer 环境完成 Debug 应用构建后，串行运行以下检查：
+
+```powershell
+python tests/test_msvc_build_contract.py out/build/debug-hdrive --probe-header
+# 使用与 run-hdrive.ps1 相同的 Qt PATH 和 QT_PLUGIN_PATH 环境：
+./tests/test_workpiece_application_lifecycle.ps1 -Executable ./out/build/debug-hdrive/UI/i2r_rlc.exe
+```
+
+第一个检查需要 Python 3 和 EXE 对应的 MSVC Debug PDB，验证实际依赖记录、
+间接头文件变动的增量编译，以及入口和构造函数活动类型大小一致。
+`--probe-header` 暂时改变头文件时间戳并在 finally 恢复，只执行 Ninja dry-run，
+运行时不得有并发生成。
+第二个检查需要 Windows UI Automation 和已有可用工件配置，
+只通过 InvokePattern 操作测试创建的应用进程，禁用设备自动启动，
+验证两次选择工件均完成在线/离线配置并正常退出。
+这两个产物级检查需要上述环境前提，故不挂入通用 CTest。
+
 ## 新机器验收清单
 
 Codex 完成配置后，应向用户汇报以下事实：

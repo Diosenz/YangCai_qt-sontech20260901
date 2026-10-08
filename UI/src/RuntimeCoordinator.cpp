@@ -303,6 +303,12 @@ void CRuntimeCoordinator::startCamera()
 void CRuntimeCoordinator::configureOnlineCorrection(
     const RuntimeOnlineCorrectionConfiguration &configuration)
 {
+    RuntimeOnlineCorrectionConfiguration resolved = configuration;
+    if (!resolved.positionerCalibrationSnapshot.has_value()) {
+        resolved.positionerCalibrationSnapshot =
+            vision::CPositionerCalibrationParser::parseFile(resolved.rbcalibFile);
+    }
+    m_onlinePositionerCalibration = resolved.positionerCalibrationSnapshot;
     if (m_onlineCorrectionWorker == nullptr) {
         return;
     }
@@ -310,7 +316,16 @@ void CRuntimeCoordinator::configureOnlineCorrection(
         m_onlineCorrectionWorker,
         "configure",
         Qt::QueuedConnection,
-        Q_ARG(i2r_rlc::ui::RuntimeOnlineCorrectionConfiguration, configuration));
+        Q_ARG(i2r_rlc::ui::RuntimeOnlineCorrectionConfiguration, resolved));
+}
+
+RuntimeTrackingOptions CRuntimeCoordinator::onlineTrackingOptions() const
+{
+    RuntimeTrackingOptions options = m_trackingOptions;
+    if (m_onlinePositionerCalibration.has_value()) {
+        options.positionerCalibration = *m_onlinePositionerCalibration;
+    }
+    return options;
 }
 
 void CRuntimeCoordinator::connectRobot()
@@ -597,6 +612,10 @@ void CRuntimeCoordinator::startOnlineCorrectionJob(
 {
     cancelOnlineCorrectionStart();
     m_pendingOnlineCorrectionConfiguration = configuration;
+    if (!m_pendingOnlineCorrectionConfiguration.positionerCalibrationSnapshot.has_value()) {
+        m_pendingOnlineCorrectionConfiguration.positionerCalibrationSnapshot =
+            vision::CPositionerCalibrationParser::parseFile(configuration.rbcalibFile);
+    }
     m_pendingOnlineCorrectionJobName = jobName;
     m_onlineCorrectionStartPhase =
         OnlineCorrectionStartPhase::WaitingForCameraFrame;
@@ -728,6 +747,7 @@ void CRuntimeCoordinator::beginOnlineCorrectionArm()
 
     const RuntimeOnlineCorrectionConfiguration configuration =
         m_pendingOnlineCorrectionConfiguration;
+    m_onlinePositionerCalibration = configuration.positionerCalibrationSnapshot;
     const quint64 sessionId = m_onlineCorrectionStartSessionId;
     const QPointer<CRuntimeCoordinator> coordinator(this);
     QMetaObject::invokeMethod(
@@ -794,7 +814,7 @@ void CRuntimeCoordinator::handleOnlineConfigurationReady(
         m_visionWorker,
         [coordinator,
          worker = m_visionWorker,
-         options = m_trackingOptions,
+         options = onlineTrackingOptions(),
          projectionContext = m_trackingProjectionContext,
          state = m_latestRobotState,
          hasState = m_hasLatestRobotState,
@@ -1612,7 +1632,7 @@ void CRuntimeCoordinator::connectWorkers()
                         : QStringLiteral(
                               "初始检测窗口已启动，等待首个完整帧。"));
                 if (m_visionWorker != nullptr) {
-                    RuntimeTrackingOptions options = m_trackingOptions;
+                    RuntimeTrackingOptions options = onlineTrackingOptions();
                     options.requireDetectionWindow =
                         !m_correctionSession.onlineControlWindowActive;
                     QMetaObject::invokeMethod(

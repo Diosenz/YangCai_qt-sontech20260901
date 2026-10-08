@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -28,12 +28,31 @@
  *
  ******************************************************************************/
 #include <algorithm>
+#include <cmath>
 #include <optional>
 #include <utility>
 
 #include "OnlineCorrectionController.h"
 
 namespace i2r_rlc::control {
+
+namespace {
+
+/** @brief 控制几何要求标定矩阵和 TCP 偏移均为有限值。 */
+bool usableCalibration(const vision::PositionerCalibration &calibration)
+{
+    return calibration.valid
+        && calibration.stationBaseInRobotBase.matrix().allFinite()
+        && calibration.toolTcpInLastLinkMm.allFinite();
+}
+
+bool finitePoint(const OnlineCorrectionPoint &point)
+{
+    return point.valid && std::isfinite(point.xMm)
+        && std::isfinite(point.yMm) && std::isfinite(point.zMm);
+}
+
+} // namespace
 
 void COnlineCorrectionController::configure(
     const OnlineCorrectionOptions &options,
@@ -49,11 +68,11 @@ void COnlineCorrectionController::configure(
     m_state.startTeachIndex = trajectory.startTeachIndex;
     m_state.endTeachIndex = trajectory.endTeachIndex;
     m_state.onlineTeachTrajectoryInitialized = trajectory.valid;
-    m_state.positionerCalibrationInitialized = positionerCalibration.valid;
+    m_state.positionerCalibrationInitialized = usableCalibration(positionerCalibration);
     m_exceptionProcessor.reset();
     m_pathFollower.reset();
 
-    const bool configured = trajectory.valid && positionerCalibration.valid;
+    const bool configured = trajectory.valid && m_state.positionerCalibrationInitialized;
     setPhase(
         OnlineCorrectionPhase::Idle,
         configured ? "online correction configured"
@@ -105,7 +124,7 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
 
     std::vector<OnlineCorrectionDetectionSample> accepted;
     for (const auto &sample : event.samples) {
-        if (!sample.point.valid) {
+        if (!finitePoint(sample.point)) {
             continue;
         }
         if (m_options.enableGapDetection && !sample.gapWidthMm.has_value()) {
@@ -116,6 +135,16 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
         }
 
         OnlineCorrectionDetectionSample normalized = sample;
+        if (!initialPhase) {
+            // 在线异常处理、参考轨迹和机器人反馈均使用末节系。入口只转换
+            // 新样本一次；初始缓存保留 TCP 点，由起点规划器完成其转换。
+            normalized.point.xMm += m_positionerCalibration.toolTcpInLastLinkMm.x();
+            normalized.point.yMm += m_positionerCalibration.toolTcpInLastLinkMm.y();
+            normalized.point.zMm += m_positionerCalibration.toolTcpInLastLinkMm.z();
+            if (!finitePoint(normalized.point)) {
+                continue;
+            }
+        }
         if (!m_options.enableGapDetection) {
             normalized.gapWidthMm = std::nullopt;
         }
@@ -430,7 +459,7 @@ OnlineCorrectionUpdate COnlineCorrectionController::fail(
 OnlineCorrectionUpdate COnlineCorrectionController::reset()
 {
     const bool trajectoryInitialized = m_trajectory.valid;
-    const bool calibrationInitialized = m_positionerCalibration.valid;
+    const bool calibrationInitialized = usableCalibration(m_positionerCalibration);
     m_state = OnlineCorrectionSessionState{};
     m_state.startMode = m_options.startMode;
     m_state.onlineTeachTrajectoryInitialized = trajectoryInitialized;

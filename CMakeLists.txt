@@ -5,6 +5,16 @@ project(i2r_rlc
     LANGUAGES CXX
 )
 
+# MSVC 的 /showIncludes 文本必须与 Ninja 的解析前缀一致。只设置配置进程
+# 的环境不足以约束后续 VS/Developer Shell 构建；launcher 固定每次编译的语言。
+# project() 之后覆盖前缀，同时修复已有 build tree 缓存的其他语言探测结果。
+if(MSVC AND CMAKE_GENERATOR MATCHES "Ninja")
+    set(CMAKE_CXX_COMPILER_LAUNCHER
+        "${CMAKE_COMMAND}" "-E" "env" "VSLANG=1033" ${CMAKE_CXX_COMPILER_LAUNCHER})
+    set(CMAKE_CL_SHOWINCLUDES_PREFIX "Note: including file: ")
+    set(CMAKE_CXX_CL_SHOWINCLUDES_PREFIX "Note: including file: ")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

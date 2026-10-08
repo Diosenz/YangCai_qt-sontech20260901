@@ -37,6 +37,24 @@
 | HALCON 显示、调试文件 | 不迁移 | 过时 |
 | `onlineFlipFlag`、`s_TraOrCor==0` | 不迁移 | 明确排除 |
 
+## 2026-10-08 坐标与会话标定边界
+
+- Vision 的在线检测点以 `WeldProjectionTargetFrame::PositionerTcp` 输出，含义是
+  变位机 TCP 坐标、单位 mm。`LegacyOnlineKcfDetector` 的空间投影不直接承担
+  在线纠偏内部坐标转换。
+- 在线入口 `COnlineCorrectionController::appendDetectionEvent()` 在进入异常处理器
+  前，将每个有效样本沿 `toolTcpInLastLinkMm` 转换到末节坐标；在线缓存保存末节
+  坐标。初始检测缓存仍保存 TCP 坐标，由
+  `COnlineCorrectionTrajectoryPlanner` 在起点规划时完成一次同样的转换，避免
+  P001/初始轨迹重复补偿。
+- 本次在线配置解析出的 `PositionerCalibration` 是会话 Source of Truth。
+  `CRuntimeCoordinator` 在显式配置边界读取或接收一次快照，并将同一快照交给
+  Vision 与 Control；分段切换继续使用该快照，只有下一次显式配置才重新读取
+  `RBCALIB.DAT`。配置快照存在但矩阵、偏移或输入点含非有限值时拒绝该数据或会话。
+- 因此在线闭环的 Observable Behavior 是：同一会话中 Vision 产生的 TCP 点与
+  Control 消费的末节点之间只有入口处一次、方向明确的 TCP→末节转换；零物理偏差
+  不产生纠偏输出，标定文件在会话中途变化不改变当前会话结果。
+
 ## 协议边界
 
 `CRobotProtocolCodec` 逐字符保持旧协议格式：

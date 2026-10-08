@@ -186,7 +186,7 @@ struct OnlineCorrectionStationAxis {
  * 点与间隙宽度放在同一结构中，保证启用间隙检测时两者按样本一一对应。
  */
 struct OnlineCorrectionDetectionSample {
-    /// @brief 视觉重建后的空间点，单位为 mm。
+    /// @brief 检测事件输入为变位机 TCP 点，mm；在线内部缓存转换为末节点。
     OnlineCorrectionPoint point;
     /// @brief 可选 gap 宽度，单位为 mm，仅 enableGapDetection 时强制要求。
     std::optional<float> gapWidthMm;
@@ -278,9 +278,9 @@ struct OnlineCorrectionSessionState {
     bool onlineTeachTrajectoryInitialized = false;
     /// @brief RBCALIB 变位机标定是否有效。
     bool positionerCalibrationInitialized = false;
-    /// @brief 初始检测样本缓存，由控制器按事件累积。
+    /// @brief 初始检测样本缓存，变位机 TCP 系、mm；规划器负责转换一次。
     std::vector<OnlineCorrectionDetectionSample> initialDetectionSamples;
-    /// @brief 在线运行阶段尚未消费的检测样本。
+    /// @brief 在线运行阶段尚未消费的样本，变位机末节系、mm。
     std::vector<OnlineCorrectionDetectionSample> onlineDetectionSamples;
     /// @brief 初始修正后的当前分段轨迹，单位 mm。
     std::vector<OnlineCorrectionPoint> correctedSegmentPath;

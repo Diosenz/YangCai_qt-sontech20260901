@@ -224,6 +224,13 @@ struct RuntimeOnlineCorrectionConfiguration {
     control::OnlineCorrectionOptions options;
     control::OnlineCorrectionTrajectoryRequest trajectoryRequest;
     std::string rbcalibFile;
+    /**
+     * @brief 本次配置的标定值快照，同时供 Vision 和 Control 使用。
+     *
+     * 未提供时由配置入口读取 rbcalibFile 一次。快照存在但无效时拒绝启动，
+     * 不回退读文件；分段切换沿用该快照，显式重新配置才可采用下一版本。
+     */
+    std::optional<vision::PositionerCalibration> positionerCalibrationSnapshot;
     /// @brief 在线纠偏会话记录根目录；生产路径使用 `output/online_correction`。
     std::string diagnosticOutputDirectory;
 };

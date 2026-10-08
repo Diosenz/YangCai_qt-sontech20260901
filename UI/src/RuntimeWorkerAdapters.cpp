@@ -2473,9 +2473,11 @@ void COnlineCorrectionWorkerAdapter::configure(
     const auto trajectory =
         control::COnlineCorrectionTrajectoryPlanner::loadTrajectory(
             configuration.trajectoryRequest);
-    const auto calibration =
-        vision::CPositionerCalibrationParser::parseFile(
-            configuration.rbcalibFile);
+    if (!m_configuration.positionerCalibrationSnapshot.has_value()) {
+        m_configuration.positionerCalibrationSnapshot =
+            vision::CPositionerCalibrationParser::parseFile(configuration.rbcalibFile);
+    }
+    const auto &calibration = *m_configuration.positionerCalibrationSnapshot;
     m_positionerCalibration = calibration;
     m_controller.configure(configuration.options, trajectory, calibration);
     emit statusChanged(QString::fromStdString(m_controller.state().message));

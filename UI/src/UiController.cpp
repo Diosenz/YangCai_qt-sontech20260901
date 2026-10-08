@@ -1489,6 +1489,7 @@ void UiController::onOnlineCorrectionConfigurationSelected(
     }
 
     m_positionerCalibration = calibration;
+    configuration.positionerCalibrationSnapshot = calibration;
     m_onlineCorrectionConfiguration = configuration;
     m_runtimeCoordinator.configureOnlineCorrection(m_onlineCorrectionConfiguration);
     m_onlineCorrectionConfigured = true;

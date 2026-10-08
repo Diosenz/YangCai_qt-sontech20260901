@@ -175,6 +175,18 @@ add_test(
 )
 i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_correction_p001_contract_tests)
 
+i2r_rlc_add_test(i2r_rlc_online_correction_coordinate_contract_tests
+    test_online_correction_coordinate_contract.cpp
+)
+target_link_libraries(i2r_rlc_online_correction_coordinate_contract_tests
+    PRIVATE i2r_rlc_ui
+)
+
+add_test(NAME i2r_rlc_online_calibration_contract_tests
+    COMMAND i2r_rlc_runtime_tracking_flow_tests --calibration-contract
+)
+i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_calibration_contract_tests)
+
 i2r_rlc_add_test(i2r_rlc_online_correction_p001_presentation_tests
     test_online_correction_p001_presentation.cpp
 )

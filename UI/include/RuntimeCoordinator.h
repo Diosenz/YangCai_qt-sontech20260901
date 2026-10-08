@@ -375,6 +375,8 @@ signals:
     void onlineCorrectionStartFailed(const QString &message);
 
 private:
+    /// @brief 按值组装在线 Vision 参数；仅覆盖在线会话标定，不改其他跟踪用途。
+    RuntimeTrackingOptions onlineTrackingOptions() const;
     enum class OnlineCorrectionStartPhase {
         Idle,
         WaitingForCameraFrame,
@@ -536,6 +538,8 @@ private:
     int m_globalLocalizationCurrentSegmentIndex = 0;
     int m_globalLocalizationSegmentSequence = 0;
     RuntimeTrackingOptions m_trackingOptions;
+    /// @brief 与在线 Control 配置同源的标定快照，包含无效配置的拒绝语义。
+    std::optional<vision::PositionerCalibration> m_onlinePositionerCalibration;
     vision::WeldProjectionContext m_trackingProjectionContext;
     RuntimeTrackingPurpose m_trackingPurpose = RuntimeTrackingPurpose::None;
     CorrectionRunSession m_correctionSession;

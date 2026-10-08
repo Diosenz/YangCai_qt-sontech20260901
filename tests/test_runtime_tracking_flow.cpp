@@ -164,6 +164,7 @@ private:
 struct FakeRobotSimTransportState {
     std::atomic<int> connectCount{0};
     std::atomic<int> sendCount{0};
+    bool centeredObservation = false;
 };
 
 class CFakeRobotSimTransport final
@@ -208,8 +209,11 @@ public:
         return {
             true,
             expectResponse
-                ? QStringLiteral(
+                ? (m_state->centeredObservation
+                    ? QStringLiteral("[[[[[1,2,3],[60,120]],[[4,5,6],[260,120]]]],[[160,120]]]")
+                    : QStringLiteral(
                     "[[[[[1,2,3],[10,20]],[[4,5,6],[11,21]]]],[[12,22]]]")
+                  )
                 : QString(),
             QStringLiteral("fake RobotSim send ok"),
             0
@@ -999,11 +1003,96 @@ bool testCalibrationGuideOverlayClipsSmallImage()
     return ok;
 }
 
+/**
+ * @brief 正式纠偏使用配置时的标定；磁盘改动仅在下一次显式配置生效。
+ * @details 从 Vision 实际输出及其图像坐标手算空间点，验证 runtime 装配而非字段相等。
+ */
+bool testOnlineCalibrationSnapshot(QCoreApplication &app)
+{
+    Q_UNUSED(app);
+    using namespace i2r_rlc;
+    auto simulation = std::make_shared<FakeRobotSimTransportState>();
+    simulation->centeredObservation = true;
+    ui::CRuntimeCoordinator runtime(
+        std::make_unique<CFakeRobotTransport>(),
+        std::make_unique<CFakeRobotSimTransport>(simulation));
+    ui::RuntimeOnlineCorrectionConfiguration configuration;
+    makeOnlineConfigurationFiles(&configuration);
+    ui::RuntimeTrackingOptions options;
+    options.sensorCalibration.valid = true;
+    options.sensorCalibration.focalLengthM = 0.01;
+    options.sensorCalibration.sxM = options.sensorCalibration.syM = 0.00001;
+    options.sensorCalibration.cxPixel = 160;
+    options.sensorCalibration.cyPixel = 120;
+    options.sensorCalibration.laserPlaneC = -1;
+    options.sensorCalibration.cameraZInToolM = -1;
+    options.positionerCalibration.valid = true; // 故意保留初始化时的另一份标定。
+    auto state = makeRobotSimReachableState();
+    QEventLoop loop;
+    std::vector<ui::RuntimeTrackingResult> results;
+    QObject::connect(&runtime, &ui::CRuntimeCoordinator::trackingResultReady, &loop,
+                     [&](const ui::RuntimeTrackingResult &result) {
+                         results.push_back(result);
+                         loop.quit();
+                     });
+    runtime.start();
+    runtime.configureTracking(options, makeProjectionContext());
+    runtime.publishRobotState(state);
+    bool ok = connectCorrectionRobotSim(runtime, loop);
+    for (int session = 0; session < 2; ++session) {
+        const double installX = session == 0 ? 100 : 200;
+        std::ofstream(configuration.rbcalibFile)
+            << "////SRANG " << installX << ",20,30,0,0,0\n";
+        runtime.configureOnlineCorrection(configuration);
+        // 会话已配置之后文件改为第三版本，两端必须继续使用刚选定的快照。
+        std::ofstream(configuration.rbcalibFile) << "////SRANG 900,20,30,0,0,0\n";
+        runtime.startOnlineTracking();
+        QTimer::singleShot(100, &loop, [&]() {
+            auto frame = makeFrame();
+            frame.frameId = 900 + session;
+            runtime.publishCameraFrame(frame);
+        });
+        QTimer timeout;
+        timeout.setSingleShot(true);
+        QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
+        timeout.start(4000);
+        loop.exec();
+        if (!results.empty() && !results.back().valid) {
+            std::cerr << "snapshot Vision: " << results.back().message.toStdString() << '\n';
+        }
+        ok &= expectTrue(results.size() == static_cast<std::size_t>(session + 1)
+                             && results.back().valid, "snapshot test gets a valid synchronized Vision result");
+        if (results.size() == static_cast<std::size_t>(session + 1) && results.back().valid) {
+            const auto &result = results.back();
+            const double rx = state.curRx_r * (3.14159265358979323846 / 1800000);
+            const double ry = state.curRy_r * (3.14159265358979323846 / 1800000);
+            const double rz = state.curRz_r * (3.14159265358979323846 / 1800000);
+            const double x = result.imageXPixel - 160;
+            const double y = result.imageYPixel - 120;
+            const double expectedX = state.curx_r / 1000.0 - installX
+                + std::cos(rz) * std::cos(ry) * x
+                + (std::cos(rz) * std::sin(ry) * std::sin(rx) - std::sin(rz) * std::cos(rx)) * y;
+            ok &= expectTrue(std::abs(result.sample.point.xMm - expectedX) < 1.0e-6,
+                             "Vision uses the selected session calibration A/B, not startup or changed file");
+        }
+        runtime.stopOnlineTracking();
+        QEventLoop drain;
+        QTimer::singleShot(100, &drain, &QEventLoop::quit);
+        drain.exec();
+    }
+    runtime.stop();
+    return ok;
+}
+
 } // namespace
 
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+
+    if (argc > 1 && std::string_view(argv[1]) == "--calibration-contract") {
+        return testOnlineCalibrationSnapshot(app) ? 0 : 1;
+    }
 
     using i2r_rlc::control::TrackingVirtualStatus;
     using i2r_rlc::ui::CRuntimeCoordinator;
@@ -1175,6 +1264,7 @@ int main(int argc, char **argv)
                      "DigitalTwin observation must be preferred over legacy callbacks");
 
     ok &= testInjectedRobotSimTransportIsUsed(app);
+    ok &= testOnlineCalibrationSnapshot(app);
     ok &= testCorrectionSessionPausesAndResumesRealtimeRobotSim(app);
     ok &= testCorrectionTrackingKeepsOnlyLatestPendingFrame(app);
     ok &= testLatestRealtimeCommandWins(app);
