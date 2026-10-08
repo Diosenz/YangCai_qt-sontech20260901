@@ -1488,6 +1488,7 @@ void UiController::onOnlineCorrectionConfigurationSelected(
         return;
     }
 
+    m_positionerCalibration = calibration;
     m_onlineCorrectionConfiguration = configuration;
     m_runtimeCoordinator.configureOnlineCorrection(m_onlineCorrectionConfiguration);
     m_onlineCorrectionConfigured = true;
@@ -3889,7 +3890,7 @@ void UiController::renderOfflineCorrectionState()
 
 void UiController::showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorrectionUpdate& update)
 {
-    m_onlineCorrectionP001Presentation.update(update);
+    m_onlineCorrectionP001Presentation.update(update, m_positionerCalibration);
     m_view.setOnlineCorrectionP001Text(
         m_onlineCorrectionP001Presentation.text());
     if (m_pendingCorrectionRobotStartKind == CorrectionRobotStartKind::OnlineGlobalLocate

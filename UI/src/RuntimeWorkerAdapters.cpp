@@ -717,6 +717,11 @@ bool CRobotCommWorkerAdapter::ensureOnlineCorrectionReady()
             "RobotComm 在线预检失败：机器人端仍有未完成的 O 示教点批次（offline=4）"));
         return false;
     }
+    if (m_state.sStart != 0) {
+        emit statusChanged(QStringLiteral(
+            "RobotComm 在线预检失败：机器人程序正在运行，不能初始化 P001 就绪状态"));
+        return false;
+    }
 
     m_trackerEnabled = 1;
     m_laserEnabled = 1;
@@ -728,9 +733,30 @@ bool CRobotCommWorkerAdapter::ensureOnlineCorrectionReady()
     emit statusChanged(QStringLiteral(
         "RobotComm 在线预检：发送 tracker=1、laser=1 的 N 并等待有效 D 回包"));
     pollRobotState();
-    return m_transport->isConnected()
-        && m_diagnostics.lastTransactionSucceeded
-        && m_diagnostics.laserEnabled == 1;
+    if (!m_transport->isConnected()
+        || !m_diagnostics.lastTransactionSucceeded
+        || m_state.sStart != 0 || m_state.offline == 4) {
+        return false;
+    }
+
+    // 中断接近 P001 会跳过 JBI 的 ENDDET。只在下一次作业启动前请求
+    // 清除残留 B005，普通 N 轮询不能反复清除本轮 O 写入的就绪标志。
+    const std::string request =
+        robot_comm::CRobotProtocolCodec::encodeOnlineCorrectionInitialization(
+            protocolContext());
+    emit statusChanged(QStringLiteral(
+        "RobotComm 在线初始化：发送 N.init=1 请求清除上轮 P001 就绪标志"));
+    const auto receipt = m_transport->transact(
+        robot_comm::RobotCommandType::StatusPoll, request, -1, &m_state);
+    emit commandReceiptReady(receipt, m_state);
+    recordDiagnostics(receipt);
+    const bool succeeded = receipt.sent && receipt.responseReceived
+        && receipt.error == robot_comm::RobotCommandError::None;
+    if (succeeded) {
+        emit robotStateReady(m_state);
+    }
+    return succeeded && m_transport->isConnected()
+        && m_state.sStart == 0 && m_state.offline != 4;
 }
 
 void CRobotCommWorkerAdapter::setLaserEnabled(bool enabled)

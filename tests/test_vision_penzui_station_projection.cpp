@@ -3,7 +3,7 @@
  *
  * @file        test_vision_penzui_station_projection.cpp
  * @brief       vision penzui station projection 测试入口
- * @details     验证对应模块的迁移行为和关键边界，测试断言保持原有语义。
+ * @details     验证相机外参采用 Rz*Ry*Rx 时的投影公式与回放轨迹连续性。
  ******************************************************************************/
 #include <algorithm>
 #include <cmath>
@@ -103,7 +103,7 @@ std::vector<i2r_rlc::robot_comm::RobotState> readRobotStates(const fs::path &pat
     return states;
 }
 
-Eigen::Vector3d independentLegacyProjection(
+Eigen::Vector3d independentZyxProjection(
     const Eigen::Vector2d &pixel,
     const i2r_rlc::vision::WeldSensorCalibration &s,
     const i2r_rlc::vision::PositionerCalibration &p,
@@ -128,9 +128,9 @@ Eigen::Vector3d independentLegacyProjection(
             s.cameraXInToolM * 1000.0,
             s.cameraYInToolM * 1000.0,
             s.cameraZInToolM * 1000.0)
-        * (Eigen::AngleAxisd(rad(s.cameraRxInToolDeg), Eigen::Vector3d::UnitX())
+        * (Eigen::AngleAxisd(rad(s.cameraRzInToolDeg), Eigen::Vector3d::UnitZ())
            * Eigen::AngleAxisd(rad(s.cameraRyInToolDeg), Eigen::Vector3d::UnitY())
-           * Eigen::AngleAxisd(rad(s.cameraRzInToolDeg), Eigen::Vector3d::UnitZ()));
+           * Eigen::AngleAxisd(rad(s.cameraRxInToolDeg), Eigen::Vector3d::UnitX()));
     const Eigen::Affine3d toolInRobot =
         Eigen::Translation3d(
             r.curx_r / 1000.0, r.cury_r / 1000.0, r.curz_r / 1000.0)
@@ -191,7 +191,7 @@ int main()
             projected.spacePoint.xMm,
             projected.spacePoint.yMm,
             projected.spacePoint.zMm);
-        const Eigen::Vector3d expected = independentLegacyProjection(
+        const Eigen::Vector3d expected = independentZyxProjection(
             pixels[index], sensor, positioner, states[index]);
         const double error = (actual - expected).norm();
         maxFormulaError = std::max(maxFormulaError, error);

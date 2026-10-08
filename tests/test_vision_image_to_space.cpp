@@ -12,6 +12,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include "geometry/WeldImageToSpaceProjector.h"
+#include "geometry/WeldProjectionContextBuilder.h"
 #include "stripe/DpStripeCenterlineDetector.h"
 
 namespace {
@@ -113,10 +114,85 @@ Eigen::Vector3d computeLegacyCameraPointMm(
         calibration.focalLengthM * g * 1000.0);
 }
 
+/**
+ * @brief 用可手算的多轴姿态验证相机 Rz*Ry*Rx 及后续坐标链。
+ * @details 期望矩阵使用闭式数值，避免与生产代码重复拼接旋转算子。
+ */
+bool testCameraZyxProjection()
+{
+    using namespace i2r_rlc::vision;
+    WeldSensorCalibration sensor;
+    sensor.focalLengthM = 0.01;
+    sensor.sxM = 0.0001;
+    sensor.syM = 0.0001;
+    sensor.cxPixel = 50.0;
+    sensor.cyPixel = 40.0;
+    sensor.laserPlaneC = -1.0;
+    sensor.cameraXInToolM = 0.01;
+    sensor.cameraYInToolM = 0.02;
+    sensor.cameraZInToolM = 0.03;
+    sensor.cameraRxInToolDeg = 30.0;
+    sensor.cameraRyInToolDeg = 60.0;
+    sensor.cameraRzInToolDeg = 90.0;
+    sensor.valid = true;
+
+    PositionerCalibration positioner;
+    positioner.toolTcpInLastLinkMm = Eigen::Vector3d(0.0, 0.0, 231.0);
+    positioner.valid = true;
+    i2r_rlc::robot_comm::RobotState state;
+    state.curx_r = 100000;
+    state.cury_r = 200000;
+    state.curz_r = 300000;
+    state.curRx_r = 900000;
+    state.curRz_r = 900000;
+    state.curS2 = 900000;
+    const auto built = CWeldProjectionContextBuilder::build(
+        sensor, positioner, state);
+    const double sqrt3 = std::sqrt(3.0);
+    Eigen::Matrix3d expectedCameraRotation;
+    expectedCameraRotation <<
+        0.0, -sqrt3 / 2.0, 0.5,
+        0.5, sqrt3 / 4.0, 0.75,
+        -sqrt3 / 2.0, 0.25, sqrt3 / 4.0;
+    if (!built.valid || !built.context.calibration.cameraInTool.rotation.isApprox(
+            expectedCameraRotation, 1.0e-12)) {
+        std::printf("FAIL: camera rotation must be Rz*Ry*Rx\n");
+        return false;
+    }
+
+    const WeldProjectionTargetFrame frames[] = {
+        WeldProjectionTargetFrame::Camera,
+        WeldProjectionTargetFrame::Tool,
+        WeldProjectionTargetFrame::RobotBase,
+        WeldProjectionTargetFrame::PositionerTcp};
+    const Eigen::Vector3d expectedPoints[] = {
+        Eigen::Vector3d(0.0, 0.0, 1000.0),
+        Eigen::Vector3d(510.0, 770.0, 30.0 + 250.0 * sqrt3),
+        Eigen::Vector3d(130.0 + 250.0 * sqrt3, 710.0, 1070.0),
+        Eigen::Vector3d(710.0, -130.0 - 250.0 * sqrt3, 839.0)};
+    for (int index = 0; index < 4; ++index) {
+        const auto projected = CWeldImageToSpaceProjector::projectImagePoint(
+            WeldImagePoint{50.0, 40.0, true}, built.context, frames[index]);
+        const auto &expected = expectedPoints[index];
+        if (!projected.valid
+            || !expectNear(projected.spacePoint.xMm, expected.x(), 1.0e-9)
+            || !expectNear(projected.spacePoint.yMm, expected.y(), 1.0e-9)
+            || !expectNear(projected.spacePoint.zMm, expected.z(), 1.0e-9)) {
+            std::printf("FAIL: ZYX projection at target frame %d\n", index);
+            return false;
+        }
+    }
+    return true;
+}
+
 } // namespace
 
 int main()
 {
+    if (!testCameraZyxProjection()) {
+        return 21;
+    }
+
     using i2r_rlc::vision::CWeldImageToSpaceProjector;
     using i2r_rlc::vision::WeldFeaturePoint;
     using i2r_rlc::vision::WeldImagePoint;

@@ -96,8 +96,11 @@ D 必须包含 32 个字段。O 按原索引逐点发送，只有最终点发送
 - `RBCALIB.DAT` 固定由
   `config/calibration/RBCALIB.DAT` 自动加载，UI 仅选择 `_W.txt/_T.txt`。
 - `CWeldProjectionContextBuilder` 使用 SENSORPARA、逐帧 RobotState 和
-  RBCALIB 构造 Camera→Tool→RobotBase→当前变位机坐标变换；相机保持
-  HALCON `gba` 的 `Rx*Ry*Rz`，工具保持 `abg` 的 `Rz*Ry*Rx`。
+  RBCALIB 构造 Camera→Tool→RobotBase→当前变位机坐标变换；按 2026-10-08
+  用户指定，相机外参改为 `Rz*Ry*Rx`，机器人工具姿态同样采用 `Rz*Ry*Rx`。
+  SENSORPARA 的角度数值与平移不变；该约定不再沿用旧 HALCON `gba`。
+  变位机安装标定和外轴变换保持原有顺序。相机外参解释的变化会改变视觉
+  三维点与后续 P001 XYZ，需以对应 TCP 的现场位置验证物理正确性。
 - 生产 runtime 使用纯 Vision `CLegacyOnlineKcfDetector`：250x200 ROI、
   仿真模板、Gabor+Otsu、Y=-5 pixel 写回、超过 50 帧重建，只启用标准 KCF。
 - gap 链使用 400x400 局部中心线和

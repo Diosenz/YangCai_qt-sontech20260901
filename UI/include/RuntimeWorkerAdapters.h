@@ -119,10 +119,11 @@ public slots:
      */
     bool ensureOfflineLaserEnabled();
     /**
-     * @brief 在线启动前把 tracker/laser 置 1，并用一次 N/D 事务确认发送链可用。
+     * @brief 在线启动前确认最新停止状态，再请求清除上轮 P001 就绪标志。
      *
-     * 返回 true 只表示携带在线握手位的 N 已发送且 D 可解析；控制柜是否真正
-     * 启动作业仍由后续 JobStart 回执、sStart、JBI 行号和 traflag 联合确认。
+     * tracker/laser 置 1；普通 N/D 检查成功且程序停止、无未完成 O 批次后，
+     * 再发送一次 N.init=1。D 不含 B005 读回，true 只确认初始化事务成功；
+     * 实际变量清除仍依赖匹配的控制柜实现，作业启动由后续 J/D 确认。
      */
     bool ensureOnlineCorrectionReady();
     void setTrackingRequested(bool enabled);

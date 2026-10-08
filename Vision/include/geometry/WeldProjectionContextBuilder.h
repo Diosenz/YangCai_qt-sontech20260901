@@ -74,9 +74,8 @@ public:
     /**
      * @brief 构造投影到当前变位机坐标系所需的完整变换链。
      *
-     * 相机姿态保持旧 HALCON `gba` 的 Rx*Ry*Rz 顺序，机器人工具姿态保持
-     * `abg` 的 Rz*Ry*Rx 顺序；机器人位置输入为 um，姿态和轴角输入为
-     * deg*10000。
+     * 相机外参和机器人工具姿态均按 Rz*Ry*Rx 顺序解释；外参平移从 m
+     * 转为 mm，机器人位置输入为 um，姿态和轴角输入为 deg*10000。
      *
      * @param sensorCalibration SENSORPARA 解析结果。
      * @param positionerCalibration RBCALIB 解析结果。

@@ -48,6 +48,14 @@ public:
     /// @brief 生成旧 N 状态轮询字符串。
     static std::string encodeStatusPoll(const RobotProtocolContext &context);
 
+    /**
+     * @brief 生成在线作业启动前的一次 N 初始化请求。
+     * N 的第九字段是控制柜 OnlineCor_initflag；置 1 请求清除 B005。
+     * 与 P 的 OnlineCor_endflag 语义不同，不改变共享上下文或普通轮询。
+     */
+    static std::string encodeOnlineCorrectionInitialization(
+        const RobotProtocolContext &context);
+
     /// @brief 生成单个示教点的旧 O 更新字符串。
     static std::string encodeTeachPointUpdate(
         const RobotProtocolContext &context,

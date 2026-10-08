@@ -51,6 +51,14 @@ int main()
         CRobotProtocolCodec::encodeStatusPoll(RobotProtocolContext{}),
         "N 0,0,0,0,0,0,0,0,0",
         "N protocol must preserve zero fields");
+    ok &= expectEqual(
+        CRobotProtocolCodec::encodeOnlineCorrectionInitialization(context),
+        "N 1,2,3,4,5,6,7,8,1",
+        "online initialization must use N.init rather than P.end");
+    ok &= expectEqual(
+        std::to_string(context.onlineEndFlag),
+        "9",
+        "online initialization must not mutate the shared P context");
 
     TeachPointUpdateCommand point{
         -10, 20, -30, 40, -50, 60, true
@@ -60,6 +68,11 @@ int main()
         CRobotProtocolCodec::encodeTeachPointUpdate(context, 11, point, axis),
         "O 1,2,3,4,5,6,7,8,11,-10,20,-30,40,-50,60,-70,80",
         "O protocol must match legacy format");
+    point.rxDeg10000 = 0;
+    ok &= expectEqual(
+        CRobotProtocolCodec::encodeTeachPointUpdate(context, 11, point, axis),
+        "O 1,2,3,4,5,6,7,8,11,-10,20,-30,0,-50,60,-70,80",
+        "zero RX must remain an explicit target value on the wire");
 
     RobotRealtimeCorrectionCommand realtime;
     realtime.dxUm = -101;

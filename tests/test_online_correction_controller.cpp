@@ -917,8 +917,23 @@ bool testInitTypeDoesNotApplyGlobalMatrix()
 
 } // namespace
 
-int main()
+int main(int argc, char *argv[])
 {
+    // 单独证明首点合同；默认入口仍执行全部回归，不隐藏既有失败。
+    if (argc == 2 && std::string(argv[1]) == "--p001-contract") {
+        bool ok = testTrajectoryParsingAndCommandUnits();
+        ok &= testReverseP001OrientationChangesOnlyFirstTeachPoint();
+        ok &= testReverseCompletionRequiresFreshEdge();
+        ok &= testIbvsStartModeUsesRobotState();
+        ok &= testGlobalCorrectionModeAppliesTransform();
+        ok &= testInitTypeDoesNotApplyGlobalMatrix();
+        if (!ok) {
+            return 1;
+        }
+        std::cout << "PASS: P001 source and compatibility contract tests\n";
+        return 0;
+    }
+
     bool ok = true;
     ok &= testTrajectoryParsingAndCommandUnits();
     ok &= testReverseP001OrientationChangesOnlyFirstTeachPoint();

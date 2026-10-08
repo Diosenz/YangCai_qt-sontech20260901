@@ -52,6 +52,22 @@ std::string CRobotProtocolCodec::encodeStatusPoll(const RobotProtocolContext &co
         context.onlineEndFlag);
 }
 
+std::string CRobotProtocolCodec::encodeOnlineCorrectionInitialization(
+    const RobotProtocolContext &context)
+{
+    // 同一位置在 N/P 中含义不同；初始化只使用本次请求的固定值。
+    return fmt::format(
+        "N {},{},{},{},{},{},{},{},1",
+        context.robotEnabled,
+        context.trackerEnabled,
+        context.laserEnabled,
+        context.filterEnabled,
+        context.offlineSignal,
+        context.offlineStartCount,
+        context.holdRequested,
+        context.firstDetectionSucceeded);
+}
+
 std::string CRobotProtocolCodec::encodeTeachPointUpdate(
     const RobotProtocolContext &context,
     int pointCount,

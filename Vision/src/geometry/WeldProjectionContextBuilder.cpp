@@ -3,7 +3,7 @@
  *
  * @file        WeldProjectionContextBuilder.cpp
  * @brief       焊缝投影上下文构造实现
- * @details     按旧工程姿态顺序构造相机、工具和变位机坐标变换链。
+ * @details     相机和机器人工具姿态采用 Rz*Ry*Rx，变位机按安装标定构造。
  ******************************************************************************/
 #include <cmath>
 
@@ -94,10 +94,11 @@ WeldProjectionContextBuildResult CWeldProjectionContextBuilder::build(
     context.calibration.laserPlaneB = sensor.laserPlaneB;
     context.calibration.laserPlaneC = sensor.laserPlaneC;
 
+    // 相机外参按 Rz*Ry*Rx 解释；多轴非零时不能交换旋转算子的顺序。
     const Eigen::Matrix3d cameraRotation =
-        (Eigen::AngleAxisd(toRad(sensor.cameraRxInToolDeg), Eigen::Vector3d::UnitX())
+        (Eigen::AngleAxisd(toRad(sensor.cameraRzInToolDeg), Eigen::Vector3d::UnitZ())
          * Eigen::AngleAxisd(toRad(sensor.cameraRyInToolDeg), Eigen::Vector3d::UnitY())
-         * Eigen::AngleAxisd(toRad(sensor.cameraRzInToolDeg), Eigen::Vector3d::UnitZ()))
+         * Eigen::AngleAxisd(toRad(sensor.cameraRxInToolDeg), Eigen::Vector3d::UnitX()))
             .toRotationMatrix();
     const Eigen::Affine3d cameraInTool =
         Eigen::Translation3d(
