@@ -1,0 +1,22 @@
+timestamp_ms	time	event	phase	vision_valid	vision_x_mm	vision_y_mm	vision_z_mm	gap_width_mm	seam_index	dx_um	dy_um	dz_um	speed_override	speed_mode	online_end_flag	sent	response_received	completed	error_code	request	response	message
+1789558738693	2026-09-16T19:38:58.693	vision_sample	initial_detection_running	1	-119.966012	-77.316793	17.882951		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558738731	2026-09-16T19:38:58.731	vision_sample	initial_detection_running	1	-119.663771	-75.331065	16.449213		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558738785	2026-09-16T19:38:58.785	vision_sample	initial_detection_running	1	-119.521786	-75.400427	16.671084		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558738825	2026-09-16T19:38:58.825	vision_sample	initial_detection_running	1	-119.348798	-75.278713	16.459164		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558738877	2026-09-16T19:38:58.877	vision_sample	initial_detection_running	1	-123.138269	-65.235047	17.025176		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558738933	2026-09-16T19:38:58.933	vision_sample	initial_detection_running	1	-123.560769	-65.040564	16.392399		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558738976	2026-09-16T19:38:58.976	vision_sample	initial_detection_running	1	-128.632263	-51.254616	16.003680		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739016	2026-09-16T19:38:59.016	vision_sample	initial_detection_running	1	-130.681725	-51.952091	16.768642		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739064	2026-09-16T19:38:59.064	vision_sample	initial_detection_running	1	-133.467459	-37.282898	16.959136		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739115	2026-09-16T19:38:59.115	vision_sample	initial_detection_running	1	-134.233682	-37.525778	17.202963		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739165	2026-09-16T19:38:59.165	vision_sample	initial_detection_running	1	-135.393605	-37.773004	17.290450		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739206	2026-09-16T19:38:59.206	vision_sample	initial_detection_running	1	-137.775089	-21.352961	17.110514		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739273	2026-09-16T19:38:59.273	vision_sample	initial_detection_running	1	-137.920176	-21.369090	17.086971		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739320	2026-09-16T19:38:59.320	vision_sample	initial_detection_running	1	-138.917429	-9.453209	16.792973		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739373	2026-09-16T19:38:59.373	vision_sample	initial_detection_running	1	-138.619134	-9.479503	16.980527		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739431	2026-09-16T19:38:59.431	vision_sample	initial_detection_running	1	-139.199620	4.963580	16.859729		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739482	2026-09-16T19:38:59.482	vision_sample	initial_detection_running	1	-137.935215	5.262298	16.696681		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739528	2026-09-16T19:38:59.528	vision_sample	initial_detection_running	1	-137.412868	5.283941	16.867265		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739567	2026-09-16T19:38:59.567	vision_sample	initial_detection_running	1	-137.544600	10.706161	16.857856		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739680	2026-09-16T19:38:59.680	vision_sample	sending_initial_teach_points	1	-137.614228	10.714483	16.808924		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789558739680	2026-09-16T19:38:59.680	vision_sample	sending_initial_teach_points	1	-137.597561	11.205006	16.812707		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。

@@ -1,0 +1,467 @@
+timestamp_ms	time	event	phase	vision_valid	vision_x_mm	vision_y_mm	vision_z_mm	gap_width_mm	seam_index	dx_um	dy_um	dz_um	speed_override	speed_mode	online_end_flag	sent	response_received	completed	error_code	request	response	message
+1789535684994	2026-09-16T13:14:44.994	vision_sample	initial_detection_running	1	-110.356542	-102.231946	18.783339		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685042	2026-09-16T13:14:45.042	vision_sample	initial_detection_running	1	-110.371746	-102.142803	18.170053		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685083	2026-09-16T13:14:45.083	vision_sample	initial_detection_running	1	-110.382041	-102.132375	18.024510		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685121	2026-09-16T13:14:45.121	vision_sample	initial_detection_running	1	-110.422105	-102.155748	18.080550		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685182	2026-09-16T13:14:45.183	vision_sample	initial_detection_running	1	-110.372251	-102.222291	18.616551		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685221	2026-09-16T13:14:45.221	vision_sample	initial_detection_running	1	-110.514342	-102.155794	17.848129		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685273	2026-09-16T13:14:45.273	vision_sample	initial_detection_running	1	-110.238908	-102.081482	18.022050		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685323	2026-09-16T13:14:45.323	vision_sample	initial_detection_running	1	-111.082566	-101.039712	18.664003		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685367	2026-09-16T13:14:45.367	vision_sample	initial_detection_running	1	-111.694354	-101.356872	19.267049		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685418	2026-09-16T13:14:45.418	vision_sample	initial_detection_running	1	-119.624545	-87.456997	18.038650		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685463	2026-09-16T13:14:45.463	vision_sample	initial_detection_running	1	-121.564196	-88.191704	18.189423		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685512	2026-09-16T13:14:45.512	vision_sample	initial_detection_running	1	-130.109815	-69.563926	16.923131		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685566	2026-09-16T13:14:45.566	vision_sample	initial_detection_running	1	-131.409052	-70.240185	18.207176		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685613	2026-09-16T13:14:45.613	vision_sample	initial_detection_running	1	-132.321483	-70.616478	18.471380		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685670	2026-09-16T13:14:45.670	vision_sample	initial_detection_running	1	-137.874627	-52.807407	17.216326		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685730	2026-09-16T13:14:45.730	vision_sample	initial_detection_running	1	-138.139695	-52.954366	17.537864		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685768	2026-09-16T13:14:45.768	vision_sample	initial_detection_running	1	-139.152772	-49.961864	17.151511		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535685843	2026-09-16T13:14:45.843	vision_sample	sending_initial_teach_points	1	-138.984168	-49.936164	17.386427		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535692897	2026-09-16T13:14:52.897	vision_sample	online_running	1	-137.259623	-52.172590	17.402553		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535692940	2026-09-16T13:14:52.940	vision_sample	online_running	1	-137.400745	-52.187637	17.164049		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535692941	2026-09-16T13:14:52.941	command_generated	online_running							-1	1	0	10000	0	0							realtime online correction generated
+1789535692986	2026-09-16T13:14:52.986	vision_sample	online_running	1	-137.392007	-52.200692	17.269420		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535692988	2026-09-16T13:14:52.988	command_generated	online_running							-1	0	-1	10000	0	0							realtime online correction generated
+1789535693043	2026-09-16T13:14:53.043	vision_sample	online_running	1	-137.252015	-52.147250	17.256528		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693045	2026-09-16T13:14:53.045	command_generated	online_running							4	3	0	10000	0	0							realtime online correction generated
+1789535693093	2026-09-16T13:14:53.093	vision_sample	online_running	1	-137.223893	-52.145974	17.374309		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693096	2026-09-16T13:14:53.096	command_generated	online_running							1	2	0	10000	0	0							realtime online correction generated
+1789535693097	2026-09-16T13:14:53.097	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,1,0,0,0,0,10000,0	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900060,-17758,-257519,-1570661,284218,10646,40,1581650,2,0,0,0,5,1,0	robot request completed
+1789535693146	2026-09-16T13:14:53.146	vision_sample	online_running	1	-137.230644	-52.140087	17.320105		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693147	2026-09-16T13:14:53.147	command_generated	online_running							1	2	0	10000	1	0							realtime online correction generated
+1789535693217	2026-09-16T13:14:53.217	vision_sample	online_running	1	-137.372852	-52.197955	17.336842		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693219	2026-09-16T13:14:53.219	command_generated	online_running							1	2	-1	10000	1	0							realtime online correction generated
+1789535693259	2026-09-16T13:14:53.259	vision_sample	online_running	1	-137.238117	-52.146220	17.273003		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693262	2026-09-16T13:14:53.262	command_generated	online_running							1	2	-1	10000	1	0							realtime online correction generated
+1789535693262	2026-09-16T13:14:53.262	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,2,0,0,0,0,10000,0	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900051,-17758,-257534,-1570663,284223,10642,40,1580713,2,-1206,491,259,5,1,0	robot request completed
+1789535693309	2026-09-16T13:14:53.309	vision_sample	online_running	1	-137.283061	-52.178460	17.374808		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693310	2026-09-16T13:14:53.310	command_generated	online_running							1	2	-1	10000	1	0							realtime online correction generated
+1789535693383	2026-09-16T13:14:53.383	vision_sample	online_running	1	-136.668268	-52.268390	17.804473		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693384	2026-09-16T13:14:53.384	command_generated	online_running							1	2	-1	10000	1	0							realtime online correction generated
+1789535693423	2026-09-16T13:14:53.423	vision_sample	online_running	1	-137.246433	-52.548813	17.092391		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693426	2026-09-16T13:14:53.426	command_generated	online_running							1	3	-1	10000	1	0							realtime online correction generated
+1789535693436	2026-09-16T13:14:53.436	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,2,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900052,-17678,-257550,-1570669,284233,10702,40,1578151,2,-1206,490,258,5,1,0	robot request completed
+1789535693488	2026-09-16T13:14:53.488	vision_sample	online_running	1	-137.270422	-52.600552	17.369601		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693551	2026-09-16T13:14:53.551	vision_sample	online_running	1	-137.003440	-53.091073	17.216261		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693552	2026-09-16T13:14:53.552	command_generated	online_running							-2	3	0	10000	1	0							realtime online correction generated
+1789535693596	2026-09-16T13:14:53.596	vision_sample	online_running	1	-136.414670	-53.173173	17.730735		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693599	2026-09-16T13:14:53.599	command_generated	online_running							0	3	0	10000	1	0							realtime online correction generated
+1789535693608	2026-09-16T13:14:53.608	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,3,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900141,-17580,-257561,-1570670,284226,10726,40,1575489,2,2059,691,-664,5,1,0	robot request completed
+1789535693649	2026-09-16T13:14:53.649	vision_sample	online_running	1	-136.411512	-53.180560	17.786118		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693650	2026-09-16T13:14:53.650	command_generated	online_running							0	3	0	10000	1	0							realtime online correction generated
+1789535693725	2026-09-16T13:14:53.725	vision_sample	online_running	1	-136.517387	-53.243581	17.935990		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693727	2026-09-16T13:14:53.727	command_generated	online_running							0	3	0	10000	1	0							realtime online correction generated
+1789535693770	2026-09-16T13:14:53.770	vision_sample	online_running	1	-136.250802	-54.022412	17.734941		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693772	2026-09-16T13:14:53.772	command_generated	online_running							0	3	0	10000	1	0							realtime online correction generated
+1789535693779	2026-09-16T13:14:53.779	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,3,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900213,-17458,-257625,-1570672,284242,10733,40,1572764,2,2060,691,-663,5,1,0	robot request completed
+1789535693819	2026-09-16T13:14:53.819	vision_sample	online_running	1	-136.276315	-54.067418	17.962266		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693821	2026-09-16T13:14:53.821	command_generated	online_running							0	3	0	10000	1	0							realtime online correction generated
+1789535693890	2026-09-16T13:14:53.890	vision_sample	online_running	1	-136.108088	-54.565305	17.762399		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693891	2026-09-16T13:14:53.891	command_generated	online_running							-1	3	0	10000	1	0							realtime online correction generated
+1789535693935	2026-09-16T13:14:53.935	vision_sample	online_running	1	-136.605538	-54.877955	16.960906		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693937	2026-09-16T13:14:53.937	command_generated	online_running							-1	3	0	10000	1	0							realtime online correction generated
+1789535693943	2026-09-16T13:14:53.943	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,3,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900278,-17343,-257672,-1570691,284225,10749,40,1570180,2,-395,1447,-1212,5,1,0	robot request completed
+1789535693983	2026-09-16T13:14:53.983	vision_sample	online_running	1	-136.047457	-54.772489	17.671890		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535693985	2026-09-16T13:14:53.985	command_generated	online_running							-1	3	0	10000	1	0							realtime online correction generated
+1789535694040	2026-09-16T13:14:54.040	vision_sample	online_running	1	-135.844367	-55.289005	17.652028		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694041	2026-09-16T13:14:54.041	command_generated	online_running							-1	3	0	10000	1	0							realtime online correction generated
+1789535694095	2026-09-16T13:14:54.095	vision_sample	online_running	1	-136.401256	-55.386174	16.878399		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694135	2026-09-16T13:14:54.135	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,3,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900354,-17172,-257680,-1570692,284209,10727,40,1567175,2,1207,-486,-254,5,1,0	robot request completed
+1789535694165	2026-09-16T13:14:54.165	vision_sample	online_running	1	-136.225213	-55.724714	16.842131		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694166	2026-09-16T13:14:54.166	command_generated	online_running							0	-3	-2	10000	1	0							realtime online correction generated
+1789535694243	2026-09-16T13:14:54.243	vision_sample	online_running	1	-136.395980	-55.755407	16.608196		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694245	2026-09-16T13:14:54.245	command_generated	online_running							-1	1	-1	10000	1	0							realtime online correction generated
+1789535694287	2026-09-16T13:14:54.287	vision_sample	online_running	1	-136.084761	-56.505434	16.755156		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694288	2026-09-16T13:14:54.288	command_generated	online_running							-1	1	-1	10000	1	0							realtime online correction generated
+1789535694309	2026-09-16T13:14:54.309	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-3,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900392,-17024,-257696,-1570683,284214,10690,40,1564434,2,1206,-491,-255,5,1,0	robot request completed
+1789535694353	2026-09-16T13:14:54.353	vision_sample	online_running	1	-136.257721	-56.559377	16.659452		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694355	2026-09-16T13:14:54.355	command_generated	online_running							-1	0	-1	10000	1	0							realtime online correction generated
+1789535694397	2026-09-16T13:14:54.398	vision_sample	online_running	1	-135.733419	-56.447395	17.279874		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694399	2026-09-16T13:14:54.399	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535694468	2026-09-16T13:14:54.468	vision_sample	online_running	1	-135.352157	-56.996320	17.466499		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694469	2026-09-16T13:14:54.469	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535694482	2026-09-16T13:14:54.482	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,0,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900395,-16971,-257734,-1570680,284223,10659,40,1561754,2,-1249,268,-807,5,1,0	robot request completed
+1789535694532	2026-09-16T13:14:54.533	vision_sample	online_running	1	-135.211346	-57.242348	17.247213		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694534	2026-09-16T13:14:54.534	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535694577	2026-09-16T13:14:54.577	vision_sample	online_running	1	-135.139585	-57.724170	17.528165		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694578	2026-09-16T13:14:54.578	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535694649	2026-09-16T13:14:54.649	vision_sample	online_running	1	-134.857289	-57.927725	17.348878		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694651	2026-09-16T13:14:54.651	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535694676	2026-09-16T13:14:54.676	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900416,-17009,-257829,-1570665,284253,10613,40,1558659,2,-1249,268,-807,5,1,0	robot request completed
+1789535694709	2026-09-16T13:14:54.709	vision_sample	online_running	1	-134.934936	-57.978027	17.466677		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694710	2026-09-16T13:14:54.710	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535694775	2026-09-16T13:14:54.775	vision_sample	online_running	1	-135.003501	-57.987679	17.348786		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694832	2026-09-16T13:14:54.832	vision_sample	online_running	1	-134.856199	-58.601782	17.368203		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694833	2026-09-16T13:14:54.833	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535694851	2026-09-16T13:14:54.851	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900410,-17019,-257907,-1570666,284255,10596,40,1555868,2,-42,-219,-1063,5,1,0	robot request completed
+1789535694900	2026-09-16T13:14:54.900	vision_sample	online_running	1	-134.932199	-58.634998	17.378742		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694902	2026-09-16T13:14:54.902	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535694955	2026-09-16T13:14:54.955	vision_sample	online_running	1	-134.574357	-59.086746	17.433270		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535694956	2026-09-16T13:14:54.956	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535695007	2026-09-16T13:14:55.007	vision_sample	online_running	1	-134.554876	-59.295046	17.461970		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695010	2026-09-16T13:14:55.010	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535695031	2026-09-16T13:14:55.031	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900418,-17017,-258017,-1570667,284254,10571,40,1553065,2,-44,-223,-1064,5,1,0	robot request completed
+1789535695066	2026-09-16T13:14:55.066	vision_sample	online_running	1	-135.077405	-59.439695	16.982873		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695067	2026-09-16T13:14:55.067	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535695128	2026-09-16T13:14:55.128	vision_sample	online_running	1	-134.453822	-59.259086	17.503839		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695129	2026-09-16T13:14:55.129	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535695183	2026-09-16T13:14:55.183	vision_sample	online_running	1	-134.301563	-60.035049	17.485064		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695184	2026-09-16T13:14:55.184	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535695215	2026-09-16T13:14:55.215	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900440,-17028,-258132,-1570661,284247,10581,40,1550200,2,165,551,166,5,1,0	robot request completed
+1789535695225	2026-09-16T13:14:55.225	vision_sample	online_running	1	-134.312004	-60.028615	17.415943		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695227	2026-09-16T13:14:55.227	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535695295	2026-09-16T13:14:55.295	vision_sample	online_running	1	-134.179668	-59.959760	17.337604		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695297	2026-09-16T13:14:55.297	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535695364	2026-09-16T13:14:55.364	vision_sample	online_running	1	-134.053076	-60.464392	17.360101		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695366	2026-09-16T13:14:55.367	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535695377	2026-09-16T13:14:55.377	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900474,-17012,-258271,-1570648,284260,10561,40,1547632,2,165,552,167,5,1,0	robot request completed
+1789535695429	2026-09-16T13:14:55.429	vision_sample	online_running	1	-133.793660	-60.619062	17.380324		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695473	2026-09-16T13:14:55.473	vision_sample	online_running	1	-133.615976	-61.031087	17.333210		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695475	2026-09-16T13:14:55.475	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535695531	2026-09-16T13:14:55.531	vision_sample	online_running	1	-133.582305	-61.283442	17.357830		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695532	2026-09-16T13:14:55.532	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535695548	2026-09-16T13:14:55.548	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900524,-17002,-258415,-1570653,284243,10578,40,1544925,2,-517,-1230,-1353,5,1,0	robot request completed
+1789535695598	2026-09-16T13:14:55.598	vision_sample	online_running	1	-133.615560	-61.322680	17.513722		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695599	2026-09-16T13:14:55.599	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535695657	2026-09-16T13:14:55.657	vision_sample	online_running	1	-133.666776	-61.840678	17.268716		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695659	2026-09-16T13:14:55.659	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535695704	2026-09-16T13:14:55.704	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900557,-16986,-258539,-1570652,284246,10591,40,1542520,2,-518,-1235,-1354,5,1,0	robot request completed
+1789535695720	2026-09-16T13:14:55.720	vision_sample	online_running	1	-133.352302	-61.911987	17.151882		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695721	2026-09-16T13:14:55.721	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535695785	2026-09-16T13:14:55.785	vision_sample	online_running	1	-133.436527	-61.965715	17.255108		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695787	2026-09-16T13:14:55.787	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535695846	2026-09-16T13:14:55.847	vision_sample	online_running	1	-133.542258	-62.480453	17.125775		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695848	2026-09-16T13:14:55.848	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535695895	2026-09-16T13:14:55.895	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900580,-17000,-258679,-1570661,284240,10602,40,1539453,2,622,-948,-1635,5,1,0	robot request completed
+1789535695897	2026-09-16T13:14:55.897	vision_sample	online_running	1	-133.777658	-62.842541	16.480300		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695898	2026-09-16T13:14:55.898	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535695962	2026-09-16T13:14:55.962	vision_sample	online_running	1	-133.840436	-62.897017	16.645457		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535695964	2026-09-16T13:14:55.964	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535696029	2026-09-16T13:14:56.029	vision_sample	online_running	1	-133.823730	-63.356006	16.311735		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696030	2026-09-16T13:14:56.030	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535696072	2026-09-16T13:14:56.072	vision_sample	online_running	1	-133.514766	-63.559243	16.740984		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696081	2026-09-16T13:14:56.081	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900584,-17015,-258790,-1570663,284235,10614,40,1536527,2,-163,-553,-166,5,1,0	robot request completed
+1789535696121	2026-09-16T13:14:56.121	vision_sample	online_running	1	-133.108920	-63.423819	17.051639		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696122	2026-09-16T13:14:56.122	command_generated	online_running							1	0	-3	10000	1	0							realtime online correction generated
+1789535696190	2026-09-16T13:14:56.190	vision_sample	online_running	1	-133.130140	-63.446551	17.133679		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696191	2026-09-16T13:14:56.191	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535696250	2026-09-16T13:14:56.250	vision_sample	online_running	1	-133.042235	-64.091588	16.446120		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696252	2026-09-16T13:14:56.252	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535696264	2026-09-16T13:14:56.264	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900585,-17074,-258895,-1570677,284224,10606,40,1533640,2,-162,-552,-166,5,1,0	robot request completed
+1789535696316	2026-09-16T13:14:56.316	vision_sample	online_running	1	-132.922305	-64.081055	16.726949		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696319	2026-09-16T13:14:56.319	command_generated	online_running							0	0	-2	10000	1	0							realtime online correction generated
+1789535696359	2026-09-16T13:14:56.359	vision_sample	online_running	1	-133.061364	-64.590914	16.155236		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696360	2026-09-16T13:14:56.360	command_generated	online_running							0	0	-2	10000	1	0							realtime online correction generated
+1789535696421	2026-09-16T13:14:56.421	vision_sample	online_running	1	-132.538858	-64.723088	16.823307		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696422	2026-09-16T13:14:56.422	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535696428	2026-09-16T13:14:56.428	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900600,-17088,-259006,-1570670,284232,10628,40,1531067,2,0,0,0,5,1,0	robot request completed
+1789535696474	2026-09-16T13:14:56.474	vision_sample	online_running	1	-132.457695	-64.690594	16.857569		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696476	2026-09-16T13:14:56.476	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535696541	2026-09-16T13:14:56.541	vision_sample	online_running	1	-132.373253	-65.104169	16.765442		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696543	2026-09-16T13:14:56.543	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535696602	2026-09-16T13:14:56.602	vision_sample	online_running	1	-132.751304	-65.526006	16.324012		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696605	2026-09-16T13:14:56.605	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535696612	2026-09-16T13:14:56.612	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900663,-17089,-259133,-1570670,284230,10634,40,1528140,2,0,0,0,5,1,0	robot request completed
+1789535696654	2026-09-16T13:14:56.654	vision_sample	online_running	1	-132.245260	-65.329594	16.593776		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696656	2026-09-16T13:14:56.656	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535696728	2026-09-16T13:14:56.728	vision_sample	online_running	1	-132.144060	-65.316909	16.813570		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696772	2026-09-16T13:14:56.772	vision_sample	online_running	1	-131.872913	-65.912792	16.479680		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696774	2026-09-16T13:14:56.774	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535696787	2026-09-16T13:14:56.787	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900714,-17078,-259243,-1570672,284219,10646,40,1525405,2,2457,-755,555,5,1,0	robot request completed
+1789535696842	2026-09-16T13:14:56.842	vision_sample	online_running	1	-131.798172	-65.871345	16.444666		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696844	2026-09-16T13:14:56.844	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535696900	2026-09-16T13:14:56.900	vision_sample	online_running	1	-131.701489	-66.472186	16.861639		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696901	2026-09-16T13:14:56.901	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535696952	2026-09-16T13:14:56.952	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900748,-17053,-259391,-1570664,284230,10630,40,1522787,2,2455,-760,554,5,1,0	robot request completed
+1789535696955	2026-09-16T13:14:56.955	vision_sample	online_running	1	-131.968062	-66.767597	16.395488		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535696958	2026-09-16T13:14:56.958	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535697018	2026-09-16T13:14:57.018	vision_sample	online_running	1	-131.878215	-66.738182	16.483507		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697019	2026-09-16T13:14:57.019	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535697091	2026-09-16T13:14:57.091	vision_sample	online_running	1	-131.396219	-67.151198	17.002627		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697093	2026-09-16T13:14:57.093	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535697116	2026-09-16T13:14:57.116	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900786,-17053,-259534,-1570670,284230,10628,40,1520225,2,1372,63,-89,5,1,0	robot request completed
+1789535697152	2026-09-16T13:14:57.152	vision_sample	online_running	1	-131.631696	-67.446461	16.527941		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697153	2026-09-16T13:14:57.153	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535697231	2026-09-16T13:14:57.231	vision_sample	online_running	1	-131.598565	-67.438485	16.579297		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697232	2026-09-16T13:14:57.232	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535697276	2026-09-16T13:14:57.276	vision_sample	online_running	1	-131.124268	-68.007780	16.400890		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697278	2026-09-16T13:14:57.278	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535697309	2026-09-16T13:14:57.309	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900834,-17059,-259680,-1570666,284229,10616,40,1517203,2,1370,60,-90,5,1,0	robot request completed
+1789535697331	2026-09-16T13:14:57.331	vision_sample	online_running	1	-130.977238	-68.027850	16.976524		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697332	2026-09-16T13:14:57.332	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535697410	2026-09-16T13:14:57.410	vision_sample	online_running	1	-130.882054	-67.974170	16.937194		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697453	2026-09-16T13:14:57.453	vision_sample	online_running	1	-131.134220	-68.782829	16.303888		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697456	2026-09-16T13:14:57.456	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535697470	2026-09-16T13:14:57.470	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900861,-17071,-259823,-1570670,284232,10631,40,1514664,2,-424,91,-1214,5,1,0	robot request completed
+1789535697524	2026-09-16T13:14:57.524	vision_sample	online_running	1	-131.100834	-68.772922	16.346317		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697526	2026-09-16T13:14:57.526	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535697570	2026-09-16T13:14:57.570	vision_sample	online_running	1	-130.619651	-68.633123	16.976274		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697571	2026-09-16T13:14:57.571	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535697627	2026-09-16T13:14:57.627	vision_sample	online_running	1	-130.812727	-69.177834	16.475034		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697629	2026-09-16T13:14:57.629	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535697652	2026-09-16T13:14:57.652	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900912,-17056,-259967,-1570671,284222,10628,40,1511793,2,-424,91,-1215,5,1,0	robot request completed
+1789535697691	2026-09-16T13:14:57.691	vision_sample	online_running	1	-130.554713	-69.392155	16.481977		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697693	2026-09-16T13:14:57.693	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535697767	2026-09-16T13:14:57.767	vision_sample	online_running	1	-130.097858	-69.744073	16.812245		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697768	2026-09-16T13:14:57.768	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535697802	2026-09-16T13:14:57.802	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900942,-17051,-260078,-1570673,284216,10634,40,1509428,2,51,1101,-923,5,1,0	robot request completed
+1789535697810	2026-09-16T13:14:57.810	vision_sample	online_running	1	-130.396938	-70.069849	16.389763		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697811	2026-09-16T13:14:57.811	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535697904	2026-09-16T13:14:57.904	vision_sample	online_running	1	-130.065085	-69.952023	16.715042		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697906	2026-09-16T13:14:57.906	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535697950	2026-09-16T13:14:57.950	vision_sample	online_running	1	-130.167036	-70.407875	16.288660		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697953	2026-09-16T13:14:57.953	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535697987	2026-09-16T13:14:57.988	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900940,-17059,-260177,-1570669,284218,10630,40,1506557,2,51,1101,-923,5,1,0	robot request completed
+1789535697993	2026-09-16T13:14:57.993	vision_sample	online_running	1	-129.673751	-70.531664	16.881136		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535697995	2026-09-16T13:14:57.995	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535698075	2026-09-16T13:14:58.075	vision_sample	online_running	1	-129.997309	-70.617812	16.377712		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698138	2026-09-16T13:14:58.138	vision_sample	online_running	1	-129.636591	-71.062230	16.816217		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698141	2026-09-16T13:14:58.141	command_generated	online_running							1	-1	-2	10000	1	0							realtime online correction generated
+1789535698142	2026-09-16T13:14:58.142	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-2,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900934,-17111,-260270,-1570674,284217,10632,40,1504085,2,-502,-2368,-289,5,1,0	robot request completed
+1789535698187	2026-09-16T13:14:58.187	vision_sample	online_running	1	-129.377776	-71.167747	16.946571		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698189	2026-09-16T13:14:58.189	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535698263	2026-09-16T13:14:58.263	vision_sample	online_running	1	-129.124546	-71.462140	16.761984		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698264	2026-09-16T13:14:58.264	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535698315	2026-09-16T13:14:58.315	vision_sample	online_running	1	-128.888077	-71.633439	16.852377		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698319	2026-09-16T13:14:58.319	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535698320	2026-09-16T13:14:58.320	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900916,-17155,-260372,-1570676,284211,10623,40,1501254,2,-503,-2368,-289,5,1,0	robot request completed
+1789535698365	2026-09-16T13:14:58.365	vision_sample	online_running	1	-128.943677	-71.660025	16.833975		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698366	2026-09-16T13:14:58.366	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535698434	2026-09-16T13:14:58.434	vision_sample	online_running	1	-128.694209	-72.006360	16.636616		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698436	2026-09-16T13:14:58.436	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535698484	2026-09-16T13:14:58.484	vision_sample	online_running	1	-128.630411	-72.212517	16.643991		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698486	2026-09-16T13:14:58.486	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535698493	2026-09-16T13:14:58.493	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900880,-17176,-260469,-1570666,284228,10612,40,1498558,2,-1442,-1640,-972,5,1,0	robot request completed
+1789535698532	2026-09-16T13:14:58.532	vision_sample	online_running	1	-128.644473	-72.242262	16.778719		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698533	2026-09-16T13:14:58.533	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535698592	2026-09-16T13:14:58.592	vision_sample	online_running	1	-128.386008	-72.663363	16.892869		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698593	2026-09-16T13:14:58.593	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535698648	2026-09-16T13:14:58.648	vision_sample	online_running	1	-128.314927	-72.607353	16.787118		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698650	2026-09-16T13:14:58.650	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535698685	2026-09-16T13:14:58.685	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900863,-17213,-260587,-1570665,284232,10635,40,1495508,2,-1678,361,-2016,5,1,0	robot request completed
+1789535698720	2026-09-16T13:14:58.720	vision_sample	online_running	1	-128.158580	-72.876400	16.756262		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698798	2026-09-16T13:14:58.798	vision_sample	online_running	1	-127.964378	-73.273197	16.685210		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698799	2026-09-16T13:14:58.799	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535698843	2026-09-16T13:14:58.843	vision_sample	online_running	1	-127.913451	-73.516213	16.704917		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698845	2026-09-16T13:14:58.845	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535698860	2026-09-16T13:14:58.860	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900886,-17244,-260676,-1570659,284229,10623,40,1492761,2,-1679,360,-2017,5,1,0	robot request completed
+1789535698930	2026-09-16T13:14:58.930	vision_sample	online_running	1	-127.819021	-73.526687	17.082989		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698933	2026-09-16T13:14:58.933	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535698988	2026-09-16T13:14:58.988	vision_sample	online_running	1	-127.590435	-73.954059	17.278407		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535698990	2026-09-16T13:14:58.990	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699031	2026-09-16T13:14:59.031	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900904,-17273,-260783,-1570655,284246,10625,40,1490037,2,-162,-552,-166,5,1,0	robot request completed
+1789535699045	2026-09-16T13:14:59.045	vision_sample	online_running	1	-127.970746	-74.361534	16.853724		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699046	2026-09-16T13:14:59.046	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699107	2026-09-16T13:14:59.107	vision_sample	online_running	1	-127.656235	-74.192415	16.892084		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699110	2026-09-16T13:14:59.110	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699176	2026-09-16T13:14:59.176	vision_sample	online_running	1	-127.418004	-74.604551	17.011743		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699179	2026-09-16T13:14:59.179	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699211	2026-09-16T13:14:59.211	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900943,-17314,-260909,-1570661,284250,10638,40,1487194,2,-162,-552,-166,5,1,0	robot request completed
+1789535699217	2026-09-16T13:14:59.217	vision_sample	online_running	1	-127.192403	-74.761116	17.155576		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699219	2026-09-16T13:14:59.219	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699283	2026-09-16T13:14:59.283	vision_sample	online_running	1	-127.153965	-74.721030	17.044955		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699286	2026-09-16T13:14:59.286	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699353	2026-09-16T13:14:59.353	vision_sample	online_running	1	-126.893002	-75.169239	17.264002		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699355	2026-09-16T13:14:59.355	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699376	2026-09-16T13:14:59.376	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900986,-17336,-261033,-1570652,284251,10621,40,1484638,2,-28,-1359,0,5,1,0	robot request completed
+1789535699411	2026-09-16T13:14:59.411	vision_sample	online_running	1	-127.141304	-75.521320	16.898598		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699481	2026-09-16T13:14:59.481	vision_sample	online_running	1	-126.700523	-75.760571	16.930712		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699483	2026-09-16T13:14:59.483	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699541	2026-09-16T13:14:59.541	vision_sample	online_running	1	-126.554709	-75.699892	17.068938		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699543	2026-09-16T13:14:59.543	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699552	2026-09-16T13:14:59.552	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901030,-17372,-261182,-1570655,284240,10633,40,1481835,2,-27,-1359,0,5,1,0	robot request completed
+1789535699602	2026-09-16T13:14:59.602	vision_sample	online_running	1	-126.537294	-76.067655	17.169478		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699603	2026-09-16T13:14:59.603	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699659	2026-09-16T13:14:59.659	vision_sample	online_running	1	-126.545305	-76.077686	17.201772		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699661	2026-09-16T13:14:59.661	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699721	2026-09-16T13:14:59.721	vision_sample	online_running	1	-126.249031	-76.637567	17.257150		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699724	2026-09-16T13:14:59.724	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699732	2026-09-16T13:14:59.732	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901073,-17412,-261330,-1570664,284235,10629,40,1479026,2,778,-402,-1472,5,1,0	robot request completed
+1789535699772	2026-09-16T13:14:59.772	vision_sample	online_running	1	-126.326138	-76.655172	17.094044		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699773	2026-09-16T13:14:59.773	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699846	2026-09-16T13:14:59.846	vision_sample	online_running	1	-126.023034	-77.050930	17.167159		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699848	2026-09-16T13:14:59.848	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699891	2026-09-16T13:14:59.891	vision_sample	online_running	1	-125.831252	-77.153937	17.132696		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699893	2026-09-16T13:14:59.893	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699896	2026-09-16T13:14:59.896	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901125,-17454,-261472,-1570674,284223,10625,40,1476425,2,779,-398,-1472,5,1,0	robot request completed
+1789535699938	2026-09-16T13:14:59.938	vision_sample	online_running	1	-125.794924	-77.163218	17.315164		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699939	2026-09-16T13:14:59.939	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535699998	2026-09-16T13:14:59.998	vision_sample	online_running	1	-125.804022	-77.699710	17.279463		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535699999	2026-09-16T13:14:59.999	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535700067	2026-09-16T13:15:00.067	vision_sample	online_running	1	-125.667735	-77.650952	17.470318		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700088	2026-09-16T13:15:00.088	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901157,-17480,-261627,-1570666,284233,10624,40,1473398,2,476,1008,290,5,1,0	robot request completed
+1789535700128	2026-09-16T13:15:00.128	vision_sample	online_running	1	-125.445871	-77.886138	17.521879		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700130	2026-09-16T13:15:00.130	command_generated	online_running							-2	-2	-2	10000	1	0							realtime online correction generated
+1789535700206	2026-09-16T13:15:00.206	vision_sample	online_running	1	-125.344293	-78.339610	17.306975		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700207	2026-09-16T13:15:00.207	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535700253	2026-09-16T13:15:00.253	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-2,-2,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901190,-17514,-261765,-1570667,284239,10630,40,1470842,2,476,1008,290,5,1,0	robot request completed
+1789535700255	2026-09-16T13:15:00.255	vision_sample	online_running	1	-125.379591	-78.587673	17.340780		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700258	2026-09-16T13:15:00.258	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535700320	2026-09-16T13:15:00.320	vision_sample	online_running	1	-125.319576	-78.574271	17.475369		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700321	2026-09-16T13:15:00.321	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535700395	2026-09-16T13:15:00.395	vision_sample	online_running	1	-125.156659	-79.011944	17.465485		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700398	2026-09-16T13:15:00.398	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535700438	2026-09-16T13:15:00.438	vision_sample	online_running	1	-124.974443	-79.181185	17.430488		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700441	2026-09-16T13:15:00.441	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535700442	2026-09-16T13:15:00.442	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901203,-17571,-261895,-1570667,284229,10602,40,1467848,2,613,-955,-1640,5,1,0	robot request completed
+1789535700490	2026-09-16T13:15:00.490	vision_sample	online_running	1	-125.047082	-79.230691	17.461401		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700491	2026-09-16T13:15:00.491	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535700569	2026-09-16T13:15:00.569	vision_sample	online_running	1	-124.923894	-79.734118	17.463618		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700570	2026-09-16T13:15:00.570	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535700614	2026-09-16T13:15:00.614	vision_sample	online_running	1	-124.853302	-79.938117	17.349987		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700616	2026-09-16T13:15:00.616	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535700620	2026-09-16T13:15:00.620	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901170,-17640,-261999,-1570666,284229,10629,40,1465034,2,476,1008,290,5,1,0	robot request completed
+1789535700663	2026-09-16T13:15:00.663	vision_sample	online_running	1	-124.901422	-79.969648	17.360922		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700664	2026-09-16T13:15:00.665	command_generated	online_running							-2	-2	-2	10000	1	0							realtime online correction generated
+1789535700740	2026-09-16T13:15:00.740	vision_sample	online_running	1	-124.537070	-80.276365	17.388420		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700783	2026-09-16T13:15:00.783	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-2,-2,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901157,-17657,-262096,-1570661,284233,10644,40,1462444,2,476,1007,290,5,1,0	robot request completed
+1789535700786	2026-09-16T13:15:00.786	vision_sample	online_running	1	-124.549030	-80.536387	17.448715		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700789	2026-09-16T13:15:00.789	command_generated	online_running							-3	1	-2	10000	1	0							realtime online correction generated
+1789535700847	2026-09-16T13:15:00.847	vision_sample	online_running	1	-124.581308	-80.549475	17.407609		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700849	2026-09-16T13:15:00.849	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535700915	2026-09-16T13:15:00.915	vision_sample	online_running	1	-124.361239	-80.997380	17.635067		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700916	2026-09-16T13:15:00.916	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535700955	2026-09-16T13:15:00.955	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-2,-1,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901148,-17720,-262193,-1570672,284226,10610,40,1459725,2,-163,-552,-166,5,1,0	robot request completed
+1789535700957	2026-09-16T13:15:00.957	vision_sample	online_running	1	-124.252270	-81.166834	17.294319		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535700958	2026-09-16T13:15:00.958	command_generated	online_running							-2	-1	-2	10000	1	0							realtime online correction generated
+1789535701022	2026-09-16T13:15:01.022	vision_sample	online_running	1	-124.230992	-81.190474	17.510597		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701024	2026-09-16T13:15:01.024	command_generated	online_running							-2	0	-2	10000	1	0							realtime online correction generated
+1789535701067	2026-09-16T13:15:01.067	vision_sample	online_running	1	-124.090936	-81.552468	17.339275		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701069	2026-09-16T13:15:01.069	command_generated	online_running							-2	0	-2	10000	1	0							realtime online correction generated
+1789535701125	2026-09-16T13:15:01.125	vision_sample	online_running	1	-123.949458	-81.756109	17.302719		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701127	2026-09-16T13:15:01.127	command_generated	online_running							-2	0	-2	10000	1	0							realtime online correction generated
+1789535701139	2026-09-16T13:15:01.139	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-2,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901093,-17786,-262296,-1570675,284224,10632,40,1456855,2,-163,-552,-166,5,1,0	robot request completed
+1789535701187	2026-09-16T13:15:01.187	vision_sample	online_running	1	-123.995690	-81.775096	17.241935		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701188	2026-09-16T13:15:01.188	command_generated	online_running							-3	0	-2	10000	1	0							realtime online correction generated
+1789535701248	2026-09-16T13:15:01.248	vision_sample	online_running	1	-123.691090	-82.126433	17.375671		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701249	2026-09-16T13:15:01.249	command_generated	online_running							-3	0	-2	10000	1	0							realtime online correction generated
+1789535701295	2026-09-16T13:15:01.295	vision_sample	online_running	1	-123.497763	-82.260780	17.508823		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701298	2026-09-16T13:15:01.298	command_generated	online_running							-3	0	-2	10000	1	0							realtime online correction generated
+1789535701304	2026-09-16T13:15:01.304	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-2,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901036,-17798,-262392,-1570671,284231,10642,40,1454237,2,-1254,270,-804,5,1,0	robot request completed
+1789535701345	2026-09-16T13:15:01.345	vision_sample	online_running	1	-123.535117	-82.328373	17.761774		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701413	2026-09-16T13:15:01.413	vision_sample	online_running	1	-123.420338	-82.793653	17.559625		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701415	2026-09-16T13:15:01.415	command_generated	online_running							1	-1	-2	10000	1	0							realtime online correction generated
+1789535701474	2026-09-16T13:15:01.474	vision_sample	online_running	1	-123.170661	-83.025061	17.924112		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701477	2026-09-16T13:15:01.477	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535701493	2026-09-16T13:15:01.493	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-3,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900992,-17795,-262505,-1570668,284229,10623,40,1451299,2,-1254,270,-804,5,1,0	robot request completed
+1789535701541	2026-09-16T13:15:01.541	vision_sample	online_running	1	-123.130480	-82.970788	17.761227		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701544	2026-09-16T13:15:01.544	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535701592	2026-09-16T13:15:01.592	vision_sample	online_running	1	-123.262604	-83.031269	17.614261		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701593	2026-09-16T13:15:01.593	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535701653	2026-09-16T13:15:01.653	vision_sample	online_running	1	-122.723781	-83.588373	17.610536		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701654	2026-09-16T13:15:01.654	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535701668	2026-09-16T13:15:01.668	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900917,-17780,-262607,-1570670,284236,10619,40,1448524,2,-50,-221,-1062,5,1,0	robot request completed
+1789535701722	2026-09-16T13:15:01.722	vision_sample	online_running	1	-122.962642	-83.740008	17.579778		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701723	2026-09-16T13:15:01.723	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535701778	2026-09-16T13:15:01.778	vision_sample	online_running	1	-122.607034	-84.127300	17.768299		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701780	2026-09-16T13:15:01.780	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated
+1789535701840	2026-09-16T13:15:01.840	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900881,-17766,-262692,-1570667,284221,10609,40,1445800,2,-51,-225,-1063,5,1,0	robot request completed
+1789535701841	2026-09-16T13:15:01.841	vision_sample	online_running	1	-122.521695	-84.426065	17.759460		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701844	2026-09-16T13:15:01.844	command_generated	online_running							0	0	-2	10000	1	0							realtime online correction generated
+1789535701902	2026-09-16T13:15:01.902	vision_sample	online_running	1	-122.704761	-84.510565	17.546159		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701903	2026-09-16T13:15:01.903	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535701973	2026-09-16T13:15:01.973	vision_sample	online_running	1	-122.534478	-84.945607	17.681180		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535701976	2026-09-16T13:15:01.976	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535702015	2026-09-16T13:15:02.015	vision_sample	online_running	1	-122.616611	-85.254851	16.927526		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702035	2026-09-16T13:15:02.035	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900862,-17766,-262803,-1570669,284221,10628,40,1442745,2,-475,-1008,-288,5,1,0	robot request completed
+1789535702083	2026-09-16T13:15:02.083	vision_sample	online_running	1	-122.593239	-85.247679	16.976358		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702086	2026-09-16T13:15:02.086	command_generated	online_running							-1	-1	-3	10000	1	0							realtime online correction generated
+1789535702130	2026-09-16T13:15:02.130	vision_sample	online_running	1	-122.705774	-85.317595	16.943947		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702131	2026-09-16T13:15:02.131	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702189	2026-09-16T13:15:02.189	vision_sample	online_running	1	-122.318601	-85.947290	16.928393		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702190	2026-09-16T13:15:02.190	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702220	2026-09-16T13:15:02.220	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900877,-17766,-262937,-1570666,284235,10605,40,1439818,2,-475,-1007,-289,5,1,0	robot request completed
+1789535702233	2026-09-16T13:15:02.233	vision_sample	online_running	1	-122.201329	-85.898468	17.104005		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702234	2026-09-16T13:15:02.234	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702297	2026-09-16T13:15:02.297	vision_sample	online_running	1	-122.209237	-85.872281	16.923829		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702298	2026-09-16T13:15:02.298	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702369	2026-09-16T13:15:02.369	vision_sample	online_running	1	-121.598677	-86.238744	17.676079		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702372	2026-09-16T13:15:02.372	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702391	2026-09-16T13:15:02.391	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900904,-17760,-263074,-1570666,284226,10618,40,1437116,2,-430,92,-1214,5,1,0	robot request completed
+1789535702426	2026-09-16T13:15:02.426	vision_sample	online_running	1	-121.299702	-86.292319	17.796232		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702428	2026-09-16T13:15:02.428	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702490	2026-09-16T13:15:02.490	vision_sample	online_running	1	-121.452858	-86.399654	17.809485		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702491	2026-09-16T13:15:02.491	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702546	2026-09-16T13:15:02.546	vision_sample	online_running	1	-120.917898	-86.985455	17.552346		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702548	2026-09-16T13:15:02.548	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702564	2026-09-16T13:15:02.564	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900909,-17770,-263215,-1570660,284234,10625,40,1434414,2,642,1557,457,5,1,0	robot request completed
+1789535702616	2026-09-16T13:15:02.616	vision_sample	online_running	1	-120.939685	-87.011069	17.611904		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702617	2026-09-16T13:15:02.617	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702670	2026-09-16T13:15:02.670	vision_sample	online_running	1	-120.713125	-87.387477	17.677297		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702725	2026-09-16T13:15:02.725	vision_sample	online_running	1	-120.584424	-87.494601	17.496596		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702728	2026-09-16T13:15:02.728	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535702736	2026-09-16T13:15:02.736	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900940,-17832,-263363,-1570667,284232,10632,40,1431678,2,642,1557,457,5,1,0	robot request completed
+1789535702779	2026-09-16T13:15:02.779	vision_sample	online_running	1	-120.511061	-87.479465	17.701222		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702797	2026-09-16T13:15:02.797	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702826	2026-09-16T13:15:02.826	vision_sample	online_running	1	-120.261678	-87.885344	17.621159		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702827	2026-09-16T13:15:02.827	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702894	2026-09-16T13:15:02.894	vision_sample	online_running	1	-120.103401	-87.789721	17.711037		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702895	2026-09-16T13:15:02.895	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535702929	2026-09-16T13:15:02.929	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,900982,-17874,-263520,-1570665,284233,10619,40,1428690,2,1203,-497,-257,5,1,0	robot request completed
+1789535702937	2026-09-16T13:15:02.937	vision_sample	online_running	1	-119.913531	-88.044112	17.755956		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702939	2026-09-16T13:15:02.939	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535702997	2026-09-16T13:15:02.997	vision_sample	online_running	1	-119.910213	-88.013916	17.599128		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535702999	2026-09-16T13:15:02.999	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535703067	2026-09-16T13:15:03.067	vision_sample	online_running	1	-119.672698	-88.398027	17.607140		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703070	2026-09-16T13:15:03.070	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535703104	2026-09-16T13:15:03.104	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901021,-17911,-263670,-1570669,284237,10620,40,1425899,2,1204,-492,-256,5,1,0	robot request completed
+1789535703107	2026-09-16T13:15:03.107	vision_sample	online_running	1	-119.599508	-88.625092	17.783368		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703111	2026-09-16T13:15:03.111	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535703168	2026-09-16T13:15:03.168	vision_sample	online_running	1	-119.558255	-88.598873	17.801688		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703169	2026-09-16T13:15:03.169	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535703240	2026-09-16T13:15:03.240	vision_sample	online_running	1	-119.201584	-88.963235	17.747817		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703241	2026-09-16T13:15:03.241	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535703284	2026-09-16T13:15:03.284	vision_sample	online_running	1	-119.168557	-89.234351	17.802511		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703288	2026-09-16T13:15:03.288	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,0,-3,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901041,-17925,-263817,-1570648,284254,10623,40,1422995,2,-1797,31,-1119,5,1,0	robot request completed
+1789535703341	2026-09-16T13:15:03.341	vision_sample	online_running	1	-119.287407	-89.312542	17.759599		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703342	2026-09-16T13:15:03.342	command_generated	online_running							0	-2	-2	10000	1	0							realtime online correction generated
+1789535703415	2026-09-16T13:15:03.415	vision_sample	online_running	1	-119.051260	-89.761022	17.536972		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703416	2026-09-16T13:15:03.416	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535703460	2026-09-16T13:15:03.460	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-2,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,16,9,1,1,0,1,30,0,1,0,901085,-17943,-263958,-1570673,284234,10636,40,1420309,2,-1795,36,-1117,5,1,0	robot request completed
+1789535703462	2026-09-16T13:15:03.463	vision_sample	online_running	1	-118.942578	-90.029001	17.423875		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703465	2026-09-16T13:15:03.465	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535703524	2026-09-16T13:15:03.524	vision_sample	online_running	1	-118.967087	-90.022296	17.286724		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703525	2026-09-16T13:15:03.525	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535703594	2026-09-16T13:15:03.594	vision_sample	online_running	1	-119.028354	-90.481091	16.761823		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703595	2026-09-16T13:15:03.595	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535703637	2026-09-16T13:15:03.637	vision_sample	online_running	1	-118.773933	-90.655158	17.165053		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703639	2026-09-16T13:15:03.639	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535703680	2026-09-16T13:15:03.680	vision_sample	online_running	1	-118.747307	-90.657632	17.287818		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703683	2026-09-16T13:15:03.683	command_generated	online_running							0	-2	-2	10000	1	0							realtime online correction generated
+1789535703722	2026-09-16T13:15:03.722	vision_sample	online_running	1	-118.613310	-90.572486	17.363669		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703725	2026-09-16T13:15:03.725	command_generated	online_running							0	-2	-2	10000	1	0							realtime online correction generated
+1789535703762	2026-09-16T13:15:03.762	vision_sample	online_running	1	-118.718753	-90.638613	17.299123		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703765	2026-09-16T13:15:03.765	command_generated	online_running							0	-2	-2	10000	1	0							realtime online correction generated
+1789535703803	2026-09-16T13:15:03.803	vision_sample	online_running	1	-118.706142	-90.642491	17.372301		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703806	2026-09-16T13:15:03.806	command_generated	online_running							0	-2	-2	10000	1	0							realtime online correction generated
+1789535703845	2026-09-16T13:15:03.845	vision_sample	online_running	1	-118.703816	-90.654464	17.448310		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703891	2026-09-16T13:15:03.891	vision_sample	online_running	1	-118.631798	-90.579324	17.325940		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703893	2026-09-16T13:15:03.893	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535703935	2026-09-16T13:15:03.935	vision_sample	online_running	1	-118.744273	-90.655245	17.286983		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703938	2026-09-16T13:15:03.938	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535703976	2026-09-16T13:15:03.976	vision_sample	online_running	1	-118.683407	-90.620965	17.345856		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535703978	2026-09-16T13:15:03.978	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535704019	2026-09-16T13:15:04.019	vision_sample	online_running	1	-118.750567	-90.653479	17.251409		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704022	2026-09-16T13:15:04.022	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535704061	2026-09-16T13:15:04.061	vision_sample	online_running	1	-118.734010	-90.640422	17.246694		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704063	2026-09-16T13:15:04.063	command_generated	online_running							0	-1	-2	10000	1	0							realtime online correction generated
+1789535704113	2026-09-16T13:15:04.113	vision_sample	online_running	1	-118.763363	-90.657019	17.218667		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704114	2026-09-16T13:15:04.114	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535704157	2026-09-16T13:15:04.157	vision_sample	online_running	1	-118.759477	-90.654868	17.222635		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704160	2026-09-16T13:15:04.160	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535704199	2026-09-16T13:15:04.199	vision_sample	online_running	1	-118.780159	-90.667933	17.210501		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704202	2026-09-16T13:15:04.202	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535704239	2026-09-16T13:15:04.239	vision_sample	online_running	1	-118.747793	-90.651333	17.250848		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704242	2026-09-16T13:15:04.242	command_generated	online_running							0	-1	-3	10000	1	0							realtime online correction generated
+1789535704281	2026-09-16T13:15:04.281	vision_sample	online_running	1	-118.805257	-90.685026	17.202653		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704284	2026-09-16T13:15:04.284	command_generated	online_running							0	0	-3	10000	1	0							realtime online correction generated
+1789535704323	2026-09-16T13:15:04.323	vision_sample	online_running	1	-118.786523	-90.677342	17.236690		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704367	2026-09-16T13:15:04.367	vision_sample	online_running	1	-118.766670	-90.662378	17.234886		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704370	2026-09-16T13:15:04.370	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535704412	2026-09-16T13:15:04.412	vision_sample	online_running	1	-118.833391	-90.701324	17.177957		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704414	2026-09-16T13:15:04.414	command_generated	online_running							-1	-1	-3	10000	1	0							realtime online correction generated
+1789535704457	2026-09-16T13:15:04.457	vision_sample	online_running	1	-118.780498	-90.676533	17.256871		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704460	2026-09-16T13:15:04.460	command_generated	online_running							-1	-1	-3	10000	1	0							realtime online correction generated
+1789535704500	2026-09-16T13:15:04.500	vision_sample	online_running	1	-118.704874	-90.627771	17.295746		-1													KCF/Gabor detection succeeded; RobotSim 线结构光虚拟参考查询成功。
+1789535704503	2026-09-16T13:15:04.503	command_generated	online_running							-1	-1	-2	10000	1	0							realtime online correction generated
+1789535704517	2026-09-16T13:15:04.517	command_receipt	online_running													0	0	0	4	P 1,1,1,0,0,0,0,1,0,0,-1,-2,0,0,0,10000,1		receive timeout or failed
