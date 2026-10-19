@@ -81,7 +81,7 @@ struct OnlineCorrectionPlannedTrajectory {
     std::vector<OnlineCorrectionPoint> segmentPathPoints;
     /// @brief 旧 AllTpMatched 等价轨迹，坐标单位为 mm。
     std::vector<OnlineCorrectionPoint> allMatchedPathPoints;
-    /// @brief 旧 AllTp_segement_line_and_curve 等价分段轨迹，坐标单位为 mm。
+    /// @brief 当前程序段内按相邻示教点切分的几何子段，坐标单位为 mm。
     std::vector<std::vector<OnlineCorrectionPoint>> pathSegments;
     /// @brief 示教机器人位姿，位置单位 mm，姿态单位 deg。
     std::vector<OnlineCorrectionPose> teachPoses;

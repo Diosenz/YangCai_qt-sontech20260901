@@ -133,20 +133,27 @@ D 必须包含 32 个字段。O 按原索引逐点发送，只有最终点发送
 
 # 2026-06-24 OnlineExceptionHandling_beta / CorrectTaughtPathO 补齐
 
-- `OnlineExceptionHandling_beta()` 已扩展为带旧状态的
-  `COnlineCorrectionExceptionProcessor`：保留正常检测段缓存、`curveFlag`、
-  `matchTime`、上一匹配末点、检测段到全局示教轨迹索引等状态。
+- `OnlineExceptionHandling_beta()` 的活动配准语义由
+  `COnlineCorrectionExceptionProcessor` 承接；2026-10-18 按当前逐帧单点入口修正为
+  拟合历史与未输出 pending 分离累计，保留完整窗口后 80%，而不是每帧替换历史。
 - `OnlineCorrectionPlannedTrajectory` 增加 `AllTpMatched` 与
   `AllTp_segement_line_and_curve` 等价字段：
   `allMatchedPathPoints` 和 `pathSegments`；当前 `_W/_T` 坐标仍为变位机坐标、mm。
 - 仿真输入在旧五个函数之后补充 `getScanLineChangePoint()`，对应旧
   `sim_scan_line_change_point`；旧五个函数名及前五步调用顺序保持不变。
-- 异常处理器按旧活动分支区分单段 ICP 与两段 ICP：
-  两段使用 `max_iter=50`、检测抽样 2/3，单段使用 `max_iter=60`、
-  检测抽样 3，`min_delta=5e-4`；单段保持旧 `match_type==1`
-  的逆变换语义，两段保持正向模型到检测段语义。
-- 匹配输出保留闭环拼接、上次末点平移连续和二次匹配旋转连续修正；
-  gap 按旧 `MapGapsToProcessedPts` 语义只从当前检测段映射到预测点。
+- 相邻 `_T` 点在当前程序段内确定几何子段；未知 seam 使用完整当前段。已知边界
+  两侧分别求解/原始释放，避免一侧条件不足时被另一侧成功结果吞掉。抽样统一每三点
+  并补末点，抽样后至少五点，窗口与新批跨度至少 2 mm；段尾不足则原样释放。
+  首几何段 `max_iter=60`，后续为 50，`min_delta=5e-4`。统一沿用单段
+  `match_type==1` 的检测到模型求解、逆变换模型到检测语义。
+- 输出只截本批精确投影端点之间的有序折线；连续模型相位只向前，不自动闭环，
+  短批前向搜索受本批弧长约束。不再搬用会重放历史的闭环拼接、上次末点平移和
+  二次旋转补丁。未启用旧 `keepRemoveFailPoint`，其零坐标删除标记会误删合法点。
+  gap 仍只从当前 pending 映射到预测点。端点不相容时原样回退；相位大幅滑移但本批
+  正向投影相容时保留原始点并重定位游标，避免一次拒绝后永久无法再次配准。
+- 在线模型及跟随参考复用起点规划后的全局变换/首点平移；
+  `config/workflows/online_correction.txt` 的 `enable_online_icp=true/false`
+  在下次启动生效，false 原始点旁路，诊断写入既有运行记录。
 - `CorrectTaughtPathO()` 已拆入 `COnlineCorrectionPathFollower` 的三段逻辑：
   目标点选择、`rp1/rp2/rp3/rp4` 纠偏向量计算、控制方法输出。
 - `ControlMethod` 映射为：

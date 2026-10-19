@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -143,6 +143,8 @@ private:
 
     OnlineCorrectionOptions m_options;
     OnlineCorrectionPlannedTrajectory m_trajectory;
+    /// @brief 本会话起点修正后的参考，只供在线 ICP 和跟随器使用。
+    OnlineCorrectionPlannedTrajectory m_onlineTrajectory;
     vision::PositionerCalibration m_positionerCalibration;
     OnlineCorrectionSessionState m_state;
     robot_comm::RobotState m_robotState;

@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -39,12 +39,17 @@ namespace i2r_rlc::control {
 struct OnlineCorrectionExceptionResult {
     bool valid = false;
     bool segmentChanged = false;
+    bool icpAttempted = false;
+    bool icpApplied = false;
+    std::size_t bufferedSampleCount = 0;
+    double rmsErrorMm = 0.0;
     std::vector<OnlineCorrectionDetectionSample> samples;
     std::string message;
 };
 
 /**
- * @brief 使用检测段与示教段 ICP 结果修复分段连续性。
+ * @brief 串行累计在线检测并用轨迹 ICP 生成尚未释放批次的预测点。
+ * @details 由控制器持有并在控制线程调用；历史只拟合，失败保留原始点，不拥有设备资源。
  */
 class COnlineCorrectionExceptionProcessor final {
 public:
@@ -56,24 +61,37 @@ public:
         const OnlineCorrectionPlannedTrajectory &trajectory);
 
     /**
+     * @brief flush 时输出段尾，条件不足则保留原始点，并清空窗口。
+     * @details 历史仅参与拟合，每个检测批次只输出一次；控制线程串行调用。
+     */
+    OnlineCorrectionExceptionResult process(
+        const std::vector<OnlineCorrectionDetectionSample> &newSamples,
+        const OnlineCorrectionPlannedTrajectory &trajectory,
+        bool flush);
+
+    /**
      * @brief 兼容旧测试入口，仅提供当前参考段时按单段轨迹处理。
      */
     OnlineCorrectionExceptionResult process(
         const std::vector<OnlineCorrectionDetectionSample> &newSamples,
         const std::vector<OnlineCorrectionPoint> &referenceSegment);
 
-    /// @brief 清空累计正常段和仿真焊缝索引。
+    /// @brief 清空历史、pending、边界及前向相位，供新会话或新程序段重新累计。
     void reset();
 
 private:
     std::vector<OnlineCorrectionDetectionSample> m_normalSamples;
+    std::vector<OnlineCorrectionDetectionSample> m_pendingSamples;
     int m_lastSimulatedSeamIndex = -1;
-    int m_curveFlag = 0;
-    int m_matchTime = 0;
-    int m_segDetFstPtToAllTpId = 0;
-    int m_segDetLstPtToAllTpId = 0;
-    int m_preDetLstPtToAllTpId = 0;
-    OnlineCorrectionPoint m_lastMatchPoint;
+    std::size_t m_curveFlag = 0;
+    std::optional<OnlineCorrectionPoint> m_lastChangePoint;
+    /// @brief 当前参考内已释放的连续相位；只前进一次，不自动绕回闭环起点。
+    std::optional<double> m_lastReleasedPhase;
+    std::optional<OnlineCorrectionPoint> m_lastReleasedRawPoint;
+
+    /** @brief 拟合当前窗口，只输出 pending，成功后保留窗口后 80%。 */
+    OnlineCorrectionExceptionResult processPending(
+        const OnlineCorrectionPlannedTrajectory &trajectory, bool flush);
 };
 
 } // namespace i2r_rlc::control

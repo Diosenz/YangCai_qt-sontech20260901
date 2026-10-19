@@ -223,6 +223,10 @@ bool COnlineCorrectionRunRecorder::beginSession(
             QStringLiteral("start_mode"),
             startModeText(configuration.options.startMode))
         && appendSummary(
+            QStringLiteral("enable_online_icp"),
+            configuration.options.enableOnlineIcp
+                ? QStringLiteral("true") : QStringLiteral("false"))
+        && appendSummary(
             QStringLiteral("work_path_file"),
             QString::fromStdString(configuration.trajectoryRequest.workPathFile))
         && appendSummary(
@@ -342,6 +346,28 @@ bool COnlineCorrectionRunRecorder::recordUpdate(
     }
 
     bool written = true;
+    if (update.onlineIcpUpdated) {
+        const auto &icp = update.state.onlineIcp;
+        const QString diagnostics = QStringLiteral(
+            "enabled=%1 attempted=%2 applied=%3 buffered=%4 rms_mm=%5 reason=%6")
+                                        .arg(boolText(icp.enabled))
+                                        .arg(boolText(icp.attempted))
+                                        .arg(boolText(icp.applied))
+                                        .arg(QString::number(
+                                            static_cast<qulonglong>(icp.bufferedSampleCount)))
+                                        .arg(numberText(icp.rmsErrorMm))
+                                        .arg(QString::fromStdString(icp.message));
+        const QStringList fields{
+            timestampMsText(),
+            timestampText(),
+            QStringLiteral("online_icp"),
+            phaseText(update.phase),
+            {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+            sanitizeField(diagnostics)
+        };
+        written = appendFields(
+            QString::fromLatin1(kRealtimeCorrectionFileName), fields) && written;
+    }
     if (update.command.valid) {
         const auto &pathMatch = update.state.initialPathMatch;
         if (pathMatch.valid) {

@@ -218,6 +218,8 @@ struct OnlineCorrectionOptions {
     OnlineCorrectionStartMode startMode = OnlineCorrectionStartMode::InitType;
     /// @brief true 表示初始检测样本必须携带 gap 宽度。
     bool enableGapDetection = false;
+    /// @brief true 使用在线轨迹 ICP；false 直接跟随检测点，不影响起点/全局配准。
+    bool enableOnlineIcp = true;
     /// @brief 机器人 TCP 速度，单位 mm/s，用于保持旧纠偏周期语义。
     double stepTcpVelocityMmPerSecond = 11.0;
     /// @brief 控制周期，单位 s，旧活动路径使用 0.0043。
@@ -250,6 +252,18 @@ struct OnlineCorrectionOptions {
     };
 };
 
+/** @brief 最近一次在线轨迹 ICP 诊断；只在控制线程更新。 */
+struct OnlineCorrectionIcpStatus {
+    bool enabled = false;
+    bool attempted = false;
+    bool applied = false;
+    /// @brief 尚未输出的原始检测点数，不包含只参与拟合的历史。
+    std::size_t bufferedSampleCount = 0;
+    /// @brief 检测点到参考轨迹的 RMS，单位 mm，仅 applied 时有效。
+    double rmsErrorMm = 0.0;
+    std::string message;
+};
+
 /**
  * @brief 在线纠偏控制器持有的会话状态。
  */
@@ -266,6 +280,8 @@ struct OnlineCorrectionSessionState {
     int endTeachIndex = 0;
     /// @brief true 表示视觉跟踪/检测应保持运行。
     bool trackerActive = false;
+    /// @brief 区分在线 ICP 等待、实际求解、失败回退和关闭状态。
+    OnlineCorrectionIcpStatus onlineIcp;
     /// @brief true 表示初始检测已经结束。
     bool initialDetectionFinished = false;
     /**
@@ -306,6 +322,8 @@ struct OnlineCorrectionSessionState {
 struct OnlineCorrectionUpdate {
     /// @brief 当前事件处理是否成功。
     bool succeeded = true;
+    /// @brief 此次含新 ICP 诊断，记录器不应重复记录普通状态快照。
+    bool onlineIcpUpdated = false;
     /// @brief 事件处理后的状态机阶段。
     OnlineCorrectionPhase phase = OnlineCorrectionPhase::Idle;
     /// @brief 事件处理后的完整会话快照。

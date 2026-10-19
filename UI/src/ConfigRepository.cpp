@@ -211,6 +211,74 @@ WorkpieceProfileLoadResult ConfigRepository::loadWorkpieceProfiles() const
     return result;
 }
 
+bool ConfigRepository::loadOnlineIcpEnabled(
+    bool &enabled, QString *errorMessage) const
+{
+    if (errorMessage != nullptr) {
+        errorMessage->clear();
+    }
+    const QString filePath = m_paths.workflowsDir().filePath(
+        QStringLiteral("online_correction.txt"));
+    QFile file(filePath);
+    if (!file.exists()) {
+        return true;
+    }
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (errorMessage != nullptr) {
+            *errorMessage = QStringLiteral("无法打开在线纠偏配置：%1；%2")
+                                .arg(filePath, file.errorString());
+        }
+        return false;
+    }
+
+    QTextStream stream(&file);
+#if QT_VERSION_MAJOR >= 6
+    stream.setEncoding(QStringConverter::Utf8);
+#else
+    stream.setCodec("UTF-8");
+#endif
+    bool hasSwitch = false;
+    bool parsedEnabled = enabled;
+    int lineNumber = 0;
+    while (!stream.atEnd()) {
+        ++lineNumber;
+        const QString line = stream.readLine().trimmed();
+        if (line.isEmpty() || line.startsWith(QLatin1Char('#'))) {
+            continue;
+        }
+        const int separator = line.indexOf(QLatin1Char('='));
+        const QString key = line.left(separator).trimmed();
+        const QString value = separator >= 0
+            ? line.mid(separator + 1).trimmed()
+            : QString();
+        if (separator < 0 || key != QStringLiteral("enable_online_icp")
+            || hasSwitch
+            || (value != QStringLiteral("true")
+                && value != QStringLiteral("false"))) {
+            if (errorMessage != nullptr) {
+                *errorMessage = QStringLiteral(
+                    "在线纠偏配置第 %1 行无效：%2；仅允许一条 enable_online_icp=true 或 false。")
+                                    .arg(lineNumber)
+                                    .arg(filePath);
+            }
+            return false;
+        }
+        hasSwitch = true;
+        parsedEnabled = value == QStringLiteral("true");
+    }
+    if (!hasSwitch || stream.status() != QTextStream::Ok) {
+        if (errorMessage != nullptr) {
+            *errorMessage = QStringLiteral(
+                "在线纠偏配置缺少有效 enable_online_icp 开关或读取失败：%1")
+                                .arg(filePath);
+        }
+        return false;
+    }
+
+    enabled = parsedEnabled;
+    return true;
+}
+
 QString ConfigRepository::workpieceOnlineWorkPathFile(const WorkpieceProfile& profile) const
 {
     return m_paths.workpieceTrajectoryDir().filePath(

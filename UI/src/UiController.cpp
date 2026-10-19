@@ -1464,6 +1464,14 @@ void UiController::onOnlineCorrectionConfigurationSelected(
             .filePath(QStringLiteral("online_correction"))
             .toStdString();
     configuration.options.startMode = m_onlineCorrectionStartMode;
+    QString onlineIcpError;
+    if (!m_configRepository.loadOnlineIcpEnabled(
+            configuration.options.enableOnlineIcp, &onlineIcpError)) {
+        m_onlineCorrectionConfigured = false;
+        appendWarning(onlineIcpError);
+        showLegacyWarningPrompt(QStringLiteral("提示!"), onlineIcpError);
+        return;
+    }
 
     const auto trajectory =
         i2r_rlc::control::COnlineCorrectionTrajectoryPlanner::loadTrajectory(
@@ -1495,12 +1503,15 @@ void UiController::onOnlineCorrectionConfigurationSelected(
     m_onlineCorrectionConfigured = true;
 
     const QString message = QStringLiteral(
-        "在线纠偏配置已提交：\n起始点=%1\n_W=%2\n_T=%3\nRBCALIB=%4")
+        "在线纠偏配置已提交：\n起始点=%1\n_W=%2\n_T=%3\nRBCALIB=%4\n在线ICP=%5")
                                 .arg(
                                     onlineCorrectionStartModeToText(m_onlineCorrectionStartMode),
                                     workPathInfo.absoluteFilePath(),
                                     teachPoseInfo.absoluteFilePath(),
-                                    m_configRepository.paths().rbcalibFilePath());
+                                    m_configRepository.paths().rbcalibFilePath(),
+                                    configuration.options.enableOnlineIcp
+                                        ? QStringLiteral("true")
+                                        : QStringLiteral("false"));
     m_view.setOnlineCorrectionStateText(
         QStringLiteral("在线纠偏：配置已提交\n起始点：%1")
             .arg(onlineCorrectionStartModeToText(m_onlineCorrectionStartMode)));
@@ -1533,6 +1544,23 @@ void UiController::onStartWeldTrackingRequested()
         return;
     }
 
+    // 每次启动建立配置快照，便于修改 true/false 后直接开启下一会话。
+    bool enableOnlineIcp =
+        i2r_rlc::control::OnlineCorrectionOptions{}.enableOnlineIcp;
+    QString onlineIcpError;
+    if (!m_configRepository.loadOnlineIcpEnabled(
+            enableOnlineIcp, &onlineIcpError)) {
+        appendWarning(onlineIcpError);
+        m_view.setOnlineCorrectionStateText(
+            QStringLiteral("在线纠偏：配置无效\n%1").arg(onlineIcpError));
+        showLegacyWarningPrompt(QStringLiteral("提示!"), onlineIcpError);
+        return;
+    }
+    m_onlineCorrectionConfiguration.options.enableOnlineIcp = enableOnlineIcp;
+    appendInfo(QStringLiteral("在线纠偏本次会话：enable_online_icp=%1")
+                   .arg(m_onlineCorrectionConfiguration.options.enableOnlineIcp
+                       ? QStringLiteral("true")
+                       : QStringLiteral("false")));
     appendInfo(QStringLiteral("UI 请求启动在线纠偏初始检测。"));
     const WorkpieceProfile* profile = selectedWorkpieceProfile();
     if (profile == nullptr) {

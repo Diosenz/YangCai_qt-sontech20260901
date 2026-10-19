@@ -347,43 +347,20 @@ OnlineCorrectionPlannedTrajectory COnlineCorrectionTrajectoryPlanner::loadTrajec
             result.allPathPoints.begin() + endPathIndex + 1);
     }
     result.allMatchedPathPoints = result.allPathPoints;
-    int teachIndex = 0;
-    while (teachIndex < poseCount) {
-        int segmentEndIndex = teachIndex;
-        while (segmentEndIndex + 1 < poseCount
-               && teachSegments[segmentEndIndex + 1] == teachSegments[teachIndex]) {
-            ++segmentEndIndex;
-        }
-        const OnlineCorrectionPoint segmentStart{
-            result.teachPoses[teachIndex].xMm,
-            result.teachPoses[teachIndex].yMm,
-            result.teachPoses[teachIndex].zMm,
-            true
-        };
-        const OnlineCorrectionPoint segmentEnd{
-            result.teachPoses[segmentEndIndex].xMm,
-            result.teachPoses[segmentEndIndex].yMm,
-            result.teachPoses[segmentEndIndex].zMm,
-            true
-        };
-        int begin = findNearestPointIndex(
-            0,
-            static_cast<int>(result.allPathPoints.size()),
-            result.allPathPoints,
-            segmentStart);
-        int end = findNearestPointIndex(
-            0,
-            static_cast<int>(result.allPathPoints.size()),
-            result.allPathPoints,
-            segmentEnd);
-        teachIndex = segmentEndIndex + 1;
-        if (begin < 0 || end < 0) {
-            continue;
-        }
-        if (begin <= end) {
+    // 拷贝工程按相邻示教点切分直线/圆弧；程序段编号不能代替几何子段。
+    // 仅切当前程序段，下一段由新会话重新加载，避免 seam 变化跳入其他程序段。
+    int geometryBegin = startPathIndex;
+    for (int teachIndex = result.startTeachIndex + 1;
+         teachIndex <= result.endTeachIndex; ++teachIndex) {
+        const auto &pose = result.teachPoses[static_cast<std::size_t>(teachIndex)];
+        const OnlineCorrectionPoint boundary{ pose.xMm, pose.yMm, pose.zMm, pose.valid };
+        const int geometryEnd = findNearestPointIndex(
+            geometryBegin, endPathIndex + 1, result.allPathPoints, boundary);
+        if (geometryEnd > geometryBegin) {
             result.pathSegments.emplace_back(
-                result.allPathPoints.begin() + begin,
-                result.allPathPoints.begin() + end + 1);
+                result.allPathPoints.begin() + geometryBegin,
+                result.allPathPoints.begin() + geometryEnd + 1);
+            geometryBegin = geometryEnd;
         }
     }
     if (result.pathSegments.empty()) {

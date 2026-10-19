@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QUuid>
 
 #include "AppPaths.h"
 #include "ConfigRepository.h"
@@ -345,6 +346,59 @@ bool testWorkpieceProfilesRejectInvalidRows()
     return ok;
 }
 
+/**
+ * @brief 在唯一临时目录验证在线 ICP 配置，不清理已有测试或用户文件。
+ */
+bool testOnlineIcpSwitchConfiguration()
+{
+    const QString uniqueDirectory = QDir::temp().filePath(
+        QStringLiteral("i2r_rlc_online_icp_config_%1")
+            .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
+    const AppPaths paths = AppPaths::fromRuntimeRoot(uniqueDirectory);
+    const ConfigRepository repository(paths);
+    QString errorMessage;
+    bool enabled = true;
+    bool ok = true;
+
+    ok &= expectTrue(repository.loadOnlineIcpEnabled(enabled, &errorMessage),
+                     "missing online ICP config should retain default");
+    ok &= expectTrue(enabled, "missing config should preserve true");
+    enabled = false;
+    ok &= expectTrue(repository.loadOnlineIcpEnabled(enabled, &errorMessage),
+                     "missing online ICP config should preserve caller value");
+    ok &= expectTrue(!enabled, "missing config should preserve false");
+
+    const QString configPath = paths.workflowsDir().filePath(
+        QStringLiteral("online_correction.txt"));
+    ok &= writeTextFile(configPath,
+                       QStringLiteral("# online ICP\n enable_online_icp = true \n"));
+    ok &= expectTrue(repository.loadOnlineIcpEnabled(enabled, &errorMessage),
+                     "true switch with whitespace and comments should load");
+    ok &= expectTrue(enabled && errorMessage.isEmpty(),
+                     "true switch should enable online ICP");
+    ok &= writeTextFile(configPath, QStringLiteral("enable_online_icp=false\n"));
+    ok &= expectTrue(repository.loadOnlineIcpEnabled(enabled, &errorMessage),
+                     "false switch should load");
+    ok &= expectTrue(!enabled, "false switch should disable online ICP");
+
+    const QStringList invalidConfigurations{
+        QStringLiteral("enable_online_icp=1\n"),
+        QStringLiteral("enable_online_icp=TRUE\n"),
+        QStringLiteral("enable_online_icp=false\nenable_online_icp=true\n"),
+        QStringLiteral("enable_online_icp=true\nunknown=false\n"),
+        QStringLiteral("# switch is missing\n")
+    };
+    for (const auto &text : invalidConfigurations) {
+        ok &= writeTextFile(configPath, text);
+        enabled = false;
+        ok &= expectTrue(!repository.loadOnlineIcpEnabled(enabled, &errorMessage),
+                         "invalid or duplicate online ICP switch should fail");
+        ok &= expectTrue(!enabled && !errorMessage.isEmpty(),
+                         "parse failure must preserve switch and explain failure");
+    }
+    return ok;
+}
+
 } // namespace
 
 /**
@@ -355,6 +409,14 @@ bool testWorkpieceProfilesRejectInvalidRows()
 int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
+
+    if (app.arguments().contains(QStringLiteral("--online-icp-config-only"))) {
+        if (!testOnlineIcpSwitchConfiguration()) {
+            return 1;
+        }
+        std::cout << "PASS: online ICP config switch tests\n";
+        return 0;
+    }
 
     bool ok = true;
     ok &= testParseCompleteSensorPara();
@@ -367,6 +429,7 @@ int main(int argc, char* argv[])
     ok &= testWorkpieceProfilesLoadAndResolveTeachFiles();
     ok &= testWorkpieceProfilesLoadStartModeSpecificOnlineJobs();
     ok &= testWorkpieceProfilesRejectInvalidRows();
+    ok &= testOnlineIcpSwitchConfiguration();
 
     if (!ok) {
         return 1;

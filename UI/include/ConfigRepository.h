@@ -96,6 +96,15 @@ public:
      */
     WorkpieceProfileLoadResult loadWorkpieceProfiles() const;
 
+    /**
+     * @brief 读取 config/workflows/online_correction.txt 的在线轨迹 ICP 开关。
+     *
+     * 仅接受 enable_online_icp=true/false；文件缺失时保留 enabled 原值，
+     * 兼容尚未部署该配置的环境。失败时不修改 enabled，并返回具体原因。
+     * 本接口只读取配置；新会话启动时生效，不切换正在运行的会话。
+     */
+    bool loadOnlineIcpEnabled(bool &enabled, QString *errorMessage) const;
+
     /// @brief 根据在线纠偏示教基名生成 `_W.txt` 路径。
     QString workpieceOnlineWorkPathFile(const WorkpieceProfile& profile) const;
 

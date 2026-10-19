@@ -52,6 +52,75 @@ bool finitePoint(const OnlineCorrectionPoint &point)
         && std::isfinite(point.yMm) && std::isfinite(point.zMm);
 }
 
+/** @brief 将起点规划的同一刚体变换应用到在线参考的所有几何子段。 */
+OnlineCorrectionPlannedTrajectory correctedOnlineTrajectory(
+    const OnlineCorrectionPlannedTrajectory &trajectory,
+    const OnlineCorrectionOptions &options,
+    const std::vector<OnlineCorrectionPoint> &correctedPath)
+{
+    auto result = trajectory;
+    if (correctedPath.empty() || trajectory.segmentPathPoints.empty()) {
+        return result;
+    }
+    const auto globalPoint = [&options](const OnlineCorrectionPoint &point) {
+        if (options.startMode != OnlineCorrectionStartMode::GlobalCorrection) {
+            return point;
+        }
+        const auto &matrix = options.globalCorrectionRowMajor;
+        return OnlineCorrectionPoint{
+            matrix[0] * point.xMm + matrix[1] * point.yMm + matrix[2] * point.zMm + matrix[3],
+            matrix[4] * point.xMm + matrix[5] * point.yMm + matrix[6] * point.zMm + matrix[7],
+            matrix[8] * point.xMm + matrix[9] * point.yMm + matrix[10] * point.zMm + matrix[11],
+            point.valid };
+    };
+    const auto first = globalPoint(trajectory.segmentPathPoints.front());
+    const auto transform = [&globalPoint, &first, &correctedPath](OnlineCorrectionPoint &point) {
+        point = globalPoint(point);
+        point.xMm += correctedPath.front().xMm - first.xMm;
+        point.yMm += correctedPath.front().yMm - first.yMm;
+        point.zMm += correctedPath.front().zMm - first.zMm;
+    };
+    result.allMatchedPathPoints = trajectory.allPathPoints;
+    for (auto &point : result.allMatchedPathPoints) {
+        transform(point);
+    }
+    for (auto &segment : result.pathSegments) {
+        for (auto &point : segment) {
+            transform(point);
+        }
+    }
+    result.segmentPathPoints = correctedPath;
+    return result;
+}
+
+/** @brief 原始点旁路不调用异常处理器，也不持有其窗口。 */
+OnlineCorrectionExceptionResult processOnlineSamples(
+    COnlineCorrectionExceptionProcessor &processor,
+    const OnlineCorrectionOptions &options,
+    const OnlineCorrectionPlannedTrajectory &trajectory,
+    const std::vector<OnlineCorrectionDetectionSample> &samples, bool flush)
+{
+    if (options.enableOnlineIcp) {
+        return processor.process(samples, trajectory, flush);
+    }
+    OnlineCorrectionExceptionResult result;
+    result.valid = true;
+    result.samples = samples;
+    result.message = "online ICP disabled; raw detection samples used";
+    return result;
+}
+
+void updateIcpStatus(OnlineCorrectionSessionState &state, bool enabled,
+                     const OnlineCorrectionExceptionResult &result)
+{
+    state.onlineIcp.enabled = enabled;
+    state.onlineIcp.attempted = result.icpAttempted;
+    state.onlineIcp.applied = result.icpApplied;
+    state.onlineIcp.bufferedSampleCount = result.bufferedSampleCount;
+    state.onlineIcp.rmsErrorMm = result.rmsErrorMm;
+    state.onlineIcp.message = result.message;
+}
+
 } // namespace
 
 void COnlineCorrectionController::configure(
@@ -61,9 +130,11 @@ void COnlineCorrectionController::configure(
 {
     m_options = options;
     m_trajectory = trajectory;
+    m_onlineTrajectory = trajectory;
     m_positionerCalibration = positionerCalibration;
     m_state = OnlineCorrectionSessionState{};
     m_state.startMode = options.startMode;
+    m_state.onlineIcp.enabled = options.enableOnlineIcp;
     m_state.segmentIndex = trajectory.segmentIndex;
     m_state.startTeachIndex = trajectory.startTeachIndex;
     m_state.endTeachIndex = trajectory.endTeachIndex;
@@ -95,6 +166,11 @@ OnlineCorrectionUpdate COnlineCorrectionController::startInitialDetection()
     }
 
     m_state.initialDetectionSamples.clear();
+    m_onlineTrajectory = m_trajectory;
+    m_exceptionProcessor.reset();
+    m_pathFollower.reset();
+    m_state.onlineIcp = OnlineCorrectionIcpStatus{};
+    m_state.onlineIcp.enabled = m_options.enableOnlineIcp;
     m_state.onlineDetectionSamples.clear();
     m_state.correctedSegmentPath.clear();
     m_state.initialPathMatch = OnlineCorrectionInitialPathMatch{};
@@ -141,6 +217,11 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
             normalized.point.xMm += m_positionerCalibration.toolTcpInLastLinkMm.x();
             normalized.point.yMm += m_positionerCalibration.toolTcpInLastLinkMm.y();
             normalized.point.zMm += m_positionerCalibration.toolTcpInLastLinkMm.z();
+            if (normalized.scanLineChangePoint.has_value()) {
+                normalized.scanLineChangePoint->xMm += m_positionerCalibration.toolTcpInLastLinkMm.x();
+                normalized.scanLineChangePoint->yMm += m_positionerCalibration.toolTcpInLastLinkMm.y();
+                normalized.scanLineChangePoint->zMm += m_positionerCalibration.toolTcpInLastLinkMm.z();
+            }
             if (!finitePoint(normalized.point)) {
                 continue;
             }
@@ -163,8 +244,9 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
         return makeUpdate(true, event.message.empty() ? m_state.message : event.message);
     }
 
-    const auto processed = m_exceptionProcessor.process(
-        accepted, m_trajectory);
+    const auto processed = processOnlineSamples(
+        m_exceptionProcessor, m_options, m_onlineTrajectory, accepted, event.detectionFinished);
+    updateIcpStatus(m_state, m_options.enableOnlineIcp, processed);
     if (!processed.valid) {
         return makeUpdate(false, processed.message);
     }
@@ -180,16 +262,22 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
         m_robotState,
         m_options,
         m_positionerCalibration,
-        m_trajectory.segmentPathPoints,
+        m_onlineTrajectory.segmentPathPoints,
         &m_state.onlineDetectionSamples,
         false);
 
     OnlineCorrectionUpdate update = makeUpdate(follow.valid, follow.message);
+    update.onlineIcpUpdated = true;
+    if (!follow.command.valid && processed.valid) {
+        update.succeeded = true;
+        update.message = processed.message + "; " + follow.message;
+    }
     update.realtimeCommand = follow.command;
     update.taughtPointIndex = follow.taughtPointIndex;
     if (event.detectionFinished) {
         setPhase(OnlineCorrectionPhase::SegmentFinishing, "online segment is finishing");
         update = makeUpdate(true, m_state.message);
+        update.onlineIcpUpdated = true;
         update.realtimeCommand = follow.command;
         update.realtimeCommand.valid = true;
         update.realtimeCommand.onlineEndFlag = 1;
@@ -232,6 +320,8 @@ OnlineCorrectionUpdate COnlineCorrectionController::onDetectionFinished(
     }
 
     m_state.correctedSegmentPath = planResult.correctedSegmentPath;
+    m_onlineTrajectory = correctedOnlineTrajectory(
+        m_trajectory, m_options, planResult.correctedSegmentPath);
     m_state.initialPathMatch = planResult.initialPathMatch;
     m_state.teachPointSendIndex = 0;
     m_state.initialTeachPointCount = planResult.command.pointCount;
@@ -424,10 +514,16 @@ OnlineCorrectionUpdate COnlineCorrectionController::finishOnlineSegment(
         return makeUpdate(false, "online correction is not running");
     }
     m_state.pendingSegmentEndKind = kind;
+    const auto tail = processOnlineSamples(
+        m_exceptionProcessor, m_options, m_onlineTrajectory, {}, true);
+    updateIcpStatus(m_state, m_options.enableOnlineIcp, tail);
+    m_state.onlineDetectionSamples.insert(
+        m_state.onlineDetectionSamples.end(), tail.samples.begin(), tail.samples.end());
     m_state.segmentEndLatched = true;
     m_state.trackerActive = false;
     setPhase(OnlineCorrectionPhase::SegmentFinishing, "online segment finish requested");
     OnlineCorrectionUpdate update = makeUpdate(true, m_state.message);
+    update.onlineIcpUpdated = true;
     update.realtimeCommand.valid = true;
     update.realtimeCommand.speedOverride = 10000;
     update.realtimeCommand.onlineEndFlag = 1;
@@ -462,6 +558,8 @@ OnlineCorrectionUpdate COnlineCorrectionController::reset()
     const bool calibrationInitialized = usableCalibration(m_positionerCalibration);
     m_state = OnlineCorrectionSessionState{};
     m_state.startMode = m_options.startMode;
+    m_state.onlineIcp.enabled = m_options.enableOnlineIcp;
+    m_onlineTrajectory = m_trajectory;
     m_state.onlineTeachTrajectoryInitialized = trajectoryInitialized;
     m_state.positionerCalibrationInitialized = calibrationInitialized;
     m_exceptionProcessor.reset();
