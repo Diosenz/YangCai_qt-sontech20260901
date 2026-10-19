@@ -28,6 +28,9 @@ RobotSim/
 ppt/
 Testing/
 
-# 将 output 下所有文件纳入版本管理
+
 !/output/
 !/output/**
+
+
+.DS_Store
