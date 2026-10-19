@@ -295,6 +295,10 @@ struct RuntimeTrackingResult {
     double imageYPixel = 0.0;
     /// @brief 空间检测样本；无有效投影时 point.valid=false。
     control::OnlineCorrectionDetectionSample sample;
+    /// @brief 检测当帧投影的原始 KCF 点，机器人固定基座坐标，单位 mm；仅供显示。
+    control::OnlineCorrectionPoint detectedRobotBasePoint;
+    /// @brief 同一 KCF 点的 RBCALIB 固定变位机基座坐标，单位 mm；不含外轴旋转。
+    control::OnlineCorrectionPoint detectedStationBasePoint;
     /// @brief 整条真实激光线重建的空间点列（全局定位专用），单位 mm。
     /// 与在线纠偏的单点 sample 互斥：非空时 sample.point 仅作参考。
     std::vector<control::OnlineCorrectionPoint> linePoints;

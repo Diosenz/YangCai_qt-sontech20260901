@@ -250,6 +250,8 @@ private:
     void configureSelectedWorkpieceCorrection();
     void configureSelectedWorkpieceOnlineCorrection();
     void configureSelectedWorkpieceOfflineCorrection();
+    /// @brief UI 定时器以 5 Hz 刷新显示快照；不滤波、不改写算法和控制数据。
+    void renderOnlineCorrectionCoordinates();
     void beginCorrectionRobotStartGate(
         CorrectionRobotStartKind kind,
         const QString& jobName);
@@ -293,6 +295,12 @@ private:
     int m_selectedWorkpieceIndex = -1;
     i2r_rlc::control::CalibrationCaptureUpdate m_lastCalibrationCaptureUpdate;
     i2r_rlc::robot_comm::RobotState m_robotState;
+    QTimer* m_onlineCoordinateTimer = nullptr;
+    control::OnlineCorrectionPoint m_onlineKcfRobotPoint;
+    control::OnlineCorrectionPoint m_onlineKcfStationPoint;
+    qint64 m_onlineKcfFrameId = -1;
+    qint64 m_lastOnlineKcfReceivedMs = 0;
+    bool m_onlineKcfLatestValid = false;
     qint64 m_lastFrameId = -1;
     bool m_hasLatestFrame = false;
     bool m_onlineCorrectionConfigured = false;

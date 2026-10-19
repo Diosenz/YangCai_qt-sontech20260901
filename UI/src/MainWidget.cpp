@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFrame>
+#include <QFontDatabase>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QGuiApplication>
@@ -472,6 +473,48 @@ MainWidget::MainWidget(QWidget* parent)
     auto* onlineDetailsLayout = new QVBoxLayout(onlineDetailsWidget);
     onlineDetailsLayout->setContentsMargins(0, 0, 4, 0);
     onlineDetailsLayout->setSpacing(4);
+    auto* coordinates = new QWidget(onlineDetailsWidget);
+    coordinates->setObjectName(QStringLiteral("onlineCorrectionCoordinates"));
+    auto* coordinateLayout = new QGridLayout(coordinates);
+    coordinateLayout->setContentsMargins(0, 0, 0, 0);
+    coordinateLayout->setHorizontalSpacing(3);
+    coordinateLayout->setVerticalSpacing(2);
+    const QStringList axes{tr("X"), tr("Y"), tr("Z")};
+    const QStringList titles{
+        tr("TCP · 机器人基（mm）"), tr("TCP · 变位机基（mm）"),
+        tr("KCF焊缝 · 机器人基（mm）"), tr("KCF焊缝 · 变位机基（mm）")};
+    for (int axis = 0; axis < 3; ++axis) {
+        auto* label = new QLabel(axes.at(axis), coordinates);
+        label->setAlignment(Qt::AlignCenter);
+        coordinateLayout->addWidget(label, 0, axis);
+        coordinateLayout->setColumnStretch(axis, 1);
+    }
+    for (int row = 0; row < 4; ++row) {
+        auto* title = new QLabel(titles.at(row), coordinates);
+        title->setToolTip(tr("变位机基指 RBCALIB 固定基座，不随外轴转动。"));
+        coordinateLayout->addWidget(title, row * 2 + 1, 0, 1, 3);
+        for (int axis = 0; axis < 3; ++axis) {
+            auto* edit = new QLineEdit(QStringLiteral("--"), coordinates);
+            edit->setObjectName(QStringLiteral("onlineCoordinate%1%2")
+                                    .arg(row).arg(axes.at(axis)));
+            edit->setReadOnly(true);
+            edit->setAlignment(Qt::AlignRight);
+            edit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+            edit->setFixedHeight(22);
+            edit->setMinimumWidth(0);
+            // 数字的位数和正负号不能改变列宽或触发布局重新分配。
+            edit->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+            m_onlineCoordinateEdits[row][axis] = edit;
+            coordinateLayout->addWidget(edit, row * 2 + 2, axis);
+        }
+    }
+    onlineDetailsLayout->addWidget(coordinates);
+    m_onlineCoordinateStatusLabel = new QLabel(
+        tr("TCP：未连接\nKCF：等待有效检测"), onlineDetailsWidget);
+    m_onlineCoordinateStatusLabel->setObjectName(
+        QStringLiteral("onlineCoordinateStatusLabel"));
+    m_onlineCoordinateStatusLabel->setFixedHeight(32);
+    onlineDetailsLayout->addWidget(m_onlineCoordinateStatusLabel);
     onlineDetailsLayout->addWidget(makeHintLabel(
         tr("起始点定位方式："), onlineDetailsWidget));
     m_onlineCorrectionStateLabel = makeHintLabel(tr("在线纠偏：空闲"), onlineDetailsWidget);
@@ -1081,6 +1124,25 @@ void MainWidget::setOnlineCorrectionP001Text(const QString& text)
 {
     if (m_onlineCorrectionP001Label != nullptr) {
         m_onlineCorrectionP001Label->setText(text);
+    }
+}
+
+void MainWidget::setOnlineCorrectionCoordinates(
+    const std::array<QStringList, 4>& rows, const QString& status)
+{
+    for (int row = 0; row < 4; ++row) {
+        for (int axis = 0; axis < 3; ++axis) {
+            auto* edit = m_onlineCoordinateEdits[row][axis];
+            const QString value = rows[row].value(axis, QStringLiteral("--"));
+            if (edit != nullptr && edit->text() != value) {
+                edit->setText(value);
+            }
+        }
+    }
+    if (m_onlineCoordinateStatusLabel != nullptr
+        && m_onlineCoordinateStatusLabel->text() != status) {
+        m_onlineCoordinateStatusLabel->setText(status);
+        m_onlineCoordinateStatusLabel->setToolTip(status);
     }
 }
 

@@ -8,6 +8,8 @@
 #ifndef I2R_RLC_UI_MAIN_WIDGET_H
 #define I2R_RLC_UI_MAIN_WIDGET_H
 
+#include <array>
+
 #include <QImage>
 #include <QPointF>
 #include <QPointer>
@@ -250,6 +252,12 @@ public slots:
     void setOnlineCorrectionStateText(const QString& text);
     /// @brief 更新在线纠偏最终 P001 的独立诊断文本。
     void setOnlineCorrectionP001Text(const QString& text);
+    /**
+     * @brief 在 UI 线程更新固定 XYZ 数值框；四行依次为 TCP 机器人基/变位机基、
+     * KCF 机器人基/变位机基，单位 mm。状态说明保留值是否仍有效。
+     */
+    void setOnlineCorrectionCoordinates(
+        const std::array<QStringList, 4>& rows, const QString& status);
 
     /**
      * @brief 更新离线纠偏逐帧同步的独立状态、最近确认帧和最近错误。
@@ -358,6 +366,8 @@ private:
     QLabel* m_offlineCorrectionStateLabel = nullptr;
     QLabel* m_onlineCorrectionStateLabel = nullptr;
     QLabel* m_onlineCorrectionP001Label = nullptr;
+    std::array<std::array<QLineEdit*, 3>, 4> m_onlineCoordinateEdits{};
+    QLabel* m_onlineCoordinateStatusLabel = nullptr;
     QLabel* m_offlineCorrectionSyncStateLabel = nullptr;
     QLabel* m_offlineCorrectionConsumedFrameLabel = nullptr;
     QLabel* m_offlineCorrectionSyncErrorLabel = nullptr;

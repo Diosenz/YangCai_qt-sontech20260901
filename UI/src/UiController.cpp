@@ -6,6 +6,7 @@
  * @details     编排 UI 事件与相机、控制、视觉、定位、数字孪生服务之间的数据流。
  ******************************************************************************/
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
 #ifdef I2R_RLC_HAS_OPENCV
@@ -780,6 +781,11 @@ UiController::UiController(MainWidget& view, QObject* parent)
             this, &UiController::capturePendingAutomaticCalibrationLaserImage);
     m_cameraService.setDevice(&m_offlineCamera);
     bindView();
+    m_onlineCoordinateTimer = new QTimer(this);
+    m_onlineCoordinateTimer->setInterval(200);
+    connect(m_onlineCoordinateTimer, &QTimer::timeout,
+            this, &UiController::renderOnlineCorrectionCoordinates);
+    m_onlineCoordinateTimer->start();
 }
 
 UiController::~UiController()
@@ -1306,6 +1312,47 @@ void UiController::showRobotDiagnostics(
     evaluatePendingCorrectionRobotStart();
     processOnlineAutoCorrectionRobotState();
     processStandaloneGlobalLocateRobotState();
+}
+
+void UiController::renderOnlineCorrectionCoordinates()
+{
+    // 保留三位小数，仅合并显示刷新；不对真实坐标做平滑或修改控制输入。
+    const auto formatPoint = [](double x, double y, double z, bool valid) {
+        QStringList values;
+        for (double value : {x, y, z}) {
+            values.push_back(valid && std::isfinite(value)
+                ? QString::number(std::abs(value) < 0.0005 ? 0.0 : value, 'f', 3)
+                : QStringLiteral("--"));
+        }
+        return values;
+    };
+    const vision::PositionerPose robotPose{
+        static_cast<double>(m_robotState.curx_r) / 1000.0,
+        static_cast<double>(m_robotState.cury_r) / 1000.0,
+        static_cast<double>(m_robotState.curz_r) / 1000.0,
+        0.0, 0.0, 0.0, m_robotDeviceConnected};
+    // 外轴置零得到固定基座，与面板“变位机基”的定义一致。
+    const auto stationPose = vision::CPositionerKinematics::robotPoseToStationPose(
+        robotPose, 0.0, 0.0, m_positionerCalibration);
+    const std::array<QStringList, 4> rows{
+        formatPoint(robotPose.xMm, robotPose.yMm, robotPose.zMm, robotPose.valid),
+        formatPoint(stationPose.xMm, stationPose.yMm, stationPose.zMm, stationPose.valid),
+        formatPoint(m_onlineKcfRobotPoint.xMm, m_onlineKcfRobotPoint.yMm,
+                    m_onlineKcfRobotPoint.zMm, m_onlineKcfRobotPoint.valid),
+        formatPoint(m_onlineKcfStationPoint.xMm, m_onlineKcfStationPoint.yMm,
+                    m_onlineKcfStationPoint.zMm, m_onlineKcfStationPoint.valid)};
+    const QString tcpStatus = !m_robotDeviceConnected
+        ? QStringLiteral("TCP：未连接")
+        : (stationPose.valid ? QStringLiteral("TCP：实时")
+                             : QStringLiteral("TCP：变位机标定无效"));
+    const bool fresh = m_robotDeviceConnected && m_onlineKcfLatestValid
+        && m_onlineCorrectionSyncState.acceptingFrames
+        && QDateTime::currentMSecsSinceEpoch() - m_lastOnlineKcfReceivedMs <= 2000;
+    const QString kcfStatus = m_onlineKcfFrameId < 0
+        ? QStringLiteral("KCF：等待有效检测")
+        : QStringLiteral("KCF：帧 %1（%2）").arg(m_onlineKcfFrameId)
+              .arg(fresh ? QStringLiteral("有效") : QStringLiteral("保留上次有效值"));
+    m_view.setOnlineCorrectionCoordinates(rows, tcpStatus + QLatin1Char('\n') + kcfStatus);
 }
 
 void UiController::onCameraExposureRequested(int exposureUs)
@@ -4012,6 +4059,16 @@ void UiController::showRuntimeTrackingResult(const i2r_rlc::ui::RuntimeTrackingR
         }
         ++correctionState->trackingResultCount;
     }
+    if (result.correlation.purpose == CorrectionPurpose::OnlineCorrection) {
+        m_onlineKcfLatestValid = result.triggerAccepted && result.valid
+            && result.detectedRobotBasePoint.valid;
+        if (m_onlineKcfLatestValid) {
+            m_onlineKcfRobotPoint = result.detectedRobotBasePoint;
+            m_onlineKcfStationPoint = result.detectedStationBasePoint;
+            m_onlineKcfFrameId = result.frameId;
+            m_lastOnlineKcfReceivedMs = QDateTime::currentMSecsSinceEpoch();
+        }
+    }
     const bool shouldRefreshCorrectionText = correctionState == nullptr
         || correctionState->trackingResultCount == 1
         || (correctionState->trackingResultCount % 5) == 0;
@@ -4495,6 +4552,13 @@ void UiController::handleCorrectionSyncUpdate(
         && update.sessionId != 0
         && update.sessionId != state->sessionId;
     if (replacementSession) {
+        if (update.purpose == CorrectionPurpose::OnlineCorrection) {
+            m_onlineKcfRobotPoint = {};
+            m_onlineKcfStationPoint = {};
+            m_onlineKcfFrameId = -1;
+            m_lastOnlineKcfReceivedMs = 0;
+            m_onlineKcfLatestValid = false;
+        }
         state->sessionId = update.sessionId;
         state->purpose = update.purpose;
         state->pendingFrameId = -1;

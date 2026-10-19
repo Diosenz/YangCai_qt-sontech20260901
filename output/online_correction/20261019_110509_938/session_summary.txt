@@ -1,0 +1,25 @@
+key	value
+session_state	running
+start_time	2026-10-19T11:05:09.941
+start_timestamp_ms	1792379109938
+start_mode	init_type
+enable_online_icp	true
+work_path_file	H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt
+teach_pose_file	H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt
+rbcalib_file	H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT
+initial_match_max_distance_mm	15.000000
+initial_match_direction_sample_count	32
+initial_match_min_scan_span_mm	2.000000
+initial_match_min_reverse_direction_cosine	0.250000
+initial_match_min_remaining_length_mm	10.000000
+session_state	error
+end_time	2026-10-19T11:19:34.156
+end_timestamp_ms	1792379974156
+duration_ms	864218
+robot_state_count	9421
+tracking_result_count	10452
+corrected_path_point_count	1368
+initial_command_count	5
+realtime_command_count	9706
+command_receipt_count	3908
+message	在线纠偏超时：等待机器人主程序停止超过120秒。当前sStart=1, corflag=0, detflag=0, offline=0, JBI行=21。

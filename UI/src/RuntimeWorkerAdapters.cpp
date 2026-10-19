@@ -1390,6 +1390,25 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         result.sample.gapWidthMm = static_cast<float>(detected.gapWidthMm);
     }
     result.valid = detected.valid;
+    if (detected.valid) {
+        // 复用检测当帧的完整投影链，禁止使用 UI 收到结果时的最新机器人位姿。
+        const auto robotProjection = vision::CWeldImageToSpaceProjector::projectCvPoint(
+            detected.weldPointPixel, projectionContext,
+            vision::WeldProjectionTargetFrame::RobotBase);
+        const auto& point = robotProjection.spacePoint;
+        if (robotProjection.valid && point.valid) {
+            const Eigen::Vector3d robotPoint(point.xMm, point.yMm, point.zMm);
+            result.detectedRobotBasePoint = control::OnlineCorrectionPoint{
+                point.xMm, point.yMm, point.zMm, robotPoint.allFinite()};
+            if (m_options.positionerCalibration.valid) {
+                const Eigen::Vector3d stationPoint =
+                    m_options.positionerCalibration.stationBaseInRobotBase * robotPoint;
+                result.detectedStationBasePoint = control::OnlineCorrectionPoint{
+                    stationPoint.x(), stationPoint.y(), stationPoint.z(),
+                    stationPoint.allFinite()};
+            }
+        }
+    }
     const bool correctionTracking =
         m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection
         || m_activeCorrelation.purpose == CorrectionPurpose::OfflineCorrection;
