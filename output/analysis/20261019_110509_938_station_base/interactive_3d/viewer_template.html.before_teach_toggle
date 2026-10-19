@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在线纠偏｜四曲线三维观察</title>
+<style>
+body{margin:0;font:15px/1.6 system-ui,"Microsoft YaHei",sans-serif;color:#203345;background:#fff}
+header{padding:18px 26px 0}h1{font-size:23px;margin:0 0 5px}p{margin:5px 0;color:#526576}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 26px 0}
+button,select{font:inherit;padding:6px 12px;background:#fff;border:1px solid #b4c3ce;border-radius:5px;color:#203345}
+button:hover{background:#edf4fa}button:focus-visible,select:focus-visible{outline:2px solid #0072b2}
+#chart{width:100%;height:calc(100vh - 205px);min-height:550px}
+footer{padding:0 26px 14px;color:#526576;font-size:13px}
+@media(max-width:650px){header,.controls,footer{padding-left:12px;padding-right:12px}#chart{height:640px}h1{font-size:19px}}
+</style>
+<script>/* PLOTLY_LIBRARY */</script>
+</head>
+<body>
+<header><h1>在线纠偏：四曲线三维观察</h1>
+<p>20261019_110509_938 · 固定变位机基坐标系 · 统一 S1/S2 = COMMON_POSE · 单位 mm</p>
+<p>左键拖动旋转，滚轮缩放，右键拖动平移；点击图例隐藏曲线，双击图例单独观察。</p></header>
+<div class="controls">
+<button data-view="iso">三维视角</button><button data-view="xy">XY 俯视</button>
+<button data-view="xz">XZ 侧视</button><button data-view="yz">YZ 侧视</button>
+<label>Z 向显示放大 <select id="zscale"><option value="1">1×（XYZ 等比例）</option><option value="5">5×</option><option value="10">10×</option><option value="20" selected>20×</option><option value="40">40×</option></select></label>
+<span id="status" role="status">Z 向显示放大 20×；坐标数值保持真实值</span>
+</div>
+<div id="chart" role="img" aria-label="TCP、KCF、原始示教拟合圆和移动后示教拟合圆的可旋转三维图"></div>
+<footer>原始示教：20260404CHUFENGKOU1_W.txt；两条示教圆半径均为 RADIUS_VALUE mm。移动圆沿用报告的刚体定位，不缩放半径。TCP 7,807 点、KCF 10,156 点全部保留，未平滑、未拟合、未剔除。移动参考由 KCF 定位，不是独立测量真值。</footer>
+<script>
+const traces = /* TRACE_DATA */;
+const ranges = /* AXIS_RANGES */;
+const spans = /* AXIS_SPANS */;
+const largest = Math.max(...spans);
+const views = {
+  iso:{eye:{x:1.5,y:1.5,z:.9},up:{x:0,y:0,z:1}},
+  xy:{eye:{x:0,y:0,z:2.2},up:{x:0,y:1,z:0}},
+  xz:{eye:{x:0,y:-2.2,z:0},up:{x:0,y:0,z:1}},
+  yz:{eye:{x:2.2,y:0,z:0},up:{x:0,y:0,z:1}}
+};
+const axis = (name,index) => ({title:{text:name+' / mm'},range:ranges[index],
+  showbackground:true,backgroundcolor:'#fafcfe',gridcolor:'#dce5ec',zerolinecolor:'#bccbd6',
+  tickformat:'.1f',showspikes:true});
+const layout = {margin:{l:5,r:5,t:68,b:5},font:{family:'system-ui, Microsoft YaHei, sans-serif',size:13,color:'#203345'},
+  paper_bgcolor:'#fff',legend:{orientation:'h',x:0,y:1.13,xanchor:'left',yanchor:'top'},
+  scene:{xaxis:axis('X',0),yaxis:axis('Y',1),zaxis:axis('Z',2),
+    aspectmode:'manual',aspectratio:{x:spans[0]/largest,y:spans[1]/largest,z:20*spans[2]/largest},
+    camera:{...views.iso,projection:{type:'orthographic'}},dragmode:'orbit'},uirevision:'four-curves'};
+window.viewerReady = Plotly.newPlot('chart',traces,layout,{responsive:true,scrollZoom:true,displaylogo:false,
+  toImageButtonOptions:{format:'png',filename:'online_correction_four_curves',scale:2}});
+document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click',() =>
+  Plotly.relayout('chart',{'scene.camera':{...views[button.dataset.view],projection:{type:'orthographic'}}})));
+document.getElementById('zscale').addEventListener('change',event => {
+  const scale = Number(event.target.value);
+  Plotly.relayout('chart',{'scene.aspectratio':{x:spans[0]/largest,y:spans[1]/largest,z:scale*spans[2]/largest}});
+  document.getElementById('status').textContent = scale===1 ? 'XYZ 等比例；坐标数值保持真实值' : `Z 向显示放大 ${scale}×；坐标数值保持真实值`;
+});
+</script>
+</body></html>
