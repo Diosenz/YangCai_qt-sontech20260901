@@ -1,0 +1,303 @@
+{
+  "session": "20261019_110509_938",
+  "tcp_count": 7807,
+  "kcf_count": 10156,
+  "teach_work_count": 1368,
+  "teach_control_count": 5,
+  "tcp_start": "2026-10-19T11:06:06.604",
+  "tcp_end": "2026-10-19T11:17:33.797",
+  "kcf_start": "2026-10-19T11:06:06.647",
+  "kcf_end": "2026-10-19T11:17:33.933",
+  "raw_session_robot_count": 9421,
+  "raw_session_vision_count": 10452,
+  "excluded_wait_stop_tcp_count": 1097,
+  "calibration_srangle": [
+    768.715,
+    20.782,
+    -511.246,
+    -1.0631,
+    -0.3026,
+    0.0135
+  ],
+  "reference_source": "KCF_3D_circle_center_and_plane_relocated_original_teach_internal_reference",
+  "metric_definition": "d=3D Euclidean point-to-recorded-polyline distance; mean(d), max(d), sqrt(mean(d^2)); sample weighted",
+  "metrics": {
+    "TCP_to_KCF": {
+      "n": 7807,
+      "mean_mm": 0.4097525450659128,
+      "max_mm": 3.9672373926336206,
+      "rmse_mm": 0.7319670204018035,
+      "median_mm": 0.21562658508974755,
+      "p95_mm": 1.987139539393931,
+      "max_time": "2026-10-19T11:06:27.130",
+      "max_index": 227,
+      "closest_kcf_record_time_at_max": "2026-10-19T11:17:20.739"
+    },
+    "KCF_to_TCP": {
+      "n": 10156,
+      "mean_mm": 0.4945456580358492,
+      "max_mm": 5.365785494456355,
+      "rmse_mm": 0.8335980879330512,
+      "median_mm": 0.28352455950321154,
+      "p95_mm": 2.265666924577407,
+      "max_time": "2026-10-19T11:11:39.009",
+      "max_index": 4970
+    },
+    "TCP_to_original_teach": {
+      "n": 7807,
+      "mean_mm": 8.917621560273805,
+      "max_mm": 16.811416051389994,
+      "rmse_mm": 9.93717071339056,
+      "median_mm": 9.523825758958898,
+      "p95_mm": 15.582055967474924,
+      "max_time": "2026-10-19T11:12:52.572",
+      "max_index": 4610
+    },
+    "KCF_to_original_teach": {
+      "n": 10156,
+      "mean_mm": 8.839601666600611,
+      "max_mm": 17.911320802080656,
+      "rmse_mm": 9.835405680342252,
+      "median_mm": 9.31984759441992,
+      "p95_mm": 15.720570967780535,
+      "max_time": "2026-10-19T11:11:42.752",
+      "max_index": 5023
+    },
+    "KCF_to_fitted_circle": {
+      "n": 10156,
+      "mean_mm": 0.8418501534877203,
+      "max_mm": 5.3872381049107485,
+      "rmse_mm": 0.9684640791173699,
+      "median_mm": 0.7981982540070941,
+      "p95_mm": 1.5386382247049082
+    },
+    "TCP_to_fitted_circle": {
+      "n": 7807,
+      "mean_mm": 0.9327881535831816,
+      "max_mm": 3.143056540962356,
+      "rmse_mm": 1.0793899235685762,
+      "median_mm": 0.8483943927192887,
+      "p95_mm": 2.0244781898063624
+    },
+    "TCP_to_relocated_teach": {
+      "n": 7807,
+      "mean_mm": 1.7009898986174445,
+      "max_mm": 3.9767406496785793,
+      "rmse_mm": 1.8676656229890076,
+      "median_mm": 1.6729005707701203,
+      "p95_mm": 2.9401124596422394,
+      "max_time": "2026-10-19T11:15:53.322"
+    },
+    "KCF_to_relocated_teach": {
+      "n": 10156,
+      "mean_mm": 1.82268651344729,
+      "max_mm": 5.223970252604126,
+      "rmse_mm": 1.9820595342302356,
+      "median_mm": 1.8291564036041297,
+      "p95_mm": 2.996618847397261,
+      "max_time": "2026-10-19T11:11:42.752"
+    },
+    "TCP_to_relocated_teach_sector_holdout": {
+      "n": 7807,
+      "mean_mm": 1.7244798936231671,
+      "max_mm": 3.992052471402716,
+      "rmse_mm": 1.8863436499469521,
+      "median_mm": 1.6895261650803006,
+      "p95_mm": 2.9629713239025
+    },
+    "KCF_to_relocated_teach_sector_holdout": {
+      "n": 10156,
+      "mean_mm": 1.8430943939221,
+      "max_mm": 5.1959645522545825,
+      "rmse_mm": 1.997706917308706,
+      "median_mm": 1.847052403625228,
+      "p95_mm": 3.0060004152341486
+    }
+  },
+  "original_teach_circle": {
+    "center": [
+      4.494638743751453,
+      8.907331289393243,
+      253.90741238537294
+    ],
+    "radius_mm": 143.7175347793701,
+    "normal": [
+      -0.0008398993919776483,
+      0.001581372767724687,
+      0.9999983969133054
+    ]
+  },
+  "kcf_circle": {
+    "center": [
+      -1.170397725794636,
+      -3.4544610695005584,
+      253.10579947228055
+    ],
+    "radius_mm": 141.96431136070288,
+    "normal": [
+      -0.0029994146612713503,
+      0.0003379422129322629,
+      0.9999954446429995
+    ]
+  },
+  "startup_translation_not_analysis_registration_mm": [
+    6.983507000000003,
+    -110.649698,
+    -2.6124969999999905
+  ],
+  "contemporaneous_sensor_tcp_separation_not_error_mm": {
+    "n": 10156,
+    "mean_mm": 41.869549928624295,
+    "max_mm": 43.39786288317459,
+    "rmse_mm": 41.87077745566361,
+    "median_mm": 41.83827764842874,
+    "p95_mm": 42.39662714682835
+  },
+  "input_sha256": {
+    "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261019_110509_938\\actual_robot_path.txt": "0f08d28afc4613ed2569c7b83cb19d26ec81b4f9262d23c3bea7284f673e61af",
+    "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261019_110509_938\\realtime_correction.txt": "d12dee245ce0951cd46b48f70f2e8ca815683a58d05ff550d5500c5cb2295c40",
+    "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261019_110509_938\\initial_correction.txt": "cadf2fb87b66395679b16a6b3f114511f02e76d19cf6318f98191351df14ab39",
+    "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261019_110509_938\\session_summary.txt": "38b601e0853b4af6f430ec45c7636963e2f06d2cb232fd5c7464f54a5880f517",
+    "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\data\\WorkPiece\\20260404CHUFENGKOU1_W.txt": "2001f5d9e4d14e8ca14da584d47b9c870a9f2fcb8c8912c7d37d014267ba09b2",
+    "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\data\\WorkPiece\\20260404CHUFENGKOU1_T.txt": "93d9710b8451cc0405b8a51f6d0f4c2e4a0d327d49b4ca5b8b873e2022df97ab",
+    "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\config\\calibration\\RBCALIB.DAT": "de9f57d91ad4af7e413dc8a3511be313ee99938444b21832eb284131f4651ea5"
+  },
+  "display_registration": {
+    "rotation": [
+      [
+        0.9999977038064367,
+        -5.658301312159081e-06,
+        -0.0021429768635235842
+      ],
+      [
+        3.090958726008903e-06,
+        0.9999992823597916,
+        -0.0011980276906694298
+      ],
+      [
+        0.0021429821044388754,
+        0.0011980183159129218,
+        0.9999969861853658
+      ]
+    ],
+    "translation": [
+      -5.103143754844031,
+      -12.068019532825785,
+      -0.8237110223735726
+    ],
+    "normal_alignment_deg": 0.14066844848769772,
+    "axial_rotation_is_identifiable": false,
+    "scale": 1.0
+  },
+  "kcf_fitted_circle_balanced": {
+    "center": [
+      -1.1549645994957138,
+      -3.462834816798243,
+      253.10341827012414
+    ],
+    "radius_mm": 141.96913269223867,
+    "normal": [
+      -0.0029755622547204584,
+      0.0003778936370756325,
+      0.999995501602716
+    ]
+  },
+  "teach_fitted_circle_balanced": {
+    "center": [
+      4.4923579817409,
+      8.909365552413297,
+      253.90759389704337
+    ],
+    "radius_mm": 143.71704466934042,
+    "normal": [
+      -0.0008325817897459309,
+      0.0015759231292623577,
+      0.9999984116356657
+    ]
+  },
+  "circle_radius_difference_mm": -1.7479119771017508,
+  "circle_center_difference_material_mm": [
+    -5.647322581236614,
+    -12.372200369211539,
+    -0.804175626919232
+  ],
+  "registration_cv_folds": [
+    {
+      "held_fold": 0,
+      "kcf_train_n": 5069,
+      "fit": {
+        "rotation": [
+          [
+            0.9999980310375011,
+            -5.7823055332294216e-06,
+            -0.0019844111685600107
+          ],
+          [
+            2.8950391115327176e-06,
+            0.9999989415210584,
+            -0.001454973670384376
+          ],
+          [
+            0.001984417481204882,
+            0.001454965060647836,
+            0.9999969725773836
+          ]
+        ],
+        "translation": [
+          -5.144244223967776,
+          -11.993806222209248,
+          -0.6969217055602144
+        ],
+        "normal_alignment_deg": 0.14098565956423614,
+        "axial_rotation_is_identifiable": false,
+        "scale": 1.0
+      }
+    },
+    {
+      "held_fold": 1,
+      "kcf_train_n": 5087,
+      "fit": {
+        "rotation": [
+          [
+            0.9999972181676913,
+            -5.617749951449556e-06,
+            -0.0023587338382564534
+          ],
+          [
+            3.3896061878621214e-06,
+            0.9999995538232513,
+            -0.0009446384540110112
+          ],
+          [
+            0.0023587380925868874,
+            0.0009446278310064261,
+            0.9999967720112258
+          ]
+        ],
+        "translation": [
+          -5.05852174212267,
+          -12.148343845263499,
+          -0.9586307168737562
+        ],
+        "normal_alignment_deg": 0.14558091248166688,
+        "axial_rotation_is_identifiable": false,
+        "scale": 1.0
+      }
+    }
+  ],
+  "common_station_base_pose_deg": [
+    0.004,
+    179.9963
+  ],
+  "kcf_circle_center_common_station_base_mm": [
+    1.1728581663606437,
+    3.4627602252183967,
+    253.10333700597505
+  ],
+  "teach_original_circle_center_common_station_base_mm": [
+    -4.475207209125239,
+    -8.909075430016074,
+    253.90790694420332
+  ],
+  "registration_method": "2-degree angular-bin coordinate medians; PCA plane; Huber geometric circle (1.5 MAD, floor 0.02 mm); centers and minimal plane-normal rotation only; scale=1; no axial-yaw fitting"
+}

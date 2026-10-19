@@ -1,0 +1,15 @@
+status=completed
+saved_at_local=2026-09-16T13:07:01.396
+completion_condition=all_O_points_and_D.offline_5
+transform_direction=model_to_detection
+point_units=mm
+point_file_columns=x_mm y_mm z_mm
+detection_point_file=icp_detection_points.txt
+model_file=H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt
+teach_file=H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece\20260404CHUFENGKOU1_T.txt
+model_point_count=1368
+detection_point_count=1982
+teach_point_count=5
+mean_error_mm=6.623728153050056
+rms_error_mm=8.0163065086483005
+confidence=0.13116941999039222

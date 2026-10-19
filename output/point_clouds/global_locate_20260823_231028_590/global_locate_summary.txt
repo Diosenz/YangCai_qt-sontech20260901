@@ -1,0 +1,1 @@
+全局定位失败：虚拟点云已生成并保存，但扫描未采集到有效三维点。trackingFrames=3596，triggerRejected=1292，invalid=2304，priorSuccess=0，priorFailure=2304，lastTracking=traflag_not_ready: traflag is not 1，lastPrior=GET_LSL_PHOTO 响应为空数组。；GET_WELD_SEAM_PHOTO 响应为空数组。。请重点检查 JBI 的 STARTDETPRG/STARTPOSSEG、Steger 提取和标定投影日志。

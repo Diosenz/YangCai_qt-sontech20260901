@@ -1,0 +1,1 @@
+全局定位完成：点云来源=weldment 模型采样，2 个定位面的分段配准和全部点云的整体一次配准均已完成；全部结果位于 D:/newCodeTest/qt-sontech1/output/point_clouds/global_locate_20260827_215447_224。

@@ -1,0 +1,9 @@
+ply
+format ascii 1.0
+comment coordinate_frame positioner_tcp
+comment units millimeter
+element vertex 0
+property double x
+property double y
+property double z
+end_header

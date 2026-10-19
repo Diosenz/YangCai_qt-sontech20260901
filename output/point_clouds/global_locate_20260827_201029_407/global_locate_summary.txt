@@ -1,0 +1,1 @@
+全局定位完成：2 个定位面 ICP，按定位面加权 RMSE 8.289326 -> 7.696173 mm；全部结果位于 D:/newCodeTest/qt-sontech1/output/point_clouds/global_locate_20260827_201029_407。
