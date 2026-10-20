@@ -1,0 +1,36 @@
+{
+  "snapshot_date": "2026-10-21",
+  "source_directory": "C:/Users/admin/AppData/Local/i2r_rlc/logs",
+  "purpose": "在线纠偏分析运行日志，包含工件在线局部定位验收与拒绝记录；原始字节复制，附加 .txt 后缀以纳入分析结果管理。",
+  "latest_session_directory": "output/online_correction/20261020_214257_216_普通测试数据",
+  "files": [
+    {
+      "source_file": "i2r_rlc.log",
+      "snapshot_file": "i2r_rlc.log.txt",
+      "source_last_write_time": "2026-10-20T21:52:49+08:00",
+      "bytes": 2600679,
+      "sha256": "45FAEFF735E7660580CEDF37454BC4EF2DCEFA29536E346CB6E60C845F7EF30B"
+    },
+    {
+      "source_file": "i2r_rlc.log.1",
+      "snapshot_file": "i2r_rlc.log.1.txt",
+      "source_last_write_time": "2026-10-20T20:52:19+08:00",
+      "bytes": 5242848,
+      "sha256": "41270C1E93FB4888F9C0426C0417BF98013052877468560AD9C48D40ED37C9A1"
+    },
+    {
+      "source_file": "i2r_rlc.log.2",
+      "snapshot_file": "i2r_rlc.log.2.txt",
+      "source_last_write_time": "2026-10-20T16:43:55+08:00",
+      "bytes": 5242859,
+      "sha256": "02AA48E95AC70CA9793FE525BBBE5B1C9F9F765E56B02E92F01D8200972F5C78"
+    },
+    {
+      "source_file": "i2r_rlc.log.3",
+      "snapshot_file": "i2r_rlc.log.3.txt",
+      "source_last_write_time": "2026-10-19T11:16:36+08:00",
+      "bytes": 5242816,
+      "sha256": "887F3D1DF0ADAD440415836003E28E63CCDE9A97680EC393B9B13B049D06E034"
+    }
+  ]
+}
