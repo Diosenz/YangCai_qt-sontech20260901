@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "增量编译主程序 (qt-debug)",
+            "type": "process",
+            "command": "powershell.exe",
+            "args": [
+                "-NoLogo",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$ErrorActionPreference = 'Stop'; if (-not (Test-Path 'out/build/qt-debug/CMakeCache.txt')) { throw '现有 qt-debug 构建目录不存在，请先配置项目。' }; & 'D:/vs2022/Common7/Tools/Launch-VsDevShell.ps1' -Arch amd64 -HostArch amd64 -SkipAutomaticLocation -ErrorAction Stop; $env:PATH = 'D:/QT/6.7.3/msvc2022_64/bin;' + $env:PATH; if (-not (Select-String -Path 'out/build/qt-debug/CMakeCache.txt' -Pattern '^VCPKG_MANIFEST_INSTALL:BOOL=OFF$' -Quiet)) { & 'D:/cmake/bin/cmake.exe' -S . -B out/build/qt-debug -DVCPKG_MANIFEST_INSTALL:BOOL=OFF; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE } }; & 'D:/cmake/bin/cmake.exe' --build out/build/qt-debug --target i2r_rlc --parallel 4; exit $LASTEXITCODE"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "runOptions": {
+                "instanceLimit": 1
+            }
+        }
+    ]
+}
