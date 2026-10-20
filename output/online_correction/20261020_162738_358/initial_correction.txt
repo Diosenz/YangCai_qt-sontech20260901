@@ -1,1 +1,0 @@
-timestamp_ms	time	event	phase	segment_index	point_index	raw_x_mm	raw_y_mm	raw_z_mm	tcp_offset_x_mm	tcp_offset_y_mm	tcp_offset_z_mm	converted_x_mm	converted_y_mm	converted_z_mm	aligned_first_x_mm	aligned_first_y_mm	aligned_first_z_mm	robot_x_mm	robot_y_mm	robot_z_mm	robot_rx_deg	robot_ry_deg	robot_rz_deg	s1_deg	s2_deg	message

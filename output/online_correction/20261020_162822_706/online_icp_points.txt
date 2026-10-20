@@ -1,1 +1,0 @@
-batch_index	kind	point_index	x_mm	y_mm	z_mm	valid	gap_width_mm	seam_index

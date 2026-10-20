@@ -1,1 +1,0 @@
-timestamp_ms	update_index	segment_index	phase	taught_point_index	s1_deg	s2_deg	current_x_mm	current_y_mm	current_z_mm	first_x_mm	first_y_mm	first_z_mm	direction_x_mm	direction_y_mm	direction_z_mm	foot_x_mm	foot_y_mm	foot_z_mm	future_foot_x_mm	future_foot_y_mm	future_foot_z_mm	dx_um	dy_um	dz_um	online_end_flag
