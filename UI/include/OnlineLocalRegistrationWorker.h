@@ -33,14 +33,15 @@ public:
         int maximumPointsPerCloud = 512;
         int maximumIterations = 40;
         /// @brief ICP 最近邻对应点的最大距离，单位 mm，范围 [0.1,10]。
-        double maximumCorrespondenceDistanceMm = 5.0;
+        double maximumCorrespondenceDistanceMm = 10.0;
         /// @brief 求解后超预算拒绝，不是对 PCL 的硬中断。
-        int maximumSolveTimeMs = 300;
-        /// @brief 单次修正的三轴合成平移上限，mm，范围 [0.01,10]；超过则拒绝。
-        double maximumTranslationMm = 5.0;
-        double maximumRotationDeg = 1.0;
+        int maximumSolveTimeMs = 2500;
+        /// @brief 单次修正的三轴合成平移上限，mm，范围 [0.01,30]；超过则拒绝。
+        double maximumTranslationMm = 30.0;
+        double maximumRotationDeg = 10.0;
         double minimumImprovementRatio = 0.05;
-        double maximumResidualMm = 2.0;
+        /// @brief 全会话统一的平均最近邻残差上限，mm；仍须满足最低改善比例。
+        double maximumResidualMm = 5.5;
     };
 
     /** @brief 主纠偏链冻结的同帧输入；虚拟点以工件父级的变位机 TCP 系为参考。 */

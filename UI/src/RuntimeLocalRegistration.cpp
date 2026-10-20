@@ -19,7 +19,7 @@
 namespace i2r_rlc::ui {
 namespace {
 
-constexpr qint64 MAXIMUM_LOCAL_RESULT_AGE_MS = 1500;
+constexpr qint64 MAXIMUM_LOCAL_RESULT_AGE_MS = 4000;
 
 /** @brief 非法现场参数停用自动写回；不静默使用危险的零间隔或无界点数。 */
 COnlineLocalRegistrationWorker::Options readLocalOptions(QString &error)
@@ -54,12 +54,12 @@ COnlineLocalRegistrationWorker::Options readLocalOptions(QString &error)
     integer("maximum_frames", options.maximumFrames, 4, 32);
     integer("maximum_points_per_cloud", options.maximumPointsPerCloud, 64, 1024);
     integer("maximum_iterations", options.maximumIterations, 5, 80);
-    integer("maximum_solve_time_ms", options.maximumSolveTimeMs, 20, 1000);
+    integer("maximum_solve_time_ms", options.maximumSolveTimeMs, 20, 2500);
     real("max_correspondence_distance_mm", options.maximumCorrespondenceDistanceMm, 0.1, 10.0);
-    real("maximum_translation_mm", options.maximumTranslationMm, 0.01, 10.0);
-    real("maximum_rotation_deg", options.maximumRotationDeg, 0.01, 2.0);
+    real("maximum_translation_mm", options.maximumTranslationMm, 0.01, 30.0);
+    real("maximum_rotation_deg", options.maximumRotationDeg, 0.01, 10.0);
     real("minimum_improvement_ratio", options.minimumImprovementRatio, 0.01, 0.9);
-    real("maximum_residual_mm", options.maximumResidualMm, 0.01, 5.0);
+    real("maximum_residual_mm", options.maximumResidualMm, 0.01, 5.5);
     if (options.maximumFrames < options.minimumFrames || settings.status() != QSettings::NoError) {
         error = QStringLiteral("局部定位配置读取失败或最大窗口小于最小窗口。");
     }
@@ -92,7 +92,7 @@ void CRuntimeCoordinator::startLocalRegistrationWorker()
     m_localRegistrationBusy = false;
     m_localRegistrationWritebackBusy = false;
     resetOnlineLocalRegistration();
-    emit statusMessage(QStringLiteral("在线局部定位：%1，采样间隔 %2 ms，配准间隔至少 %3 ms，窗口 %4~%5 帧，每侧最多 %6 点，对应距离 %7 mm，最大平移修正 %8 mm。")
+    emit statusMessage(QStringLiteral("在线局部定位：%1，采样间隔 %2 ms，配准间隔至少 %3 ms，窗口 %4~%5 帧，每侧最多 %6 点，对应距离 %7 mm，最大平移修正 %8 mm，最大旋转 %9 度，配准预算 %10 ms，候选有效期 %11 ms，残差上限 %12 mm，最低改善 %13%。")
         .arg(m_localRegistrationOptions.enabled ? QStringLiteral("启用") : QStringLiteral("停用"))
         .arg(m_localRegistrationOptions.sampleIntervalMs)
         .arg(m_localRegistrationOptions.minimumMatchIntervalMs)
@@ -100,7 +100,12 @@ void CRuntimeCoordinator::startLocalRegistrationWorker()
         .arg(m_localRegistrationOptions.maximumFrames)
         .arg(m_localRegistrationOptions.maximumPointsPerCloud)
         .arg(m_localRegistrationOptions.maximumCorrespondenceDistanceMm)
-        .arg(m_localRegistrationOptions.maximumTranslationMm));
+        .arg(m_localRegistrationOptions.maximumTranslationMm)
+        .arg(m_localRegistrationOptions.maximumRotationDeg)
+        .arg(m_localRegistrationOptions.maximumSolveTimeMs)
+        .arg(MAXIMUM_LOCAL_RESULT_AGE_MS)
+        .arg(m_localRegistrationOptions.maximumResidualMm)
+        .arg(m_localRegistrationOptions.minimumImprovementRatio * 100.0));
 }
 
 bool CRuntimeCoordinator::onlineLocalRegistrationEnabled() const
@@ -121,7 +126,7 @@ double CRuntimeCoordinator::onlineLocalIcpDistance() const
 void CRuntimeCoordinator::setOnlineLocalIcpDistance(double distanceMm)
 {
     const double normalized = std::isfinite(distanceMm)
-        ? std::clamp(distanceMm, 0.1, 10.0) : 5.0;
+        ? std::clamp(distanceMm, 0.1, 10.0) : 10.0;
     if (m_localRegistrationOptions.maximumCorrespondenceDistanceMm == normalized) {
         return;
     }
@@ -147,7 +152,7 @@ double CRuntimeCoordinator::onlineLocalIcpTranslationLimit() const
 void CRuntimeCoordinator::setOnlineLocalIcpTranslationLimit(double translationMm)
 {
     const double normalized = std::isfinite(translationMm)
-        ? std::clamp(translationMm, 0.01, 10.0) : 5.0;
+        ? std::clamp(translationMm, 0.01, 30.0) : 30.0;
     if (m_localRegistrationOptions.maximumTranslationMm == normalized) {
         return;
     }

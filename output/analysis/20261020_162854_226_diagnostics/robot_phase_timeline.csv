@@ -1,0 +1,10 @@
+﻿phase,start,end,count
+idle,16:28:54.286,16:29:12.101,165
+initial_detection_running,16:29:12.178,16:29:28.601,151
+sending_initial_teach_points,16:29:29.204,16:29:29.239,6
+waiting_initial_teach_point_ack,16:29:29.485,16:29:30.176,4
+waiting_initial_approach,16:29:30.407,16:29:40.113,90
+waiting_online_start,16:29:40.234,16:29:40.234,1
+online_running,16:29:40.388,16:41:07.572,7688
+waiting_detection_reset,16:41:07.743,16:41:07.743,1
+waiting_robot_program_stop,16:41:07.799,16:43:07.693,1097

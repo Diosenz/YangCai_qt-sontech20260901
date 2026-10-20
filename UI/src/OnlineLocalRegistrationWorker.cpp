@@ -78,10 +78,10 @@ void COnlineLocalRegistrationWorker::configure(const Options &options)
     m_options.maximumPointsPerCloud = std::clamp(options.maximumPointsPerCloud, 10, 2048);
     m_options.maximumIterations = std::clamp(options.maximumIterations, 1, 100);
     m_options.maximumCorrespondenceDistanceMm = std::isfinite(options.maximumCorrespondenceDistanceMm)
-        ? std::clamp(options.maximumCorrespondenceDistanceMm, 0.1, 10.0) : 5.0;
+        ? std::clamp(options.maximumCorrespondenceDistanceMm, 0.1, 10.0) : 10.0;
     m_options.maximumTranslationMm = std::isfinite(options.maximumTranslationMm)
-        ? std::clamp(options.maximumTranslationMm, 0.01, 10.0) : 5.0;
-    m_options.maximumSolveTimeMs = std::clamp(options.maximumSolveTimeMs, 1, 2000);
+        ? std::clamp(options.maximumTranslationMm, 0.01, 30.0) : 30.0;
+    m_options.maximumSolveTimeMs = std::clamp(options.maximumSolveTimeMs, 1, 2500);
     reset();
 }
 

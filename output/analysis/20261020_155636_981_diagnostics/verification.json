@@ -1,0 +1,21 @@
+{
+  "input_files_unchanged": true,
+  "unique_diagnostic_frames": 2124,
+  "unique_projected_coordinates": 2124,
+  "verified_png_pairs": 30,
+  "all_1749_icp_raw_points_mapped_to_source_frames": true,
+  "projection_reproduction_max_mm": 8.512799835540429e-07,
+  "browser_verified": [
+    "report renders",
+    "frame selector changes to 9550 and displays computed values",
+    "XY camera view renders",
+    "Z 8x display button updates label"
+  ],
+  "browser_preview": "interactive_preview.png",
+  "not_claimed": [
+    "independent seam truth",
+    "late-event source images",
+    "real robot re-run",
+    "all browser gestures tested"
+  ]
+}

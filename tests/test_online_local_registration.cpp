@@ -73,17 +73,17 @@ bool testRuntimeHotProcessingOptions()
         .filePath(QStringLiteral("online_local_registration.ini")), QSettings::IniFormat);
     const bool configuredEnabled = settings.value(QStringLiteral("enabled"), true).toBool();
     const double configuredDistance = settings.value(
-        QStringLiteral("max_correspondence_distance_mm"), 5.0).toDouble();
+        QStringLiteral("max_correspondence_distance_mm"), 10.0).toDouble();
     const double configuredTranslation = settings.value(
-        QStringLiteral("maximum_translation_mm"), 5.0).toDouble();
+        QStringLiteral("maximum_translation_mm"), 30.0).toDouble();
     ui::CRuntimeCoordinator runtime;
     runtime.start();
     bool ok = expect(runtime.onlineLocalRegistrationEnabled() == configuredEnabled,
         "runtime getter must reflect production INI enabled state after start");
     ok &= expect(near(runtime.onlineLocalIcpDistance(), configuredDistance),
-        "runtime ICP correspondence distance must initially reflect INI or default 5 mm");
+        "runtime ICP correspondence distance must initially reflect INI or default 10 mm");
     ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), configuredTranslation),
-        "runtime maximum translation must reflect INI or default 5 mm");
+        "runtime maximum translation must reflect INI or default 30 mm");
     ok &= expect(runtime.onlineFusionOptions().mode == KcfFusionMode::AutomaticKalman,
         "runtime must initially retain automatic Kalman fusion");
 
@@ -99,21 +99,21 @@ bool testRuntimeHotProcessingOptions()
         && runtime.onlineFusionOptions().mode == KcfFusionMode::ManualWeight
         && near(runtime.onlineFusionOptions().simulationWeight, 0.3),
         "translation adjustment must preserve correspondence range, disabled ICP and fusion");
-    runtime.setOnlineLocalIcpTranslationLimit(10.0);
-    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 10.0),
-        "running runtime must accept 10 mm translation limit");
+    runtime.setOnlineLocalIcpTranslationLimit(30.0);
+    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 30.0),
+        "running runtime must accept 30 mm translation limit");
     runtime.setOnlineLocalIcpTranslationLimit(100.0);
-    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 10.0),
-        "excessive finite translation limit must clamp to 10 mm");
+    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 30.0),
+        "excessive finite translation limit must clamp to 30 mm");
     runtime.setOnlineLocalIcpTranslationLimit(-1.0);
     ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 0.01),
         "negative finite translation limit must clamp to 0.01 mm");
     runtime.setOnlineLocalIcpTranslationLimit(std::numeric_limits<double>::quiet_NaN());
-    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 5.0),
-        "NaN translation limit must fall back to 5 mm");
+    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 30.0),
+        "NaN translation limit must fall back to 30 mm");
     runtime.setOnlineLocalIcpTranslationLimit(std::numeric_limits<double>::infinity());
-    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 5.0),
-        "infinite translation limit must fall back to 5 mm");
+    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 30.0),
+        "infinite translation limit must fall back to 30 mm");
     runtime.setOnlineLocalIcpDistance(7.5);
     ok &= expect(near(runtime.onlineLocalIcpDistance(), 7.5)
         && !runtime.onlineLocalRegistrationEnabled()
@@ -130,19 +130,19 @@ bool testRuntimeHotProcessingOptions()
     ok &= expect(near(runtime.onlineLocalIcpDistance(), 0.1),
         "finite negative correspondence distance must clamp to 0.1 mm");
     runtime.setOnlineLocalIcpDistance(std::numeric_limits<double>::quiet_NaN());
-    ok &= expect(near(runtime.onlineLocalIcpDistance(), 5.0),
-        "NaN correspondence distance must fall back to 5 mm");
+    ok &= expect(near(runtime.onlineLocalIcpDistance(), 10.0),
+        "NaN correspondence distance must fall back to 10 mm");
     runtime.setOnlineLocalIcpDistance(std::numeric_limits<double>::infinity());
-    ok &= expect(near(runtime.onlineLocalIcpDistance(), 5.0),
-        "infinite correspondence distance must fall back to 5 mm");
+    ok &= expect(near(runtime.onlineLocalIcpDistance(), 10.0),
+        "infinite correspondence distance must fall back to 10 mm");
     QCoreApplication::processEvents();
     runtime.updateOnlineProcessingOptions(true, {KcfFusionMode::KcfOnly, 0.3});
     ok &= expect(runtime.onlineLocalRegistrationEnabled()
         && runtime.onlineFusionOptions().mode == KcfFusionMode::KcfOnly,
         "running runtime must reenable ICP independently of KCF-only mode");
-    ok &= expect(near(runtime.onlineLocalIcpDistance(), 5.0),
+    ok &= expect(near(runtime.onlineLocalIcpDistance(), 10.0),
         "ICP enable and fusion changes must not overwrite correspondence distance");
-    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 5.0),
+    ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 30.0),
         "correspondence, enable and fusion updates must not overwrite translation limit");
 
     runtime.updateOnlineProcessingOptions(true,
@@ -477,7 +477,7 @@ ui::COnlineLocalRegistrationWorker::Options cloudOptions()
     options.minimumFrames = 1;
     options.sampleIntervalMs = 0;
     options.minimumMatchIntervalMs = 0;
-    // 正确性测试不依赖调试/CI 机器的求解速度，生产默认预算仍为 300 ms。
+    // 正确性测试不依赖调试/CI 机器的求解速度，生产默认预算为 2500 ms。
     options.maximumSolveTimeMs = 2000;
     return options;
 }
@@ -735,8 +735,8 @@ bool testImageExtractionWithDifferentTcpOffsets()
 bool testLocalCorrespondenceDistanceAndMotionLimit()
 {
     bool ok = expect(near(ui::COnlineLocalRegistrationWorker::Options{}
-        .maximumCorrespondenceDistanceMm, 5.0),
-        "local ICP default correspondence distance must remain 5 mm");
+        .maximumCorrespondenceDistanceMm, 10.0),
+        "local ICP default correspondence distance must be 10 mm");
     const auto runWithDistance = [](double distance) {
         ui::COnlineLocalRegistrationWorker worker(nullptr);
         auto options = cloudOptions();
@@ -772,16 +772,17 @@ bool testLocalCorrespondenceDistanceAndMotionLimit()
         "worker must clamp excessive correspondence distance while retaining motion safety");
     const auto fallback = runWithDistance(std::numeric_limits<double>::quiet_NaN());
     ok &= expect(fallback.attempted && !fallback.accepted
-        && std::abs(fallback.correction.rowMajor[11]) < 0.1,
-        "worker NaN distance must fall back to 5 mm and fail to capture this surface");
+        && fallback.afterResidualMm < 0.1
+        && std::abs(fallback.correction.rowMajor[11] - 6.25) < 0.08,
+        "worker NaN distance must fall back to 10 mm while retaining the 2 mm motion bound");
     return ok;
 }
 
 /** @brief 匹配范围及平移限幅独立生效，放宽位移仍需通过残差质量验收。 */
 bool testAdjustableTranslationLimitAndQuality()
 {
-    bool ok = expect(near(ui::COnlineLocalRegistrationWorker::Options{}.maximumTranslationMm, 5.0),
-        "default local translation limit must be 5 mm");
+    bool ok = expect(near(ui::COnlineLocalRegistrationWorker::Options{}.maximumTranslationMm, 30.0),
+        "default local translation limit must be 30 mm");
     const auto runWithOptions = [](const ui::COnlineLocalRegistrationWorker::Options &options) {
         ui::COnlineLocalRegistrationWorker worker(nullptr);
         worker.configure(options);
@@ -813,13 +814,13 @@ bool testAdjustableTranslationLimitAndQuality()
         "10 mm translation limit may accept 6.25 mm only after existing quality gates pass");
     options.maximumTranslationMm = 100.0;
     ok &= expect(runWithOptions(options).accepted,
-        "worker must normalize finite translation limit above 10 mm");
+        "worker must normalize finite translation limit above 30 mm");
     options.maximumTranslationMm = std::numeric_limits<double>::quiet_NaN();
-    ok &= expect(!runWithOptions(options).accepted,
-        "worker NaN translation limit must fall back to 5 mm");
+    ok &= expect(runWithOptions(options).accepted,
+        "worker NaN translation limit must fall back to 30 mm");
     options.maximumTranslationMm = std::numeric_limits<double>::infinity();
-    ok &= expect(!runWithOptions(options).accepted,
-        "worker infinite translation limit must fall back to 5 mm");
+    ok &= expect(runWithOptions(options).accepted,
+        "worker infinite translation limit must fall back to 30 mm");
     options.maximumTranslationMm = 10.0;
     options.maximumResidualMm = 0.01;
     const auto strictResidual = runWithOptions(options);

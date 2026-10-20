@@ -1,0 +1,38 @@
+[
+  {
+    "session": "20261020_202202_369_P1+4固_启动在线icp但不成功，作为普通的测试数据_自动卡尔曼",
+    "tcp_time_weighted_mean_mm": 1.8172708186758624,
+    "tcp_angle_balanced_mean_mm": 1.810461829158319,
+    "tcp_radius_median_mm": 141.9924959069696,
+    "tcp_normal_height_median_mm": -0.04697232434087267,
+    "teach_minus_raw_circle_radius_mm": 1.8886919029468743,
+    "s2_speed_median_deg_s": 0.5255813953488516,
+    "first_60s_mean_mm": 2.144348002334492,
+    "after_60s_mean_mm": 1.7850027318871688,
+    "negative_state_age_percent": 24.292262065246696
+  },
+  {
+    "session": "20261020_204102_195_P1+4固_未启动在线icp，作为普通的测试数据_仅kcf",
+    "tcp_time_weighted_mean_mm": 1.93300094919949,
+    "tcp_angle_balanced_mean_mm": 1.9260314099670248,
+    "tcp_radius_median_mm": 141.9392522209484,
+    "tcp_normal_height_median_mm": -0.018747644866943285,
+    "teach_minus_raw_circle_radius_mm": 2.0362910150506366,
+    "s2_speed_median_deg_s": 0.524799999999999,
+    "first_60s_mean_mm": 1.7526436290642133,
+    "after_60s_mean_mm": 1.9496295714617229,
+    "negative_state_age_percent": 16.814860463068932
+  },
+  {
+    "session": "20261020_214257_216_普通测试数据",
+    "tcp_time_weighted_mean_mm": 1.9119231128586076,
+    "tcp_angle_balanced_mean_mm": 1.9132722543175813,
+    "tcp_radius_median_mm": 141.94384185768183,
+    "tcp_normal_height_median_mm": -0.058240206543814996,
+    "teach_minus_raw_circle_radius_mm": 1.990781695112787,
+    "s2_speed_median_deg_s": 0.7000000000000455,
+    "first_60s_mean_mm": 2.3987836290019637,
+    "after_60s_mean_mm": 1.8467418480959155,
+    "negative_state_age_percent": 17.533267619517005
+  }
+]

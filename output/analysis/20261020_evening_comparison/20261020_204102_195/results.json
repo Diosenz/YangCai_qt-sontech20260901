@@ -1,0 +1,291 @@
+{
+  "session": "20261020_204102_195_P1+4固_未启动在线icp，作为普通的测试数据_仅kcf",
+  "summary": {
+    "session_state": "completed",
+    "vision_diagnostics_schema": "1",
+    "vision_diagnostics_enabled": "1",
+    "vision_images_enabled": "1",
+    "vision_image_sample_every_n": "15",
+    "vision_max_image_pairs": "30",
+    "vision_max_image_bytes": "33554432",
+    "icp_diagnostics_schema": "1",
+    "start_time": "2026-10-20T20:41:02.216",
+    "start_timestamp_ms": "1792500062195",
+    "start_mode": "init_type",
+    "enable_online_icp": "true",
+    "work_path_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+    "teach_pose_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+    "rbcalib_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT",
+    "initial_match_max_distance_mm": "15.000000",
+    "initial_match_direction_sample_count": "32",
+    "initial_match_min_scan_span_mm": "2.000000",
+    "initial_match_min_reverse_direction_cosine": "0.250000",
+    "initial_match_min_remaining_length_mm": "10.000000",
+    "end_time": "2026-10-20T20:53:25.451",
+    "end_timestamp_ms": "1792500805450",
+    "duration_ms": "743255",
+    "robot_state_count": "8301",
+    "tracking_result_count": "11663",
+    "corrected_path_point_count": "1368",
+    "initial_command_count": "5",
+    "realtime_command_count": "10750",
+    "command_receipt_count": "3913",
+    "icp_batch_count": "439",
+    "vision_diagnostic_count": "11663",
+    "vision_image_submission_count": "30",
+    "message": "online correction completed after robot program stopped"
+  },
+  "counts": {
+    "robot_state_count": 8301,
+    "tracking_result_count": 11663,
+    "vision_diagnostic_count": 11663,
+    "corrected_path_point_count": 1368,
+    "icp_batch_count": 439,
+    "realtime_command_count": 10750
+  },
+  "tcp_count": 7803,
+  "raw_kcf_count": 11359,
+  "tcp_start": "2026-10-20T20:41:46.309",
+  "tcp_end": "2026-10-20T20:53:13.472",
+  "online_duration_s": 687.318,
+  "online_fps": 16.525101917889536,
+  "metrics": {
+    "TCP_to_raw_relocated_teach": {
+      "n": 7803,
+      "mean_mm": 1.9326145099243757,
+      "max_mm": 4.269903620088431,
+      "rmse_mm": 2.0967780090247787,
+      "median_mm": 1.866216936322094,
+      "p95_mm": 3.2384370646105483,
+      "max_time": "2026-10-20T20:48:03.056"
+    },
+    "raw_KCF_to_relocated_teach": {
+      "n": 11359,
+      "mean_mm": 2.1076568856924056,
+      "max_mm": 7.995461309944327,
+      "rmse_mm": 2.2624006365317544,
+      "median_mm": 2.100891140211771,
+      "p95_mm": 3.293397027286701,
+      "max_time": "20:42:51.527"
+    },
+    "final_vision_to_raw_relocated_teach": {
+      "n": 11359,
+      "mean_mm": 2.1076568856924056,
+      "max_mm": 7.995461309944327,
+      "rmse_mm": 2.2624006365317544,
+      "median_mm": 2.100891140211771,
+      "p95_mm": 3.293397027286701,
+      "max_time": "20:42:51.527"
+    },
+    "TCP_to_final_relocated_teach": {
+      "n": 7803,
+      "mean_mm": 1.9326145099243757,
+      "max_mm": 4.269903620088431,
+      "rmse_mm": 2.0967780090247787,
+      "median_mm": 1.866216936322094,
+      "p95_mm": 3.2384370646105483,
+      "max_time": "2026-10-20T20:48:03.056"
+    },
+    "TCP_to_raw_KCF": {
+      "n": 7803,
+      "mean_mm": 0.4241975020106378,
+      "max_mm": 3.8154258291330514,
+      "rmse_mm": 0.7473378584401016,
+      "median_mm": 0.20846729319464702,
+      "p95_mm": 1.9399371480954954,
+      "max_time": "2026-10-20T20:42:08.409"
+    },
+    "TCP_to_final_vision": {
+      "n": 7803,
+      "mean_mm": 0.4241975020106378,
+      "max_mm": 3.8154258291330514,
+      "rmse_mm": 0.7473378584401016,
+      "median_mm": 0.20846729319464702,
+      "p95_mm": 1.9399371480954954,
+      "max_time": "2026-10-20T20:42:08.409"
+    },
+    "TCP_to_original_teach": {
+      "n": 7803,
+      "mean_mm": 8.983901594051655,
+      "max_mm": 17.141189988905477,
+      "rmse_mm": 10.0634163132991,
+      "median_mm": 9.726132786072576,
+      "p95_mm": 16.20620532074124,
+      "max_time": "2026-10-20T20:48:40.026"
+    }
+  },
+  "segments": [
+    {
+      "job_line": 14,
+      "n": 2080,
+      "start": "2026-10-20T20:41:46.309",
+      "end": "2026-10-20T20:44:49.977",
+      "metric": {
+        "n": 2080,
+        "mean_mm": 1.8547162525066407,
+        "max_mm": 3.7772977746950445,
+        "rmse_mm": 2.049999600117988,
+        "median_mm": 1.7671927926693032,
+        "p95_mm": 3.299267792376983
+      }
+    },
+    {
+      "job_line": 15,
+      "n": 1773,
+      "start": "2026-10-20T20:44:50.085",
+      "end": "2026-10-20T20:47:25.911",
+      "metric": {
+        "n": 1773,
+        "mean_mm": 1.981532132558375,
+        "max_mm": 3.57920085687867,
+        "rmse_mm": 2.1826808235060473,
+        "median_mm": 1.962315573019603,
+        "p95_mm": 3.263290741468404
+      }
+    },
+    {
+      "job_line": 16,
+      "n": 1975,
+      "start": "2026-10-20T20:47:26.028",
+      "end": "2026-10-20T20:50:19.618",
+      "metric": {
+        "n": 1975,
+        "mean_mm": 2.0800370994586714,
+        "max_mm": 4.269903620088431,
+        "rmse_mm": 2.1965136349398158,
+        "median_mm": 1.9995112026130977,
+        "p95_mm": 3.2553664285010235
+      }
+    },
+    {
+      "job_line": 17,
+      "n": 1975,
+      "start": "2026-10-20T20:50:19.772",
+      "end": "2026-10-20T20:53:13.472",
+      "metric": {
+        "n": 1975,
+        "mean_mm": 1.8233172016552988,
+        "max_mm": 4.2446793318424785,
+        "rmse_mm": 1.9602444231046998,
+        "median_mm": 1.7490422089788695,
+        "p95_mm": 2.8435351497574515
+      }
+    }
+  ],
+  "projection_max_residual_mm": 9.218457467076114e-07,
+  "raw_circle": {
+    "center": [
+      -1.1617147919240538,
+      -3.625122769329172,
+      253.1884656732861
+    ],
+    "radius_mm": 141.68075365428973,
+    "normal": [
+      -0.002991963173725458,
+      0.00073404349459949,
+      0.9999952546569986
+    ]
+  },
+  "final_circle": {
+    "center": [
+      -1.1617147919240538,
+      -3.625122769329172,
+      253.1884656732861
+    ],
+    "radius_mm": 141.68075365428973,
+    "normal": [
+      -0.002991963173725458,
+      0.00073404349459949,
+      0.9999952546569986
+    ]
+  },
+  "teach_circle": {
+    "center": [
+      4.492357981740891,
+      8.9093655524133,
+      253.90759389704337
+    ],
+    "radius_mm": 143.71704466934037,
+    "normal": [
+      -0.0008325817897459308,
+      0.0015759231292623577,
+      0.9999984116356656
+    ]
+  },
+  "alignment": {
+    "rotation": [
+      [
+        0.9999976685261976,
+        -5.012916394120988e-06,
+        -0.002159378855031626
+      ],
+      [
+        3.1949890476593284e-06,
+        0.9999996456157575,
+        -0.0008418777532994412
+      ],
+      [
+        0.002159382310044577,
+        0.000841868891291723,
+        0.9999973141587976
+      ]
+    ],
+    "translation": [
+      -5.105734948552129,
+      -12.32074036274255,
+      -0.7356475043358728
+    ],
+    "normal_alignment_deg": 0.13279403711061338,
+    "axial_rotation_is_identifiable": false,
+    "scale": 1.0
+  },
+  "tcp_coverage_deg": 358.11085168360324,
+  "raw_kcf_coverage_deg": 357.9841720241227,
+  "common_pose_deg": [
+    0.004,
+    179.9958
+  ],
+  "icp_attempts": 439,
+  "icp_applied": 405,
+  "icp_fallbacks": 34,
+  "icp_release_to_raw_max_mm": 1.2787731273523886,
+  "icp_release_to_raw_batch_mean_median_mm": 0.11666975322023986,
+  "fusion_frames": 0,
+  "fusion_displacement_mm": {
+    "n": 11359,
+    "mean_mm": 0.0,
+    "max_mm": 0.0,
+    "rmse_mm": 0.0,
+    "median_mm": 0.0,
+    "p95_mm": 0.0
+  },
+  "raw_vs_final_reference_center_shift_mm": 0.0,
+  "jump_events": 326,
+  "jump_reinitialized": 51,
+  "template_reinitialized": 223,
+  "raw_x_jumps": 322,
+  "raw_y_jumps": 8,
+  "final_x_jumps": 322,
+  "final_y_jumps": 8,
+  "dt_ms": {
+    "median": 66.0,
+    "p95": 99.0,
+    "max": 198.0
+  },
+  "state_age_ms": {
+    "median": 37.0,
+    "p95": 96.0,
+    "max": 155.0,
+    "negative_count": 1910
+  },
+  "waiting_stop": {
+    "count": 96,
+    "s_start_last": 0,
+    "alarm_max": 0,
+    "last_job_line": 21
+  },
+  "work_path": "data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+  "image_pairs": 30,
+  "image_first_time": "20:41:18.006",
+  "image_last_time": "20:41:54.504"
+}

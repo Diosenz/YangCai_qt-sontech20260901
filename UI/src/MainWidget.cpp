@@ -510,10 +510,10 @@ MainWidget::MainWidget(QWidget* parent)
     m_onlineLocalIcpDistanceSpinBox->setRange(0.1, 10.0);
     m_onlineLocalIcpDistanceSpinBox->setDecimals(1);
     m_onlineLocalIcpDistanceSpinBox->setSingleStep(0.5);
-    m_onlineLocalIcpDistanceSpinBox->setValue(5.0);
+    m_onlineLocalIcpDistanceSpinBox->setValue(10.0);
     m_onlineLocalIcpDistanceSpinBox->setKeyboardTracking(false);
     m_onlineLocalIcpDistanceSpinBox->setToolTip(tr(
-        "默认 5 mm，上限 10 mm：ICP 搜索对应点的最大距离，不是最终残差验收阈值；可在运行中调整。"));
+        "默认 10 mm，上限 10 mm：ICP 搜索对应点的最大距离，不是最终残差验收阈值；可在运行中调整。"));
     localIcpDistanceLayout->addWidget(m_onlineLocalIcpDistanceSpinBox);
     onlineDetailsLayout->addWidget(m_onlineLocalIcpDistanceRow);
     m_onlineLocalIcpTranslationRow = new QWidget(onlineDetailsWidget);
@@ -524,13 +524,13 @@ MainWidget::MainWidget(QWidget* parent)
     localIcpTranslationLayout->addWidget(new QLabel(tr("最大平移修正(mm)"), m_onlineLocalIcpTranslationRow));
     m_onlineLocalIcpTranslationSpinBox = new QDoubleSpinBox(m_onlineLocalIcpTranslationRow);
     m_onlineLocalIcpTranslationSpinBox->setObjectName(QStringLiteral("onlineLocalIcpTranslationSpinBox"));
-    m_onlineLocalIcpTranslationSpinBox->setRange(0.01, 10.0);
+    m_onlineLocalIcpTranslationSpinBox->setRange(0.01, 30.0);
     m_onlineLocalIcpTranslationSpinBox->setDecimals(2);
     m_onlineLocalIcpTranslationSpinBox->setSingleStep(0.5);
-    m_onlineLocalIcpTranslationSpinBox->setValue(5.0);
+    m_onlineLocalIcpTranslationSpinBox->setValue(30.0);
     m_onlineLocalIcpTranslationSpinBox->setKeyboardTracking(false);
     m_onlineLocalIcpTranslationSpinBox->setToolTip(tr(
-        "默认 5 mm，上限 10 mm：一次修正三轴合成平移长度的上限，超过时整次拒绝，不截断修正；不是对应点搜索距离。可在运行中调整。"));
+        "默认 30 mm，上限 30 mm：一次修正三轴合成平移长度的上限，超过时整次拒绝，不截断修正；不是对应点搜索距离。可在运行中调整。"));
     localIcpTranslationLayout->addWidget(m_onlineLocalIcpTranslationSpinBox);
     onlineDetailsLayout->addWidget(m_onlineLocalIcpTranslationRow);
     m_onlineFusionModeComboBox = new QComboBox(onlineDetailsWidget);
@@ -1269,14 +1269,14 @@ void MainWidget::setOnlineLocalIcpDistance(double distanceMm)
 {
     const QSignalBlocker blocker(m_onlineLocalIcpDistanceSpinBox);
     m_onlineLocalIcpDistanceSpinBox->setValue(std::isfinite(distanceMm)
-        ? std::clamp(distanceMm, 0.1, 10.0) : 5.0);
+        ? std::clamp(distanceMm, 0.1, 10.0) : 10.0);
 }
 
 void MainWidget::setOnlineLocalIcpTranslationLimit(double translationMm)
 {
     const QSignalBlocker blocker(m_onlineLocalIcpTranslationSpinBox);
     m_onlineLocalIcpTranslationSpinBox->setValue(std::isfinite(translationMm)
-        ? std::clamp(translationMm, 0.01, 10.0) : 5.0);
+        ? std::clamp(translationMm, 0.01, 30.0) : 30.0);
 }
 
 void MainWidget::setOnlineCorrectionP001Text(const QString& text)

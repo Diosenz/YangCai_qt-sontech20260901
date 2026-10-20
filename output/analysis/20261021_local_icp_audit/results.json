@@ -1,0 +1,659 @@
+{
+  "scope": "2026-10-20 saved online correction sessions; duplicate batch/vision data excluded",
+  "limitations": [
+    "Saved ICP batches belong to trajectory ICP, not workpiece surface ICP.",
+    "Current calibration reproduces logged production projection; no per-session calibration snapshot is saved.",
+    "Weld-point pixel backprojection is only a proxy; not ICP residual, surface overlap, or estimated workpiece pose.",
+    "No local surface cloud pairs, rejection metrics, live thresholds or SET_POSE confirmations were found in session files."
+  ],
+  "sessions": [
+    {
+      "session": "20261020_155636_981_增加有过程记录的测试",
+      "start_time": "2026-10-20T15:56:36.986",
+      "recorded_trajectory_icp_enabled": "true",
+      "local_surface_icp_runtime_options_recorded": false,
+      "trajectory_icp_batches": 319,
+      "trajectory_icp_applied": 307,
+      "trajectory_icp_messages": {
+        "online ICP applied": 307,
+        "online ICP rejected; raw pending samples retained": 12
+      },
+      "trajectory_icp_applied_rms_mm": {
+        "n": 307,
+        "minimum": 0.144511509,
+        "median": 0.262622412,
+        "p95": 1.4000977720999996,
+        "maximum": 2.242828466
+      },
+      "weld_point_proxy_raw_mm": {
+        "n": 1749,
+        "minimum": 0.006974697032303179,
+        "median": 3.285453548060606,
+        "p95": 7.871839522755569,
+        "maximum": 9.680435867289992
+      },
+      "weld_point_proxy_final_mm": {
+        "n": 1749,
+        "minimum": 0.006853263489305699,
+        "median": 3.20889134778887,
+        "p95": 7.71422987827486,
+        "maximum": 9.42125663999422
+      },
+      "weld_point_proxy_fraction_above_5mm": 0.3133218982275586,
+      "weld_point_proxy_sectors": [
+        {
+          "s2_degrees": [
+            0,
+            60
+          ],
+          "proxy_distance_mm": {
+            "n": 288,
+            "minimum": 0.32520354377061506,
+            "median": 2.113827911023882,
+            "p95": 4.030201986409245,
+            "maximum": 5.16922095831712
+          }
+        },
+        {
+          "s2_degrees": [
+            60,
+            120
+          ],
+          "proxy_distance_mm": {
+            "n": 283,
+            "minimum": 0.006974697032303179,
+            "median": 0.6235732629463463,
+            "p95": 2.0895412066412167,
+            "maximum": 5.2700077916533035
+          }
+        },
+        {
+          "s2_degrees": [
+            120,
+            180
+          ],
+          "proxy_distance_mm": {
+            "n": 291,
+            "minimum": 0.8833723533300906,
+            "median": 1.6426102291942228,
+            "p95": 2.878354927422695,
+            "maximum": 3.3615417888109778
+          }
+        },
+        {
+          "s2_degrees": [
+            180,
+            240
+          ],
+          "proxy_distance_mm": {
+            "n": 320,
+            "minimum": 0.01854546861147818,
+            "median": 3.5422631206279385,
+            "p95": 4.674373266588844,
+            "maximum": 8.787998391870843
+          }
+        },
+        {
+          "s2_degrees": [
+            240,
+            300
+          ],
+          "proxy_distance_mm": {
+            "n": 299,
+            "minimum": 4.341915588567134,
+            "median": 6.838419167135646,
+            "p95": 7.958018236353104,
+            "maximum": 8.154696749585652
+          }
+        },
+        {
+          "s2_degrees": [
+            300,
+            360
+          ],
+          "proxy_distance_mm": {
+            "n": 268,
+            "minimum": 3.805008290634965,
+            "median": 7.3844343565557455,
+            "p95": 8.443865700245157,
+            "maximum": 9.680435867289992
+          }
+        }
+      ],
+      "projection_verification_max_error_mm": 8.512799143647794e-07,
+      "online_vision_processing_ms": {
+        "n": 1749,
+        "minimum": 19.0,
+        "median": 35.0,
+        "p95": 40.0,
+        "maximum": 69.0
+      },
+      "local_icp_residuals_and_clouds_available": false
+    },
+    {
+      "session": "20261020_162854_226",
+      "start_time": "2026-10-20T16:28:54.251",
+      "recorded_trajectory_icp_enabled": "true",
+      "local_surface_icp_runtime_options_recorded": false,
+      "trajectory_icp_batches": 413,
+      "trajectory_icp_applied": 355,
+      "trajectory_icp_messages": {
+        "online ICP applied": 355,
+        "online ICP rejected; raw pending samples retained": 27,
+        "online ICP phase shift; raw pending samples retained and cursor reanchored": 31
+      },
+      "trajectory_icp_applied_rms_mm": {
+        "n": 355,
+        "minimum": 0.191709889,
+        "median": 0.269815529,
+        "p95": 0.7524946121000001,
+        "maximum": 1.761996904
+      },
+      "weld_point_proxy_raw_mm": {
+        "n": 6179,
+        "minimum": 1.6017652928225545,
+        "median": 4.2986331543969705,
+        "p95": 7.055976442232798,
+        "maximum": 11.291011258280218
+      },
+      "weld_point_proxy_final_mm": {
+        "n": 6179,
+        "minimum": 1.5722009303414841,
+        "median": 4.237491357823592,
+        "p95": 6.966037528400553,
+        "maximum": 9.211299748892726
+      },
+      "weld_point_proxy_fraction_above_5mm": 0.3570156983330636,
+      "weld_point_proxy_sectors": [
+        {
+          "s2_degrees": [
+            0,
+            60
+          ],
+          "proxy_distance_mm": {
+            "n": 1012,
+            "minimum": 4.543091336855546,
+            "median": 5.984614601361853,
+            "p95": 7.039931945352515,
+            "maximum": 9.224559794678138
+          }
+        },
+        {
+          "s2_degrees": [
+            60,
+            120
+          ],
+          "proxy_distance_mm": {
+            "n": 988,
+            "minimum": 3.047036222950172,
+            "median": 4.150400505169193,
+            "p95": 4.962353136978145,
+            "maximum": 11.291011258280218
+          }
+        },
+        {
+          "s2_degrees": [
+            120,
+            180
+          ],
+          "proxy_distance_mm": {
+            "n": 967,
+            "minimum": 1.6017652928225545,
+            "median": 4.125099608205594,
+            "p95": 4.630817902215073,
+            "maximum": 7.388964048128139
+          }
+        },
+        {
+          "s2_degrees": [
+            180,
+            240
+          ],
+          "proxy_distance_mm": {
+            "n": 1094,
+            "minimum": 2.067025664160442,
+            "median": 3.572670269572262,
+            "p95": 4.359677132713028,
+            "maximum": 4.890790347622945
+          }
+        },
+        {
+          "s2_degrees": [
+            240,
+            300
+          ],
+          "proxy_distance_mm": {
+            "n": 1072,
+            "minimum": 3.037298385902358,
+            "median": 3.949317324638631,
+            "p95": 5.127632466614252,
+            "maximum": 6.075846601619002
+          }
+        },
+        {
+          "s2_degrees": [
+            300,
+            360
+          ],
+          "proxy_distance_mm": {
+            "n": 1046,
+            "minimum": 4.955709829665898,
+            "median": 6.384364831570936,
+            "p95": 7.760089891935091,
+            "maximum": 8.376554463806348
+          }
+        }
+      ],
+      "projection_verification_max_error_mm": 9.163915792691815e-07,
+      "online_vision_processing_ms": {
+        "n": 6179,
+        "minimum": 18.0,
+        "median": 30.0,
+        "p95": 38.0,
+        "maximum": 68.0
+      },
+      "local_icp_residuals_and_clouds_available": false
+    },
+    {
+      "session": "20261020_202202_369_P1+4固_启动在线icp但不成功，作为普通的测试数据_自动卡尔曼",
+      "start_time": "2026-10-20T20:22:02.391",
+      "recorded_trajectory_icp_enabled": "true",
+      "local_surface_icp_runtime_options_recorded": false,
+      "trajectory_icp_batches": 420,
+      "trajectory_icp_applied": 362,
+      "trajectory_icp_messages": {
+        "online ICP applied": 362,
+        "online ICP rejected; raw pending samples retained": 27,
+        "online ICP phase shift; raw pending samples retained and cursor reanchored": 31
+      },
+      "trajectory_icp_applied_rms_mm": {
+        "n": 362,
+        "minimum": 0.201812083,
+        "median": 0.2689317335,
+        "p95": 0.8249926957999998,
+        "maximum": 2.291630511
+      },
+      "weld_point_proxy_raw_mm": {
+        "n": 7418,
+        "minimum": 0.8497077000055835,
+        "median": 4.307365699927743,
+        "p95": 6.9834918876278635,
+        "maximum": 9.297339252357867
+      },
+      "weld_point_proxy_final_mm": {
+        "n": 7418,
+        "minimum": 0.8326387591021166,
+        "median": 4.2508930288488145,
+        "p95": 6.895657463235863,
+        "maximum": 9.091691829543844
+      },
+      "weld_point_proxy_fraction_above_5mm": 0.36519277433270425,
+      "weld_point_proxy_sectors": [
+        {
+          "s2_degrees": [
+            0,
+            60
+          ],
+          "proxy_distance_mm": {
+            "n": 1257,
+            "minimum": 4.3476439600606795,
+            "median": 5.915494061741655,
+            "p95": 6.726666999855542,
+            "maximum": 9.297339252357867
+          }
+        },
+        {
+          "s2_degrees": [
+            60,
+            120
+          ],
+          "proxy_distance_mm": {
+            "n": 1085,
+            "minimum": 2.4165022958861613,
+            "median": 3.9442559048126027,
+            "p95": 4.934075369292497,
+            "maximum": 7.446164524341532
+          }
+        },
+        {
+          "s2_degrees": [
+            120,
+            180
+          ],
+          "proxy_distance_mm": {
+            "n": 1091,
+            "minimum": 0.8497077000055835,
+            "median": 4.137992201729643,
+            "p95": 4.731451186917173,
+            "maximum": 7.644415302580212
+          }
+        },
+        {
+          "s2_degrees": [
+            180,
+            240
+          ],
+          "proxy_distance_mm": {
+            "n": 1351,
+            "minimum": 2.1298120741307867,
+            "median": 3.433002713976928,
+            "p95": 4.472493086270012,
+            "maximum": 4.865237775584538
+          }
+        },
+        {
+          "s2_degrees": [
+            240,
+            300
+          ],
+          "proxy_distance_mm": {
+            "n": 1325,
+            "minimum": 2.8353578195218008,
+            "median": 4.032496456158471,
+            "p95": 5.1275751110683245,
+            "maximum": 6.0125064660450045
+          }
+        },
+        {
+          "s2_degrees": [
+            300,
+            360
+          ],
+          "proxy_distance_mm": {
+            "n": 1309,
+            "minimum": 4.791866235796705,
+            "median": 6.383690502706902,
+            "p95": 7.836702751422828,
+            "maximum": 8.649921040304216
+          }
+        }
+      ],
+      "projection_verification_max_error_mm": 9.47220858701334e-07,
+      "online_vision_processing_ms": {
+        "n": 7418,
+        "minimum": 18.0,
+        "median": 25.0,
+        "p95": 39.0,
+        "maximum": 79.0
+      },
+      "local_icp_residuals_and_clouds_available": false
+    },
+    {
+      "session": "20261020_204102_195_P1+4固_未启动在线icp，作为普通的测试数据_仅kcf",
+      "start_time": "2026-10-20T20:41:02.216",
+      "recorded_trajectory_icp_enabled": "true",
+      "local_surface_icp_runtime_options_recorded": false,
+      "trajectory_icp_batches": 439,
+      "trajectory_icp_applied": 405,
+      "trajectory_icp_messages": {
+        "online ICP applied": 405,
+        "online ICP rejected; raw pending samples retained": 27,
+        "online ICP phase shift; raw pending samples retained and cursor reanchored": 7
+      },
+      "trajectory_icp_applied_rms_mm": {
+        "n": 405,
+        "minimum": 0.226209249,
+        "median": 0.28133047,
+        "p95": 0.7091067049999993,
+        "maximum": 2.076706212
+      },
+      "weld_point_proxy_raw_mm": {
+        "n": 11359,
+        "minimum": 0.7295936886971367,
+        "median": 4.332491019231394,
+        "p95": 7.220245630915732,
+        "maximum": 10.537290150547417
+      },
+      "weld_point_proxy_final_mm": {
+        "n": 11359,
+        "minimum": 0.7295936886971367,
+        "median": 4.332491019231394,
+        "p95": 7.220245630915732,
+        "maximum": 10.537290150547417
+      },
+      "weld_point_proxy_fraction_above_5mm": 0.34659741174399156,
+      "weld_point_proxy_sectors": [
+        {
+          "s2_degrees": [
+            0,
+            60
+          ],
+          "proxy_distance_mm": {
+            "n": 1921,
+            "minimum": 4.651543031444956,
+            "median": 6.115905529547068,
+            "p95": 8.418807058017252,
+            "maximum": 10.537290150547417
+          }
+        },
+        {
+          "s2_degrees": [
+            60,
+            120
+          ],
+          "proxy_distance_mm": {
+            "n": 1864,
+            "minimum": 2.3145335659965043,
+            "median": 3.9130405025595967,
+            "p95": 4.658560857907231,
+            "maximum": 8.553567949287375
+          }
+        },
+        {
+          "s2_degrees": [
+            120,
+            180
+          ],
+          "proxy_distance_mm": {
+            "n": 1796,
+            "minimum": 0.7295936886971367,
+            "median": 4.142046388993805,
+            "p95": 4.659160282848298,
+            "maximum": 8.647989981517016
+          }
+        },
+        {
+          "s2_degrees": [
+            180,
+            240
+          ],
+          "proxy_distance_mm": {
+            "n": 1925,
+            "minimum": 2.2046244757708156,
+            "median": 3.572780232415025,
+            "p95": 4.590626928859588,
+            "maximum": 4.993938599534301
+          }
+        },
+        {
+          "s2_degrees": [
+            240,
+            300
+          ],
+          "proxy_distance_mm": {
+            "n": 1948,
+            "minimum": 2.906350194775975,
+            "median": 4.170495219265019,
+            "p95": 5.289088601365862,
+            "maximum": 7.21484540574628
+          }
+        },
+        {
+          "s2_degrees": [
+            300,
+            360
+          ],
+          "proxy_distance_mm": {
+            "n": 1905,
+            "minimum": 4.399970934192629,
+            "median": 6.339461543095436,
+            "p95": 7.780279260013387,
+            "maximum": 8.286929004467128
+          }
+        }
+      ],
+      "projection_verification_max_error_mm": 9.218456579048795e-07,
+      "online_vision_processing_ms": {
+        "n": 11359,
+        "minimum": 17.0,
+        "median": 20.0,
+        "p95": 33.0,
+        "maximum": 65.0
+      },
+      "local_icp_residuals_and_clouds_available": false
+    },
+    {
+      "session": "20261020_214257_216_普通测试数据",
+      "start_time": "2026-10-20T21:42:57.233",
+      "recorded_trajectory_icp_enabled": "true",
+      "local_surface_icp_runtime_options_recorded": false,
+      "trajectory_icp_batches": 432,
+      "trajectory_icp_applied": 388,
+      "trajectory_icp_messages": {
+        "online ICP applied": 388,
+        "online ICP rejected; raw pending samples retained": 26,
+        "online ICP phase shift; raw pending samples retained and cursor reanchored": 18
+      },
+      "trajectory_icp_applied_rms_mm": {
+        "n": 388,
+        "minimum": 0.210106738,
+        "median": 0.2793535195,
+        "p95": 0.7823578748000001,
+        "maximum": 1.80506764
+      },
+      "weld_point_proxy_raw_mm": {
+        "n": 8116,
+        "minimum": 2.215487846113573,
+        "median": 3.959411455555842,
+        "p95": 5.65878985981517,
+        "maximum": 8.446116982296122
+      },
+      "weld_point_proxy_final_mm": {
+        "n": 8116,
+        "minimum": 2.184579916843963,
+        "median": 3.905184487396803,
+        "p95": 5.594799981846528,
+        "maximum": 8.310055175427303
+      },
+      "weld_point_proxy_fraction_above_5mm": 0.23878758008871365,
+      "weld_point_proxy_sectors": [
+        {
+          "s2_degrees": [
+            0,
+            60
+          ],
+          "proxy_distance_mm": {
+            "n": 1348,
+            "minimum": 4.522321392976677,
+            "median": 5.303794807122657,
+            "p95": 5.822404940740389,
+            "maximum": 8.412469560143483
+          }
+        },
+        {
+          "s2_degrees": [
+            60,
+            120
+          ],
+          "proxy_distance_mm": {
+            "n": 1339,
+            "minimum": 2.215487846113573,
+            "median": 3.7689455978076625,
+            "p95": 4.55928914386783,
+            "maximum": 8.446116982296122
+          }
+        },
+        {
+          "s2_degrees": [
+            120,
+            180
+          ],
+          "proxy_distance_mm": {
+            "n": 1352,
+            "minimum": 2.428938794650291,
+            "median": 3.6741499287749475,
+            "p95": 4.272990612694583,
+            "maximum": 8.046973819802666
+          }
+        },
+        {
+          "s2_degrees": [
+            180,
+            240
+          ],
+          "proxy_distance_mm": {
+            "n": 1374,
+            "minimum": 2.5823163514979477,
+            "median": 3.738957594677978,
+            "p95": 4.885113476849925,
+            "maximum": 5.209616475531349
+          }
+        },
+        {
+          "s2_degrees": [
+            240,
+            300
+          ],
+          "proxy_distance_mm": {
+            "n": 1369,
+            "minimum": 2.5941469786232147,
+            "median": 3.532868846178024,
+            "p95": 4.330487338862346,
+            "maximum": 5.332878953162835
+          }
+        },
+        {
+          "s2_degrees": [
+            300,
+            360
+          ],
+          "proxy_distance_mm": {
+            "n": 1334,
+            "minimum": 3.6283580844727013,
+            "median": 5.028892936363603,
+            "p95": 6.383218050248235,
+            "maximum": 7.642412406180603
+          }
+        }
+      ],
+      "projection_verification_max_error_mm": 8.981551104820837e-07,
+      "online_vision_processing_ms": {
+        "n": 8116,
+        "minimum": 17.0,
+        "median": 21.0,
+        "p95": 34.0,
+        "maximum": 67.0
+      },
+      "local_icp_residuals_and_clouds_available": false
+    }
+  ],
+  "duplicates": [
+    {
+      "session": "20261020_162854_226_P1+4固定结果",
+      "same_batch_and_vision_data_as": "20261020_162854_226"
+    }
+  ],
+  "input_sha256": {
+    "config/calibration/SENSORPARA.txt": "bf212663cc9006d31833bc893b1f7d007c7c2ce0c0ce433e685228dbebf95f7c",
+    "config/calibration/RBCALIB.DAT": "be223786f3d7297e32db530fdb0594ee84eefe4cdc53cc111b84579aa6b22757",
+    "output/online_correction/20261020_155636_981_增加有过程记录的测试/online_icp_batches.txt": "380f7da7ff84f744cbe9c235edc0404925abf0d95b5d7ddeceb74f4ad2e1b1bb",
+    "output/online_correction/20261020_155636_981_增加有过程记录的测试/vision_diagnostics.tsv": "4bbe19d0fa9036183e8f25e526d3ad1da8695d5634ffd3ee89bccc12f6d3dfac",
+    "output/online_correction/20261020_155636_981_增加有过程记录的测试/session_summary.txt": "f59c9283b17b66bd74bdfedd859219a367c5f6cec2da22b590108ea34b6de35d",
+    "output/online_correction/20261020_162854_226/online_icp_batches.txt": "3451b80f743e17d85e7d17a64a8b7239c80684472fb245270b8658eaf9368037",
+    "output/online_correction/20261020_162854_226/vision_diagnostics.tsv": "46bbca1404d0ed291c0052f5ccc0d044b1178cd2148d710254bfa6d29684f1bf",
+    "output/online_correction/20261020_162854_226/session_summary.txt": "381b46cb943a8159b98da7b97e86485131e80836e1cfbeca8eae8dd402aa6253",
+    "output/online_correction/20261020_162854_226_P1+4固定结果/online_icp_batches.txt": "3451b80f743e17d85e7d17a64a8b7239c80684472fb245270b8658eaf9368037",
+    "output/online_correction/20261020_162854_226_P1+4固定结果/vision_diagnostics.tsv": "46bbca1404d0ed291c0052f5ccc0d044b1178cd2148d710254bfa6d29684f1bf",
+    "output/online_correction/20261020_202202_369_P1+4固_启动在线icp但不成功，作为普通的测试数据_自动卡尔曼/online_icp_batches.txt": "629f7c63622e8fae71b1b24065b9061eae6e9f00d6f42a2359bc16f64b16af52",
+    "output/online_correction/20261020_202202_369_P1+4固_启动在线icp但不成功，作为普通的测试数据_自动卡尔曼/vision_diagnostics.tsv": "2e86d7850b67605ae6ff471a493c1b6eb62be306b719876a96cfd03d3411efde",
+    "output/online_correction/20261020_202202_369_P1+4固_启动在线icp但不成功，作为普通的测试数据_自动卡尔曼/session_summary.txt": "93c37520067c350cf7aabe361a87a73923274b2bb5fa442a7d86b52ee918e623",
+    "output/online_correction/20261020_204102_195_P1+4固_未启动在线icp，作为普通的测试数据_仅kcf/online_icp_batches.txt": "cf9c558d232087ff7c389b6eeb0921163ed1fe66c4180e979d7dbc77c7093466",
+    "output/online_correction/20261020_204102_195_P1+4固_未启动在线icp，作为普通的测试数据_仅kcf/vision_diagnostics.tsv": "52da706ead5dbcc8f533e3395916ead97ab0a4dc750befa54ea55b1e28b15465",
+    "output/online_correction/20261020_204102_195_P1+4固_未启动在线icp，作为普通的测试数据_仅kcf/session_summary.txt": "f018d6004517947def428e8e5b4af9f296adfeca338e42a01ef061a440da2e23",
+    "output/online_correction/20261020_214257_216_普通测试数据/online_icp_batches.txt": "f58d9e5055fb54c1377fb4295b99e3ad5724e1a55d636c0aff309414fcde177d",
+    "output/online_correction/20261020_214257_216_普通测试数据/vision_diagnostics.tsv": "3fd34fd0d8fd8f4500dc666c7c278ae3aee53ce5fafd21e4819e1a60e83c90a3",
+    "output/online_correction/20261020_214257_216_普通测试数据/session_summary.txt": "a14be9efc98d6a8275a678ebe433ad12e7ba04048817d1ed3cef2bab7b635f8f",
+    "config/digital_twin/online_local_registration.ini": "0d4da0a19063cd684379bb97fb07d37255af0ece50d362a8d479926e57bd6444"
+  },
+  "source_hashes_unchanged": true
+}

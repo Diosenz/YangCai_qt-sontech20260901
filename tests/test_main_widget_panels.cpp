@@ -851,9 +851,9 @@ bool testOnlineLocalIcpDistanceControl()
         return expectTrue(false, "online local ICP distance controls should exist");
     }
     bool ok = expectTrue(localIcp->isChecked() && !row->isHidden()
-                             && distance->value() == 5.0
+                             && distance->value() == 10.0
                              && distance->minimum() == 0.1 && distance->maximum() == 10.0,
-                         "enabled local ICP should expose a default 5 mm correspondence distance capped at 10 mm");
+                         "enabled local ICP should expose a default 10 mm correspondence distance capped at 10 mm");
     ok &= expectTrue(distance->toolTip().contains(QStringLiteral("不是最终残差验收阈值")),
                      "distance help must distinguish correspondence selection from residual acceptance");
     int distanceSignalCount = 0;
@@ -895,9 +895,9 @@ bool testOnlineLocalIcpTranslationLimitControl()
         return expectTrue(false, "online local ICP translation limit controls should exist");
     }
     bool ok = expectTrue(localIcp->isChecked() && !row->isHidden()
-                             && translation->value() == 5.0 && translation->minimum() == 0.01
-                             && translation->maximum() == 10.0 && translation->decimals() == 2,
-                         "local ICP translation limit should default to 5 mm with a 10 mm maximum");
+                             && translation->value() == 30.0 && translation->minimum() == 0.01
+                             && translation->maximum() == 30.0 && translation->decimals() == 2,
+                         "local ICP translation limit should default to 30 mm with a 30 mm maximum");
     ok &= expectTrue(translation->toolTip().contains(QStringLiteral("三轴合成平移长度"))
                          && translation->toolTip().contains(QStringLiteral("整次拒绝"))
                          && translation->toolTip().contains(QStringLiteral("不截断")),
@@ -916,19 +916,19 @@ bool testOnlineLocalIcpTranslationLimitControl()
     widget.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：运行中"));
     translation->setValue(6.5);
     ok &= expectTrue(!row->isHidden() && translation->isEnabled()
-                         && signalCount == 1 && lastValue == 6.5 && distance->value() == 5.0,
+                         && signalCount == 1 && lastValue == 6.5 && distance->value() == 10.0,
                      "translation limit must support one hot-update independently of correspondence distance");
     distance->setValue(3.0);
     ok &= expectTrue(translation->value() == 6.5 && signalCount == 1,
                      "correspondence distance adjustment must not modify the translation limit");
-    widget.setOnlineLocalIcpTranslationLimit(20.0);
-    ok &= expectTrue(translation->value() == 10.0 && signalCount == 1,
+    widget.setOnlineLocalIcpTranslationLimit(100.0);
+    ok &= expectTrue(translation->value() == 30.0 && signalCount == 1,
                      "programmatic translation limit should clamp without feedback");
     widget.setOnlineLocalIcpTranslationLimit(std::numeric_limits<double>::quiet_NaN());
-    ok &= expectTrue(translation->value() == 5.0 && signalCount == 1,
-                     "nonfinite translation limit should restore 5 mm without feedback");
+    ok &= expectTrue(translation->value() == 30.0 && signalCount == 1,
+                     "nonfinite translation limit should restore 30 mm without feedback");
     widget.setOnlineProcessingOptions(false, 1, 0.5);
-    ok &= expectTrue(row->isHidden() && translation->value() == 5.0,
+    ok &= expectTrue(row->isHidden() && translation->value() == 30.0,
                      "programmatic disable should hide the translation row and retain its setting");
     widget.setOnlineProcessingOptions(true, 1, 0.5);
     ok &= expectTrue(!row->isHidden() && translation->isEnabled() && signalCount == 1,

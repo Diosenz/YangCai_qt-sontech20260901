@@ -1,0 +1,27 @@
+{
+  "trace_counts": [
+    7803,
+    11359,
+    1441,
+    1441,
+    1368,
+    1368,
+    11359
+  ],
+  "common_pose_deg": [
+    0.004,
+    179.9958
+  ],
+  "default_visible": [
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    "legendonly"
+  ],
+  "coordinate_values_change_with_zscale": false,
+  "reference": "raw before_fusion KCF, rigid circle center/normal alignment, original radius, no fitted yaw",
+  "source_session": "20261020_204102_195_P1+4固_未启动在线icp，作为普通的测试数据_仅kcf"
+}

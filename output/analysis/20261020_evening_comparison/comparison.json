@@ -1,0 +1,903 @@
+[
+  {
+    "session": "20261020_202202_369_P1+4固_启动在线icp但不成功，作为普通的测试数据_自动卡尔曼",
+    "summary": {
+      "session_state": "completed",
+      "vision_diagnostics_schema": "1",
+      "vision_diagnostics_enabled": "1",
+      "vision_images_enabled": "1",
+      "vision_image_sample_every_n": "15",
+      "vision_max_image_pairs": "30",
+      "vision_max_image_bytes": "33554432",
+      "icp_diagnostics_schema": "1",
+      "start_time": "2026-10-20T20:22:02.391",
+      "start_timestamp_ms": "1792498922369",
+      "start_mode": "init_type",
+      "enable_online_icp": "true",
+      "work_path_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+      "teach_pose_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+      "rbcalib_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT",
+      "initial_match_max_distance_mm": "15.000000",
+      "initial_match_direction_sample_count": "32",
+      "initial_match_min_scan_span_mm": "2.000000",
+      "initial_match_min_reverse_direction_cosine": "0.250000",
+      "initial_match_min_remaining_length_mm": "10.000000",
+      "end_time": "2026-10-20T20:34:26.044",
+      "end_timestamp_ms": "1792499666044",
+      "duration_ms": "743675",
+      "robot_state_count": "8219",
+      "tracking_result_count": "7719",
+      "corrected_path_point_count": "1368",
+      "initial_command_count": "5",
+      "realtime_command_count": "7188",
+      "command_receipt_count": "3712",
+      "icp_batch_count": "420",
+      "vision_diagnostic_count": "7719",
+      "vision_image_submission_count": "30",
+      "message": "online correction completed after robot program stopped"
+    },
+    "counts": {
+      "robot_state_count": 8219,
+      "tracking_result_count": 7719,
+      "vision_diagnostic_count": 7719,
+      "corrected_path_point_count": 1368,
+      "icp_batch_count": 420,
+      "realtime_command_count": 7188
+    },
+    "tcp_count": 7717,
+    "raw_kcf_count": 7418,
+    "tcp_start": "2026-10-20T20:22:46.369",
+    "tcp_end": "2026-10-20T20:34:13.481",
+    "online_duration_s": 687.252,
+    "online_fps": 10.792256697688767,
+    "metrics": {
+      "TCP_to_raw_relocated_teach": {
+        "n": 7717,
+        "mean_mm": 1.8163412529460066,
+        "max_mm": 3.7143238010135655,
+        "rmse_mm": 1.9790196207711557,
+        "median_mm": 1.8215615076415386,
+        "p95_mm": 3.1349867799717037,
+        "max_time": "2026-10-20T20:22:48.344"
+      },
+      "raw_KCF_to_relocated_teach": {
+        "n": 7418,
+        "mean_mm": 1.9859006120864293,
+        "max_mm": 6.77798724944831,
+        "rmse_mm": 2.140990921669421,
+        "median_mm": 2.011268367125095,
+        "p95_mm": 3.1903924650924864,
+        "max_time": "20:23:51.057"
+      },
+      "final_vision_to_raw_relocated_teach": {
+        "n": 7418,
+        "mean_mm": 1.9664385834418643,
+        "max_mm": 6.757361399279276,
+        "rmse_mm": 2.11903750841071,
+        "median_mm": 1.995172370253825,
+        "p95_mm": 3.166748254353171,
+        "max_time": "20:23:51.057"
+      },
+      "TCP_to_final_relocated_teach": {
+        "n": 7717,
+        "mean_mm": 1.8169921244342961,
+        "max_mm": 3.655493477355674,
+        "rmse_mm": 1.9806653108590777,
+        "median_mm": 1.826146385719626,
+        "p95_mm": 3.1158480246758704,
+        "max_time": "2026-10-20T20:22:48.344"
+      },
+      "TCP_to_raw_KCF": {
+        "n": 7717,
+        "mean_mm": 0.39540128805299046,
+        "max_mm": 3.377324214034737,
+        "rmse_mm": 0.6228995291575906,
+        "median_mm": 0.240215185377071,
+        "p95_mm": 1.5022564521295694,
+        "max_time": "2026-10-20T20:22:56.706"
+      },
+      "TCP_to_final_vision": {
+        "n": 7717,
+        "mean_mm": 0.3873130807941592,
+        "max_mm": 3.3844554035802896,
+        "rmse_mm": 0.6144867958553815,
+        "median_mm": 0.23550622918935663,
+        "p95_mm": 1.4561969335843117,
+        "max_time": "2026-10-20T20:22:56.706"
+      },
+      "TCP_to_original_teach": {
+        "n": 7717,
+        "mean_mm": 8.934312208904915,
+        "max_mm": 17.20031811484656,
+        "rmse_mm": 9.977313448088555,
+        "median_mm": 9.762910717888326,
+        "p95_mm": 15.817557854496892,
+        "max_time": "2026-10-20T20:29:38.903"
+      }
+    },
+    "segments": [
+      {
+        "job_line": 4,
+        "n": 1,
+        "start": "2026-10-20T20:22:46.369",
+        "end": "2026-10-20T20:22:46.369",
+        "metric": {
+          "n": 1,
+          "mean_mm": 3.6682992599372652,
+          "max_mm": 3.6682992599372652,
+          "rmse_mm": 3.6682992599372652,
+          "median_mm": 3.6682992599372652,
+          "p95_mm": 3.6682992599372652
+        }
+      },
+      {
+        "job_line": 14,
+        "n": 2058,
+        "start": "2026-10-20T20:22:46.489",
+        "end": "2026-10-20T20:25:50.621",
+        "metric": {
+          "n": 2058,
+          "mean_mm": 1.9569571364967213,
+          "max_mm": 3.7143238010135655,
+          "rmse_mm": 2.160223839041237,
+          "median_mm": 1.982092641428013,
+          "p95_mm": 3.406332883380451
+        }
+      },
+      {
+        "job_line": 15,
+        "n": 1757,
+        "start": "2026-10-20T20:25:50.621",
+        "end": "2026-10-20T20:28:25.916",
+        "metric": {
+          "n": 1757,
+          "mean_mm": 1.8009741013828247,
+          "max_mm": 3.5142855532871073,
+          "rmse_mm": 1.9850168592577204,
+          "median_mm": 1.9678052352532889,
+          "p95_mm": 2.9855763973455804
+        }
+      },
+      {
+        "job_line": 16,
+        "n": 1950,
+        "start": "2026-10-20T20:28:26.022",
+        "end": "2026-10-20T20:31:19.641",
+        "metric": {
+          "n": 1950,
+          "mean_mm": 1.913046800339558,
+          "max_mm": 3.5419119920331816,
+          "rmse_mm": 2.007526797122942,
+          "median_mm": 1.8698598902056598,
+          "p95_mm": 3.0257903971283713
+        }
+      },
+      {
+        "job_line": 17,
+        "n": 1951,
+        "start": "2026-10-20T20:31:19.709",
+        "end": "2026-10-20T20:34:13.481",
+        "metric": {
+          "n": 1951,
+          "mean_mm": 1.584247363414855,
+          "max_mm": 3.4354365149484503,
+          "rmse_mm": 1.7278451460072606,
+          "median_mm": 1.4457588453035237,
+          "p95_mm": 2.719755936188629
+        }
+      }
+    ],
+    "projection_max_residual_mm": 9.472208097414395e-07,
+    "raw_circle": {
+      "center": [
+        -1.1752725563615756,
+        -3.635145753875664,
+        253.18622517810545
+      ],
+      "radius_mm": 141.8283527663935,
+      "normal": [
+        -0.003096689374213288,
+        0.0009237477432638697,
+        0.9999947785888816
+      ]
+    },
+    "final_circle": {
+      "center": [
+        -1.1603496686714263,
+        -3.586883670035558,
+        253.13614037874615
+      ],
+      "radius_mm": 141.84398909739673,
+      "normal": [
+        -0.003103710641154214,
+        0.0008503721704672396,
+        0.9999948219103075
+      ]
+    },
+    "teach_circle": {
+      "center": [
+        4.492357981740891,
+        8.9093655524133,
+        253.90759389704337
+      ],
+      "radius_mm": 143.71704466934037,
+      "normal": [
+        -0.0008325817897459308,
+        0.0015759231292623577,
+        0.9999984116356656
+      ]
+    },
+    "alignment": {
+      "rotation": [
+        [
+          0.999997436897709,
+          -4.849339662705081e-06,
+          -0.0022641056724978137
+        ],
+        [
+          3.372758056501518e-06,
+          0.999999787329297,
+          -0.0006521732786376448
+        ],
+        [
+          0.002264108353598616,
+          0.0006521639707701726,
+          0.9999972242439068
+        ]
+      ],
+      "translation": [
+        -5.092702195557122,
+        -12.378932815181672,
+        -0.7366454858365614
+      ],
+      "normal_alignment_deg": 0.13499853099426826,
+      "axial_rotation_is_identifiable": false,
+      "scale": 1.0
+    },
+    "tcp_coverage_deg": 359.4360661172905,
+    "raw_kcf_coverage_deg": 359.12353696201984,
+    "common_pose_deg": [
+      0.004,
+      179.9963
+    ],
+    "icp_attempts": 420,
+    "icp_applied": 362,
+    "icp_fallbacks": 58,
+    "icp_release_to_raw_max_mm": 2.444633268294436,
+    "icp_release_to_raw_batch_mean_median_mm": 0.12153340028249789,
+    "fusion_frames": 7272,
+    "fusion_displacement_mm": {
+      "n": 7418,
+      "mean_mm": 0.06417944091928508,
+      "max_mm": 1.538926284767724,
+      "rmse_mm": 0.11299673901527489,
+      "median_mm": 0.05335250139193129,
+      "p95_mm": 0.09962306116780349
+    },
+    "raw_vs_final_reference_center_shift_mm": 0.0711365478531485,
+    "jump_events": 269,
+    "jump_reinitialized": 31,
+    "template_reinitialized": 146,
+    "raw_x_jumps": 252,
+    "raw_y_jumps": 9,
+    "final_x_jumps": 263,
+    "final_y_jumps": 12,
+    "dt_ms": {
+      "median": 96.0,
+      "p95": 165.0,
+      "max": 363.0
+    },
+    "state_age_ms": {
+      "median": 19.0,
+      "p95": 91.0,
+      "max": 145.0,
+      "negative_count": 1802
+    },
+    "waiting_stop": {
+      "count": 101,
+      "s_start_last": 0,
+      "alarm_max": 0,
+      "last_job_line": 21
+    },
+    "work_path": "data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+    "image_pairs": 30,
+    "image_first_time": "20:22:18.196",
+    "image_last_time": "20:23:01.261"
+  },
+  {
+    "session": "20261020_204102_195_P1+4固_未启动在线icp，作为普通的测试数据_仅kcf",
+    "summary": {
+      "session_state": "completed",
+      "vision_diagnostics_schema": "1",
+      "vision_diagnostics_enabled": "1",
+      "vision_images_enabled": "1",
+      "vision_image_sample_every_n": "15",
+      "vision_max_image_pairs": "30",
+      "vision_max_image_bytes": "33554432",
+      "icp_diagnostics_schema": "1",
+      "start_time": "2026-10-20T20:41:02.216",
+      "start_timestamp_ms": "1792500062195",
+      "start_mode": "init_type",
+      "enable_online_icp": "true",
+      "work_path_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+      "teach_pose_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+      "rbcalib_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT",
+      "initial_match_max_distance_mm": "15.000000",
+      "initial_match_direction_sample_count": "32",
+      "initial_match_min_scan_span_mm": "2.000000",
+      "initial_match_min_reverse_direction_cosine": "0.250000",
+      "initial_match_min_remaining_length_mm": "10.000000",
+      "end_time": "2026-10-20T20:53:25.451",
+      "end_timestamp_ms": "1792500805450",
+      "duration_ms": "743255",
+      "robot_state_count": "8301",
+      "tracking_result_count": "11663",
+      "corrected_path_point_count": "1368",
+      "initial_command_count": "5",
+      "realtime_command_count": "10750",
+      "command_receipt_count": "3913",
+      "icp_batch_count": "439",
+      "vision_diagnostic_count": "11663",
+      "vision_image_submission_count": "30",
+      "message": "online correction completed after robot program stopped"
+    },
+    "counts": {
+      "robot_state_count": 8301,
+      "tracking_result_count": 11663,
+      "vision_diagnostic_count": 11663,
+      "corrected_path_point_count": 1368,
+      "icp_batch_count": 439,
+      "realtime_command_count": 10750
+    },
+    "tcp_count": 7803,
+    "raw_kcf_count": 11359,
+    "tcp_start": "2026-10-20T20:41:46.309",
+    "tcp_end": "2026-10-20T20:53:13.472",
+    "online_duration_s": 687.318,
+    "online_fps": 16.525101917889536,
+    "metrics": {
+      "TCP_to_raw_relocated_teach": {
+        "n": 7803,
+        "mean_mm": 1.9326145099243757,
+        "max_mm": 4.269903620088431,
+        "rmse_mm": 2.0967780090247787,
+        "median_mm": 1.866216936322094,
+        "p95_mm": 3.2384370646105483,
+        "max_time": "2026-10-20T20:48:03.056"
+      },
+      "raw_KCF_to_relocated_teach": {
+        "n": 11359,
+        "mean_mm": 2.1076568856924056,
+        "max_mm": 7.995461309944327,
+        "rmse_mm": 2.2624006365317544,
+        "median_mm": 2.100891140211771,
+        "p95_mm": 3.293397027286701,
+        "max_time": "20:42:51.527"
+      },
+      "final_vision_to_raw_relocated_teach": {
+        "n": 11359,
+        "mean_mm": 2.1076568856924056,
+        "max_mm": 7.995461309944327,
+        "rmse_mm": 2.2624006365317544,
+        "median_mm": 2.100891140211771,
+        "p95_mm": 3.293397027286701,
+        "max_time": "20:42:51.527"
+      },
+      "TCP_to_final_relocated_teach": {
+        "n": 7803,
+        "mean_mm": 1.9326145099243757,
+        "max_mm": 4.269903620088431,
+        "rmse_mm": 2.0967780090247787,
+        "median_mm": 1.866216936322094,
+        "p95_mm": 3.2384370646105483,
+        "max_time": "2026-10-20T20:48:03.056"
+      },
+      "TCP_to_raw_KCF": {
+        "n": 7803,
+        "mean_mm": 0.4241975020106378,
+        "max_mm": 3.8154258291330514,
+        "rmse_mm": 0.7473378584401016,
+        "median_mm": 0.20846729319464702,
+        "p95_mm": 1.9399371480954954,
+        "max_time": "2026-10-20T20:42:08.409"
+      },
+      "TCP_to_final_vision": {
+        "n": 7803,
+        "mean_mm": 0.4241975020106378,
+        "max_mm": 3.8154258291330514,
+        "rmse_mm": 0.7473378584401016,
+        "median_mm": 0.20846729319464702,
+        "p95_mm": 1.9399371480954954,
+        "max_time": "2026-10-20T20:42:08.409"
+      },
+      "TCP_to_original_teach": {
+        "n": 7803,
+        "mean_mm": 8.983901594051655,
+        "max_mm": 17.141189988905477,
+        "rmse_mm": 10.0634163132991,
+        "median_mm": 9.726132786072576,
+        "p95_mm": 16.20620532074124,
+        "max_time": "2026-10-20T20:48:40.026"
+      }
+    },
+    "segments": [
+      {
+        "job_line": 14,
+        "n": 2080,
+        "start": "2026-10-20T20:41:46.309",
+        "end": "2026-10-20T20:44:49.977",
+        "metric": {
+          "n": 2080,
+          "mean_mm": 1.8547162525066407,
+          "max_mm": 3.7772977746950445,
+          "rmse_mm": 2.049999600117988,
+          "median_mm": 1.7671927926693032,
+          "p95_mm": 3.299267792376983
+        }
+      },
+      {
+        "job_line": 15,
+        "n": 1773,
+        "start": "2026-10-20T20:44:50.085",
+        "end": "2026-10-20T20:47:25.911",
+        "metric": {
+          "n": 1773,
+          "mean_mm": 1.981532132558375,
+          "max_mm": 3.57920085687867,
+          "rmse_mm": 2.1826808235060473,
+          "median_mm": 1.962315573019603,
+          "p95_mm": 3.263290741468404
+        }
+      },
+      {
+        "job_line": 16,
+        "n": 1975,
+        "start": "2026-10-20T20:47:26.028",
+        "end": "2026-10-20T20:50:19.618",
+        "metric": {
+          "n": 1975,
+          "mean_mm": 2.0800370994586714,
+          "max_mm": 4.269903620088431,
+          "rmse_mm": 2.1965136349398158,
+          "median_mm": 1.9995112026130977,
+          "p95_mm": 3.2553664285010235
+        }
+      },
+      {
+        "job_line": 17,
+        "n": 1975,
+        "start": "2026-10-20T20:50:19.772",
+        "end": "2026-10-20T20:53:13.472",
+        "metric": {
+          "n": 1975,
+          "mean_mm": 1.8233172016552988,
+          "max_mm": 4.2446793318424785,
+          "rmse_mm": 1.9602444231046998,
+          "median_mm": 1.7490422089788695,
+          "p95_mm": 2.8435351497574515
+        }
+      }
+    ],
+    "projection_max_residual_mm": 9.218457467076114e-07,
+    "raw_circle": {
+      "center": [
+        -1.1617147919240538,
+        -3.625122769329172,
+        253.1884656732861
+      ],
+      "radius_mm": 141.68075365428973,
+      "normal": [
+        -0.002991963173725458,
+        0.00073404349459949,
+        0.9999952546569986
+      ]
+    },
+    "final_circle": {
+      "center": [
+        -1.1617147919240538,
+        -3.625122769329172,
+        253.1884656732861
+      ],
+      "radius_mm": 141.68075365428973,
+      "normal": [
+        -0.002991963173725458,
+        0.00073404349459949,
+        0.9999952546569986
+      ]
+    },
+    "teach_circle": {
+      "center": [
+        4.492357981740891,
+        8.9093655524133,
+        253.90759389704337
+      ],
+      "radius_mm": 143.71704466934037,
+      "normal": [
+        -0.0008325817897459308,
+        0.0015759231292623577,
+        0.9999984116356656
+      ]
+    },
+    "alignment": {
+      "rotation": [
+        [
+          0.9999976685261976,
+          -5.012916394120988e-06,
+          -0.002159378855031626
+        ],
+        [
+          3.1949890476593284e-06,
+          0.9999996456157575,
+          -0.0008418777532994412
+        ],
+        [
+          0.002159382310044577,
+          0.000841868891291723,
+          0.9999973141587976
+        ]
+      ],
+      "translation": [
+        -5.105734948552129,
+        -12.32074036274255,
+        -0.7356475043358728
+      ],
+      "normal_alignment_deg": 0.13279403711061338,
+      "axial_rotation_is_identifiable": false,
+      "scale": 1.0
+    },
+    "tcp_coverage_deg": 358.11085168360324,
+    "raw_kcf_coverage_deg": 357.9841720241227,
+    "common_pose_deg": [
+      0.004,
+      179.9958
+    ],
+    "icp_attempts": 439,
+    "icp_applied": 405,
+    "icp_fallbacks": 34,
+    "icp_release_to_raw_max_mm": 1.2787731273523886,
+    "icp_release_to_raw_batch_mean_median_mm": 0.11666975322023986,
+    "fusion_frames": 0,
+    "fusion_displacement_mm": {
+      "n": 11359,
+      "mean_mm": 0.0,
+      "max_mm": 0.0,
+      "rmse_mm": 0.0,
+      "median_mm": 0.0,
+      "p95_mm": 0.0
+    },
+    "raw_vs_final_reference_center_shift_mm": 0.0,
+    "jump_events": 326,
+    "jump_reinitialized": 51,
+    "template_reinitialized": 223,
+    "raw_x_jumps": 322,
+    "raw_y_jumps": 8,
+    "final_x_jumps": 322,
+    "final_y_jumps": 8,
+    "dt_ms": {
+      "median": 66.0,
+      "p95": 99.0,
+      "max": 198.0
+    },
+    "state_age_ms": {
+      "median": 37.0,
+      "p95": 96.0,
+      "max": 155.0,
+      "negative_count": 1910
+    },
+    "waiting_stop": {
+      "count": 96,
+      "s_start_last": 0,
+      "alarm_max": 0,
+      "last_job_line": 21
+    },
+    "work_path": "data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+    "image_pairs": 30,
+    "image_first_time": "20:41:18.006",
+    "image_last_time": "20:41:54.504"
+  },
+  {
+    "session": "20261020_214257_216_普通测试数据",
+    "summary": {
+      "session_state": "reset",
+      "vision_diagnostics_schema": "1",
+      "vision_diagnostics_enabled": "1",
+      "vision_images_enabled": "1",
+      "vision_image_sample_every_n": "15",
+      "vision_max_image_pairs": "30",
+      "vision_max_image_bytes": "33554432",
+      "icp_diagnostics_schema": "1",
+      "start_time": "2026-10-20T21:42:57.233",
+      "start_timestamp_ms": "1792503777216",
+      "start_mode": "init_type",
+      "enable_online_icp": "true",
+      "work_path_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+      "teach_pose_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+      "rbcalib_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT",
+      "initial_match_max_distance_mm": "15.000000",
+      "initial_match_direction_sample_count": "32",
+      "initial_match_min_scan_span_mm": "2.000000",
+      "initial_match_min_reverse_direction_cosine": "0.250000",
+      "initial_match_min_remaining_length_mm": "10.000000",
+      "end_time": "2026-10-20T21:52:28.153",
+      "end_timestamp_ms": "1792504348152",
+      "duration_ms": "570936",
+      "robot_state_count": "6359",
+      "tracking_result_count": "8469",
+      "corrected_path_point_count": "1368",
+      "initial_command_count": "5",
+      "realtime_command_count": "7873",
+      "command_receipt_count": "2938",
+      "icp_batch_count": "432",
+      "vision_diagnostic_count": "8469",
+      "vision_image_submission_count": "30",
+      "message": "在线纠偏在终态前被复位。"
+    },
+    "counts": {
+      "robot_state_count": 6359,
+      "tracking_result_count": 8469,
+      "vision_diagnostic_count": 8469,
+      "corrected_path_point_count": 1368,
+      "icp_batch_count": 432,
+      "realtime_command_count": 7873
+    },
+    "tcp_count": 5858,
+    "raw_kcf_count": 8116,
+    "tcp_start": "2026-10-20T21:43:40.981",
+    "tcp_end": "2026-10-20T21:52:16.582",
+    "online_duration_s": 515.72,
+    "online_fps": 15.735282711548901,
+    "metrics": {
+      "TCP_to_raw_relocated_teach": {
+        "n": 5858,
+        "mean_mm": 1.9108231746606326,
+        "max_mm": 4.948545610688133,
+        "rmse_mm": 2.068294061800055,
+        "median_mm": 1.8919187568205482,
+        "p95_mm": 3.1290521129487505,
+        "max_time": "2026-10-20T21:43:42.832"
+      },
+      "raw_KCF_to_relocated_teach": {
+        "n": 8116,
+        "mean_mm": 2.0707059408392174,
+        "max_mm": 9.657002426760975,
+        "rmse_mm": 2.232261822601873,
+        "median_mm": 2.0622926771929677,
+        "p95_mm": 3.2381277095995955,
+        "max_time": "21:44:30.494"
+      },
+      "final_vision_to_raw_relocated_teach": {
+        "n": 8116,
+        "mean_mm": 2.0501214715433553,
+        "max_mm": 9.522644791711091,
+        "rmse_mm": 2.207805816554049,
+        "median_mm": 2.045254100544118,
+        "p95_mm": 3.1983490780633073,
+        "max_time": "21:44:30.494"
+      },
+      "TCP_to_final_relocated_teach": {
+        "n": 5858,
+        "mean_mm": 1.9095895951682835,
+        "max_mm": 4.918124048422619,
+        "rmse_mm": 2.068714053751989,
+        "median_mm": 1.888085245701257,
+        "p95_mm": 3.1261817221077868,
+        "max_time": "2026-10-20T21:43:42.832"
+      },
+      "TCP_to_raw_KCF": {
+        "n": 5858,
+        "mean_mm": 0.432376948859959,
+        "max_mm": 3.5808440208127768,
+        "rmse_mm": 0.7290039592936145,
+        "median_mm": 0.22345545367399117,
+        "p95_mm": 1.8209566007925517,
+        "max_time": "2026-10-20T21:43:55.633"
+      },
+      "TCP_to_final_vision": {
+        "n": 5858,
+        "mean_mm": 0.423093147024737,
+        "max_mm": 3.572549379723606,
+        "rmse_mm": 0.716618031888158,
+        "median_mm": 0.2225365919952509,
+        "p95_mm": 1.7486986190383582,
+        "max_time": "2026-10-20T21:43:55.633"
+      },
+      "TCP_to_original_teach": {
+        "n": 5858,
+        "mean_mm": 7.65986677584289,
+        "max_mm": 15.00144646334338,
+        "rmse_mm": 8.622039038376474,
+        "median_mm": 8.244721738856075,
+        "p95_mm": 14.027545438811535,
+        "max_time": "2026-10-20T21:48:50.805"
+      }
+    },
+    "segments": [
+      {
+        "job_line": 4,
+        "n": 1,
+        "start": "2026-10-20T21:43:40.981",
+        "end": "2026-10-20T21:43:40.981",
+        "metric": {
+          "n": 1,
+          "mean_mm": 3.7263400272180727,
+          "max_mm": 3.7263400272180727,
+          "rmse_mm": 3.7263400272180727,
+          "median_mm": 3.7263400272180727,
+          "p95_mm": 3.7263400272180727
+        }
+      },
+      {
+        "job_line": 14,
+        "n": 1563,
+        "start": "2026-10-20T21:43:41.111",
+        "end": "2026-10-20T21:45:58.802",
+        "metric": {
+          "n": 1563,
+          "mean_mm": 2.0293565436150143,
+          "max_mm": 4.948545610688133,
+          "rmse_mm": 2.1875050183427556,
+          "median_mm": 2.020704033225349,
+          "p95_mm": 3.204648455280879
+        }
+      },
+      {
+        "job_line": 15,
+        "n": 1329,
+        "start": "2026-10-20T21:45:58.928",
+        "end": "2026-10-20T21:47:55.759",
+        "metric": {
+          "n": 1329,
+          "mean_mm": 1.8257847875568538,
+          "max_mm": 3.5788842888179904,
+          "rmse_mm": 2.062095717707251,
+          "median_mm": 1.8072663857903404,
+          "p95_mm": 3.150542567034603
+        }
+      },
+      {
+        "job_line": 16,
+        "n": 1481,
+        "start": "2026-10-20T21:47:55.817",
+        "end": "2026-10-20T21:50:06.185",
+        "metric": {
+          "n": 1481,
+          "mean_mm": 2.0678941296793987,
+          "max_mm": 3.814438059712841,
+          "rmse_mm": 2.159942706681929,
+          "median_mm": 2.002494061920433,
+          "p95_mm": 3.1558433498150302
+        }
+      },
+      {
+        "job_line": 17,
+        "n": 1484,
+        "start": "2026-10-20T21:50:06.241",
+        "end": "2026-10-20T21:52:16.582",
+        "metric": {
+          "n": 1484,
+          "mean_mm": 1.704159266001518,
+          "max_mm": 3.399456181982527,
+          "rmse_mm": 1.8366325429408326,
+          "median_mm": 1.5839971641219854,
+          "p95_mm": 2.8396033087317907
+        }
+      }
+    ],
+    "projection_max_residual_mm": 8.981551518320943e-07,
+    "raw_circle": {
+      "center": [
+        -0.4444932363451196,
+        -1.7301722455981898,
+        253.26762230839972
+      ],
+      "radius_mm": 141.72626297422758,
+      "normal": [
+        -0.0031270986438632015,
+        0.000824995477507473,
+        0.9999947703045919
+      ]
+    },
+    "final_circle": {
+      "center": [
+        -0.44258066239131216,
+        -1.7124494221307518,
+        253.21834635487124
+      ],
+      "radius_mm": 141.7440981614162,
+      "normal": [
+        -0.0031642953414465535,
+        0.0006921137022924961,
+        0.9999947540930477
+      ]
+    },
+    "teach_circle": {
+      "center": [
+        4.492357981740891,
+        8.9093655524133,
+        253.90759389704337
+      ],
+      "radius_mm": 143.71704466934037,
+      "normal": [
+        -0.0008325817897459308,
+        0.0015759231292623577,
+        0.9999984116356656
+      ]
+    },
+    "alignment": {
+      "rotation": [
+        [
+          0.9999973675847794,
+          -5.102692019127915e-06,
+          -0.002294514648893105
+        ],
+        [
+          3.379689719179085e-06,
+          0.9999997180496311,
+          -0.0007509255862980808
+        ],
+        [
+          0.0022945178336958496,
+          0.0007509158548025686,
+          0.9999970856523982
+        ]
+      ],
+      "translation": [
+        -4.354199236924016,
+        -10.448884759976,
+        -0.6562295930102948
+      ],
+      "normal_alignment_deg": 0.13832767608351187,
+      "axial_rotation_is_identifiable": false,
+      "scale": 1.0
+    },
+    "tcp_coverage_deg": 358.7521671749672,
+    "raw_kcf_coverage_deg": 358.49376953046954,
+    "common_pose_deg": [
+      0.004,
+      179.9958
+    ],
+    "icp_attempts": 432,
+    "icp_applied": 388,
+    "icp_fallbacks": 44,
+    "icp_release_to_raw_max_mm": 1.920602559389632,
+    "icp_release_to_raw_batch_mean_median_mm": 0.12093133535461506,
+    "fusion_frames": 7956,
+    "fusion_displacement_mm": {
+      "n": 8116,
+      "mean_mm": 0.05941238524040642,
+      "max_mm": 1.7006518531726733,
+      "rmse_mm": 0.11750598956734662,
+      "median_mm": 0.045695553263420466,
+      "p95_mm": 0.08486529049152816
+    },
+    "raw_vs_final_reference_center_shift_mm": 0.052401106924640235,
+    "jump_events": 324,
+    "jump_reinitialized": 39,
+    "template_reinitialized": 160,
+    "raw_x_jumps": 306,
+    "raw_y_jumps": 11,
+    "final_x_jumps": 317,
+    "final_y_jumps": 14,
+    "dt_ms": {
+      "median": 66.0,
+      "p95": 99.0,
+      "max": 166.0
+    },
+    "state_age_ms": {
+      "median": 34.0,
+      "p95": 95.0,
+      "max": 126.0,
+      "negative_count": 1423
+    },
+    "waiting_stop": {
+      "count": 102,
+      "s_start_last": 1,
+      "alarm_max": 0,
+      "last_job_line": 21
+    },
+    "work_path": "data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+    "image_pairs": 30,
+    "image_first_time": "21:43:13.010",
+    "image_last_time": "21:43:45.779"
+  }
+]
