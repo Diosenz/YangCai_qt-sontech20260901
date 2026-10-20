@@ -279,3 +279,59 @@ CMake/依赖：否
 验证：文档审查，通过现有构建
 风险：dev 分支如同时修改 RobotComm 或 digital_twin，需要合并前确认协议命名
 ```
+
+## GitHub HTTPS 推送超时处理（2026-10-20 本机实测）
+
+本次故障表现为 VS Code 推送约 199 秒后返回 `RPC failed; HTTP 408`、`unexpected disconnect` 和 `remote end hung up unexpectedly`，并伴随 `User cancelled dialog`。末尾即使出现 `Everything up-to-date`，也不能据此确认成功，应核对远程分支 SHA。
+
+### 已验证结果与当前首选方式
+
+- 本机 Git Credential Manager 保存多个 GitHub 账号。未指定账号的查询停在凭据选择环节；明确指定仓库所属账号 `Diosenz` 后，查询远程及推送预检查成功。因此不能仅凭取消对话框断言没有可用凭据。
+- 使用现有本机代理时，默认 HTTP 协议和 HTTP/1.1 的推送预检查均成功，分别约 1.75 秒、1.38 秒。预检查不上传对象，耗时差异不能证明大数据传输性能优劣。
+- 临时绕过代理、使用 HTTP/1.1 的预检查触发低速保护，约 15.44 秒失败。因此这台机器当前继续使用已配置代理，不默认清除全局代理。
+- 使用现有代理、明确账号、HTTP/1.1，实际推送 `74311f6` 成功：压缩传输约 34.63 MiB，远端确认 `8880f5b..74311f6 main -> main`。未增大 `http.postBuffer`，未关闭 TLS 证书校验，未重写提交历史。
+- 以上组合是当前环境已经验证可用的首选方案；未进行相同大包的多次受控对照，不能断言 HTTP/1.1 是唯一原因或所有网络环境中的最优协议。
+
+本仓库的本地配置（保存在 `.git/config`，不会随提交传播）已设置：
+
+```powershell
+git config --local credential.https://github.com.username Diosenz
+git config --local http.version HTTP/1.1
+```
+
+账号设置仅适用于本机已有 `Diosenz` 凭据且有仓库权限的情况；协作者应使用自己的授权账号。代理地址依机器而定，不写进共享 Git 配置。
+
+### 后续处理顺序
+
+1. 查看当前分支、工作区和客户端 Git 日志，先区分认证失败、连接超时、远端分叉、文件限制及本地锁问题，不能把所有失败都归为代码问题。
+2. 使用已授权账号查询远程分支，再做预检查。下例对应当前 `main`，其他分支必须替换分支名；本段不改变本文既有的集成验证要求。
+
+   ```powershell
+   git ls-remote origin refs/heads/main
+   git push --dry-run origin main:main
+   ```
+
+3. 完成本地检查后执行实际推送。必要时临时启用低速保护，连续 45 秒低于 1024 字节/秒会退出，便于诊断；它不是总时限，也不能修复服务端返回的 HTTP 408。
+
+   ```powershell
+   git -c http.lowSpeedLimit=1024 -c http.lowSpeedTime=45 push --progress origin main:main
+   ```
+
+4. 推送返回成功后，分别读取本地与远程 SHA，确认一致；仅观察客户端提示或本地缓存引用不足以证明远程已更新。
+
+   ```powershell
+   git rev-parse HEAD
+   git ls-remote origin refs/heads/main
+   git status --short --branch
+   ```
+
+5. 若仍有 408，逐项测试代理/直连及 HTTP 版本，每次失败先核对远端 SHA，避免盲目重试。`--dry-run` 只验证连接和推送协商，不能验证大包上传。当前本机直连失败，不作为默认回退方案。
+6. 仅有分块传输与代理不兼容的证据时，临时用 `-c http.postBuffer=<字节数>` 测试足够覆盖实际压缩包的缓冲区；成功后仍需核对 SHA。不要默认全局增至数百 MiB。SSH 443 可作候选，但本机没有现成 GitHub SSH 密钥，本次没有测试或切换。
+
+### 依据
+
+- [Git 官方 http.postBuffer 说明](https://git-scm.com/docs/git-config#Documentation/git-config.txt-httppostBuffer)：增大缓冲区主要用于禁用分块传输，并非多数推送问题的通用修复，会增加内存使用。
+- [Git 官方 http.version 说明](https://git-scm.com/docs/git-config#Documentation/git-config.txt-httpversion)：支持指定 HTTP/1.1 或 HTTP/2，实际支持依赖客户端 libcurl。
+- [GitHub 官方连接排障](https://docs.github.com/en/get-started/using-github/troubleshooting-connectivity-problems)：检查代理、防火墙和网络，必要时切换连接方式。
+- [GitHub 官方 SSH 443 方案](https://docs.github.com/en/authentication/troubleshooting-ssh/using-ssh-over-the-https-port)：使用 `ssh.github.com:443`，仍需有效 SSH 身份认证。
+- [相同 408 错误的用户原始案例](https://github.com/orgs/community/discussions/49789)：包含换网络成功及增大缓冲区建议，仅作案例线索，不作为统一结论。
