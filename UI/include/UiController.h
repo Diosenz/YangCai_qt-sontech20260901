@@ -221,7 +221,8 @@ private:
     void showCalibrationCaptureUpdate(const i2r_rlc::control::CalibrationCaptureUpdate& update);
     void showOfflineCorrectionUpdate(const i2r_rlc::control::OfflineCorrectionUpdate& update);
     void renderOfflineCorrectionState();
-    void showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorrectionUpdate& update);
+    /// @brief UI 边界接收在线业务快照；保留业务状态并忽略无变化的轮询心跳。
+    Q_SLOT void showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorrectionUpdate& update);
     void showTeachTrajectoryRecorderUpdate(
         const i2r_rlc::control::TeachTrajectoryRecorderSnapshot& snapshot);
     void showRuntimeTrackingResult(const i2r_rlc::ui::RuntimeTrackingResult& result);

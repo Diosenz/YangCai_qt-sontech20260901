@@ -185,6 +185,8 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
             true, true, false, false, KcfFeatureMode::Standard, 2);
     }
 
+    m_tracker->setFusionOptions(options.fusion);
+
     const std::vector<MyLaserImagePoint> simulatedLaserPoints =
         toMyLaserImagePoints(observation.laserLineImagePoints_px);
     const MyLaserImagePoint simulatedWeldPoint =

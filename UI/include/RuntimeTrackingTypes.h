@@ -209,6 +209,8 @@ struct RuntimeTrackingOptions {
     RuntimeTrackingMethod method = RuntimeTrackingMethod::Kcf;
     /// @brief 是否启用 gap 检测；第一版只透传给 OnlineCor 状态机。
     bool enableGapDetection = false;
+    /// @brief 在线仿真/KCF 融合参数，按帧更新，不重建跟踪模板。
+    vision::KcfFusionOptions fusion;
     /// @brief 会话级逐帧诊断策略，仅在线纠偏链使用。
     COnlineVisionDiagnosticOptions visionDiagnostics;
     /// @brief true 表示使用全局定位专用“整条激光线提取”链路（Gabor+Steger），而非在线纠偏 KCF 单点。

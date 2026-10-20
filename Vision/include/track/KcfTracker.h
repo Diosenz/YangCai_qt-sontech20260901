@@ -55,12 +55,29 @@ enum class KcfFeatureMode
     Mkcf = 2
 };
 
+/** @brief 在线焊缝位置融合策略；默认保留响应自适应 Kalman。 */
+enum class KcfFusionMode
+{
+    AutomaticKalman = 0,
+    ManualWeight = 1,
+    KcfOnly = 2
+};
+
+/** @brief 跟踪线程按帧接收的融合配置；仿真权重范围为 [0, 1]。 */
+struct KcfFusionOptions
+{
+    KcfFusionMode mode = KcfFusionMode::AutomaticKalman;
+    double simulationWeight = 0.5;
+};
+
 /**
  * @brief 单次 update 的只读诊断快照；坐标为原图 ROI 左上角，单位 pixel。
  *
  * 标记决定字段是否可用；未融合时 gain/noise 不代表实际权重。
  */
 struct CKcfUpdateDiagnostic {
+    KcfFusionMode fusionMode = KcfFusionMode::AutomaticKalman;
+    double simulationWeight = 0.5;
     bool hasResponse = false;
     bool completed = false;
     bool kalmanSeeded = false;
@@ -121,6 +138,14 @@ public:
      * 调用后下一次 update 会重新以当前响应初始化位置观测历史。
      */
     void initKF();
+
+    /**
+     * @brief 在跟踪线程热更新融合策略，不重建 KCF 模板。
+     * @param options 非法模式回退自动 Kalman；非有限权重回退 0.5，其余限幅至 [0, 1]。
+     * 策略或权重变化时清除滤波历史；重复提交同一配置不影响滤波连续性。
+     * 调用方须与 init/update 串行执行。
+     */
+    void setFusionOptions(const KcfFusionOptions &options);
 
     /**
      * @brief 设置 MKCF 使用的仿真模板图像与 ROI。
@@ -448,6 +473,7 @@ private:
         float primarySigma,
         float secondarySigma);
 
+    KcfFusionOptions m_fusionOptions;
     CKcfUpdateDiagnostic m_updateDiagnostic;
     cv::Mat m_alphaF;
     cv::Mat m_prob;

@@ -15,6 +15,8 @@ add_library(i2r_rlc_ui STATIC
     src/OnlineCorrectionWorkflow.cpp
     src/RobotSimVirtualReferenceCache.cpp
     src/RuntimeCoordinator.cpp
+    src/RuntimeLocalRegistration.cpp
+    src/OnlineLocalRegistrationWorker.cpp
     src/RuntimeWorkerAdapters.cpp
     src/SensorCalibrationParser.cpp
     src/UiController.cpp
@@ -33,6 +35,7 @@ add_library(i2r_rlc_ui STATIC
     include/OnlineCorrectionWorkflow.h
     include/RobotSimVirtualReferenceCache.h
     include/RuntimeCoordinator.h
+    include/OnlineLocalRegistrationWorker.h
     include/RuntimeTrackingTypes.h
     include/TrackingFramePresentation.h
     include/RuntimeWorkerAdapters.h

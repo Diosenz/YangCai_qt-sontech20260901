@@ -472,6 +472,35 @@ void CKcfTracker::initKF()
     m_Kalman_status_y = 0.0;
 }
 
+void CKcfTracker::setFusionOptions(const KcfFusionOptions &options)
+{
+    KcfFusionOptions normalized = options;
+    switch (normalized.mode)
+    {
+    case KcfFusionMode::AutomaticKalman:
+    case KcfFusionMode::ManualWeight:
+    case KcfFusionMode::KcfOnly:
+        break;
+    default:
+        normalized.mode = KcfFusionMode::AutomaticKalman;
+        break;
+    }
+    normalized.simulationWeight = std::isfinite(normalized.simulationWeight)
+        ? std::clamp(normalized.simulationWeight, 0.0, 1.0) : 0.5;
+    if (normalized.mode == m_fusionOptions.mode
+        && std::abs(normalized.simulationWeight - m_fusionOptions.simulationWeight) < 1e-12)
+    {
+        return;
+    }
+
+    m_fusionOptions = normalized;
+    initKF();
+    m_accum_x.clear();
+    m_accum_y.clear();
+    m_peakValueMaximum = 1.0F;
+    m_peakValueMinimum = 0.85F;
+}
+
 void CKcfTracker::setSimulatedTemplate(const cv::Mat &image, const cv::Rect &roi)
 {
     if (image.empty() || roi.width <= 0 || roi.height <= 0)
@@ -514,6 +543,8 @@ const CKcfUpdateDiagnostic &CKcfTracker::lastUpdateDiagnostic() const
 cv::Rect CKcfTracker::update(cv::Mat image)
 {
     m_updateDiagnostic = {};
+    m_updateDiagnostic.fusionMode = m_fusionOptions.mode;
+    m_updateDiagnostic.simulationWeight = m_fusionOptions.simulationWeight;
     normalizeImage(image);
     clampRoiToImage(image);
 
@@ -604,66 +635,90 @@ cv::Rect CKcfTracker::update(cv::Mat image)
     }
 
     m_updateDiagnostic.beforeFusionRoi = m_roi;
-    double tempX[2] = {0.0, 0.0}; //状态矩阵
-    double tempY[2] = {0.0, 0.0}; //观测矩阵
-    if (!m_Kal_init)
+    if (m_fusionOptions.mode == KcfFusionMode::AutomaticKalman)
     {
-        m_updateDiagnostic.kalmanSeeded = true;
-        m_Kal_init = true;
-        tempX[0] = tempY[0] = m_roi.x;
-        tempX[1] = tempY[1] = m_roi.y;
-        m_filter->m_X = RMatrix::Matrix(2, 1, tempX);
-        m_filter->m_Y = RMatrix::Matrix(2, 1, tempY);
-    }
-    else
-    {
-        double tempU[2] = {0.0, 0.0};
-        m_filter->m_u = RMatrix::Matrix(2, 1, tempU);
-
-        if (peakValue > m_peakValueMaximum)
+        double tempX[2] = {0.0, 0.0}; //状态矩阵
+        double tempY[2] = {0.0, 0.0}; //观测矩阵
+        if (!m_Kal_init)
         {
-            m_peakValueMaximum = peakValue;
-        }
-        if (peakValue < m_peakValueMinimum)
-        {
-            m_peakValueMinimum = peakValue;
-        }
-        const double peakRange = std::max(
-            1e-12,
-            static_cast<double>(m_peakValueMaximum - m_peakValueMinimum));
-        const double normalizedPeak =
-            (static_cast<double>(peakValue) - m_peakValueMinimum) / peakRange;
-        if (normalizedPeak > 0.2)
-        {
-            m_filter->m_cR = m_filter->m_cRMaximum
-                - normalizedPeak * (m_filter->m_cRMaximum - m_filter->m_cRMinimum);
+            m_updateDiagnostic.kalmanSeeded = true;
+            m_Kal_init = true;
+            tempX[0] = tempY[0] = m_roi.x;
+            tempX[1] = tempY[1] = m_roi.y;
+            m_filter->m_X = RMatrix::Matrix(2, 1, tempX);
+            m_filter->m_Y = RMatrix::Matrix(2, 1, tempY);
         }
         else
         {
-            m_filter->m_cR = 1e-2 - normalizedPeak * (1e-2 - m_filter->m_cRMinimum);
+            double tempU[2] = {0.0, 0.0};
+            m_filter->m_u = RMatrix::Matrix(2, 1, tempU);
+
+            if (peakValue > m_peakValueMaximum)
+            {
+                m_peakValueMaximum = peakValue;
+            }
+            if (peakValue < m_peakValueMinimum)
+            {
+                m_peakValueMinimum = peakValue;
+            }
+            const double peakRange = std::max(
+                1e-12,
+                static_cast<double>(m_peakValueMaximum - m_peakValueMinimum));
+            const double normalizedPeak =
+                (static_cast<double>(peakValue) - m_peakValueMinimum) / peakRange;
+            if (normalizedPeak > 0.2)
+            {
+                m_filter->m_cR = m_filter->m_cRMaximum
+                    - normalizedPeak * (m_filter->m_cRMaximum - m_filter->m_cRMinimum);
+            }
+            else
+            {
+                m_filter->m_cR = 1e-2 - normalizedPeak * (1e-2 - m_filter->m_cRMinimum);
+            }
+
+            tempY[0] = m_roi.x;
+            tempY[1] = m_roi.y;
+            if (m_Kalman_status_x != 0.0 && m_Kalman_status_y != 0.0)
+            {
+                tempX[0] = m_Kalman_status_x;
+                tempX[1] = m_Kalman_status_y;
+                m_filter->m_X = RMatrix::Matrix(2, 1, tempX);
+                m_filter->m_Y = RMatrix::Matrix(2, 1, tempY);
+                m_filter->Kalfilter();
+                m_updateDiagnostic.fusionApplied = true;
+                m_updateDiagnostic.normalizedPeak = normalizedPeak;
+                m_updateDiagnostic.observationNoise = m_filter->m_cR;
+                m_updateDiagnostic.gainX = m_filter->m_K.val[0][0];
+                m_updateDiagnostic.gainY = m_filter->m_K.val[1][1];
+            }
         }
 
-        tempY[0] = m_roi.x;
-        tempY[1] = m_roi.y;
         if (m_Kalman_status_x != 0.0 && m_Kalman_status_y != 0.0)
         {
-            tempX[0] = m_Kalman_status_x;
-            tempX[1] = m_Kalman_status_y;
-            m_filter->m_X = RMatrix::Matrix(2, 1, tempX);
-            m_filter->m_Y = RMatrix::Matrix(2, 1, tempY);
-            m_filter->Kalfilter();
-            m_updateDiagnostic.fusionApplied = true;
-            m_updateDiagnostic.normalizedPeak = normalizedPeak;
-            m_updateDiagnostic.observationNoise = m_filter->m_cR;
-            m_updateDiagnostic.gainX = m_filter->m_K.val[0][0];
-            m_updateDiagnostic.gainY = m_filter->m_K.val[1][1];
+            m_roi.x = static_cast<float>(m_filter->m_X.val[0][0]);
+            m_roi.y = static_cast<float>(m_filter->m_X.val[1][0]);
         }
     }
-
-    if (m_Kalman_status_x != 0.0 && m_Kalman_status_y != 0.0)
+    else if (m_fusionOptions.mode == KcfFusionMode::ManualWeight
+        && std::isfinite(m_Kalman_status_x) && std::isfinite(m_Kalman_status_y))
     {
-        m_roi.x = static_cast<float>(m_filter->m_X.val[0][0]);
-        m_roi.y = static_cast<float>(m_filter->m_X.val[1][0]);
+        // 手动比例直接作用于当前仿真先验与原始 KCF，不经过旧协方差重加权。
+        const double simulationWeight = m_fusionOptions.simulationWeight;
+        const double kcfWeight = 1.0 - simulationWeight;
+        m_roi.x = static_cast<float>(simulationWeight * m_Kalman_status_x
+            + kcfWeight * m_updateDiagnostic.beforeFusionRoi.x);
+        m_roi.y = static_cast<float>(simulationWeight * m_Kalman_status_y
+            + kcfWeight * m_updateDiagnostic.beforeFusionRoi.y);
+        m_updateDiagnostic.fusionApplied = true;
+        m_updateDiagnostic.gainX = kcfWeight;
+        m_updateDiagnostic.gainY = kcfWeight;
+    }
+
+    if ((m_fusionOptions.mode == KcfFusionMode::AutomaticKalman
+            && m_Kalman_status_x != 0.0 && m_Kalman_status_y != 0.0)
+        || (m_fusionOptions.mode == KcfFusionMode::ManualWeight
+            && m_updateDiagnostic.fusionApplied))
+    {
         if (std::abs(m_roi.x - previousTopLeft.x) > 0.5F * m_roi.width
             || std::abs(m_roi.y - previousTopLeft.y) > 0.5F * m_roi.height)
         {

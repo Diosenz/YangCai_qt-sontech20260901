@@ -44,6 +44,7 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QSaveFile>
 #include <QTextStream>
@@ -1180,6 +1181,12 @@ void CVisionTrackingWorkerAdapter::configure(
     emit statusChanged(QStringLiteral("vision tracking configured"));
 }
 
+void CVisionTrackingWorkerAdapter::updateOnlineFusionOptions(
+    const vision::KcfFusionOptions &options)
+{
+    m_options.fusion = options;
+}
+
 void CVisionTrackingWorkerAdapter::updateRobotState(const robot_comm::RobotState &state)
 {
     m_robotState = state;
@@ -1394,6 +1401,9 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
 
     vision::LegacyOnlineKcfOptions detectorOptions;
     detectorOptions.enableGapDetection = m_options.enableGapDetection;
+    if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
+        detectorOptions.fusion = m_options.fusion;
+    }
     const auto detected = m_detector.process(
         gray8, observation, projectionContext, detectorOptions);
     if (diagnosticsEnabled) {
@@ -1737,6 +1747,45 @@ digital_twin::DigitalTwinCommandResult
 CGlobalLocatePriorWorkerAdapter::applyGlobalLocalizationCorrection(
     const localization::RigidTransform &virtualToRealCorrection)
 {
+    return applyWorkpieceCorrection(virtualToRealCorrection, 0);
+}
+
+void CGlobalLocatePriorWorkerAdapter::setLocalRegistrationEpoch(quint64 epoch) noexcept
+{
+    m_localRegistrationEpoch.store(epoch);
+}
+
+void CGlobalLocatePriorWorkerAdapter::setLocalRegistrationStateDeadline(qint64 deadlineMs) noexcept
+{
+    m_localRegistrationStateDeadlineMs.store(deadlineMs);
+}
+
+digital_twin::DigitalTwinCommandResult
+CGlobalLocatePriorWorkerAdapter::applyLocalRegistrationCorrection(
+    quint64 epoch,
+    const localization::RigidTransform &virtualToRealCorrection)
+{
+    m_localRegistrationWriteAttempted = false;
+    const qint64 deadlineMs = m_localRegistrationStateDeadlineMs.load();
+    if (epoch == 0 || epoch != m_localRegistrationEpoch.load()
+        || (deadlineMs > 0 && QDateTime::currentMSecsSinceEpoch() > deadlineMs)) {
+        return {false, QStringLiteral("局部定位代次已失效，未写回工件。")};
+    }
+    return applyWorkpieceCorrection(virtualToRealCorrection, epoch);
+}
+
+bool CGlobalLocatePriorWorkerAdapter::localRegistrationWriteAttempted() const
+{
+    return m_localRegistrationWriteAttempted;
+}
+
+digital_twin::DigitalTwinCommandResult
+CGlobalLocatePriorWorkerAdapter::applyWorkpieceCorrection(
+    const localization::RigidTransform &virtualToRealCorrection,
+    quint64 epoch)
+{
+    QElapsedTimer writebackTimer;
+    writebackTimer.start();
     if (!m_robotSimConnected
         || m_robotSimConnectionMode != RobotSimConnectionMode::RealScene) {
         return {
@@ -1762,6 +1811,15 @@ CGlobalLocatePriorWorkerAdapter::applyGlobalLocalizationCorrection(
 
     const auto workpiecePose =
         m_robotSimService.getObjectPose(m_robotSimScene.workpieceId);
+    if (!workpiecePose.available) {
+        return {false, QStringLiteral("读取 RobotSim 工件位姿失败：%1").arg(workpiecePose.message)};
+    }
+    if (epoch != 0 && (epoch != m_localRegistrationEpoch.load()
+        || writebackTimer.elapsed() > 150
+        || (m_localRegistrationStateDeadlineMs.load() > 0
+            && QDateTime::currentMSecsSinceEpoch() > m_localRegistrationStateDeadlineMs.load()))) {
+        return {false, QStringLiteral("局部定位读取已取消或超过150 ms，未继续查询和写回。")};
+    }
     const auto parentPose =
         m_robotSimService.getObjectPose(m_robotSimScene.workpieceParentId);
     if (!workpiecePose.available || !parentPose.available) {
@@ -1778,7 +1836,8 @@ CGlobalLocatePriorWorkerAdapter::applyGlobalLocalizationCorrection(
         robotSimPoseToMatrix(workpiecePose.pose);
     const Eigen::Matrix4d parentFromWorkpiece =
         worldFromParent.inverse() * worldFromWorkpiece;
-    // 全局 ICP 的 virtualToReal 位于变位机末端系，按旧流程左乘工件相对位姿。
+    // 修正需与工件相对位姿使用同一父级参考系；局部修正已在父级 TCP 系，
+    // 直接左乘，不再叠加或共轭末节到 TCP 的 231 mm 偏移。
     const Eigen::Matrix4d correctedParentFromWorkpiece =
         rigidTransformToMatrix(virtualToRealCorrection)
         * parentFromWorkpiece;
@@ -1789,6 +1848,16 @@ CGlobalLocatePriorWorkerAdapter::applyGlobalLocalizationCorrection(
         };
     }
 
+    // 网络读取期间可能已停止或切换焊缝；不可将旧模型的修正应用到新模型。
+    if (epoch != 0 && (epoch != m_localRegistrationEpoch.load()
+        || writebackTimer.elapsed() > 150
+        || (m_localRegistrationStateDeadlineMs.load() > 0
+            && QDateTime::currentMSecsSinceEpoch() > m_localRegistrationStateDeadlineMs.load()))) {
+        return {false, QStringLiteral("局部定位读取期间已取消，未发送 SET_POSE。")};
+    }
+    if (epoch != 0) {
+        m_localRegistrationWriteAttempted = true;
+    }
     const auto commandResult = m_robotSimService.setObjectPose(
         m_robotSimScene.workpieceId,
         matrixToRobotSimPose(correctedParentFromWorkpiece),
@@ -1825,7 +1894,7 @@ CGlobalLocatePriorWorkerAdapter::applyGlobalLocalizationCorrection(
         poseConfirmed,
         poseConfirmed
             ? QStringLiteral(
-                  "全局定位矩阵已写回并确认 RobotSim 工件 %1。")
+                  "定位矩阵已写回并确认 RobotSim 工件 %1。")
                   .arg(m_robotSimScene.workpieceId)
             : QStringLiteral("SET_POSE 已发送，但回读位姿与目标不一致。")
     };

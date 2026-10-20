@@ -34,8 +34,10 @@
 #include <optional>
 
 #include <QObject>
+#include <QElapsedTimer>
 #include <QThread>
 
+#include "OnlineLocalRegistrationWorker.h"
 #include "RuntimeWorkerAdapters.h"
 
 namespace i2r_rlc::ui {
@@ -113,6 +115,21 @@ public:
      */
     void configureOnlineCorrection(
         const RuntimeOnlineCorrectionConfiguration &configuration);
+
+    /** @brief UI 线程热更新在线选项；关闭定位时立即撤销未执行的位姿写回。 */
+    void updateOnlineProcessingOptions(bool localEnabled, const vision::KcfFusionOptions &fusion);
+    /// @brief UI 线程读取当前定位开关，不代表现场配准一定可用。
+    bool onlineLocalRegistrationEnabled() const;
+    /// @brief UI 线程调整局部 ICP 最大对应距离，mm；撤销旧窗口，后续采样应用。
+    void setOnlineLocalIcpDistance(double distanceMm);
+    /// @brief UI 线程读取已归一化到 [0.1,10] mm 的局部 ICP 对应距离。
+    double onlineLocalIcpDistance() const;
+    /// @brief UI 线程热调单次合成平移修正上限，mm；旧匹配窗口及候选失效。
+    void setOnlineLocalIcpTranslationLimit(double translationMm);
+    /// @brief UI 线程读取已归一化到 [0.01,10] mm 的平移修正上限。
+    double onlineLocalIcpTranslationLimit() const;
+    /// @brief UI 线程读取已归一化的在线融合配置。
+    vision::KcfFusionOptions onlineFusionOptions() const;
 
     /**
      * @brief 配置有匹配离线纠偏存档。
@@ -401,6 +418,8 @@ private:
         qint64 robotStateReceivedMs = -1;
         RuntimeTrackingPurpose purpose = RuntimeTrackingPurpose::None;
         quint64 correctionSessionId = 0;
+        /// @brief RobotSim 查询派发时的模型代次，隔离写回前后的局部表面。
+        quint64 modelGeneration = 0;
         int localizationSegmentIndex = -1;
         quint64 requestId = 0;
         std::optional<digital_twin::DigitalTwinVisionLaserObservation>
@@ -489,7 +508,37 @@ private:
         quint64 requestId,
         const digital_twin::DigitalTwinVisionLaserObservation &observation);
     void routeTrackingResult(const RuntimeTrackingResult &result);
+    /// @brief 启动独立局部定位线程，读取有界采样/验收配置。
+    void startLocalRegistrationWorker();
+    /// @brief 撤销旧窗口、候选修正及网络写回代次；不停止机器人运动。
+    void resetOnlineLocalRegistration();
+    /// @brief 从已完成的同帧上下文低频投递表面采样，繁忙时跳过且不排队。
+    void submitOnlineLocalRegistration(const FrozenVisionFrameContext &context);
+    void handleOnlineLocalRegistrationResult(
+        quint64 requestId,
+        const COnlineLocalRegistrationWorker::Result &result);
+    /// @brief 仅在主视觉和 RobotSim 查询空隙提交候选修正；写回期间保留最新相机帧。
+    bool dispatchOnlineLocalRegistrationWriteback();
     void shutdownThread(QThread &thread);
+
+    QThread m_localRegistrationThread;
+    COnlineLocalRegistrationWorker *m_localRegistrationWorker = nullptr;
+    COnlineLocalRegistrationWorker::Options m_localRegistrationOptions;
+    /// @brief 启动参数无效时禁止通过界面开关绕过停用保护。
+    bool m_localRegistrationConfigurationValid = true;
+    std::optional<COnlineLocalRegistrationWorker::Result> m_pendingLocalCorrection;
+    QElapsedTimer m_localRegistrationClock;
+    qint64 m_lastLocalRegistrationSampleMs = -1;
+    /// @brief 跨模型写回代次保留的配准冷却，防止清窗重置 worker 时钟后过频求解。
+    qint64 m_lastLocalRegistrationAttemptMs = -1;
+    qint64 m_localRegistrationInputMs = -1;
+    quint64 m_localRegistrationGeneration = 0;
+    quint64 m_localRegistrationRequestId = 0;
+    bool m_localRegistrationBusy = false;
+    bool m_localRegistrationWritebackBusy = false;
+    /// @brief 配准异常或写回未确认时停用本轮自动更新，避免重复叠加不确定结果。
+    bool m_localRegistrationFaulted = false;
+    bool m_localRegistrationRobotStateFresh = false;
 
     QThread m_cameraThread;
     QThread m_robotThread;

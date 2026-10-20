@@ -6,11 +6,14 @@
  * @details     构建工业视觉运行界面并把用户操作转换为信号。
  ******************************************************************************/
 #include <algorithm>
+#include <cmath>
 
+#include <QCheckBox>
 #include <QColor>
 #include <QComboBox>
 #include <QCoreApplication>
 #include <QDir>
+#include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFrame>
@@ -90,6 +93,23 @@ QLabel* makeHintLabel(const QString& text, QWidget* parent)
     label->setWordWrap(true);
     label->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     return label;
+}
+
+// 固定诊断区几何，长错误和坐标全文仍可通过提示查看，避免刷新挤动滚动视口。
+void stabilizeDiagnosticLabel(QLabel* label, int lineCount)
+{
+    label->setTextFormat(Qt::PlainText);
+    label->setFixedHeight(label->fontMetrics().lineSpacing() * lineCount + 4);
+    label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    label->setToolTip(label->text());
+}
+
+void updateDiagnosticLabel(QLabel* label, const QString& text)
+{
+    if (label != nullptr && label->text() != text) {
+        label->setText(text);
+        label->setToolTip(text);
+    }
 }
 
 QLabel* makeStatusTile(const QString& text, QWidget* parent, const char* objectName)
@@ -298,6 +318,7 @@ MainWidget::MainWidget(QWidget* parent)
     m_digitalTwinStateLabel =
         makeHintLabel(tr("仿真：未连接"), robotSimConnectionGroup);
     m_digitalTwinStateLabel->setObjectName(QStringLiteral("digitalTwinStateLabel"));
+    stabilizeDiagnosticLabel(m_digitalTwinStateLabel, 3);
     robotSimLayout->addWidget(robotSimPortLabel, 0, 0);
     robotSimLayout->addWidget(m_robotSimPortLineEdit, 0, 1);
     robotSimLayout->addWidget(m_robotSimQueryButton, 1, 0);
@@ -473,6 +494,74 @@ MainWidget::MainWidget(QWidget* parent)
     auto* onlineDetailsLayout = new QVBoxLayout(onlineDetailsWidget);
     onlineDetailsLayout->setContentsMargins(0, 0, 4, 0);
     onlineDetailsLayout->setSpacing(4);
+    m_onlineLocalIcpCheckBox = new QCheckBox(tr("开启在线 ICP 局部定位"), onlineDetailsWidget);
+    m_onlineLocalIcpCheckBox->setObjectName(QStringLiteral("onlineLocalIcpCheckBox"));
+    m_onlineLocalIcpCheckBox->setChecked(true);
+    m_onlineLocalIcpCheckBox->setToolTip(tr("可在运行中调整；关闭后停止新的局部配准和位姿写回。"));
+    onlineDetailsLayout->addWidget(m_onlineLocalIcpCheckBox);
+    m_onlineLocalIcpDistanceRow = new QWidget(onlineDetailsWidget);
+    m_onlineLocalIcpDistanceRow->setObjectName(QStringLiteral("onlineLocalIcpDistanceRow"));
+    auto* localIcpDistanceLayout = new QHBoxLayout(m_onlineLocalIcpDistanceRow);
+    localIcpDistanceLayout->setContentsMargins(0, 0, 0, 0);
+    localIcpDistanceLayout->setSpacing(4);
+    localIcpDistanceLayout->addWidget(new QLabel(tr("最大对应距离(mm)"), m_onlineLocalIcpDistanceRow));
+    m_onlineLocalIcpDistanceSpinBox = new QDoubleSpinBox(m_onlineLocalIcpDistanceRow);
+    m_onlineLocalIcpDistanceSpinBox->setObjectName(QStringLiteral("onlineLocalIcpDistanceSpinBox"));
+    m_onlineLocalIcpDistanceSpinBox->setRange(0.1, 10.0);
+    m_onlineLocalIcpDistanceSpinBox->setDecimals(1);
+    m_onlineLocalIcpDistanceSpinBox->setSingleStep(0.5);
+    m_onlineLocalIcpDistanceSpinBox->setValue(5.0);
+    m_onlineLocalIcpDistanceSpinBox->setKeyboardTracking(false);
+    m_onlineLocalIcpDistanceSpinBox->setToolTip(tr(
+        "默认 5 mm，上限 10 mm：ICP 搜索对应点的最大距离，不是最终残差验收阈值；可在运行中调整。"));
+    localIcpDistanceLayout->addWidget(m_onlineLocalIcpDistanceSpinBox);
+    onlineDetailsLayout->addWidget(m_onlineLocalIcpDistanceRow);
+    m_onlineLocalIcpTranslationRow = new QWidget(onlineDetailsWidget);
+    m_onlineLocalIcpTranslationRow->setObjectName(QStringLiteral("onlineLocalIcpTranslationRow"));
+    auto* localIcpTranslationLayout = new QHBoxLayout(m_onlineLocalIcpTranslationRow);
+    localIcpTranslationLayout->setContentsMargins(0, 0, 0, 0);
+    localIcpTranslationLayout->setSpacing(4);
+    localIcpTranslationLayout->addWidget(new QLabel(tr("最大平移修正(mm)"), m_onlineLocalIcpTranslationRow));
+    m_onlineLocalIcpTranslationSpinBox = new QDoubleSpinBox(m_onlineLocalIcpTranslationRow);
+    m_onlineLocalIcpTranslationSpinBox->setObjectName(QStringLiteral("onlineLocalIcpTranslationSpinBox"));
+    m_onlineLocalIcpTranslationSpinBox->setRange(0.01, 10.0);
+    m_onlineLocalIcpTranslationSpinBox->setDecimals(2);
+    m_onlineLocalIcpTranslationSpinBox->setSingleStep(0.5);
+    m_onlineLocalIcpTranslationSpinBox->setValue(5.0);
+    m_onlineLocalIcpTranslationSpinBox->setKeyboardTracking(false);
+    m_onlineLocalIcpTranslationSpinBox->setToolTip(tr(
+        "默认 5 mm，上限 10 mm：一次修正三轴合成平移长度的上限，超过时整次拒绝，不截断修正；不是对应点搜索距离。可在运行中调整。"));
+    localIcpTranslationLayout->addWidget(m_onlineLocalIcpTranslationSpinBox);
+    onlineDetailsLayout->addWidget(m_onlineLocalIcpTranslationRow);
+    m_onlineFusionModeComboBox = new QComboBox(onlineDetailsWidget);
+    m_onlineFusionModeComboBox->setObjectName(QStringLiteral("onlineFusionModeComboBox"));
+    m_onlineFusionModeComboBox->addItems({tr("自动卡尔曼"), tr("手动比例"), tr("仅 KCF（关闭融合）")});
+    m_onlineFusionModeComboBox->setToolTip(tr(
+        "自动卡尔曼：沿用响应自适应融合；手动比例：按下方权重融合仿真与 KCF；仅 KCF：关闭位置融合。"));
+    onlineDetailsLayout->addWidget(m_onlineFusionModeComboBox);
+    auto* fusionWeights = new QWidget(onlineDetailsWidget);
+    auto* fusionWeightLayout = new QGridLayout(fusionWeights);
+    fusionWeightLayout->setContentsMargins(0, 0, 0, 0);
+    fusionWeightLayout->setHorizontalSpacing(3);
+    m_onlineSimulationWeightSpinBox = new QDoubleSpinBox(fusionWeights);
+    m_onlineSimulationWeightSpinBox->setObjectName(QStringLiteral("onlineSimulationWeightSpinBox"));
+    m_onlineKcfWeightSpinBox = new QDoubleSpinBox(fusionWeights);
+    m_onlineKcfWeightSpinBox->setObjectName(QStringLiteral("onlineKcfWeightSpinBox"));
+    for (auto* spinBox : {m_onlineSimulationWeightSpinBox, m_onlineKcfWeightSpinBox}) {
+        spinBox->setRange(0.0, 100.0);
+        spinBox->setDecimals(1);
+        spinBox->setSingleStep(1.0);
+        spinBox->setSuffix(QStringLiteral(" %"));
+        spinBox->setKeyboardTracking(false);
+        spinBox->setEnabled(false);
+        spinBox->setValue(50.0);
+        spinBox->setToolTip(tr("仅手动比例模式可编辑；仿真与 KCF 百分比之和为 100%。"));
+    }
+    fusionWeightLayout->addWidget(new QLabel(tr("仿真"), fusionWeights), 0, 0);
+    fusionWeightLayout->addWidget(m_onlineSimulationWeightSpinBox, 0, 1);
+    fusionWeightLayout->addWidget(new QLabel(tr("KCF"), fusionWeights), 0, 2);
+    fusionWeightLayout->addWidget(m_onlineKcfWeightSpinBox, 0, 3);
+    onlineDetailsLayout->addWidget(fusionWeights);
     auto* coordinates = new QWidget(onlineDetailsWidget);
     coordinates->setObjectName(QStringLiteral("onlineCorrectionCoordinates"));
     auto* coordinateLayout = new QGridLayout(coordinates);
@@ -513,7 +602,7 @@ MainWidget::MainWidget(QWidget* parent)
         tr("TCP：未连接\nKCF：等待有效检测"), onlineDetailsWidget);
     m_onlineCoordinateStatusLabel->setObjectName(
         QStringLiteral("onlineCoordinateStatusLabel"));
-    m_onlineCoordinateStatusLabel->setFixedHeight(32);
+    stabilizeDiagnosticLabel(m_onlineCoordinateStatusLabel, 2);
     onlineDetailsLayout->addWidget(m_onlineCoordinateStatusLabel);
     onlineDetailsLayout->addWidget(makeHintLabel(
         tr("起始点定位方式："), onlineDetailsWidget));
@@ -521,6 +610,8 @@ MainWidget::MainWidget(QWidget* parent)
     m_onlineCorrectionStateLabel->setObjectName(QStringLiteral("onlineCorrectionStateLabel"));
     m_onlineCorrectionP001Label = makeHintLabel(tr("P001：未计算"), onlineDetailsWidget);
     m_onlineCorrectionP001Label->setObjectName(QStringLiteral("onlineCorrectionP001Label"));
+    stabilizeDiagnosticLabel(m_onlineCorrectionStateLabel, 3);
+    stabilizeDiagnosticLabel(m_onlineCorrectionP001Label, 8);
     m_onlineStartModeComboBox = new QComboBox(onlineDetailsWidget);
     m_onlineStartModeComboBox->setObjectName(QStringLiteral("onlineStartModeComboBox"));
     m_onlineStartModeComboBox->addItem(tr("反向扫描"));
@@ -543,6 +634,9 @@ MainWidget::MainWidget(QWidget* parent)
         tr("最近同步错误：无"), onlineDetailsWidget);
     m_onlineCorrectionSyncErrorLabel->setObjectName(
         QStringLiteral("onlineCorrectionSyncErrorLabel"));
+    stabilizeDiagnosticLabel(m_onlineCorrectionSyncStateLabel, 1);
+    stabilizeDiagnosticLabel(m_onlineCorrectionConsumedFrameLabel, 1);
+    stabilizeDiagnosticLabel(m_onlineCorrectionSyncErrorLabel, 2);
     onlineDetailsLayout->addWidget(m_onlineCorrectionSyncStateLabel);
     onlineDetailsLayout->addWidget(m_onlineCorrectionConsumedFrameLabel);
     onlineDetailsLayout->addWidget(m_onlineCorrectionSyncErrorLabel);
@@ -797,6 +891,39 @@ MainWidget::MainWidget(QWidget* parent)
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
             &MainWidget::onlineCorrectionStartModeChanged);
+    const auto emitProcessingOptions = [this]() {
+        emit onlineProcessingOptionsChanged(m_onlineLocalIcpCheckBox->isChecked(),
+            m_onlineFusionModeComboBox->currentIndex(),
+            m_onlineSimulationWeightSpinBox->value() / 100.0);
+    };
+    connect(m_onlineLocalIcpCheckBox, &QCheckBox::toggled,
+            this, [this, emitProcessingOptions](bool enabled) {
+                m_onlineLocalIcpDistanceRow->setVisible(enabled);
+                m_onlineLocalIcpTranslationRow->setVisible(enabled);
+                emitProcessingOptions();
+            });
+    connect(m_onlineLocalIcpDistanceSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWidget::onlineLocalIcpDistanceChanged);
+    connect(m_onlineLocalIcpTranslationSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWidget::onlineLocalIcpTranslationLimitChanged);
+    connect(m_onlineFusionModeComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, [this, emitProcessingOptions](int index) {
+                m_onlineSimulationWeightSpinBox->setEnabled(index == 1);
+                m_onlineKcfWeightSpinBox->setEnabled(index == 1);
+                emitProcessingOptions();
+            });
+    connect(m_onlineSimulationWeightSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, [this, emitProcessingOptions](double percentage) {
+                const QSignalBlocker blocker(m_onlineKcfWeightSpinBox);
+                m_onlineKcfWeightSpinBox->setValue(100.0 - percentage);
+                emitProcessingOptions();
+            });
+    connect(m_onlineKcfWeightSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, [this, emitProcessingOptions](double percentage) {
+                const QSignalBlocker blocker(m_onlineSimulationWeightSpinBox);
+                m_onlineSimulationWeightSpinBox->setValue(100.0 - percentage);
+                emitProcessingOptions();
+            });
 
     connect(m_calibrationManualModeButton, &QPushButton::clicked,
             this, [this]() {
@@ -1115,16 +1242,46 @@ void MainWidget::setOfflineCorrectionStateText(const QString& text)
 
 void MainWidget::setOnlineCorrectionStateText(const QString& text)
 {
-    if (m_onlineCorrectionStateLabel != nullptr) {
-        m_onlineCorrectionStateLabel->setText(text);
-    }
+    updateDiagnosticLabel(m_onlineCorrectionStateLabel, text);
+}
+
+void MainWidget::setOnlineProcessingOptions(
+    bool localEnabled, int fusionMode, double simulationWeight)
+{
+    const QSignalBlocker localBlocker(m_onlineLocalIcpCheckBox);
+    const QSignalBlocker modeBlocker(m_onlineFusionModeComboBox);
+    const QSignalBlocker simulationBlocker(m_onlineSimulationWeightSpinBox);
+    const QSignalBlocker kcfBlocker(m_onlineKcfWeightSpinBox);
+    const int mode = fusionMode >= 0 && fusionMode <= 2 ? fusionMode : 0;
+    const double weight = std::isfinite(simulationWeight)
+        ? std::clamp(simulationWeight, 0.0, 1.0) : 0.5;
+    m_onlineLocalIcpCheckBox->setChecked(localEnabled);
+    m_onlineLocalIcpDistanceRow->setVisible(localEnabled);
+    m_onlineLocalIcpTranslationRow->setVisible(localEnabled);
+    m_onlineFusionModeComboBox->setCurrentIndex(mode);
+    m_onlineSimulationWeightSpinBox->setValue(weight * 100.0);
+    m_onlineKcfWeightSpinBox->setValue(100.0 - m_onlineSimulationWeightSpinBox->value());
+    m_onlineSimulationWeightSpinBox->setEnabled(mode == 1);
+    m_onlineKcfWeightSpinBox->setEnabled(mode == 1);
+}
+
+void MainWidget::setOnlineLocalIcpDistance(double distanceMm)
+{
+    const QSignalBlocker blocker(m_onlineLocalIcpDistanceSpinBox);
+    m_onlineLocalIcpDistanceSpinBox->setValue(std::isfinite(distanceMm)
+        ? std::clamp(distanceMm, 0.1, 10.0) : 5.0);
+}
+
+void MainWidget::setOnlineLocalIcpTranslationLimit(double translationMm)
+{
+    const QSignalBlocker blocker(m_onlineLocalIcpTranslationSpinBox);
+    m_onlineLocalIcpTranslationSpinBox->setValue(std::isfinite(translationMm)
+        ? std::clamp(translationMm, 0.01, 10.0) : 5.0);
 }
 
 void MainWidget::setOnlineCorrectionP001Text(const QString& text)
 {
-    if (m_onlineCorrectionP001Label != nullptr) {
-        m_onlineCorrectionP001Label->setText(text);
-    }
+    updateDiagnosticLabel(m_onlineCorrectionP001Label, text);
 }
 
 void MainWidget::setOnlineCorrectionCoordinates(
@@ -1167,15 +1324,9 @@ void MainWidget::setOnlineCorrectionSyncDetails(
     const QString& consumedFrameText,
     const QString& errorText)
 {
-    if (m_onlineCorrectionSyncStateLabel != nullptr) {
-        m_onlineCorrectionSyncStateLabel->setText(stateText);
-    }
-    if (m_onlineCorrectionConsumedFrameLabel != nullptr) {
-        m_onlineCorrectionConsumedFrameLabel->setText(consumedFrameText);
-    }
-    if (m_onlineCorrectionSyncErrorLabel != nullptr) {
-        m_onlineCorrectionSyncErrorLabel->setText(errorText);
-    }
+    updateDiagnosticLabel(m_onlineCorrectionSyncStateLabel, stateText);
+    updateDiagnosticLabel(m_onlineCorrectionConsumedFrameLabel, consumedFrameText);
+    updateDiagnosticLabel(m_onlineCorrectionSyncErrorLabel, errorText);
 }
 
 void MainWidget::setVisionStateText(const QString& text)
@@ -1263,9 +1414,7 @@ void MainWidget::resetFeaturePanelsAfterStop()
 
 void MainWidget::setDigitalTwinStateText(const QString& text)
 {
-    if (m_digitalTwinStateLabel != nullptr) {
-        m_digitalTwinStateLabel->setText(text);
-    }
+    updateDiagnosticLabel(m_digitalTwinStateLabel, text);
 }
 
 int MainWidget::globalLocateVirtualLaserSourceIndex() const

@@ -263,6 +263,19 @@ target_link_libraries(i2r_rlc_runtime_tracking_flow_tests
         i2r_rlc_ui
 )
 
+i2r_rlc_add_test(i2r_rlc_online_fusion_controls_tests
+    test_online_fusion_controls.cpp
+)
+target_link_libraries(i2r_rlc_online_fusion_controls_tests PRIVATE i2r_rlc_vision)
+i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_fusion_controls_tests)
+
+i2r_rlc_add_test(i2r_rlc_online_local_registration_tests
+    test_online_local_registration.cpp
+)
+target_link_libraries(i2r_rlc_online_local_registration_tests
+    PRIVATE i2r_rlc_ui
+)
+
 i2r_rlc_add_test(i2r_rlc_runtime_live_camera_flow_tests
     test_runtime_live_camera_flow.cpp
 )

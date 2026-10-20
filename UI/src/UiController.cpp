@@ -907,6 +907,13 @@ void UiController::initialize()
         trackingOptions,
         i2r_rlc::vision::WeldProjectionContext{});
 
+    m_view.setOnlineProcessingOptions(
+        m_runtimeCoordinator.onlineLocalRegistrationEnabled(),
+        static_cast<int>(m_runtimeCoordinator.onlineFusionOptions().mode),
+        m_runtimeCoordinator.onlineFusionOptions().simulationWeight);
+    m_view.setOnlineLocalIcpDistance(m_runtimeCoordinator.onlineLocalIcpDistance());
+    m_view.setOnlineLocalIcpTranslationLimit(m_runtimeCoordinator.onlineLocalIcpTranslationLimit());
+
     const bool autoStartDevices = !autoDeviceStartDisabled();
     if (m_liveCameraDeviceConfigured) {
         appendInfo(QStringLiteral(
@@ -979,6 +986,27 @@ void UiController::shutdown()
 
 void UiController::bindView()
 {
+    connect(&m_view, &MainWidget::onlineLocalIcpTranslationLimitChanged, this,
+        [this](double translationMm) {
+            m_runtimeCoordinator.setOnlineLocalIcpTranslationLimit(translationMm);
+            m_view.setOnlineLocalIcpTranslationLimit(m_runtimeCoordinator.onlineLocalIcpTranslationLimit());
+        });
+    connect(&m_view, &MainWidget::onlineLocalIcpDistanceChanged, this,
+        [this](double distanceMm) {
+            m_runtimeCoordinator.setOnlineLocalIcpDistance(distanceMm);
+            m_view.setOnlineLocalIcpDistance(m_runtimeCoordinator.onlineLocalIcpDistance());
+        });
+    connect(&m_view, &MainWidget::onlineProcessingOptionsChanged, this,
+        [this](bool localEnabled, int fusionMode, double simulationWeight) {
+            vision::KcfFusionOptions options;
+            options.mode = static_cast<vision::KcfFusionMode>(fusionMode);
+            options.simulationWeight = simulationWeight;
+            m_runtimeCoordinator.updateOnlineProcessingOptions(localEnabled, options);
+            const auto actual = m_runtimeCoordinator.onlineFusionOptions();
+            m_view.setOnlineProcessingOptions(
+                m_runtimeCoordinator.onlineLocalRegistrationEnabled(),
+                static_cast<int>(actual.mode), actual.simulationWeight);
+        });
     connect(&m_view, &MainWidget::cameraExposureRequested,
             this, &UiController::onCameraExposureRequested);
     connect(&m_view, &MainWidget::laserEnabledChanged,
@@ -3983,6 +4011,10 @@ void UiController::showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorr
         renderPendingCorrectionRobotStart();
         return;
     }
+    // 成功轮询心跳没有业务变化，不覆盖最近的配准/跟随信息。
+    if (update.succeeded && update.message == "robot state accepted") {
+        return;
+    }
     const QString message = QString::fromStdString(update.message);
     m_view.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：%1\n%2")
                                     .arg(onlineCorrectionPhaseToText(update.phase),
@@ -4665,7 +4697,12 @@ void UiController::handleCorrectionSyncUpdate(
                 .arg(update.message));
         break;
     }
-    state->stateText = correctionSyncStateToText(update.state);
+    const bool normalOnlineStage = update.purpose == CorrectionPurpose::OnlineCorrection
+        && (update.state == CorrectionSyncState::Querying
+            || update.state == CorrectionSyncState::ObservationReady
+            || update.state == CorrectionSyncState::VisionConsumed);
+    state->stateText = normalOnlineStage ? QStringLiteral("运行中")
+                                       : correctionSyncStateToText(update.state);
     renderCorrectionSyncState(*state);
 }
 

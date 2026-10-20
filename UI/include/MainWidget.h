@@ -20,7 +20,9 @@
 #include "CameraFrame.h"
 
 class QLabel;
+class QCheckBox;
 class QComboBox;
+class QDoubleSpinBox;
 class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
@@ -68,6 +70,13 @@ signals:
      * 索引顺序与 UI 下拉框保持一致：0=InitType，1=GlobalCorrection，2=IBVSStart。
      */
     void onlineCorrectionStartModeChanged(int modeIndex);
+
+    /// @brief 用户热调整在线处理；融合模式为自动/手动/仅 KCF，仿真权重范围 [0, 1]。
+    void onlineProcessingOptionsChanged(bool localEnabled, int fusionMode, double simulationWeight);
+    /// @brief 用户热调整局部 ICP 最大对应点距离，单位 mm；不代表残差验收阈值。
+    void onlineLocalIcpDistanceChanged(double distanceMm);
+    /// @brief 用户热调整单次局部 ICP 合成平移长度上限，单位 mm；超限时整次拒绝。
+    void onlineLocalIcpTranslationLimitChanged(double translationMm);
 
     /**
      * @brief 用户确认选择当前工件。
@@ -250,6 +259,12 @@ public slots:
 
     /// @brief 更新流程状态文本。
     void setOnlineCorrectionStateText(const QString& text);
+    /// @brief 在 UI 线程同步在线处理选项，不发出用户变更信号。
+    void setOnlineProcessingOptions(bool localEnabled, int fusionMode, double simulationWeight);
+    /// @brief 在 UI 线程同步局部 ICP 最大对应点距离，单位 mm，不发出用户变更信号。
+    void setOnlineLocalIcpDistance(double distanceMm);
+    /// @brief 在 UI 线程回填局部 ICP 平移修正上限，单位 mm，不发出用户变更信号。
+    void setOnlineLocalIcpTranslationLimit(double translationMm);
     /// @brief 更新在线纠偏最终 P001 的独立诊断文本。
     void setOnlineCorrectionP001Text(const QString& text);
     /**
@@ -365,6 +380,14 @@ private:
     QLabel* m_calibrationStateLabel = nullptr;
     QLabel* m_offlineCorrectionStateLabel = nullptr;
     QLabel* m_onlineCorrectionStateLabel = nullptr;
+    QCheckBox* m_onlineLocalIcpCheckBox = nullptr;
+    QWidget* m_onlineLocalIcpDistanceRow = nullptr;
+    QDoubleSpinBox* m_onlineLocalIcpDistanceSpinBox = nullptr;
+    QWidget* m_onlineLocalIcpTranslationRow = nullptr;
+    QDoubleSpinBox* m_onlineLocalIcpTranslationSpinBox = nullptr;
+    QComboBox* m_onlineFusionModeComboBox = nullptr;
+    QDoubleSpinBox* m_onlineSimulationWeightSpinBox = nullptr;
+    QDoubleSpinBox* m_onlineKcfWeightSpinBox = nullptr;
     QLabel* m_onlineCorrectionP001Label = nullptr;
     std::array<std::array<QLineEdit*, 3>, 4> m_onlineCoordinateEdits{};
     QLabel* m_onlineCoordinateStatusLabel = nullptr;

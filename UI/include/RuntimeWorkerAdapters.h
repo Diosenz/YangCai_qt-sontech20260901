@@ -30,6 +30,7 @@
 #ifndef I2R_RLC_UI_RUNTIME_WORKER_ADAPTERS_H
 #define I2R_RLC_UI_RUNTIME_WORKER_ADAPTERS_H
 
+#include <atomic>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -195,6 +196,8 @@ public slots:
     void configure(
         const RuntimeTrackingOptions &options,
         const vision::WeldProjectionContext &projectionContext);
+    /// @brief 视觉线程热更新在线融合选项，保留当前 KCF 模板。
+    void updateOnlineFusionOptions(const vision::KcfFusionOptions &options);
     void updateRobotState(const robot_comm::RobotState &state);
     /// @brief 按值接收 DigitalTwin 线程发布的 Vision 仿真观测快照。
     void updateDigitalTwinVisionObservation(
@@ -300,6 +303,17 @@ public:
     digital_twin::DigitalTwinCommandResult applyGlobalLocalizationCorrection(
         const localization::RigidTransform &virtualToRealCorrection);
 
+    /// @brief 可跨线程撤销旧代次；只写原子值，不访问服务或 Qt 对象状态。
+    void setLocalRegistrationEpoch(quint64 epoch) noexcept;
+    /// @brief 设置本次写回允许使用的机器人快照截止时间（UTC毫秒），可跨线程撤销。
+    void setLocalRegistrationStateDeadline(qint64 deadlineMs) noexcept;
+    /** @brief 在 RobotSim 线程写回局部修正；读取位姿后再次检查代次，拒绝迟到结果。 */
+    digital_twin::DigitalTwinCommandResult applyLocalRegistrationCorrection(
+        quint64 epoch,
+        const localization::RigidTransform &virtualToRealCorrection);
+    /// @brief 仅在 RobotSim 线程紧随写回调用读取，用于区分取消与未知写入结果。
+    bool localRegistrationWriteAttempted() const;
+
 public slots:
     void generateVirtualPrior(
         quint64 requestId,
@@ -383,6 +397,14 @@ private:
         ManualSimulation,
         RealScene
     };
+
+    /// @brief 全局/局部共用相对位姿左乘及回读；epoch=0 仅供既有全局入口。
+    digital_twin::DigitalTwinCommandResult applyWorkpieceCorrection(
+        const localization::RigidTransform &virtualToRealCorrection,
+        quint64 epoch);
+    std::atomic<quint64> m_localRegistrationEpoch{0};
+    bool m_localRegistrationWriteAttempted = false;
+    std::atomic<qint64> m_localRegistrationStateDeadlineMs{0};
 
     bool buildRobotSimJointVectors(
         const robot_comm::RobotState &state,

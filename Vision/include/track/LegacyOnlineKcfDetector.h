@@ -25,6 +25,7 @@ namespace i2r_rlc::vision {
  * @brief 旧在线 KCF 与 gap 检测参数。
  */
 struct LegacyOnlineKcfOptions {
+    KcfFusionOptions fusion;
     bool enableGapDetection = false;
     PointCloudGapWidthOptions gapWidthOptions;
 };

@@ -6,19 +6,26 @@
  * @details     验证对应模块的迁移行为和关键边界，测试断言保持原有语义。
  ******************************************************************************/
 #include <cstdlib>
+#include <cmath>
 #include <iostream>
+#include <limits>
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QCoreApplication>
+#include <QDoubleSpinBox>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QStackedWidget>
 #include <QStringList>
 
 #include "MainWidget.h"
+#include "OnlineCorrectionTypes.h"
 #include "UiController.h"
 
 namespace {
@@ -736,6 +743,269 @@ bool testAppendLogSmoke()
     return expectTrue(true, "appendLog smoke test should not crash");
 }
 
+bool testOnlineProcessingOptionsRemainEditable()
+{
+    i2r_rlc::ui::MainWidget widget;
+    auto* localIcp = widget.findChild<QCheckBox*>(QStringLiteral("onlineLocalIcpCheckBox"));
+    auto* mode = findComboBox(widget, "onlineFusionModeComboBox");
+    auto* simulation = widget.findChild<QDoubleSpinBox*>(QStringLiteral("onlineSimulationWeightSpinBox"));
+    auto* kcf = widget.findChild<QDoubleSpinBox*>(QStringLiteral("onlineKcfWeightSpinBox"));
+    if (localIcp == nullptr || mode == nullptr || simulation == nullptr || kcf == nullptr) {
+        return expectTrue(false, "online processing controls should exist");
+    }
+    bool ok = true;
+    int count = 0;
+    bool lastLocalEnabled = false;
+    int lastMode = -1;
+    double lastSimulationWeight = -1.0;
+    QObject::connect(&widget, &i2r_rlc::ui::MainWidget::onlineProcessingOptionsChanged,
+        [&count, &lastLocalEnabled, &lastMode, &lastSimulationWeight](bool enabled, int selectedMode, double weight) {
+            ++count;
+            lastLocalEnabled = enabled;
+            lastMode = selectedMode;
+            lastSimulationWeight = weight;
+        });
+    widget.setOnlineProcessingOptions(true, 0, 0.4);
+    ok &= expectTrue(count == 0 && !simulation->isEnabled() && !kcf->isEnabled(),
+                     "automatic mode synchronization should block feedback and disable manual weights");
+    mode->setCurrentIndex(1);
+    ok &= expectTrue(count == 1 && lastLocalEnabled && lastMode == 1
+                         && simulation->isEnabled() && kcf->isEnabled(),
+                     "manual mode should immediately publish and enable both weights");
+    simulation->setValue(25.0);
+    ok &= expectTrue(count == 2 && std::abs(lastSimulationWeight - 0.25) < 1e-9
+                         && kcf->value() == 75.0,
+                     "simulation weight should complement KCF with one user update");
+    kcf->setValue(35.0);
+    ok &= expectTrue(count == 3 && std::abs(lastSimulationWeight - 0.65) < 1e-9
+                         && simulation->value() == 65.0,
+                     "KCF weight should complement simulation with one user update");
+    widget.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：运行中"));
+    localIcp->setChecked(false);
+    mode->setCurrentIndex(2);
+    ok &= expectTrue(count == 5 && !lastLocalEnabled && lastMode == 2
+                         && localIcp->isEnabled() && mode->isEnabled()
+                         && !simulation->isEnabled() && !kcf->isEnabled()
+                         && !simulation->isHidden() && !kcf->isHidden(),
+                     "running status must not lock or hide processing options");
+    widget.setOnlineProcessingOptions(true, 1, 2.0);
+    ok &= expectTrue(count == 5 && simulation->value() == 100.0 && kcf->value() == 0.0,
+                     "programmatic weight synchronization should clamp values without feedback");
+    return ok;
+}
+
+bool testOnlineDiagnosticsKeepStableGeometry()
+{
+    i2r_rlc::ui::MainWidget widget;
+    auto* entry = findButton(widget, "entryOnlineCorrectionButton");
+    auto* scroll = widget.findChild<QScrollArea*>(QStringLiteral("onlineCorrectionDetailsScrollArea"));
+    auto* p001 = findLabel(widget, "onlineCorrectionP001Label");
+    auto* error = findLabel(widget, "onlineCorrectionSyncErrorLabel");
+    if (entry == nullptr || scroll == nullptr || p001 == nullptr || error == nullptr) {
+        return expectTrue(false, "online diagnostics should expose stable scroll content");
+    }
+    widget.show();
+    entry->click();
+    QCoreApplication::processEvents();
+    scroll->verticalScrollBar()->setValue(scroll->verticalScrollBar()->maximum() / 2);
+    const int scrollValue = scroll->verticalScrollBar()->value();
+    const int scrollMaximum = scroll->verticalScrollBar()->maximum();
+    const QSize viewportSize = scroll->viewport()->size();
+    const QRect p001Geometry = p001->geometry();
+    const QString longError = QStringLiteral("最近同步错误：连接超时，未完成同帧参考查询，请检查通信状态。").repeated(12);
+    bool ok = true;
+    for (int index = 0; index < 6; ++index) {
+        const bool detailed = (index % 2) == 0;
+        widget.setOnlineCorrectionStateText(detailed
+            ? QStringLiteral("在线纠偏：运行中\nICP 配准已采用，等待后续检测与机器人状态。\n详细诊断信息。").repeated(4)
+            : QStringLiteral("在线纠偏：运行中"));
+        widget.setOnlineCorrectionP001Text(detailed
+            ? QStringLiteral("P001：X = 123.456，Y = -789.123，Z = 456.789\nRX = 123.45，RY = 67.89，RZ = -12.34\n").repeated(4)
+            : QStringLiteral("P001：未计算"));
+        widget.setOnlineCorrectionSyncDetails(QStringLiteral("逐帧同步：运行中"),
+            QStringLiteral("最近确认帧：1234567"), detailed ? longError : QStringLiteral("最近同步错误：无"));
+        widget.setDigitalTwinStateText(detailed
+            ? QStringLiteral("仿真：与检测图同帧\n端口：61541\n显示帧：1234567\n激光线：512 图像点 / 512 三维点\n焊缝点二维：(1234, 5678) pixel")
+            : QStringLiteral("仿真：未连接"));
+        QCoreApplication::processEvents();
+        ok &= expectTrue(scroll->viewport()->size() == viewportSize
+                             && scroll->verticalScrollBar()->maximum() == scrollMaximum
+                             && scroll->verticalScrollBar()->value() == scrollValue
+                             && p001->geometry() == p001Geometry,
+                         "changing online diagnostic lengths must not move content or its scroll position");
+        if (detailed) {
+            ok &= expectTrue(error->text() == longError && error->toolTip() == longError,
+                             "fixed diagnostic geometry should retain full error text and tooltip");
+        }
+    }
+    return ok;
+}
+
+bool testOnlineLocalIcpDistanceControl()
+{
+    i2r_rlc::ui::MainWidget widget;
+    auto* localIcp = widget.findChild<QCheckBox*>(QStringLiteral("onlineLocalIcpCheckBox"));
+    auto* row = widget.findChild<QWidget*>(QStringLiteral("onlineLocalIcpDistanceRow"));
+    auto* distance = widget.findChild<QDoubleSpinBox*>(QStringLiteral("onlineLocalIcpDistanceSpinBox"));
+    if (localIcp == nullptr || row == nullptr || distance == nullptr) {
+        return expectTrue(false, "online local ICP distance controls should exist");
+    }
+    bool ok = expectTrue(localIcp->isChecked() && !row->isHidden()
+                             && distance->value() == 5.0
+                             && distance->minimum() == 0.1 && distance->maximum() == 10.0,
+                         "enabled local ICP should expose a default 5 mm correspondence distance capped at 10 mm");
+    ok &= expectTrue(distance->toolTip().contains(QStringLiteral("不是最终残差验收阈值")),
+                     "distance help must distinguish correspondence selection from residual acceptance");
+    int distanceSignalCount = 0;
+    double lastDistance = 0.0;
+    QObject::connect(&widget, &i2r_rlc::ui::MainWidget::onlineLocalIcpDistanceChanged,
+        [&distanceSignalCount, &lastDistance](double value) {
+            ++distanceSignalCount;
+            lastDistance = value;
+        });
+    localIcp->setChecked(false);
+    ok &= expectTrue(row->isHidden() && distanceSignalCount == 0,
+                     "turning local ICP off should hide its distance without modifying it");
+    localIcp->setChecked(true);
+    widget.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：运行中"));
+    distance->setValue(6.5);
+    ok &= expectTrue(!row->isHidden() && distance->isEnabled()
+                         && distanceSignalCount == 1 && lastDistance == 6.5,
+                     "distance must remain editable during online correction with one update per value change");
+    widget.setOnlineLocalIcpDistance(20.0);
+    ok &= expectTrue(distance->value() == 10.0 && distanceSignalCount == 1,
+                     "programmatic distance update should clamp to 10 mm without signal feedback");
+    widget.setOnlineProcessingOptions(false, 1, 0.5);
+    ok &= expectTrue(row->isHidden() && distance->value() == 10.0,
+                     "programmatic local ICP disable should hide the row and retain its setting");
+    widget.setOnlineProcessingOptions(true, 1, 0.5);
+    ok &= expectTrue(!row->isHidden() && distance->isEnabled() && distanceSignalCount == 1,
+                     "programmatic re-enable should restore the distance row without user feedback");
+    return ok;
+}
+
+bool testOnlineLocalIcpTranslationLimitControl()
+{
+    i2r_rlc::ui::MainWidget widget;
+    auto* localIcp = widget.findChild<QCheckBox*>(QStringLiteral("onlineLocalIcpCheckBox"));
+    auto* row = widget.findChild<QWidget*>(QStringLiteral("onlineLocalIcpTranslationRow"));
+    auto* translation = widget.findChild<QDoubleSpinBox*>(QStringLiteral("onlineLocalIcpTranslationSpinBox"));
+    auto* distance = widget.findChild<QDoubleSpinBox*>(QStringLiteral("onlineLocalIcpDistanceSpinBox"));
+    if (localIcp == nullptr || row == nullptr || translation == nullptr || distance == nullptr) {
+        return expectTrue(false, "online local ICP translation limit controls should exist");
+    }
+    bool ok = expectTrue(localIcp->isChecked() && !row->isHidden()
+                             && translation->value() == 5.0 && translation->minimum() == 0.01
+                             && translation->maximum() == 10.0 && translation->decimals() == 2,
+                         "local ICP translation limit should default to 5 mm with a 10 mm maximum");
+    ok &= expectTrue(translation->toolTip().contains(QStringLiteral("三轴合成平移长度"))
+                         && translation->toolTip().contains(QStringLiteral("整次拒绝"))
+                         && translation->toolTip().contains(QStringLiteral("不截断")),
+                     "translation limit help should describe whole-correction rejection and its vector length");
+    int signalCount = 0;
+    double lastValue = 0.0;
+    QObject::connect(&widget, &i2r_rlc::ui::MainWidget::onlineLocalIcpTranslationLimitChanged,
+        [&signalCount, &lastValue](double value) {
+            ++signalCount;
+            lastValue = value;
+        });
+    localIcp->setChecked(false);
+    ok &= expectTrue(row->isHidden() && signalCount == 0,
+                     "disabling ICP should hide the translation limit without changing its value");
+    localIcp->setChecked(true);
+    widget.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：运行中"));
+    translation->setValue(6.5);
+    ok &= expectTrue(!row->isHidden() && translation->isEnabled()
+                         && signalCount == 1 && lastValue == 6.5 && distance->value() == 5.0,
+                     "translation limit must support one hot-update independently of correspondence distance");
+    distance->setValue(3.0);
+    ok &= expectTrue(translation->value() == 6.5 && signalCount == 1,
+                     "correspondence distance adjustment must not modify the translation limit");
+    widget.setOnlineLocalIcpTranslationLimit(20.0);
+    ok &= expectTrue(translation->value() == 10.0 && signalCount == 1,
+                     "programmatic translation limit should clamp without feedback");
+    widget.setOnlineLocalIcpTranslationLimit(std::numeric_limits<double>::quiet_NaN());
+    ok &= expectTrue(translation->value() == 5.0 && signalCount == 1,
+                     "nonfinite translation limit should restore 5 mm without feedback");
+    widget.setOnlineProcessingOptions(false, 1, 0.5);
+    ok &= expectTrue(row->isHidden() && translation->value() == 5.0,
+                     "programmatic disable should hide the translation row and retain its setting");
+    widget.setOnlineProcessingOptions(true, 1, 0.5);
+    ok &= expectTrue(!row->isHidden() && translation->isEnabled() && signalCount == 1,
+                     "programmatic enable should restore the translation row without feedback");
+    return ok;
+}
+
+bool testOnlineBusinessAndSyncTextRemainStable()
+{
+    using i2r_rlc::control::OnlineCorrectionPhase;
+    using i2r_rlc::control::OnlineCorrectionUpdate;
+    using i2r_rlc::ui::CorrectionPurpose;
+    using i2r_rlc::ui::CorrectionSyncState;
+    using i2r_rlc::ui::CorrectionSyncUpdate;
+    i2r_rlc::ui::MainWidget widget;
+    i2r_rlc::ui::UiController controller(widget);
+    auto* business = findLabel(widget, "onlineCorrectionStateLabel");
+    auto* sync = findLabel(widget, "onlineCorrectionSyncStateLabel");
+    auto* error = findLabel(widget, "onlineCorrectionSyncErrorLabel");
+    if (business == nullptr || sync == nullptr || error == nullptr) {
+        controller.shutdown();
+        return expectTrue(false, "online business and synchronization labels should exist");
+    }
+    const auto applyBusiness = [&controller](const OnlineCorrectionUpdate& update) {
+        return QMetaObject::invokeMethod(&controller, "showOnlineCorrectionUpdate",
+            Qt::DirectConnection, Q_ARG(i2r_rlc::control::OnlineCorrectionUpdate, update));
+    };
+    const auto applySync = [&controller](const CorrectionSyncUpdate& update) {
+        return QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate",
+            Qt::DirectConnection, Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, update));
+    };
+    OnlineCorrectionUpdate update;
+    update.succeeded = true;
+    update.phase = OnlineCorrectionPhase::OnlineRunning;
+    update.message = "online business detail retained";
+    bool ok = expectTrue(applyBusiness(update), "online update must be callable through Qt metadata");
+    const QString businessText = business->text();
+    ok &= expectTrue(businessText.contains(QStringLiteral("online business detail retained")),
+                     "online business result should be displayed immediately");
+    update.message = "robot state accepted";
+    ok &= expectTrue(applyBusiness(update) && business->text() == businessText,
+                     "robot polling heartbeat must not overwrite online business details");
+    update.phase = OnlineCorrectionPhase::SegmentFinishing;
+    update.message = "online segment finishing";
+    ok &= expectTrue(applyBusiness(update)
+                         && business->text().contains(QStringLiteral("online segment finishing")),
+                     "real phase transition should update immediately after a heartbeat");
+
+    CorrectionSyncUpdate syncUpdate;
+    syncUpdate.purpose = CorrectionPurpose::OnlineCorrection;
+    syncUpdate.sessionId = 31;
+    syncUpdate.frameId = 41;
+    syncUpdate.state = CorrectionSyncState::Querying;
+    ok &= expectTrue(applySync(syncUpdate)
+                         && sync->text() == QStringLiteral("逐帧同步：运行中"),
+                     "online query stage should display a stable running status");
+    syncUpdate.state = CorrectionSyncState::ObservationReady;
+    syncUpdate.hasObservation = true;
+    syncUpdate.observation.valid = true;
+    syncUpdate.observation.frameId = syncUpdate.frameId;
+    ok &= expectTrue(applySync(syncUpdate)
+                         && sync->text() == QStringLiteral("逐帧同步：运行中"),
+                     "online observation-ready stage should retain the running status");
+    syncUpdate.state = CorrectionSyncState::VisionConsumed;
+    ok &= expectTrue(applySync(syncUpdate)
+                         && sync->text() == QStringLiteral("逐帧同步：运行中"),
+                     "online consumed stage should retain the running status");
+    syncUpdate.state = CorrectionSyncState::Failed;
+    syncUpdate.message = QStringLiteral("专项测试同步失败");
+    ok &= expectTrue(applySync(syncUpdate)
+                         && sync->text().contains(QStringLiteral("同步失败"))
+                         && error->text().contains(syncUpdate.message),
+                     "synchronization errors should replace the stable status immediately");
+    controller.shutdown();
+    return ok;
+}
+
 bool testCorrectionSyncThreeKeyPresentation()
 {
     using i2r_rlc::ui::CorrectionPurpose;
@@ -900,6 +1170,11 @@ int main(int argc, char **argv)
     ok &= testAutomaticCalibrationConfirmationGate();
     ok &= testManualCalibrationPlacementImage();
     ok &= testOnlineCorrectionStartModeComboBox();
+    ok &= testOnlineProcessingOptionsRemainEditable();
+    ok &= testOnlineDiagnosticsKeepStableGeometry();
+    ok &= testOnlineLocalIcpDistanceControl();
+    ok &= testOnlineLocalIcpTranslationLimitControl();
+    ok &= testOnlineBusinessAndSyncTextRemainStable();
     ok &= testWorkpieceSelectorPanel();
     ok &= testIbvsAndLocalizationPanelsUseTwinButtonDesign();
     ok &= testTeachTrajectoryPanelSignals();

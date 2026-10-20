@@ -175,6 +175,7 @@ void CRuntimeCoordinator::start()
     m_offlineCorrectionThread.start();
     m_teachTrajectoryThread.start();
     m_running = true;
+    startLocalRegistrationWorker();
 
     emit statusMessage(QStringLiteral(
         "运行时线程已启动；相机和 RobotComm 等待 UI 自动启动/连接"));
@@ -204,6 +205,7 @@ void CRuntimeCoordinator::stop()
     shutdownThread(m_visionThread);
     shutdownThread(m_globalLocatePriorThread);
     shutdownThread(m_globalLocalizationThread);
+    shutdownThread(m_localRegistrationThread);
     shutdownThread(m_robotSimThread);
     shutdownThread(m_onlineCorrectionThread);
     shutdownThread(m_offlineCorrectionThread);
@@ -213,6 +215,8 @@ void CRuntimeCoordinator::stop()
     m_visionWorker = nullptr;
     m_globalLocatePriorWorker = nullptr;
     m_globalLocalizationWorker = nullptr;
+    m_localRegistrationWorker = nullptr;
+    m_localRegistrationBusy = false;
     m_robotSimWorker = nullptr;
     m_onlineCorrectionWorker = nullptr;
     m_offlineCorrectionWorker = nullptr;
@@ -252,6 +256,7 @@ void CRuntimeCoordinator::configureTracking(
 {
     m_trackingOptions = options;
     m_trackingProjectionContext = projectionContext;
+    resetOnlineLocalRegistration();
     if (m_visionWorker == nullptr) {
         return;
     }
@@ -309,6 +314,7 @@ void CRuntimeCoordinator::configureOnlineCorrection(
             vision::CPositionerCalibrationParser::parseFile(resolved.rbcalibFile);
     }
     m_onlinePositionerCalibration = resolved.positionerCalibrationSnapshot;
+    resetOnlineLocalRegistration();
     if (m_onlineCorrectionWorker == nullptr) {
         return;
     }
@@ -511,6 +517,7 @@ void CRuntimeCoordinator::connectRobotSimManual(
     m_robotSimManualModeRequested = true;
     m_robotSimConnectionActiveOrPending = true;
     m_robotSimConnected = false;
+    resetOnlineLocalRegistration();
     m_hasPendingRobotSimSyncState = false;
     m_robotSimSyncInFlightRequestId = 0;
     m_robotSimPriorInFlightRequestId = 0;
@@ -541,6 +548,7 @@ void CRuntimeCoordinator::connectRobotSim(
     m_globalLocateRobotSimEndpoint = endpoint;
     m_globalLocateRobotSimScene = scene;
     m_robotSimConnected = false;
+    resetOnlineLocalRegistration();
     m_hasPendingRobotSimSyncState = m_hasLatestRobotState;
     if (m_hasLatestRobotState) {
         m_pendingRobotSimSyncState = m_latestRobotState;
@@ -579,6 +587,7 @@ void CRuntimeCoordinator::resetRobotSimConnection()
 {
     m_robotSimConnectionActiveOrPending = false;
     m_robotSimConnected = false;
+    resetOnlineLocalRegistration();
     m_robotSimManualModeRequested = false;
     m_hasPendingRobotSimSyncState = false;
     m_robotSimSyncInFlightRequestId = 0;
@@ -1163,6 +1172,7 @@ void CRuntimeCoordinator::startGlobalLocalizationTracking(
     }
     m_activeGlobalLocalizationSources = sources;
     m_trackingPurpose = RuntimeTrackingPurpose::GlobalLocalization;
+    resetOnlineLocalRegistration();
     m_globalLocalizationDrainRequested = false;
     resetVisionFrameDispatch();
     m_globalLocalizationLastPosflag = 0;
@@ -1585,9 +1595,13 @@ void CRuntimeCoordinator::connectWorkers()
                 // STARTCOR 是在线 SMOVC 窗口的权威门禁。当前实机 JBI
                 // 会在 STARTCOR 前执行 ENDDETPRG，因此在线阶段 traflag=0
                 // 不能被继续解释为“禁止跟踪”。
+                const bool wasOnline = m_correctionSession.onlineControlWindowActive;
                 m_correctionSession.onlineControlWindowActive =
                     update.phase
                     == control::OnlineCorrectionPhase::OnlineRunning;
+                if (wasOnline != m_correctionSession.onlineControlWindowActive) {
+                    resetOnlineLocalRegistration();
+                }
             }
             emit onlineCorrectionUpdated(update);
             if (update.phase == control::OnlineCorrectionPhase::Completed
@@ -1624,6 +1638,7 @@ void CRuntimeCoordinator::connectWorkers()
                 }
                 m_trackingPurpose = RuntimeTrackingPurpose::OnlineCorrection;
                 setCorrectionVisionTrackingActive(true);
+                resetOnlineLocalRegistration();
                 resetVisionFrameDispatch();
                 emitCorrectionSyncState(
                     CorrectionSyncState::Idle,
@@ -1669,6 +1684,7 @@ void CRuntimeCoordinator::connectWorkers()
                 // 在线控制器会在反向检测、示教点下发等阶段临时暂停 Vision。
                 // 这些阶段仍属于同一次正式纠偏，不得更换或失效 sessionId。
                 setCorrectionVisionTrackingActive(false);
+                resetOnlineLocalRegistration();
                 resetVisionFrameDispatch();
                 if (m_correctionSession.active
                     && m_correctionSession.purpose
@@ -1848,9 +1864,18 @@ void CRuntimeCoordinator::applyStandaloneGlobalLocalization(
 
 void CRuntimeCoordinator::handleRobotState(const robot_comm::RobotState &state)
 {
+    const bool localMotionGateChanged = !m_hasLatestRobotState
+        || state.sStart != m_latestRobotState.sStart
+        || state.sHold != m_latestRobotState.sHold
+        || state.sMode != m_latestRobotState.sMode;
     m_latestRobotStateReceivedMs = QDateTime::currentMSecsSinceEpoch();
     m_latestRobotState = state;
     m_hasLatestRobotState = true;
+    if ((localMotionGateChanged || !m_localRegistrationRobotStateFresh)
+        && m_correctionSession.active) {
+        resetOnlineLocalRegistration();
+    }
+    m_localRegistrationRobotStateFresh = true;
     processOnlineCorrectionStartState(state);
     updateOfflineSeamWindow(state);
     if (m_robotSimConnected && canRunRealtimeRobotSimSynchronization()) {
@@ -1944,6 +1969,7 @@ void CRuntimeCoordinator::handleRobotSimConnectionStateChanged(
         return;
     }
     m_robotSimConnected = connected;
+    resetOnlineLocalRegistration();
     m_robotSimConnectionActiveOrPending = connected;
     m_robotSimHasSynchronizationStatus = false;
     m_robotSimLastSynchronizationMessage.clear();
@@ -2057,6 +2083,9 @@ void CRuntimeCoordinator::enqueueVisionFrame(const camera::CameraFrame &frame)
 
 void CRuntimeCoordinator::dispatchPendingVisionFrame()
 {
+    if (dispatchOnlineLocalRegistrationWriteback()) {
+        return;
+    }
     if (m_visionFrameInFlight
         || !m_pendingVisionFrame.has_value()
         || m_trackingPurpose == RuntimeTrackingPurpose::None
@@ -2086,6 +2115,7 @@ void CRuntimeCoordinator::dispatchPendingVisionFrame()
     m_currentVisionFrame = std::move(context);
     m_visionFrameInFlight = true;
     FrozenVisionFrameContext &current = *m_currentVisionFrame;
+    current.modelGeneration = m_localRegistrationGeneration;
     const bool isCorrection =
         current.purpose == RuntimeTrackingPurpose::OnlineCorrection
         || current.purpose == RuntimeTrackingPurpose::OfflineCorrection;
@@ -2276,6 +2306,8 @@ void CRuntimeCoordinator::beginCorrectionSession(CorrectionPurpose purpose)
     m_correctionSession.sessionId = m_nextCorrectionSessionId;
     m_correctionSession.purpose = purpose;
     m_correctionSession.active = true;
+    m_localRegistrationFaulted = false;
+    resetOnlineLocalRegistration();
 
     // KCF 工作期间独占逐帧同步通道。清除尚未派发的普通实时状态，但保留
     // m_latestRobotState，待纠偏会话结束后从最新快照恢复实时显示。
@@ -2308,6 +2340,7 @@ void CRuntimeCoordinator::invalidateCorrectionSession(
     m_correctionSession.active = false;
     m_correctionSession.visionTrackingActive = false;
     m_correctionSession.onlineControlWindowActive = false;
+    resetOnlineLocalRegistration();
     m_pendingOfflineCorrectionJobName.clear();
     if (m_trackingPurpose == RuntimeTrackingPurpose::OnlineCorrection
         || m_trackingPurpose == RuntimeTrackingPurpose::OfflineCorrection) {
@@ -2673,6 +2706,9 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
     const auto synchronizedObservation = current.synchronizedObservation;
     m_currentVisionFrame.reset();
     m_visionFrameInFlight = false;
+    if (current.purpose == RuntimeTrackingPurpose::OnlineCorrection) {
+        submitOnlineLocalRegistration(current);
+    }
     if (isCorrection) {
         emitCorrectionSyncState(
             CorrectionSyncState::VisionConsumed,
