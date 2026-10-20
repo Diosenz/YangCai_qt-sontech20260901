@@ -1,0 +1,1 @@
+timestamp_ms	update_index	batch_index	segment_index	phase	enabled	attempted	applied	flush	fit_count	model_count	pending_count	released_count	rms_mm	matrix_present	m00	m01	m02	m03	m10	m11	m12	m13	m20	m21	m22	m23	m30	m31	m32	m33	message
