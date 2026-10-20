@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -41,6 +41,8 @@ namespace i2r_rlc::control {
 struct OnlineCorrectionFollowResult {
     bool valid = false;
     bool completed = false;
+    /// @brief 仅普通实时命令成功生成时填充的目标几何快照。
+    OnlineCorrectionFollowDiagnostic diagnostic;
     /// @brief 本次实时计算使用的 `_W` 示教点索引，供运行诊断和回归测试使用。
     int taughtPointIndex = -1;
     robot_comm::RobotRealtimeCorrectionCommand command;

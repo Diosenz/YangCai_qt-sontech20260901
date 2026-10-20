@@ -429,6 +429,7 @@ CKcfTracker::CKcfTracker(
 
 void CKcfTracker::init(const cv::Rect &roi, cv::Mat image)
 {
+    m_updateDiagnostic = {};
     m_modify_flag = false;
     m_imageCount = 1;
     m_roi = roi;
@@ -505,8 +506,14 @@ bool CKcfTracker::hasSimulatedTemplate() const
     return !m_imageSim.empty() && m_imageSimROI.width > 0 && m_imageSimROI.height > 0;
 }
 
+const CKcfUpdateDiagnostic &CKcfTracker::lastUpdateDiagnostic() const
+{
+    return m_updateDiagnostic;
+}
+
 cv::Rect CKcfTracker::update(cv::Mat image)
 {
+    m_updateDiagnostic = {};
     normalizeImage(image);
     clampRoiToImage(image);
 
@@ -578,9 +585,13 @@ cv::Rect CKcfTracker::update(cv::Mat image)
     m_roi.x += offset.x * static_cast<float>(m_cell_size) * m_scale;
     m_roi.y += offset.y * static_cast<float>(m_cell_size) * m_scale;
 
+    m_updateDiagnostic.hasResponse = true;
+    m_updateDiagnostic.responsePeak = peakValue;
+    m_updateDiagnostic.responseRoi = m_roi;
     if (std::abs(m_roi.x - previousTopLeft.x) > 0.5F * m_roi.width
         || std::abs(m_roi.y - previousTopLeft.y) > 0.5F * m_roi.height)
     {
+        m_updateDiagnostic.correlationJumpRejected = true;
         m_roi.x = previousTopLeft.x;
         m_roi.y = previousTopLeft.y;
     }
@@ -592,10 +603,12 @@ cv::Rect CKcfTracker::update(cv::Mat image)
         initKF();
     }
 
+    m_updateDiagnostic.beforeFusionRoi = m_roi;
     double tempX[2] = {0.0, 0.0}; //状态矩阵
     double tempY[2] = {0.0, 0.0}; //观测矩阵
     if (!m_Kal_init)
     {
+        m_updateDiagnostic.kalmanSeeded = true;
         m_Kal_init = true;
         tempX[0] = tempY[0] = m_roi.x;
         tempX[1] = tempY[1] = m_roi.y;
@@ -639,6 +652,11 @@ cv::Rect CKcfTracker::update(cv::Mat image)
             m_filter->m_X = RMatrix::Matrix(2, 1, tempX);
             m_filter->m_Y = RMatrix::Matrix(2, 1, tempY);
             m_filter->Kalfilter();
+            m_updateDiagnostic.fusionApplied = true;
+            m_updateDiagnostic.normalizedPeak = normalizedPeak;
+            m_updateDiagnostic.observationNoise = m_filter->m_cR;
+            m_updateDiagnostic.gainX = m_filter->m_K.val[0][0];
+            m_updateDiagnostic.gainY = m_filter->m_K.val[1][1];
         }
     }
 
@@ -649,6 +667,7 @@ cv::Rect CKcfTracker::update(cv::Mat image)
         if (std::abs(m_roi.x - previousTopLeft.x) > 0.5F * m_roi.width
             || std::abs(m_roi.y - previousTopLeft.y) > 0.5F * m_roi.height)
         {
+            m_updateDiagnostic.fusionJumpRejected = true;
             m_roi.x = previousTopLeft.x;
             m_roi.y = previousTopLeft.y;
         }
@@ -675,6 +694,8 @@ cv::Rect CKcfTracker::update(cv::Mat image)
         train(currentFeature, m_interp_factor);
     }
 
+    m_updateDiagnostic.finalRoi = m_roi;
+    m_updateDiagnostic.completed = true;
     ++m_imageCount;
     return toIntegerRect(m_roi);
 }

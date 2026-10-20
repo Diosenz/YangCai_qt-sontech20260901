@@ -252,6 +252,40 @@ struct OnlineCorrectionOptions {
     };
 };
 
+/**
+ * @brief 单次释放批的诊断值快照，仅随事件传出，不留在会话状态中。
+ * @details 坐标均为变位机末节系、mm。矩阵按行展开，将检测映射到参考模型；
+ *          采用时算法取其逆变换模型。候选矩阵存在不代表已用于目标轨迹。
+ */
+struct OnlineCorrectionIcpBatchDiagnostic {
+    bool enabled = true;
+    bool attempted = false;
+    bool applied = false;
+    bool flush = false;
+    std::optional<std::array<double, 16>> detectionToModel;
+    std::optional<double> rmsErrorMm;
+    /// @brief 实际送入求解器的降采样检测窗口，包含历史。
+    std::vector<OnlineCorrectionPoint> fitPoints;
+    /// @brief 本次求解所用参考模型，已包含全局与起点修正。
+    std::vector<OnlineCorrectionPoint> modelPoints;
+    /// @brief 尚未释放的原始新点及实际释放给跟随器的点列。
+    std::vector<OnlineCorrectionDetectionSample> pendingSamples;
+    std::vector<OnlineCorrectionDetectionSample> releasedSamples;
+    std::string message;
+};
+
+/** @brief 跟随器实际使用的目标直线及垂足，末节系、mm；仅生成普通 P 时有效。 */
+struct OnlineCorrectionFollowDiagnostic {
+    bool valid = false;
+    OnlineCorrectionPoint current;
+    OnlineCorrectionPoint first;
+    OnlineCorrectionPoint directionPoint;
+    OnlineCorrectionPoint foot;
+    OnlineCorrectionPoint futureFoot;
+    double s1Deg = 0.0;
+    double s2Deg = 0.0;
+};
+
 /** @brief 最近一次在线轨迹 ICP 诊断；只在控制线程更新。 */
 struct OnlineCorrectionIcpStatus {
     bool enabled = false;
@@ -324,6 +358,10 @@ struct OnlineCorrectionUpdate {
     bool succeeded = true;
     /// @brief 此次含新 ICP 诊断，记录器不应重复记录普通状态快照。
     bool onlineIcpUpdated = false;
+    /// @brief 本事件释放的各个批次，保留同次 seam 切换产生的多个结果。
+    std::vector<OnlineCorrectionIcpBatchDiagnostic> onlineIcpBatches;
+    /// @brief 实际参与本次 P 计算的目标几何，区别于刚释放而尚未消费的批次。
+    OnlineCorrectionFollowDiagnostic followDiagnostic;
     /// @brief 事件处理后的状态机阶段。
     OnlineCorrectionPhase phase = OnlineCorrectionPhase::Idle;
     /// @brief 事件处理后的完整会话快照。

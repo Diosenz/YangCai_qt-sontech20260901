@@ -254,6 +254,8 @@ private:
     bool makeObservation(
         qint64 frameId,
         digital_twin::DigitalTwinVisionLaserObservation *observation);
+    quint64 m_diagnosticFrameCount = 0;
+    quint64 m_diagnosticImageCount = 0;
     RuntimeTrackingOptions m_options;
     vision::WeldProjectionContext m_projectionContext;
     robot_comm::RobotState m_robotState;

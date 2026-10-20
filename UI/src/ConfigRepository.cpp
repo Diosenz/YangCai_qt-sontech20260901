@@ -279,6 +279,90 @@ bool ConfigRepository::loadOnlineIcpEnabled(
     return true;
 }
 
+bool ConfigRepository::loadOnlineVisionDiagnostics(
+    COnlineVisionDiagnosticOptions &options, QString *errorMessage) const
+{
+    if (errorMessage != nullptr) {
+        errorMessage->clear();
+    }
+    QFile file(m_paths.workflowsDir().filePath(
+        QStringLiteral("online_vision_diagnostics.txt")));
+    if (!file.exists()) {
+        return true;
+    }
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        if (errorMessage != nullptr) {
+            *errorMessage = QStringLiteral("无法读取在线视觉诊断配置：%1").arg(file.fileName());
+        }
+        return false;
+    }
+    auto parsed = options;
+    QSet<QString> keys;
+    const QString content = QString::fromUtf8(file.readAll());
+    bool valid = file.error() == QFile::NoError;
+    int lineNumber = 0;
+    for (const QString &rawLine : content.split(QLatin1Char('\n'))) {
+        ++lineNumber;
+        QString line = rawLine.trimmed();
+        if (line.startsWith(QChar(0xfeff))) {
+            line.remove(0, 1);
+        }
+        if (line.isEmpty() || line.startsWith(QLatin1Char('#'))) {
+            continue;
+        }
+        const int separator = line.indexOf(QLatin1Char('='));
+        const QString key = line.left(separator).trimmed();
+        const QString value = line.mid(separator + 1).trimmed();
+        valid = valid && separator > 0 && !keys.contains(key);
+        keys.insert(key);
+        if (key == QStringLiteral("enabled") || key == QStringLiteral("images_enabled")) {
+            valid = valid && (value == QStringLiteral("true") || value == QStringLiteral("false"));
+            if (key == QStringLiteral("enabled")) {
+                parsed.enabled = value == QStringLiteral("true");
+            } else {
+                parsed.imagesEnabled = value == QStringLiteral("true");
+            }
+        } else {
+            bool converted = false;
+            const qint64 number = value.toLongLong(&converted);
+            valid = valid && converted;
+            if (key == QStringLiteral("image_sample_every_n")) {
+                valid = valid && number >= 1 && number <= 1000000;
+                if (valid) {
+                    parsed.imageSampleEveryN = static_cast<int>(number);
+                }
+            } else if (key == QStringLiteral("max_image_pairs")) {
+                valid = valid && number >= 0 && number <= 10000;
+                if (valid) {
+                    parsed.maxImagePairs = static_cast<int>(number);
+                }
+            } else if (key == QStringLiteral("max_image_bytes")) {
+                valid = valid && number >= 0 && number <= 1024LL * 1024 * 1024;
+                if (valid) {
+                    parsed.maxImageBytes = number;
+                }
+            } else {
+                valid = false;
+            }
+        }
+        if (!valid) {
+            if (errorMessage != nullptr) {
+                *errorMessage = QStringLiteral("在线视觉诊断配置第 %1 行无效：%2")
+                    .arg(lineNumber).arg(file.fileName());
+            }
+            return false;
+        }
+    }
+    if (!valid) {
+        if (errorMessage != nullptr) {
+            *errorMessage = QStringLiteral("在线视觉诊断配置读取失败：%1").arg(file.fileName());
+        }
+        return false;
+    }
+    options = parsed;
+    return true;
+}
+
 QString ConfigRepository::workpieceOnlineWorkPathFile(const WorkpieceProfile& profile) const
 {
     return m_paths.workpieceTrajectoryDir().filePath(

@@ -398,6 +398,7 @@ private:
         camera::CameraFrame frame;
         robot_comm::RobotState robotState;
         bool hasRobotState = false;
+        qint64 robotStateReceivedMs = -1;
         RuntimeTrackingPurpose purpose = RuntimeTrackingPurpose::None;
         quint64 correctionSessionId = 0;
         int localizationSegmentIndex = -1;
@@ -514,6 +515,7 @@ private:
     int m_cameraCaptureIntervalMs = 33;
     std::unique_ptr<robot_comm::IRobotCommandTransport> m_robotTransport;
     std::unique_ptr<digital_twin::IRobotSimTransport> m_robotSimTransport;
+    qint64 m_latestRobotStateReceivedMs = -1;
     robot_comm::RobotState m_latestRobotState;
     bool m_hasLatestRobotState = false;
     bool m_hasLatestCameraFrame = false;

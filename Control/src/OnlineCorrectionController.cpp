@@ -107,6 +107,15 @@ OnlineCorrectionExceptionResult processOnlineSamples(
     result.valid = true;
     result.samples = samples;
     result.message = "online ICP disabled; raw detection samples used";
+    if (!samples.empty()) {
+        OnlineCorrectionIcpBatchDiagnostic diagnostic;
+        diagnostic.enabled = false;
+        diagnostic.flush = flush;
+        diagnostic.pendingSamples = samples;
+        diagnostic.releasedSamples = samples;
+        diagnostic.message = result.message;
+        result.batches.push_back(std::move(diagnostic));
+    }
     return result;
 }
 
@@ -268,6 +277,8 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
 
     OnlineCorrectionUpdate update = makeUpdate(follow.valid, follow.message);
     update.onlineIcpUpdated = true;
+    update.onlineIcpBatches = processed.batches;
+    update.followDiagnostic = follow.diagnostic;
     if (!follow.command.valid && processed.valid) {
         update.succeeded = true;
         update.message = processed.message + "; " + follow.message;
@@ -278,6 +289,9 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
         setPhase(OnlineCorrectionPhase::SegmentFinishing, "online segment is finishing");
         update = makeUpdate(true, m_state.message);
         update.onlineIcpUpdated = true;
+        update.onlineIcpBatches = processed.batches;
+        update.followDiagnostic = follow.diagnostic;
+        update.taughtPointIndex = follow.taughtPointIndex;
         update.realtimeCommand = follow.command;
         update.realtimeCommand.valid = true;
         update.realtimeCommand.onlineEndFlag = 1;
@@ -524,6 +538,7 @@ OnlineCorrectionUpdate COnlineCorrectionController::finishOnlineSegment(
     setPhase(OnlineCorrectionPhase::SegmentFinishing, "online segment finish requested");
     OnlineCorrectionUpdate update = makeUpdate(true, m_state.message);
     update.onlineIcpUpdated = true;
+    update.onlineIcpBatches = tail.batches;
     update.realtimeCommand.valid = true;
     update.realtimeCommand.speedOverride = 10000;
     update.realtimeCommand.onlineEndFlag = 1;

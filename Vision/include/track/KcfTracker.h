@@ -56,6 +56,28 @@ enum class KcfFeatureMode
 };
 
 /**
+ * @brief 单次 update 的只读诊断快照；坐标为原图 ROI 左上角，单位 pixel。
+ *
+ * 标记决定字段是否可用；未融合时 gain/noise 不代表实际权重。
+ */
+struct CKcfUpdateDiagnostic {
+    bool hasResponse = false;
+    bool completed = false;
+    bool kalmanSeeded = false;
+    bool fusionApplied = false;
+    bool correlationJumpRejected = false;
+    bool fusionJumpRejected = false;
+    double responsePeak = 0.0;
+    double normalizedPeak = 0.0;
+    double observationNoise = 0.0;
+    double gainX = 0.0;
+    double gainY = 0.0;
+    cv::Rect2f responseRoi;
+    cv::Rect2f beforeFusionRoi;
+    cv::Rect2f finalRoi;
+};
+
+/**
  * @brief Kernelized Correlation Filter 跟踪器。
  *
  * 构造函数、`init` 和 `update` 保持原工程 KCFTracker 的调用方式。所有坐标单位均为 pixel。
@@ -115,6 +137,9 @@ public:
      * @return `true` 表示已设置非空仿真图像和有效 ROI。
      */
     bool hasSimulatedTemplate() const;
+
+    /// @brief 返回最近一次 update 的阶段快照；仅可在跟踪线程中读取。
+    const CKcfUpdateDiagnostic &lastUpdateDiagnostic() const;
 
     /// @brief KCF 模板更新插值因子，取值通常为 `[0, 1]`。
     float m_interp_factor = 0.012F;
@@ -423,6 +448,7 @@ private:
         float primarySigma,
         float secondarySigma);
 
+    CKcfUpdateDiagnostic m_updateDiagnostic;
     cv::Mat m_alphaF;
     cv::Mat m_prob;
     cv::Mat m_tmpl;

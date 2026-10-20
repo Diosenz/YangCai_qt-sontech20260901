@@ -322,6 +322,7 @@ void CRuntimeCoordinator::configureOnlineCorrection(
 RuntimeTrackingOptions CRuntimeCoordinator::onlineTrackingOptions() const
 {
     RuntimeTrackingOptions options = m_trackingOptions;
+    options.visionDiagnostics = m_pendingOnlineCorrectionConfiguration.visionDiagnostics;
     if (m_onlinePositionerCalibration.has_value()) {
         options.positionerCalibration = *m_onlinePositionerCalibration;
     }
@@ -421,6 +422,7 @@ void CRuntimeCoordinator::publishCameraFrame(const camera::CameraFrame &frame)
 
 void CRuntimeCoordinator::publishRobotState(const robot_comm::RobotState &state)
 {
+    m_latestRobotStateReceivedMs = QDateTime::currentMSecsSinceEpoch();
     m_latestRobotState = state;
     m_hasLatestRobotState = true;
     updateGlobalLocalizationSegmentState(state);
@@ -1846,6 +1848,7 @@ void CRuntimeCoordinator::applyStandaloneGlobalLocalization(
 
 void CRuntimeCoordinator::handleRobotState(const robot_comm::RobotState &state)
 {
+    m_latestRobotStateReceivedMs = QDateTime::currentMSecsSinceEpoch();
     m_latestRobotState = state;
     m_hasLatestRobotState = true;
     processOnlineCorrectionStartState(state);
@@ -2025,6 +2028,7 @@ void CRuntimeCoordinator::enqueueVisionFrame(const camera::CameraFrame &frame)
     FrozenVisionFrameContext context;
     context.frame = frame;
     context.robotState = m_latestRobotState;
+    context.robotStateReceivedMs = m_latestRobotStateReceivedMs;
     context.hasRobotState = m_hasLatestRobotState;
     context.purpose = m_trackingPurpose;
     context.localizationSegmentIndex =
@@ -2679,7 +2683,24 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
                 : nullptr);
     }
 
-    RuntimeTrackingResult displayResult = result;
+    RuntimeTrackingResult routedResult = result;
+    if (current.purpose == RuntimeTrackingPurpose::OnlineCorrection
+        && m_pendingOnlineCorrectionConfiguration.visionDiagnostics.enabled
+        && !routedResult.diagnostic.has_value()) {
+        routedResult.diagnostic.emplace();
+    }
+    if (routedResult.diagnostic.has_value()) {
+        routedResult.diagnostic->cameraTimestampMs = current.frame.timestamp.isValid()
+            ? current.frame.timestamp.toMSecsSinceEpoch() : -1;
+        routedResult.diagnostic->robotState = current.robotState;
+        routedResult.diagnostic->robotStateReceivedMs = current.robotStateReceivedMs;
+    }
+    RuntimeTrackingResult displayResult = routedResult;
+    // 图像只交给记录线程；UI 使用独立的同帧原图展示路径。
+    if (displayResult.diagnostic.has_value()) {
+        displayResult.diagnostic->sourceImage = {};
+        displayResult.diagnostic->enhancedImage = {};
+    }
     if (isCorrection && synchronizedObservation.has_value()) {
         displayResult.frameContext = RuntimeTrackingFrameContext{
             current.frame, synchronizedObservation.value()};
@@ -2697,8 +2718,8 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
         && m_onlineCorrectionWorker != nullptr) {
         QMetaObject::invokeMethod(
             m_onlineCorrectionWorker,
-            [worker = m_onlineCorrectionWorker, result]() {
-                worker->appendTrackingResult(result);
+            [worker = m_onlineCorrectionWorker, routedResult]() {
+                worker->appendTrackingResult(routedResult);
             },
             Qt::QueuedConnection);
     } else if (current.purpose == RuntimeTrackingPurpose::OfflineCorrection

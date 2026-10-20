@@ -532,6 +532,19 @@ bool testCorrectionTrackingKeepsOnlyLatestPendingFrame(QCoreApplication &app)
                 && results[0].correlation.frameId == results[0].frameId
                 && results[1].correlation.frameId == results[1].frameId,
             "Vision correlation should preserve purpose and each frozen frameId");
+        for (const auto &result : results) {
+            ok &= expectTrue(result.diagnostic.has_value() && result.frameContext.has_value(),
+                             "online results must retain frozen diagnostic inputs");
+            if (result.diagnostic.has_value() && result.frameContext.has_value()) {
+                ok &= expectTrue(result.diagnostic->cameraTimestampMs
+                                     == result.frameContext->sourceFrame.timestamp.toMSecsSinceEpoch()
+                                 && result.diagnostic->robotStateReceivedMs > 0,
+                                 "diagnostic timestamps must belong to the displayed frozen frame");
+                ok &= expectTrue(result.diagnostic->sourceImage.isNull()
+                                 && result.diagnostic->enhancedImage.isNull(),
+                                 "diagnostic image payload must not be sent to the display consumer");
+            }
+        }
     }
     return ok;
 }

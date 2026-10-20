@@ -40,6 +40,8 @@
 #include <QString>
 
 #include "CameraFrame.h"
+#include "OnlineVisionDiagnosticOptions.h"
+#include "track/LegacyOnlineKcfDetector.h"
 #include "DigitalTwinVisionTypes.h"
 #include "geometry/PositionerKinematics.h"
 #include "geometry/WeldGeometryTypes.h"
@@ -207,6 +209,8 @@ struct RuntimeTrackingOptions {
     RuntimeTrackingMethod method = RuntimeTrackingMethod::Kcf;
     /// @brief 是否启用 gap 检测；第一版只透传给 OnlineCor 状态机。
     bool enableGapDetection = false;
+    /// @brief 会话级逐帧诊断策略，仅在线纠偏链使用。
+    COnlineVisionDiagnosticOptions visionDiagnostics;
     /// @brief true 表示使用全局定位专用“整条激光线提取”链路（Gabor+Steger），而非在线纠偏 KCF 单点。
     bool globalLocateLineExtraction = false;
     /// @brief true 表示 Vision 必须在 traflag==1 的 STARTDETPRG 窗口内跟踪。
@@ -233,6 +237,8 @@ struct RuntimeOnlineCorrectionConfiguration {
     std::optional<vision::PositionerCalibration> positionerCalibrationSnapshot;
     /// @brief 在线纠偏会话记录根目录；生产路径使用 `output/online_correction`。
     std::string diagnosticOutputDirectory;
+    /// @brief 启动时固定的诊断开关与图像采样上限。
+    COnlineVisionDiagnosticOptions visionDiagnostics;
 };
 
 /**
@@ -276,6 +282,23 @@ struct RuntimeTrackingFrameContext {
 };
 
 /**
+ * @brief 与 Vision 结果一起传递的诊断值对象；图像仅在采样帧持有。
+ *
+ * robotState 是查询 RobotSim/构建投影实际使用的冻结位姿。
+ * robotStateReceivedMs 是 coordinator 收到状态的本机时间，不是控制柜采样时刻。
+ */
+struct CRuntimeTrackingDiagnostic {
+    vision::CLegacyOnlineKcfDiagnostic algorithm;
+    qint64 cameraTimestampMs = -1;
+    qint64 robotStateReceivedMs = -1;
+    qint64 processingStartedMs = -1;
+    qint64 processingFinishedMs = -1;
+    robot_comm::RobotState robotState;
+    QImage sourceImage;
+    QImage enhancedImage;
+};
+
+/**
  * @brief 视觉跟踪线程单帧输出。
  */
 struct RuntimeTrackingResult {
@@ -287,6 +310,8 @@ struct RuntimeTrackingResult {
     qint64 frameId = -1;
     /// @brief 正式纠偏结果的会话/purpose/frame 关联；其他路径保持默认值。
     RuntimeVisionCorrelation correlation;
+    /// @brief 关闭诊断时为空；不能用其他帧填补缺失阶段。
+    std::optional<CRuntimeTrackingDiagnostic> diagnostic;
     /// @brief 纠偏显示必须具备的完整上下文；禁止缺失时改用 UI 最新相机帧。
     std::optional<RuntimeTrackingFrameContext> frameContext;
     /// @brief 焊缝图像点 X，单位 pixel。

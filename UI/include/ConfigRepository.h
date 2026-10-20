@@ -11,6 +11,7 @@
 #include <QVector>
 
 #include "AppPaths.h"
+#include "OnlineVisionDiagnosticOptions.h"
 #include "geometry/PositionerKinematics.h"
 #include "SensorCalibrationParser.h"
 
@@ -104,6 +105,14 @@ public:
      * 本接口只读取配置；新会话启动时生效，不切换正在运行的会话。
      */
     bool loadOnlineIcpEnabled(bool &enabled, QString *errorMessage) const;
+
+    /**
+     * @brief 读取 online_vision_diagnostics.txt；缺失时使用默认值。
+     *
+     * 严格校验重复/未知键及限额；失败不修改输出。只在下一次会话启动生效。
+     */
+    bool loadOnlineVisionDiagnostics(
+        COnlineVisionDiagnosticOptions &options, QString *errorMessage) const;
 
     /// @brief 根据在线纠偏示教基名生成 `_W.txt` 路径。
     QString workpieceOnlineWorkPathFile(const WorkpieceProfile& profile) const;

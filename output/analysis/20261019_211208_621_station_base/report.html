@@ -1,0 +1,21 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>21:12 五个 P 点实验分析</title><style>body{font:16px/1.8 system-ui,sans-serif;color:#203345;max-width:1100px;margin:30px auto;padding:0 22px}table{border-collapse:collapse;width:100%;margin:18px 0}td,th{padding:9px;border-bottom:1px solid #d4dfe8;text-align:right}td:first-child,th:first-child{text-align:left}a{color:#0072b2}iframe{width:100%;height:860px;border:1px solid #d4dfe8}</style>
+<h1>21:12 五个 P 点实验：轨迹与距离分析</h1>
+<p><a href="interactive_3d/index.html">打开可旋转四曲线三维图</a> · <a href="metrics.csv">全部指标</a> · <a href="results.json">数据口径与来源</a></p>
+<p>工件示教：20260404CHUFENGKOU1_W.txt（1368 点）；控制点：20260404CHUFENGKOU1_T.txt（5 点）。在线 ICP=true。</p>
+<p>TCP：2026-10-19T21:13:00.502 至 2026-10-19T21:16:47.344，2582 点；KCF：2026-10-19T21:13:00.494 至 2026-10-19T21:16:47.477，3188 点。排除结束等待阶段 1097 条 TCP。</p>
+<h2>本轮距离，单位 mm</h2><table><tr><th>查询点 → 参考</th><th>平均</th><th>最大</th><th>RMS</th><th>P95</th></tr><tr><td>TCP → 移动后原始示教折线</td><td>2.705</td><td>4.820</td><td>2.838</td><td>4.196</td></tr><tr><td>KCF → 移动后原始示教折线</td><td>2.911</td><td>7.216</td><td>3.001</td><td>4.082</td></tr><tr><td>TCP → 整圈原始 KCF 折线</td><td>0.804</td><td>9.423</td><td>1.428</td><td>3.184</td></tr><tr><td>KCF → 整圈 TCP 折线</td><td>0.836</td><td>6.789</td><td>1.365</td><td>3.377</td></tr><tr><td>TCP → 移动后示教拟合圆</td><td>2.672</td><td>4.723</td><td>2.802</td><td>4.229</td></tr></table>
+<p>逐点到全部参考线段求最短三维距离，不按行号或相同时刻配对，不删异常点、不平滑。拟合圆距离单独列出。</p>
+<h2>与上午实验对照，单位 mm</h2><table><tr><th>比较项</th><th>上午平均</th><th>本轮平均</th><th>上午最大</th><th>本轮最大</th></tr><tr><td>TCP → 移动后原始示教折线</td><td>1.701</td><td>2.705</td><td>3.977</td><td>4.820</td></tr><tr><td>KCF → 移动后原始示教折线</td><td>1.823</td><td>2.911</td><td>5.224</td><td>7.216</td></tr><tr><td>TCP → 整圈原始 KCF 折线</td><td>0.410</td><td>0.804</td><td>3.967</td><td>9.423</td></tr><tr><td>KCF → 整圈 TCP 折线</td><td>0.495</td><td>0.836</td><td>5.366</td><td>6.789</td></tr></table>
+<h2>首段姿态变化与分段观察</h2><p>本轮 S2 速度中位约 1.591°/s，上午约 0.525°/s。首段（JBI 行 13，21:13:00.618—21:13:56.940）工具 Rx 约 −176.19°→−160.68°，Ry 约 41.34°→30.57°；后面三段姿态接近恒定。初始下发的 P1/P2 目标也存在此姿态差，因此不能沿用上午全程近固定姿态的前提。</p>
+<table><tr><th>反馈程序行</th><th>TCP 点数</th><th>TCP→KCF 平均</th><th>TCP→KCF 最大</th><th>TCP→移动示教平均</th></tr><tr><td>JBI 行 13</td><td>638</td><td>1.791</td><td>9.423</td><td>2.362</td></tr><tr><td>JBI 行 14</td><td>648</td><td>0.457</td><td>2.521</td><td>2.606</td></tr><tr><td>JBI 行 15</td><td>652</td><td>0.486</td><td>2.498</td><td>3.588</td></tr><tr><td>JBI 行 16</td><td>643</td><td>0.495</td><td>2.739</td><td>2.247</td></tr></table>
+<p>首段 TCP/KCF 几何差距更大，但移动示教最大距离发生在第三段 2026-10-19T21:15:38.780；不是同一种偏差。速度和姿态变化与差距同时存在，现有数据不能据此单独认定原因。</p>
+<h2>9.423 mm 最大距离的首尾缺口影响</h2><p>KCF 原始轨迹没有闭合：首末点相距 17.143 mm，最大未采样扇区 185.6152°—192.3602°（6.7450°）。TCP 最大距离点的材料角为 188.8934°，落在该缺口中。主结果保留原始开放折线，没有人为补线。</p>
+<p>只作敏感性检验：人工连接 KCF 末点与首点会影响 46 个 TCP 点，最大距离变为 4.984 mm。补线不是实测数据，不替代主指标；9.423 mm 不能直接称为纯机器人跟随误差。</p>
+<p>日志中 ICP 共尝试 383 次、应用 366 次；17 次回退中有 13 次集中在闭环尾段附近。尾段目标可能更多回退到原始检测点，这不等于证明 KCF 不准确。</p>
+<h2>参考与解释边界</h2><p>原示教平衡拟合半径 143.717045 mm；本轮 KCF 平衡拟合半径 140.893173 mm。移动后示教只做刚体变换，保留原半径。TCP 不参与参考定位。TCP/KCF 角度覆盖约 354.50°/353.25°。</p>
+<p>移动参考由本轮 KCF 的圆心与法线确定，属于内部参考，不能证明绝对焊缝精度。近圆轮廓无法唯一确定绕法线转角；本图采用最小法线对齐，不另拟合圆周相位。整圈最近距离不代表实时延迟误差。</p>
+<p>动态 KCF 固定基座坐标使用结果记录时间插值外轴，只是近似；主距离在材料/末节系计算，图中则统一到首个有效 TCP 外轴姿态 S1=0.0035°、S2=179.9958°。</p>
+<p>实验名称来自用户提供目录；日志不包含现场 JBI/exe 版本，不能仅由名称确认版本差异。日志仅记录配置路径；示教形状已由初始轨迹逐点验证，标定参数仍缺现场冻结副本。</p>
+<p>会话最终状态：error；在线纠偏超时：等待机器人主程序停止超过120秒。当前sStart=1, corflag=0, detflag=0, offline=0, JBI行=21。。结束等待超时不参与主轨迹统计。</p>
+<iframe src="interactive_3d/index.html" title="四曲线三维交互图"></iframe></html>

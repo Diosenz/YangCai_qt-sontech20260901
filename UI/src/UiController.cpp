@@ -1520,6 +1520,15 @@ void UiController::onOnlineCorrectionConfigurationSelected(
         return;
     }
 
+    QString visionDiagnosticError;
+    if (!m_configRepository.loadOnlineVisionDiagnostics(
+            configuration.visionDiagnostics, &visionDiagnosticError)) {
+        m_onlineCorrectionConfigured = false;
+        appendWarning(visionDiagnosticError);
+        showLegacyWarningPrompt(QStringLiteral("提示!"), visionDiagnosticError);
+        return;
+    }
+
     const auto trajectory =
         i2r_rlc::control::COnlineCorrectionTrajectoryPlanner::loadTrajectory(
             configuration.trajectoryRequest);

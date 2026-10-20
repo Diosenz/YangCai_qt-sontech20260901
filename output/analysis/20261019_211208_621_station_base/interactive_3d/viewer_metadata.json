@@ -1,0 +1,25 @@
+{
+  "session": "20261019_211208_621",
+  "common_station_base_pose_deg": [
+    0.0035,
+    179.9958
+  ],
+  "original_teach_file": "20260404CHUFENGKOU1_W.txt",
+  "original_radius_mm": 143.71704466934037,
+  "relocated_radius_mm": 143.71704466934037,
+  "trace_counts": [
+    2582,
+    3188,
+    1441,
+    1441,
+    1368,
+    1368
+  ],
+  "inputs_sha256": {
+    "results.json": "d7eac826c16f6d7a70e24f2b9520d665b484c85d1b000f760b08f99626dd612f",
+    "tcp_coordinates.csv": "068db066afe6329c91024e87b125b1493ed7e256e6d2aabc3924f2240b237325",
+    "kcf_coordinates.csv": "842480f9bfdd9048e94c12551b42871e1605460831210acc018faa02d4c13467",
+    "relocated_teach_material_frame.csv": "0437132b89a6e38e8f6f2526f753f5b8fc585e5254c1dfbcf3f6b80612b823e2"
+  },
+  "original_teach_sha256": "2001f5d9e4d14e8ca14da584d47b9c870a9f2fcb8c8912c7d37d014267ba09b2"
+}

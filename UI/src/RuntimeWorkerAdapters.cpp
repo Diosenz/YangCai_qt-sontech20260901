@@ -1171,6 +1171,8 @@ void CVisionTrackingWorkerAdapter::configure(
     const RuntimeTrackingOptions &options,
     const vision::WeldProjectionContext &projectionContext)
 {
+    m_diagnosticFrameCount = 0;
+    m_diagnosticImageCount = 0;
     m_options = options;
     m_options.method = RuntimeTrackingMethod::Kcf;
     m_projectionContext = projectionContext;
@@ -1263,6 +1265,16 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
     result.robotJobLine = m_robotState.usJobLine;
     result.localizationSegmentIndex = m_currentLocalizationSegmentIndex;
     result.correlation = m_activeCorrelation;
+    if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection
+        && m_options.visionDiagnostics.enabled) {
+        if (!result.diagnostic.has_value()) {
+            result.diagnostic.emplace();
+            result.diagnostic->robotState = m_robotState;
+            result.diagnostic->cameraTimestampMs = frame.timestamp.isValid()
+                ? frame.timestamp.toMSecsSinceEpoch() : -1;
+        }
+        result.diagnostic->processingFinishedMs = QDateTime::currentMSecsSinceEpoch();
+    }
     emit trackingResultReady(result);
 }
 
@@ -1333,6 +1345,15 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     RuntimeTrackingResult result;
     result.frameId = frame.frameId;
     result.posflag = m_robotState.posflag;
+    const bool diagnosticsEnabled = m_options.visionDiagnostics.enabled
+        && m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
+    if (diagnosticsEnabled) {
+        result.diagnostic.emplace();
+        result.diagnostic->robotState = m_robotState;
+        result.diagnostic->cameraTimestampMs = frame.timestamp.isValid()
+            ? frame.timestamp.toMSecsSinceEpoch() : -1;
+        result.diagnostic->processingStartedMs = QDateTime::currentMSecsSinceEpoch();
+    }
 
     const QImage image = frame.image.isNull() ? frame.previewImage : frame.image;
     const cv::Mat gray8 = qImageToGray8(image);
@@ -1375,6 +1396,24 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     detectorOptions.enableGapDetection = m_options.enableGapDetection;
     const auto detected = m_detector.process(
         gray8, observation, projectionContext, detectorOptions);
+    if (diagnosticsEnabled) {
+        result.diagnostic->algorithm = detected.diagnostic;
+        const auto &policy = m_options.visionDiagnostics;
+        const bool sampleImage = policy.imagesEnabled && policy.maxImageBytes > 0
+            && policy.imageSampleEveryN > 0 && policy.maxImagePairs > 0
+            && m_diagnosticImageCount < static_cast<quint64>(policy.maxImagePairs)
+            && (m_diagnosticFrameCount % static_cast<quint64>(policy.imageSampleEveryN)) == 0;
+        ++m_diagnosticFrameCount;
+        if (sampleImage && !detected.processedImage.empty()) {
+            // Mat 数据属于检测器输出；copy 后才可跨线程交给后台写入器。
+            result.diagnostic->sourceImage = image;
+            result.diagnostic->enhancedImage = QImage(
+                detected.processedImage.data, detected.processedImage.cols,
+                detected.processedImage.rows, static_cast<int>(detected.processedImage.step),
+                QImage::Format_Grayscale8).copy();
+            ++m_diagnosticImageCount;
+        }
+    }
     result.imageXPixel = detected.weldPointPixel.x;
     result.imageYPixel = detected.weldPointPixel.y;
     result.sample.point = control::OnlineCorrectionPoint{

@@ -153,6 +153,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
     const LegacyOnlineKcfOptions &options)
 {
     LegacyOnlineKcfResult result;
+    result.diagnostic.imageSize = gray8.size();
     if (gray8.empty() || gray8.type() != CV_8UC1) {
         result.message = "input frame is not CV_8UC1";
         return result;
@@ -201,6 +202,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
     const cv::Rect2f previous = m_tracker->m_roi;
     const bool wasInitialized = m_initialized;
     if (!m_initialized || m_framesSinceInitialize > kReinitializeIntervalFrame) {
+        result.diagnostic.templateReinitialized = true;
         const cv::Point2d previousWeldPoint =
             weldPointFromRoi(previous, m_templateWeldAnchor);
         m_tracker->init(
@@ -238,15 +240,28 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
     m_tracker->m_Kalman_status_y =
         simulatedWeldPoint.py - m_tracker->m_roi.height * m_templateWeldAnchor.y;
 
+    result.diagnostic.attempted = true;
+    result.diagnostic.gaborSucceeded = gaborSucceeded;
+    result.diagnostic.enhancementRoi = currentRoi;
+    result.diagnostic.templateAnchor = m_templateWeldAnchor;
+    result.diagnostic.simulatedPoint = simulatedPoint;
+    result.diagnostic.framesSinceInitialize = m_framesSinceInitialize;
     try {
         result.trackedRoi = m_tracker->update(result.processedImage);
         ++m_framesSinceInitialize;
     } catch (const std::exception &exception) {
+        result.diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
         result.message = std::string("KCF exception: ") + exception.what();
         return result;
     }
 
+    result.diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
+    result.diagnostic.responsePoint = weldPointFromRoi(
+        result.diagnostic.tracker.responseRoi, m_templateWeldAnchor);
+    result.diagnostic.beforeFusionPoint = weldPointFromRoi(
+        result.diagnostic.tracker.beforeFusionRoi, m_templateWeldAnchor);
     result.weldPointPixel = weldPointFromRoi(m_tracker->m_roi, m_templateWeldAnchor);
+    result.diagnostic.finalPoint = result.weldPointPixel;
     if (!std::isfinite(result.weldPointPixel.x)
         || !std::isfinite(result.weldPointPixel.y)
         || result.weldPointPixel.x < 0.0 || result.weldPointPixel.x >= gray8.cols

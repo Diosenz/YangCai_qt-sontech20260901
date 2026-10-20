@@ -30,10 +30,29 @@ struct LegacyOnlineKcfOptions {
 };
 
 /**
+ * @brief 检测器阶段快照，随本帧结果按值传递，不拥有跟踪器状态。
+ */
+struct CLegacyOnlineKcfDiagnostic {
+    bool attempted = false;
+    bool templateReinitialized = false;
+    bool gaborSucceeded = false;
+    int framesSinceInitialize = 0;
+    cv::Size imageSize;
+    cv::Rect enhancementRoi;
+    cv::Point2d templateAnchor;
+    cv::Point2d simulatedPoint;
+    cv::Point2d responsePoint;
+    cv::Point2d beforeFusionPoint;
+    cv::Point2d finalPoint;
+    CKcfUpdateDiagnostic tracker;
+};
+
+/**
  * @brief 旧在线 KCF 单帧输出。
  */
 struct LegacyOnlineKcfResult {
     bool valid = false;
+    CLegacyOnlineKcfDiagnostic diagnostic;
     /// @brief 原始图像坐标，单位 pixel；由模板内焊缝锚点恢复，不等同于 ROI 中心。
     cv::Point2d weldPointPixel;
     WeldSpacePoint stationPoint;

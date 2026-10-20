@@ -152,10 +152,48 @@ gap 仅从本批 pending 映射。求解或截段失败时保留原始新点，�
 原始点并重定位游标，记录 `online ICP phase shift` 原因；不合成跨距轨迹。
 当前参考只允许单次向前经过，达到参考尾端后继续输入会原始回退，不自动闭环重放。
 
-`summary.txt` 记录 `enable_online_icp`；`realtime_correction.txt` 沿用原列布局，
+`session_summary.txt` 记录 `enable_online_icp`；`realtime_correction.txt` 沿用原列布局，
 以 `event=online_icp` 的 message 记录 `enabled/attempted/applied/buffered/rms_mm/reason`，
 用于区分关闭、累计等待、真实求解应用和原始回退。RMS 只是匹配残差，不能作为
 机器人定位精度或收敛验收证明。
+
+### 每批 ICP 与实际跟随目标记录（2026-10-20）
+
+新的在线纠偏会话自动在原 `output/online_correction/<会话>/` 目录增加以下
+UTF-8、Tab 分隔文件，旧文件列布局保持不变：
+
+| 文件 | 内容 |
+| --- | --- |
+| `online_icp_batches.txt` | 每个释放批的时间、事件编号、批次编号、程序段、开关、求解/采用/flush 标志、点数、RMS、候选 4×4 矩阵和结果说明。 |
+| `online_icp_points.txt` | 通过 `batch_index` 关联的 `fit_input`（含历史的实际降采样拟合输入）、`reference_model`（当前参考模型，仅 valid 点送入求解）、`raw_pending`（本批原始新点）和 `released_target`（实际送入跟随队列的点列）。 |
+| `online_follow_targets.txt` | 通过 `update_index` 关联事件，记录普通 P 计算实际使用的当前位置、目标直线的 first/direction 两点、当前及预测垂足、外轴角、`_W` 索引和最终 dx/dy/dz。 |
+
+`batch_index` 从 1 开始，在会话内唯一，跨程序段继续递增；`update_index` 从 1
+开始，每次 worker 发布状态更新时递增。一事件可能释放多个批次，逐批保留，不用
+最后一批覆盖前一批。普通状态更新不重复落盘批次；等待状态仍留在旧 `online_icp`
+事件中。点索引和 `_W` 索引均从 0 开始。摘要新增 `icp_diagnostics_schema=1`
+及结束时的 `icp_batch_count`。
+
+所有新增点坐标均为**变位机末节系、mm**；外轴角为 deg，P 增量为机器人基座方向
+的 µm。矩阵 `m00` 至 `m33` 按行展开，采用列向量约定：
+`p_model = T_detection_to_model * p_detection`。在线算法取其逆移动模型，
+因此不可直接把矩阵平移项当成目标轨迹的位移。候选矩阵不代表已采用，必须同时看
+`attempted/applied/message`。未求解时矩阵及 RMS 留空，不能用单位阵或 0 宣称求解
+成功；`matrix_present` 只表示保存了求解器返回值，不表示矩阵有效。
+
+`released_target` 是入队点，可能在后续事件才被使用，或被越过/方向判断移除；
+**当次释放批不等于当次跟随目标批**。实际目标线以 `online_follow_targets.txt`
+为准，它保存的是目标直线上的两个点及垂足，不能把 direction 字段读作单位方向向量。
+没有生成普通 P（包括只发送段尾结束标志）时不伪造跟随几何。
+结合现有 `actual_robot_path.txt` 和 P 发送/回包记录，可以进一步分析检测点、局部
+配准目标、实际跟随目标和 TCP 高度的传播关系；记录时间是 worker 落盘时间，
+不能当作相机曝光或控制柜实际执行时刻。
+
+诊断通过值快照由 Control 传到现有 UI worker 记录器，不在求解器内执行文件 IO，
+不把整批数据留在会话状态里。每次事件合并批次和点行后写入，避免逐点开关文件。
+记录失败沿用现有状态提示，不改变纠偏命令的数学结果；现场仍需核查额外 IO 的
+周期耗时。历史会话无法补回未记录的真实矩阵与目标线，新程序需重新生成并运行后
+才会产生这些数据。
 
 ## 与视觉伺服起点的边界
 

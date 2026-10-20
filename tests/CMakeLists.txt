@@ -195,6 +195,14 @@ target_link_libraries(i2r_rlc_online_correction_p001_presentation_tests
         i2r_rlc_ui
 )
 
+i2r_rlc_add_test(i2r_rlc_online_correction_run_recorder_tests
+    test_online_correction_run_recorder.cpp
+)
+target_link_libraries(i2r_rlc_online_correction_run_recorder_tests
+    PRIVATE
+        i2r_rlc_ui
+)
+
 i2r_rlc_add_test(i2r_rlc_online_correction_initialization_tests
     test_online_correction_initialization.cpp
 )

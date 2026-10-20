@@ -553,6 +553,23 @@ bool testExceptionProcessorAccumulatesSingleFramesAndAppliesIcp()
     ok &= expectTrue(!result.samples.empty(), "applied ICP should emit a model subrange");
     ok &= expectTrue(std::isfinite(result.rmsErrorMm) && result.rmsErrorMm < 0.05,
                      "known rigid transform should have a small finite ICP residual");
+    ok &= expectTrue(result.batches.size() == 1U,
+                     "one released batch must have one diagnostic snapshot");
+    if (result.batches.size() == 1U) {
+        const auto &batch = result.batches.front();
+        ok &= expectTrue(batch.attempted && batch.applied && batch.detectionToModel.has_value()
+                             && batch.pendingSamples.size() == 11U && batch.fitPoints.size() >= 5U
+                             && batch.releasedSamples.size() == result.samples.size(),
+                         "diagnostics must preserve solver inputs and actual released targets");
+        if (batch.detectionToModel.has_value()) {
+            const auto &matrix = *batch.detectionToModel;
+            const auto &point = batch.pendingSamples.front().point;
+            const double z = matrix[8] * point.xMm + matrix[9] * point.yMm
+                + matrix[10] * point.zMm + matrix[11];
+            ok &= expectNear(z, reference.front().zMm, 0.05,
+                             "row-major diagnostic matrix must map detection back to model");
+        }
+    }
     double maximumPredictionError = 0.0;
     for (const auto &sample : result.samples) {
         double nearest = 1.0e9;
@@ -759,6 +776,10 @@ bool testExceptionProcessorSpanFlushAndReset()
     result = processor.process({}, trajectory, true);
     ok &= expectTrue(result.valid && !result.icpApplied && result.samples.size() == 30U,
                      "tail flush must release all under-spanned raw points without ICP");
+    ok &= expectTrue(result.batches.size() == 1U && result.batches.front().flush
+                         && !result.batches.front().detectionToModel.has_value()
+                         && result.batches.front().releasedSamples.size() == 30U,
+                     "raw tail fallback must be recorded without a fictitious transform");
     for (std::size_t index = 0; index < result.samples.size(); ++index) {
         ok &= expectNear(result.samples[index].point.xMm,
                          0.03 * static_cast<double>(index),
@@ -766,7 +787,8 @@ bool testExceptionProcessorSpanFlushAndReset()
                          "flushed raw points should keep their order and values");
     }
     result = processor.process({}, trajectory, true);
-    ok &= expectTrue(result.samples.empty(), "a second flush must not duplicate a tail");
+    ok &= expectTrue(result.samples.empty() && result.batches.empty(),
+                     "a second flush must not duplicate a tail or diagnostics");
 
     for (std::size_t index = 0; index < 10U; ++index) {
         processor.process({ makeIcpSample(trajectory.segmentPathPoints[index], 0) },
@@ -918,14 +940,23 @@ bool testControllerOnlineIcpSwitchAndFlush()
                                      && !update.state.onlineIcp.applied
                                      && update.state.onlineIcp.bufferedSampleCount == 0U,
                                  "disabled online ICP must bypass fitting and buffering");
+                ok &= expectTrue(update.onlineIcpBatches.size() == 1U
+                                     && !update.onlineIcpBatches.front().enabled
+                                     && !update.onlineIcpBatches.front().detectionToModel.has_value(),
+                                 "disabled ICP must record raw releases without a fake matrix");
             } else if (index < 10U) {
                 ok &= expectTrue(!update.state.onlineIcp.attempted
                                      && !update.state.onlineIcp.applied
                                      && update.state.onlineIcp.bufferedSampleCount == index + 1U,
                                  "controller must preserve one-frame ICP accumulation");
+                ok &= expectTrue(update.onlineIcpBatches.empty(),
+                                 "waiting status must not duplicate a released batch");
             } else {
                 ok &= expectTrue(update.state.onlineIcp.attempted && update.state.onlineIcp.applied,
                                  "enabled controller path must really apply ICP");
+                ok &= expectTrue(update.onlineIcpBatches.size() == 1U
+                                     && update.onlineIcpBatches.front().applied,
+                                 "controller must forward the actual ICP batch snapshot");
             }
         }
         i2r_rlc::control::OnlineCorrectionDetectionEvent tail;
@@ -1246,6 +1277,14 @@ bool testRealtimePathFollowerLimitsAndGapSpeed()
     bool ok = true;
     ok &= expectTrue(result.valid,
                      "path follower should generate realtime correction");
+    ok &= expectTrue(result.diagnostic.valid,
+                     "a generated P must expose its actual follow geometry");
+    ok &= expectNear(result.diagnostic.first.xMm, 10.0, 1.0e-9,
+                     "diagnostic first point must be the actual queue target");
+    ok &= expectNear(result.diagnostic.directionPoint.xMm, 40.0, 1.0e-9,
+                     "diagnostic direction point must be the actual line endpoint");
+    ok &= expectNear(result.diagnostic.foot.yMm, 1.0, 1.0e-9,
+                     "diagnostic foot must preserve the actual detection line offset");
     ok &= expectTrue(std::abs(result.command.dxUm) <= 80,
                      "realtime x increment should respect limit");
     ok &= expectTrue(std::abs(result.command.dyUm) <= 80,

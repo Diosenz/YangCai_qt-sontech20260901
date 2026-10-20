@@ -39,6 +39,8 @@ namespace i2r_rlc::control {
 struct OnlineCorrectionExceptionResult {
     bool valid = false;
     bool segmentChanged = false;
+    /// @brief 本次调用释放的批次诊断，不影响求解与缓存生命周期。
+    std::vector<OnlineCorrectionIcpBatchDiagnostic> batches;
     bool icpAttempted = false;
     bool icpApplied = false;
     std::size_t bufferedSampleCount = 0;

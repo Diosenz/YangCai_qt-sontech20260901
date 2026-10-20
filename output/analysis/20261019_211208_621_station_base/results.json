@@ -1,0 +1,379 @@
+{
+  "session": "20261019_211208_621",
+  "experiment_label": "采用 CFKONTEST3 五个 P 点测试",
+  "source_session_directory": "output/online_correction/20261019_211208_621_采用CFKONTEST3五个P点测试结果",
+  "work_path_file": "data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+  "teach_pose_file": "data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+  "recorded_windows_paths": {
+    "work_path_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+    "teach_pose_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+    "rbcalib_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT"
+  },
+  "tcp_count": 2582,
+  "kcf_count": 3188,
+  "teach_work_count": 1368,
+  "teach_control_count": 5,
+  "tcp_start": "2026-10-19T21:13:00.502",
+  "tcp_end": "2026-10-19T21:16:47.344",
+  "kcf_start": "2026-10-19T21:13:00.494",
+  "kcf_end": "2026-10-19T21:16:47.477",
+  "raw_session_robot_count": 4151,
+  "raw_session_vision_count": 3692,
+  "excluded_wait_stop_tcp_count": 1097,
+  "common_station_base_pose_deg": [
+    0.0035,
+    179.9958
+  ],
+  "calibration_srangle": [
+    768.715,
+    20.782,
+    -511.246,
+    -1.0631,
+    -0.3026,
+    0.0135
+  ],
+  "original_teach_circle": {
+    "center": [
+      4.494638743751453,
+      8.907331289393243,
+      253.90741238537294
+    ],
+    "radius_mm": 143.7175347793701,
+    "normal": [
+      -0.0008398993919776481,
+      0.0015813727677247424,
+      0.9999983969133055
+    ]
+  },
+  "kcf_circle": {
+    "center": [
+      -1.7597917505614977,
+      -3.5147513124766174,
+      250.6424942950895
+    ],
+    "radius_mm": 140.89642583391702,
+    "normal": [
+      0.00265518582291391,
+      0.002453687998220544,
+      0.9999934646803714
+    ]
+  },
+  "teach_fitted_circle_balanced": {
+    "center": [
+      4.492357981740891,
+      8.9093655524133,
+      253.90759389704337
+    ],
+    "radius_mm": 143.71704466934037,
+    "normal": [
+      -0.0008325817897459308,
+      0.0015759231292623577,
+      0.9999984116356656
+    ]
+  },
+  "kcf_fitted_circle_balanced": {
+    "center": [
+      -1.8019771543832261,
+      -3.4851749093818656,
+      250.6411742902453
+    ],
+    "radius_mm": 140.89317269514558,
+    "normal": [
+      0.0023558835526501227,
+      0.0027161935479490806,
+      0.9999935360317568
+    ]
+  },
+  "display_registration": {
+    "rotation": [
+      [
+        0.9999949168410542,
+        4.156278939109924e-06,
+        0.003188459624709919
+      ],
+      [
+        -7.79201039272587e-06,
+        0.999999349865281,
+        0.0011402667669221697
+      ],
+      [
+        -0.003188452812514869,
+        -0.0011402858152754854,
+        0.9999942667420259
+      ]
+    ],
+    "translation": [
+      -7.103923442110826,
+      -12.684022056197186,
+      -3.2404809944564477
+    ],
+    "normal_alignment_deg": 0.19401676345603575,
+    "axial_rotation_is_identifiable": false,
+    "scale": 1.0
+  },
+  "metrics": {
+    "TCP_to_KCF": {
+      "n": 2582,
+      "mean_mm": 0.8035785301483108,
+      "max_mm": 9.423335717247015,
+      "rmse_mm": 1.428020208858919,
+      "median_mm": 0.34962718778234303,
+      "p95_mm": 3.1839257398163743,
+      "max_time": "2026-10-19T21:13:09.503",
+      "closest_kcf_record_time_at_max": "2026-10-19T21:13:00.494"
+    },
+    "KCF_to_TCP": {
+      "n": 3188,
+      "mean_mm": 0.8356421986380376,
+      "max_mm": 6.7887774538367465,
+      "rmse_mm": 1.3652706830920638,
+      "median_mm": 0.39283201658148964,
+      "p95_mm": 3.3768027633267805,
+      "max_time": "2026-10-19T21:16:38.639"
+    },
+    "TCP_to_original_teach": {
+      "n": 2582,
+      "mean_mm": 10.09254677859123,
+      "max_mm": 18.52392569097391,
+      "rmse_mm": 10.889274709731568,
+      "median_mm": 10.40145553012091,
+      "p95_mm": 17.51663567221917,
+      "max_time": "2026-10-19T21:15:39.671"
+    },
+    "KCF_to_original_teach": {
+      "n": 3188,
+      "mean_mm": 9.675510311627802,
+      "max_mm": 18.888446418840015,
+      "rmse_mm": 10.552273231211663,
+      "median_mm": 9.63596062412915,
+      "p95_mm": 17.14748418267605,
+      "max_time": "2026-10-19T21:15:27.972"
+    },
+    "TCP_to_relocated_teach": {
+      "n": 2582,
+      "mean_mm": 2.7046405994184686,
+      "max_mm": 4.820364896683737,
+      "rmse_mm": 2.8377464002499786,
+      "median_mm": 2.6428364282675294,
+      "p95_mm": 4.196157590428758,
+      "max_time": "2026-10-19T21:15:38.780"
+    },
+    "KCF_to_relocated_teach": {
+      "n": 3188,
+      "mean_mm": 2.9113306628114355,
+      "max_mm": 7.215864088347586,
+      "rmse_mm": 3.0005953327511805,
+      "median_mm": 2.8753475305609175,
+      "p95_mm": 4.08184562557428,
+      "max_time": "2026-10-19T21:16:29.538"
+    },
+    "TCP_to_relocated_teach_circle": {
+      "n": 2582,
+      "mean_mm": 2.67231561812853,
+      "max_mm": 4.723492497583271,
+      "rmse_mm": 2.801739102476707,
+      "median_mm": 2.583306475408385,
+      "p95_mm": 4.228653587650907,
+      "max_time": "2026-10-19T21:15:38.780"
+    },
+    "KCF_to_relocated_teach_circle": {
+      "n": 3188,
+      "mean_mm": 2.9219989055929543,
+      "max_mm": 7.499423883048782,
+      "rmse_mm": 3.0152267676206055,
+      "median_mm": 2.8453070068818036,
+      "p95_mm": 4.204135329488501,
+      "max_time": "2026-10-19T21:16:29.538"
+    },
+    "KCF_to_fitted_circle": {
+      "n": 3188,
+      "mean_mm": 0.8933305216329833,
+      "max_mm": 6.0888871211435305,
+      "rmse_mm": 1.0543299746343973,
+      "median_mm": 0.8142569197404926,
+      "p95_mm": 1.7322970183844926,
+      "max_time": "2026-10-19T21:16:29.538"
+    }
+  },
+  "teach_original_circle_center_common_station_base_mm": [
+    -4.477500719619867,
+    -8.909036221437143,
+    253.90786788573422
+  ],
+  "kcf_circle_center_common_station_base_mm": [
+    1.8175434208971302,
+    3.485042808193838,
+    250.64106373047738
+  ],
+  "circle_radius_difference_mm": -2.8238719741947875,
+  "tcp_coverage_deg": 354.4990976072301,
+  "kcf_coverage_deg": 353.2549759414719,
+  "startup_translation_not_analysis_registration_mm": [
+    -6.659562999999999,
+    -33.744119999999995,
+    -2.3733450000000005
+  ],
+  "startup_corrected_shape_max_residual_mm": 3.256115871121665e-14,
+  "job_line_segments": [
+    {
+      "job_line": 13,
+      "count": 638,
+      "start": "2026-10-19T21:13:00.618",
+      "end": "2026-10-19T21:13:56.940",
+      "tcp_to_kcf": {
+        "n": 638,
+        "mean_mm": 1.7912766747839084,
+        "max_mm": 9.423335717247015,
+        "rmse_mm": 2.6252748308026685,
+        "median_mm": 0.762755423675824,
+        "p95_mm": 5.11873220796458
+      },
+      "tcp_to_relocated_teach": {
+        "n": 638,
+        "mean_mm": 2.3618633429350573,
+        "max_mm": 4.047558079537422,
+        "rmse_mm": 2.532566679446761,
+        "median_mm": 2.5809450474560753,
+        "p95_mm": 3.6490018364867427
+      },
+      "tool_rpy_start_deg": [
+        -176.1895,
+        41.3361,
+        -2.3582
+      ],
+      "tool_rpy_end_deg": [
+        -160.682,
+        30.5709,
+        -4.4563
+      ]
+    },
+    {
+      "job_line": 14,
+      "count": 648,
+      "start": "2026-10-19T21:13:57.038",
+      "end": "2026-10-19T21:14:53.765",
+      "tcp_to_kcf": {
+        "n": 648,
+        "mean_mm": 0.4568779493056767,
+        "max_mm": 2.5212234946561054,
+        "rmse_mm": 0.6668960748822595,
+        "median_mm": 0.2856218967005156,
+        "p95_mm": 1.6071050092890888
+      },
+      "tcp_to_relocated_teach": {
+        "n": 648,
+        "mean_mm": 2.6055606664958484,
+        "max_mm": 4.684225734236469,
+        "rmse_mm": 2.690214318781277,
+        "median_mm": 2.4693999011958545,
+        "p95_mm": 3.991568865602622
+      },
+      "tool_rpy_start_deg": [
+        -160.6802,
+        30.5642,
+        -4.4542
+      ],
+      "tool_rpy_end_deg": [
+        -160.6763,
+        30.5679,
+        -4.4628
+      ]
+    },
+    {
+      "job_line": 15,
+      "count": 652,
+      "start": "2026-10-19T21:14:53.889",
+      "end": "2026-10-19T21:15:50.998",
+      "tcp_to_kcf": {
+        "n": 652,
+        "mean_mm": 0.486182111270004,
+        "max_mm": 2.497787165651281,
+        "rmse_mm": 0.660657913642159,
+        "median_mm": 0.32021249836031157,
+        "p95_mm": 1.4951159241074305
+      },
+      "tcp_to_relocated_teach": {
+        "n": 652,
+        "mean_mm": 3.588237721646412,
+        "max_mm": 4.820364896683737,
+        "rmse_mm": 3.6279386737350454,
+        "median_mm": 3.5924563671724403,
+        "p95_mm": 4.396115006950696
+      },
+      "tool_rpy_start_deg": [
+        -160.6769,
+        30.5681,
+        -4.4623
+      ],
+      "tool_rpy_end_deg": [
+        -160.6777,
+        30.5707,
+        -4.4689
+      ]
+    },
+    {
+      "job_line": 16,
+      "count": 643,
+      "start": "2026-10-19T21:15:51.100",
+      "end": "2026-10-19T21:16:47.344",
+      "tcp_to_kcf": {
+        "n": 643,
+        "mean_mm": 0.4949382954847967,
+        "max_mm": 2.739270129754494,
+        "rmse_mm": 0.6772227180436792,
+        "median_mm": 0.3458722186560065,
+        "p95_mm": 1.3869567290191767
+      },
+      "tcp_to_relocated_teach": {
+        "n": 643,
+        "mean_mm": 2.2474663033368243,
+        "max_mm": 3.9919062951041435,
+        "rmse_mm": 2.3052427479223705,
+        "median_mm": 2.1793366589139875,
+        "p95_mm": 3.337541426469632
+      },
+      "tool_rpy_start_deg": [
+        -160.677,
+        30.5705,
+        -4.4695
+      ],
+      "tool_rpy_end_deg": [
+        -160.6767,
+        30.5714,
+        -4.4726
+      ]
+    }
+  ],
+  "endpoint_gap_diagnostic": {
+    "largest_unsampled_sector_deg": 6.745024058528088,
+    "gap_start_deg": 185.6152109519337,
+    "gap_end_deg": 192.3602350104618,
+    "max_tcp_to_kcf_query_angle_deg": 188.89342950826153,
+    "kcf_endpoint_gap_mm": 17.142996400709652,
+    "synthetic_closing_segment_affected_tcp_count": 46,
+    "synthetic_closed_metric_not_primary": {
+      "n": 2582,
+      "mean_mm": 0.7658048427403221,
+      "max_mm": 4.984103796235023,
+      "rmse_mm": 1.2629353564028436,
+      "median_mm": 0.34962718778234303,
+      "p95_mm": 3.164301295596399
+    },
+    "warning": "Synthetic closure sensitivity only; no measured closing segment is added to main distances or curves."
+  },
+  "session_end_state": "error",
+  "session_end_message": "在线纠偏超时：等待机器人主程序停止超过120秒。当前sStart=1, corflag=0, detflag=0, offline=0, JBI行=21。",
+  "metric_definition": "3D point-to-recorded-polyline minimum over all segments; sample weighted; all valid online points",
+  "registration_method": "same as morning: 2-degree angular medians, PCA plane, Huber geometric circle; rigid center/normal alignment, scale=1, no yaw fit",
+  "reference_source": "KCF-derived internal reference; not independently measured seam truth",
+  "input_sha256": {
+    "output/online_correction/20261019_211208_621_采用CFKONTEST3五个P点测试结果/session_summary.txt": "507f9fa63b69e7b7c02d3e00a214c85b7e3aee8028a827b21285687378ba37a9",
+    "output/online_correction/20261019_211208_621_采用CFKONTEST3五个P点测试结果/actual_robot_path.txt": "69a89f7ee446689925a886b302d2a3c210812e8edede866d81b95b3bf11a185e",
+    "output/online_correction/20261019_211208_621_采用CFKONTEST3五个P点测试结果/initial_correction.txt": "6ea5ba7a9ed61a96be06cf34fab641f2ef642370f0c8fea5846ce1c09bb76077",
+    "output/online_correction/20261019_211208_621_采用CFKONTEST3五个P点测试结果/realtime_correction.txt": "f0c5ca11b90f63e2604829ee31208c69842fed2b510c078e29f1ef9d6d0eb965",
+    "data/WorkPiece/20260404CHUFENGKOU1_W.txt": "2001f5d9e4d14e8ca14da584d47b9c870a9f2fcb8c8912c7d37d014267ba09b2",
+    "data/WorkPiece/20260404CHUFENGKOU1_T.txt": "93d9710b8451cc0405b8a51f6d0f4c2e4a0d327d49b4ca5b8b873e2022df97ab",
+    "config/calibration/RBCALIB.DAT": "be223786f3d7297e32db530fdb0594ee84eefe4cdc53cc111b84579aa6b22757"
+  },
+  "provenance_limit": "Recorded session contains file paths but not runtime calibration hashes or executable/JBI version; current local calibration is used."
+}

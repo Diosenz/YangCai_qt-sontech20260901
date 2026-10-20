@@ -10,6 +10,7 @@ add_library(i2r_rlc_ui STATIC
     src/Logger.cpp
     src/MainWidget.cpp
     src/OnlineCorrectionP001Presentation.cpp
+    src/TrackingDiagnosticImageWriter.cpp
     src/OnlineCorrectionRunRecorder.cpp
     src/OnlineCorrectionWorkflow.cpp
     src/RobotSimVirtualReferenceCache.cpp
@@ -26,6 +27,8 @@ add_library(i2r_rlc_ui STATIC
     include/Logger.h
     include/MainWidget.h
     include/OnlineCorrectionP001Presentation.h
+    include/OnlineVisionDiagnosticOptions.h
+    include/TrackingDiagnosticImageWriter.h
     include/OnlineCorrectionRunRecorder.h
     include/OnlineCorrectionWorkflow.h
     include/RobotSimVirtualReferenceCache.h

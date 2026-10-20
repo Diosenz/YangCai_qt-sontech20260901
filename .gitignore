@@ -34,3 +34,7 @@ Testing/
 
 
 .DS_Store
+
+# Local source backups and validation executables are not shared run results.
+/output/backups/
+/output/validation/

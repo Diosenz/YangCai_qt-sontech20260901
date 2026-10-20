@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  * @copyright   Copyright (c) 2024, 华南理工大学 I2R 实验室, All rights reserved.
  *
  * @file        OnlineCorrectionRunRecorder.h
@@ -8,10 +8,14 @@
 #ifndef I2R_RLC_UI_ONLINE_CORRECTION_RUN_RECORDER_H
 #define I2R_RLC_UI_ONLINE_CORRECTION_RUN_RECORDER_H
 
+#include <memory>
+
+#include <QByteArray>
 #include <QString>
 #include <QStringList>
 
 #include "RuntimeTrackingTypes.h"
+#include "TrackingDiagnosticImageWriter.h"
 
 namespace i2r_rlc::ui {
 
@@ -73,6 +77,18 @@ public:
     QString lastError() const;
 
 private:
+    /// @brief 保存本帧各阶段快照；只读诊断，失败不改变控制状态。
+    bool recordVisionDiagnostic(
+        const RuntimeTrackingResult &result, control::OnlineCorrectionPhase phase);
+    COnlineVisionDiagnosticOptions m_visionDiagnosticOptions;
+    std::unique_ptr<CTrackingDiagnosticImageWriter> m_imageWriter;
+    quint64 m_visionDiagnosticCount = 0;
+    quint64 m_imageSubmissionCount = 0;
+    bool m_imageErrorReported = false;
+
+    /// @brief 批次点列合并写入，避免逐点开关文件；仅由在线 worker 调用。
+    bool recordIcpDiagnostics(const control::OnlineCorrectionUpdate &update);
+    bool appendData(const QString &fileName, const QByteArray &data);
     bool createSessionFile(const QString &fileName, const QString &header);
     bool appendFields(const QString &fileName, const QStringList &fields);
     bool appendSummary(const QString &key, const QString &value);
@@ -87,6 +103,8 @@ private:
     quint64 m_initialCommandCount = 0;
     quint64 m_realtimeCommandCount = 0;
     quint64 m_receiptCount = 0;
+    quint64 m_updateCount = 0;
+    quint64 m_icpBatchCount = 0;
     bool m_active = false;
 };
 

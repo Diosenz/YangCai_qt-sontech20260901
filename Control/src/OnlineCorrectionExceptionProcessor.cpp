@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 #include <Eigen/Geometry>
 
@@ -164,6 +165,7 @@ double rawRms(
 void appendResult(OnlineCorrectionExceptionResult &result,
                   OnlineCorrectionExceptionResult part)
 {
+    result.batches.insert(result.batches.end(), part.batches.begin(), part.batches.end());
     result.icpAttempted = result.icpAttempted || part.icpAttempted;
     result.icpApplied = result.icpApplied || part.icpApplied;
     if (part.icpApplied) {
@@ -216,6 +218,8 @@ OnlineCorrectionExceptionResult COnlineCorrectionExceptionProcessor::processPend
             >= MIN_WINDOW_SPAN_MM * MIN_WINDOW_SPAN_MM)
         && (enoughNewPoints || flush);
 
+    OnlineCorrectionIcpBatchDiagnostic diagnostic;
+    diagnostic.flush = flush;
     if (ready) {
         vision::IcpRegistrationOptions options;
         options.dimension = 3;
@@ -226,6 +230,15 @@ OnlineCorrectionExceptionResult COnlineCorrectionExceptionProcessor::processPend
         result.icpAttempted = true;
         const auto match = vision::CIcpRegistrationMatcher::alignPointToPoint(
             modelPoints, detected, options);
+        std::array<double, 16> matrix;
+        for (int row = 0; row < 4; ++row) {
+            for (int column = 0; column < 4; ++column) {
+                matrix[static_cast<std::size_t>(row * 4 + column)] =
+                    match.transformMatrix(row, column);
+            }
+        }
+        diagnostic.detectionToModel = matrix;
+        diagnostic.rmsErrorMm = match.rmsErrorMm;
         const Eigen::Matrix3d rotation = match.transformMatrix.topLeftCorner<3, 3>();
         const bool usable = match.valid && match.transformMatrix.allFinite()
             && std::isfinite(match.rmsErrorMm)
@@ -341,6 +354,16 @@ OnlineCorrectionExceptionResult COnlineCorrectionExceptionProcessor::processPend
                          : "online ICP window limit; raw samples retained");
         }
     }
+    diagnostic.attempted = result.icpAttempted;
+    diagnostic.applied = result.icpApplied;
+    diagnostic.pendingSamples = m_pendingSamples;
+    diagnostic.releasedSamples = result.samples;
+    diagnostic.modelPoints = model;
+    diagnostic.message = result.message;
+    for (const auto &point : detected) {
+        diagnostic.fitPoints.push_back({point.xMm, point.yMm, point.zMm, true});
+    }
+    result.batches.push_back(std::move(diagnostic));
     m_lastReleasedRawPoint = m_pendingSamples.back().point;
     m_pendingSamples.clear();
     if (flush) {

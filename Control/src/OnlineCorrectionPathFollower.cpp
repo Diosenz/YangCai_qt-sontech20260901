@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -442,6 +442,15 @@ OnlineCorrectionFollowResult COnlineCorrectionPathFollower::update(
     m_lastDzUm = command.dzUm;
     ++m_controlCount;
 
+    result.diagnostic.valid = true;
+    result.diagnostic.current = current;
+    result.diagnostic.first = firstPoint;
+    result.diagnostic.directionPoint = thirdPoint;
+    result.diagnostic.foot = {footOnDetection.x(), footOnDetection.y(), footOnDetection.z(), true};
+    result.diagnostic.futureFoot = {
+        footOnFutureDetection.x(), footOnFutureDetection.y(), footOnFutureDetection.z(), true};
+    result.diagnostic.s1Deg = s1Deg;
+    result.diagnostic.s2Deg = s2Deg;
     result.valid = true;
     result.command = command;
     result.message = command.message;

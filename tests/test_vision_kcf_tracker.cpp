@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -128,6 +128,10 @@ void testLegacyKalmanFlow()
 
     const cv::Rect first = tracker.update(makeFrame(cv::Point(42, 41)));
     require(tracker.m_Kal_init, "KCF first update should initialize legacy Kalman state");
+    const auto firstDiagnostic = tracker.lastUpdateDiagnostic();
+    require(firstDiagnostic.completed && firstDiagnostic.hasResponse
+            && firstDiagnostic.kalmanSeeded && !firstDiagnostic.fusionApplied,
+        "first frame must identify Kalman seeding without a fabricated weight");
     require(std::abs(tracker.m_filter->m_X.val[0][0] - tracker.m_roi.x) < 1e-6
             && std::abs(tracker.m_filter->m_X.val[1][0] - tracker.m_roi.y) < 1e-6,
         "KCF first update should seed X/Y without external state correction");
@@ -136,6 +140,13 @@ void testLegacyKalmanFlow()
     tracker.m_Kalman_status_y = first.y + 1.0;
     const cv::Rect second = tracker.update(makeFrame(cv::Point(44, 42)));
     require(second.area() > 0, "KCF Kalman-corrected update produced invalid rectangle");
+    const auto diagnostic = tracker.lastUpdateDiagnostic();
+    require(diagnostic.completed && diagnostic.fusionApplied && !diagnostic.kalmanSeeded,
+        "subsequent frame must report actual fusion");
+    require(std::abs(diagnostic.gainX - tracker.m_filter->m_K.val[0][0]) < 1e-12
+            && std::abs(diagnostic.observationNoise - tracker.m_filter->m_cR) < 1e-12
+            && diagnostic.finalRoi == tracker.m_roi,
+        "diagnostics must expose actual gain and emitted ROI without recomputing them");
     require(tracker.m_filter->m_cR >= tracker.m_filter->m_cRMinimum
             && tracker.m_filter->m_cR <= 1e-2,
         "KCF legacy Kalman cR should be updated from peak response");

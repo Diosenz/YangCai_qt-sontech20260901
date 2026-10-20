@@ -396,6 +396,26 @@ bool testOnlineIcpSwitchConfiguration()
         ok &= expectTrue(!enabled && !errorMessage.isEmpty(),
                          "parse failure must preserve switch and explain failure");
     }
+    i2r_rlc::ui::COnlineVisionDiagnosticOptions diagnostic;
+    ok &= expectTrue(repository.loadOnlineVisionDiagnostics(diagnostic, &errorMessage),
+                     "missing diagnostic config must preserve defaults");
+    const QString diagnosticPath = paths.workflowsDir().filePath("online_vision_diagnostics.txt");
+    ok &= writeTextFile(diagnosticPath, QStringLiteral(
+        "enabled=false\nimages_enabled=false\nimage_sample_every_n=2\n"
+        "max_image_pairs=3\nmax_image_bytes=1000\n"));
+    ok &= expectTrue(repository.loadOnlineVisionDiagnostics(diagnostic, &errorMessage)
+                     && !diagnostic.enabled && !diagnostic.imagesEnabled
+                     && diagnostic.imageSampleEveryN == 2 && diagnostic.maxImagePairs == 3
+                     && diagnostic.maxImageBytes == 1000, "all diagnostic options must load");
+    for (const QString &invalid : {QStringLiteral("enabled=TRUE\n"),
+             QStringLiteral("enabled=true\nenabled=false\n"),
+             QStringLiteral("image_sample_every_n=0\n"), QStringLiteral("max_image_pairs=-1\n"),
+             QStringLiteral("max_image_bytes=999999999999999\n"), QStringLiteral("unknown=1\n")}) {
+        ok &= writeTextFile(diagnosticPath, invalid);
+        ok &= expectTrue(!repository.loadOnlineVisionDiagnostics(diagnostic, &errorMessage)
+                         && !diagnostic.enabled && diagnostic.maxImagePairs == 3,
+                         "invalid diagnostic config must not mutate the output snapshot");
+    }
     return ok;
 }
 

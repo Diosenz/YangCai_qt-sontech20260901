@@ -1,0 +1,14 @@
+# 在线二维检测诊断；下一次启动在线纠偏时读取，会话内不变。
+# enabled=false 关闭新增诊断，原有运行日志仍保留。
+# 数值逐帧写 vision_diagnostics.tsv，包含无效和未触发结果。
+enabled=true
+# 无损原图/增强图采样；不是持续录像，也不自动删除历史文件。
+images_enabled=true
+# 从首个到达检测器的可用帧开始，每 15 个处理帧采一对。
+image_sample_every_n=15
+# 会话内最多采样 30 对，压缩后总计不超过 32 MiB。
+# 改为 every_n=1 和较小 max_image_pairs 可做短时逐帧采样。
+max_image_pairs=30
+max_image_bytes=33554432
+# 后台队列最多两对；磁盘可用空间低于 512 MiB 时跳过图像。
+# 实际保存结果以 vision_images/image_manifest.tsv 为准。
