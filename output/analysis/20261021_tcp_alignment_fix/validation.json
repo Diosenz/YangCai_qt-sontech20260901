@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-21",
+  "authority": "RobotSim test31 TCP1011",
+  "red": {
+    "compiled_with": "MSVC 14.44 / existing qt-debug build tree",
+    "result": "failed as expected with old production tool parameters",
+    "scene_tcp_position_error_mm": 4.28073,
+    "scene_tcp_rotation_matrix_error": 0.225449
+  },
+  "green": {
+    "synthetic_scene_poses": 6,
+    "scene_tcp_max_position_error_mm": 4.17954e-13,
+    "scene_tcp_max_rotation_matrix_error": 1.79104e-15,
+    "saved_actual_tcp_poses": 8097,
+    "saved_tcp_max_position_error_mm": 9.46517e-13,
+    "saved_tcp_max_rotation_matrix_error": 2.24546e-15,
+    "ctest_passed": [
+      "i2r_rlc_mh12_inverse_kinematics_tests",
+      "i2r_rlc_digital_twin_tests"
+    ]
+  },
+  "production_libraries_built": [
+    "i2r_rlc_digital_twin",
+    "i2r_rlc_ui"
+  ],
+  "application_link": "passed: MSVC qt-debug, exit code 0",
+  "independent_review": "no blocking findings",
+  "robotsim_modified": false,
+  "robot_or_simulation_commands_sent": false,
+  "computer_use_or_mouse": false,
+  "physical_correction_retest": "not performed; new executable is ready for a new run",
+  "application_executable": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe",
+  "application_sha256": "5f3b542d1f722db12890a58a521a7b4d2653e16427f15aee37d046b1b06ef17b",
+  "application_file_modified_at": "2026-10-21T15:21:34.508488+08:00",
+  "application_built_from_verified_solver": true
+}

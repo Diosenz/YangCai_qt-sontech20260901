@@ -1,0 +1,26 @@
+{
+  "scene_file": "G:\\RobotSimWork-Leningrad-win64\\data\\test31.xml",
+  "scene_sha256": "41ac8c1bb92a3a0ee91924daf297fa0cf4ec58e5a7ebfd88fb817187576381dc",
+  "scene_tcp_pose_mm_deg": [
+    -125.8,
+    4.7,
+    490.2,
+    -174.8,
+    -145.2,
+    169.2
+  ],
+  "project_tool_pose_mm_deg": [
+    -125.8,
+    4.7,
+    490.20000000000005,
+    -174.8,
+    -145.2,
+    169.2
+  ],
+  "source_sha256": "8a8d98fe0151564aa13ca467d763d5e4e6d805e2c624e0fb969e0a4f375dc6b1",
+  "saved_input_file": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261021_114211_739\\vision_diagnostics.tsv",
+  "saved_input_sha256": "21186cbd3ecda8797cfee6e262c289c76513f6ac109cfdf4f15fe1ac356f7c3b",
+  "replay_samples": 8097,
+  "robot_commands_sent": false,
+  "ui_or_computer_use": false
+}

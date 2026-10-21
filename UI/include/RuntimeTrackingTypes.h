@@ -326,6 +326,8 @@ struct RuntimeTrackingResult {
     control::OnlineCorrectionPoint detectedRobotBasePoint;
     /// @brief 同一 KCF 点的 RBCALIB 固定变位机基座坐标，单位 mm；不含外轴旋转。
     control::OnlineCorrectionPoint detectedStationBasePoint;
+    /// @brief 同帧融合前 KCF 点投影至工件父级 TCP 系；仅有效原始跟踪可用于独立验收。
+    control::OnlineCorrectionPoint independentWeldPointInParent_mm;
     /// @brief 整条真实激光线重建的空间点列（全局定位专用），单位 mm。
     /// 与在线纠偏的单点 sample 互斥：非空时 sample.point 仅作参考。
     std::vector<control::OnlineCorrectionPoint> linePoints;

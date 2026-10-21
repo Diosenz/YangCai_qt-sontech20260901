@@ -1,0 +1,5 @@
+FAIL: improved fitted residual must be vetoed when independent weld point gets worse
+FAIL: independent improvement plus covered geometry and archive should allow a valid correction
+FAIL: generation change and worker reset must not replenish the same session archive budget
+FAIL: a new correction session may start its own archive budget
+QTemporaryDir: Unable to remove "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\.codex_backups\\local_icp_safety_20261021\\safety-capture\\temp\\i2r_rlc_online_local_registration_safety_tests-ojYLjs" most likely due to the presence of read-only files.

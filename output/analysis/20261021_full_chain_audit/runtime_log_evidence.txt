@@ -1,0 +1,27 @@
+Source: G:\RobotSimWork-Leningrad-win64\log\20261019\20261019-102140.log
+Line numbers are one-based. Read-only extracted subset.
+
+2367375: [11:32:02.867] [Model] [debug] 1068 new260626-FengJiKeChuKou.STEP: Set the relative pose: Pos[X, Y, Z]mm = [-1.563868, -1.649579, -0.554996]; Rot[X, Y, Z]deg = [-179.890, -179.435, 179.177].
+2367376: [11:41:05.706] [UserInterface] [info] Main: Load scene from file: G:/RobotSimWork-Leningrad-win64/data/test31.xml.
+2367377: [11:41:05.803] [Model] [info] 1003 Base: Base object has been destructed.
+2367539: [11:41:07.335] [Model] [debug] 1014 MH12's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [0.000000, 0.000000, 100.000000]; Rot[X, Y, Z]deg = [0.000, -0.000, 0.000].
+2367540: [11:41:07.335] [Model] [debug] 1013 Sensor LSL: Set the relative pose: Pos[X, Y, Z]mm = [8.133649, -86.098784, -220.636598]; Rot[X, Y, Z]deg = [-9.110, 2.726, 5.354].
+2367541: [11:41:07.335] [Model] [debug] 1002 Sensor LSL's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [0.000000, 0.000000, 0.000000]; Rot[X, Y, Z]deg = [0.000, -0.000, 0.000].
+2367542: [11:41:07.335] [Model] [debug] 1002 Sensor LSL's Frame End: Set parent to Sensor LSL.
+2367543: [11:41:07.335] [Model] [debug] 1011 Welding Gun's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [-125.800000, 4.700000, 490.200000]; Rot[X, Y, Z]deg = [-174.800, -145.200, 169.200].
+2367544: [11:41:07.335] [Model] [debug] 1011 Welding Gun's Frame End: Set parent to Welding Gun's Shape.
+2367545: [11:41:07.335] [Model] [debug] 1011 Welding Gun's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [-125.800000, 4.700000, 490.200000]; Rot[X, Y, Z]deg = [-174.800, -145.200, 169.200].
+2367546: [11:41:07.354] [Model] [debug] Load model from file: ../model/tool/WeldingGun/WeldingGun.bbrep.
+2367550: [11:41:07.372] [Model] [debug] 1012 Welding Gun's Shape: Set the relative pose: Pos[X, Y, Z]mm = [0.000000, 0.000000, 0.000000]; Rot[X, Y, Z]deg = [0.000, -0.000, 0.000].
+2367551: [11:41:07.372] [Model] [debug] 1011 Welding Gun's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [-125.800000, 4.700000, 490.200000]; Rot[X, Y, Z]deg = [-174.800, -145.200, 169.200].
+2367552: [11:41:07.372] [Model] [debug] 1063 MA2P-300D's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [0.000000, 0.000000, 231.000000]; Rot[X, Y, Z]deg = [0.000, -0.000, 0.000].
+2367581: [11:41:07.410] [Model] [debug] 1013 Sensor LSL: Set parent to Welding Gun's Frame End.
+2367582: [11:41:07.410] [Model] [debug] 1013 Sensor LSL: Set the relative pose: Pos[X, Y, Z]mm = [8.133649, -86.098784, -220.636598]; Rot[X, Y, Z]deg = [-9.110, 2.726, 5.354].
+2367583: [11:41:07.410] [Model] [debug] 1002 Sensor LSL's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [0.000000, 0.000000, 0.000000]; Rot[X, Y, Z]deg = [0.000, -0.000, 0.000].
+2367586: [11:41:07.410] [Model] [debug] 1012 Welding Gun's Shape: Set the relative pose: Pos[X, Y, Z]mm = [0.000000, 0.000000, 0.000000]; Rot[X, Y, Z]deg = [0.000, -0.000, 0.000].
+2367587: [11:41:07.410] [Model] [debug] 1011 Welding Gun's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [-125.800000, 4.700000, 490.200000]; Rot[X, Y, Z]deg = [-174.800, -145.200, 169.200].
+2367588: [11:41:07.410] [Model] [debug] 1013 Sensor LSL: Set the relative pose: Pos[X, Y, Z]mm = [8.133649, -86.098784, -220.636598]; Rot[X, Y, Z]deg = [-9.110, 2.726, 5.354].
+2367589: [11:41:07.410] [Model] [debug] 1002 Sensor LSL's Frame End: Set the relative pose: Pos[X, Y, Z]mm = [0.000000, 0.000000, 0.000000]; Rot[X, Y, Z]deg = [0.000, -0.000, 0.000].
+2380852: [11:43:16.082] [Model] [debug] 1068 new260626-FengJiKeChuKou.STEP: Set the relative pose: Pos[X, Y, Z]mm = [0.000000, 0.000000, 0.000000]; Rot[X, Y, Z]deg = [0.000, -0.000, 0.000].
+2380853: [11:43:16.234] [Model] [debug] 1068 new260626-FengJiKeChuKou.STEP: Set the relative pose: Pos[X, Y, Z]mm = [9.461327, -13.443195, -4.379898]; Rot[X, Y, Z]deg = [180.000, -180.000, 174.126].
+2380854: [11:43:16.290] [Model] [info] 1001 MH12: Set Q vector: (0.110, -0.553, -0.074, 0.110, -1.131, -0.561).

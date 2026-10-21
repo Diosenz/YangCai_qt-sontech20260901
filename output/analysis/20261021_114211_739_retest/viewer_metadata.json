@@ -1,0 +1,23 @@
+{
+  "trace_counts": [
+    5838,
+    7889,
+    1441,
+    1441,
+    1368,
+    1368,
+    7889
+  ],
+  "default_visible": [
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    "legendonly"
+  ],
+  "coordinate_values_change_with_zscale": false,
+  "reference": "Post-hoc raw KCF circle center/normal alignment of original teach polyline; rigid, no scaling, no axial yaw. Diagnostic reference, not independent truth or online controller target.",
+  "ui_verification": "not performed: user prohibits Computer Use"
+}

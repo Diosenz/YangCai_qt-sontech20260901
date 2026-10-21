@@ -35,9 +35,11 @@
 
 #include <QObject>
 #include <QElapsedTimer>
+#include <QJsonArray>
 #include <QThread>
 
 #include "OnlineLocalRegistrationWorker.h"
+#include "OnlineLocalRegistrationVerification.h"
 #include "RuntimeWorkerAdapters.h"
 
 namespace i2r_rlc::ui {
@@ -513,7 +515,13 @@ private:
     /// @brief 撤销旧窗口、候选修正及网络写回代次；不停止机器人运动。
     void resetOnlineLocalRegistration();
     /// @brief 从已完成的同帧上下文低频投递表面采样，繁忙时跳过且不排队。
-    void submitOnlineLocalRegistration(const FrozenVisionFrameContext &context);
+    void submitOnlineLocalRegistration(const FrozenVisionFrameContext &context,
+        const RuntimeTrackingResult &trackingResult);
+    /// @brief 使用写回完成后新采集的同帧独立点确认效果；验证期间禁止继续配准写回。
+    void verifyOnlineLocalRegistration(const FrozenVisionFrameContext &context,
+        const RuntimeTrackingResult &trackingResult);
+    /// @brief 在仿真通道空隙确认后验结果或尝试受保护恢复；停止/换会话不触发恢复。
+    bool finishOnlineLocalRegistrationVerification();
     void handleOnlineLocalRegistrationResult(
         quint64 requestId,
         const COnlineLocalRegistrationWorker::Result &result);
@@ -539,6 +547,19 @@ private:
     /// @brief 配准异常或写回未确认时停用本轮自动更新，避免重复叠加不确定结果。
     bool m_localRegistrationFaulted = false;
     bool m_localRegistrationRobotStateFresh = false;
+    CGlobalLocatePriorWorkerAdapter::LocalRegistrationSafetyOptions m_localRegistrationSafetyOptions;
+    QString m_localRegistrationArchiveDirectory;
+    struct LocalVerification {
+        quint64 sessionId = 0;
+        quint64 generation = 0;
+        qint64 completedAtMs = -1;
+        qint64 sourceFrameId = -1;
+        QString archivePath;
+        QJsonArray samples;
+        std::optional<COnlineLocalRegistrationVerification> check;
+        bool rollbackRequested = false;
+    };
+    std::optional<LocalVerification> m_localVerification;
 
     QThread m_cameraThread;
     QThread m_robotThread;

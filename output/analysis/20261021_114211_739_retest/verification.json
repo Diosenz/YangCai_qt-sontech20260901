@@ -1,0 +1,10 @@
+{
+  "numeric_replay_assertions": "passed",
+  "input_hashes_verified": 75,
+  "viewer_javascript_syntax": "passed",
+  "viewer_mocked_control_handlers": "passed",
+  "all_trajectory_coordinates_unchanged_after_zscale": "passed",
+  "actual_browser_ui": "not performed; user prohibits Computer Use",
+  "mouse_and_computer_use": "not used",
+  "production_build_and_tests": "not run; read-only analysis"
+}

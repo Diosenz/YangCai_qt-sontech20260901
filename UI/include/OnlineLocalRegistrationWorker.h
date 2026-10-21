@@ -42,6 +42,31 @@ public:
         double minimumImprovementRatio = 0.05;
         /// @brief 全会话统一的平均最近邻残差上限，mm；仍须满足最低改善比例。
         double maximumResidualMm = 5.5;
+        /// @brief 独立焊点仅作否决观测，并非真实值；误差或恶化超限均拒绝。
+        double maximumIndependentErrorMm = 5.5;
+        double maximumIndependentWorseningMm = 0.1;
+        /// @brief 双向匹配覆盖及匹配区域分布门禁，不代表全部自由度可观测。
+        double coverageDistanceMm = 3.0;
+        double minimumBidirectionalCoverage = 0.7;
+        double minimumMatchedSpreadRatio = 0.5;
+        /// @brief 归档预算跨代次保留；达到上限暂停更新，禁止删除旧归档腾出空间。
+        int maximumArchivedAttemptsPerSession = 128;
+        int maximumRawPointsPerFrame = 32768;
+    };
+
+    /** @brief 同帧、同父级 TCP 系下的独立特征观测；缺失或失效时不允许生产写回。 */
+    struct IndependentObservation {
+        bool valid = false;
+        qint64 frameId = -1;
+        localization::Point3D_mm realWeldPointInParent_mm;
+        localization::Point3D_mm virtualWeldPointInParent_mm;
+    };
+
+    /** @brief 离线验证也可复用生产验收；旧五参数入口仅保留合成点云兼容。 */
+    struct CloudValidationContext {
+        IndependentObservation independentObservation;
+        QString archiveDirectory;
+        bool requireIndependentObservation = true;
     };
 
     /** @brief 主纠偏链冻结的同帧输入；虚拟点以工件父级的变位机 TCP 系为参考。 */
@@ -53,6 +78,9 @@ public:
         digital_twin::DigitalTwinVisionLaserObservation observation;
         RuntimeTrackingOptions trackingOptions;
         vision::WeldProjectionContext projectionContext;
+        IndependentObservation independentObservation;
+        /// @brief 本轮运行的局部配准归档目录；必须非空且可写，I/O 仅在 worker 执行。
+        QString archiveDirectory;
     };
 
     /** @brief 工件父级系下的小幅虚拟到真实修正；accepted 才允许提交场景写回。 */
@@ -63,6 +91,8 @@ public:
         bool attempted = false;
         bool accepted = false;
         localization::RigidTransform correction;
+        /// @brief 最新同帧独立观测，同时供写回关键点位移限幅使用。
+        IndependentObservation independentObservation;
         QString message;
         double beforeResidualMm = 0.0;
         double afterResidualMm = 0.0;
@@ -70,6 +100,13 @@ public:
         qint64 solveElapsedMs = 0;
         int frameCount = 0;
         int pointCount = 0;
+        double beforeIndependentErrorMm = 0.0;
+        double afterIndependentErrorMm = 0.0;
+        double realCoverageRatio = 0.0;
+        double virtualCoverageRatio = 0.0;
+        double matchedSpreadRatio = 0.0;
+        bool archiveSucceeded = false;
+        QString archivePath;
     };
 
     /** @brief 创建不拥有外部设备的 worker。 */
@@ -86,6 +123,11 @@ public:
     Result processClouds(quint64 sessionId, quint64 generation, qint64 frameId,
         const std::vector<localization::Point3D_mm> &realPointsInParent_mm,
         const std::vector<localization::Point3D_mm> &virtualPointsInParent_mm);
+    /** @brief 生产安全入口；独立观测、双向覆盖及归档全部通过后才允许 accepted。 */
+    Result processClouds(quint64 sessionId, quint64 generation, qint64 frameId,
+        const std::vector<localization::Point3D_mm> &realPointsInParent_mm,
+        const std::vector<localization::Point3D_mm> &virtualPointsInParent_mm,
+        const CloudValidationContext &validation);
     /** @brief 清窗及节流时钟；正在执行的 PCL 调用只能在返回后由上层丢弃。 */
     void reset();
 
@@ -93,8 +135,17 @@ private:
     struct CloudFrame {
         std::vector<localization::Point3D_mm> real;
         std::vector<localization::Point3D_mm> reference;
+        std::vector<localization::Point3D_mm> rawReal;
+        std::vector<localization::Point3D_mm> rawReference;
+        IndependentObservation independentObservation;
+        qint64 frameId = -1;
         qint64 capturedMs = 0;
     };
+    /** @brief 只按尝试落盘；写入失败或预算耗尽必须使候选失效。 */
+    bool archiveAttempt(const std::deque<CloudFrame> &frames,
+        const localization::LocalCorrectionPipelineRequest &request,
+        const std::vector<localization::Point3D_mm> &preprocessedRealPoints,
+        const CloudValidationContext &validation, Result &result);
     Options m_options;
     quint64 m_sessionId = 0;
     quint64 m_generation = 0;
@@ -103,6 +154,8 @@ private:
     qint64 m_lastMatchMs = -1;
     QElapsedTimer m_clock;
     std::deque<CloudFrame> m_frames;
+    quint64 m_archiveSessionId = 0;
+    int m_archiveAttemptCount = 0;
     localization::LocalizationService m_service;
     localization::LocalizationLocalCorrectionPipeline m_pipeline;
 };

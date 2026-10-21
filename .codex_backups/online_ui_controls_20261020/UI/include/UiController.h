@@ -1,0 +1,410 @@
+﻿/*******************************************************************************
+ * @copyright   Copyright (c) 2024, 华南理工大学 I2R 实验室, All rights reserved.
+ *
+ * @file        UiController.h
+ * @brief       UI 控制器
+ * @details     连接主界面、相机、机器人、视觉、定位和控制模块的运行时流程。
+ ******************************************************************************/
+#ifndef I2R_RLC_UI_UI_CONTROLLER_H
+#define I2R_RLC_UI_UI_CONTROLLER_H
+
+#include <memory>
+#include <vector>
+
+#include <QObject>
+
+#include "AutomaticCalibrationPoseController.h"
+#include "CameraService.h"
+#include "CalibrationCaptureController.h"
+#include "ConfigRepository.h"
+#include "CorrectionRobotJobMonitor.h"
+#include "LocalizationApplicationService.h"
+#include "NullDigitalTwinService.h"
+#include "OfflineCorrectionTypes.h"
+#include "OfflineImageCameraDevice.h"
+#include "OnlineCorrectionP001Presentation.h"
+#include "OnlineCorrectionTypes.h"
+#include "OnlineCorrectionWorkflow.h"
+#include "RobotSimVirtualReferenceCache.h"
+#include "WeldmentLocalizationVirtualReferenceProvider.h"
+#include "WeldmentVirtualLaserPriorGenerator.h"
+#include "geometry/WeldProjectionContextBuilder.h"
+#include "RuntimeCoordinator.h"
+#include "ibvs/IbvsOnlineService.h"
+
+#ifdef I2R_RLC_HAS_OPENCV
+#include "pipeline/WeldVisionAlgorithmPipeline.h"
+#endif
+
+class QTimer;
+
+namespace i2r_rlc::ui {
+
+class MainWidget;
+/**
+ * @brief UI 层控制器。
+ *
+ * 本类位于 UI 模块 MVC 的 Controller 位置，负责把 QWidget 用户意图转换为
+ * 对各功能模块的调用，并把模块返回的值对象写回 View。具体算法仍在各模块内，
+ * Controller 不持有真实设备生命周期，也不直接实现焊缝识别或定位求解。
+ */
+class UiController final : public QObject {
+    Q_OBJECT
+
+public:
+    explicit UiController(MainWidget& view, QObject* parent = nullptr);
+    ~UiController() override;
+
+    /**
+     * @brief 在初始化运行时前注入真实流式相机设备。
+     *
+     * 设备所有权转交给 Camera worker；调用方通常传入
+     * `AlliedCameraDevice` 或 `BaslerCameraDevice`。
+     */
+    bool setLiveCameraDevice(
+        std::unique_ptr<i2r_rlc::camera::ICameraDevice> device,
+        int captureIntervalMs = 33);
+
+    /**
+     * @brief 初始化默认 no-op 服务状态。
+     */
+    void initialize();
+
+    /**
+     * @brief 关闭运行时线程并断开到 UI 的异步信号。
+     *
+     * 应在 QApplication 事件循环退出后、View 析构前调用，避免后台线程在
+     * UI 控件销毁边界继续追加日志或刷新状态。
+     */
+    void shutdown();
+
+private slots:
+    /**
+     * @brief 消费 runtime 的纠偏同步快照，并执行三键 pending/consumed 匹配。
+     *
+     * 槽只接受 OnlineCorrection/OfflineCorrection；全局定位、普通实时和手动
+     * RobotSim 信号没有该关联键，不能借此更新纠偏确认状态。
+     */
+    void handleCorrectionSyncUpdate(const CorrectionSyncUpdate& update);
+
+private:
+    struct RobotStateModel {
+        QString connectionText = QStringLiteral("未连接");
+        QString modeText = QStringLiteral("Dry-run");
+        QString endpointText = QStringLiteral("RobotComm/DryRun");
+        double x_mm = 0.0;
+        double y_mm = 0.0;
+        double z_mm = 0.0;
+    };
+
+    /**
+     * @brief 单个纠偏页面的 UI 同步投影状态。
+     *
+     * pending 必须同时匹配 sessionId、purpose 和 frameId 才能转成 consumed。
+     * 最近确认帧和最近错误分开保存，避免普通流程文本覆盖同步诊断信息。
+     */
+    struct CorrectionSyncPresentationState {
+        quint64 sessionId = 0;
+        CorrectionPurpose purpose = CorrectionPurpose::None;
+        qint64 pendingFrameId = -1;
+        qint64 lastConsumedFrameId = -1;
+        quint64 trackingResultCount = 0;
+        /// @brief 会话终止后拒绝迟到显示结果，直至新会话建立。
+        bool acceptingFrames = false;
+        QString stateText = QStringLiteral("空闲");
+        QString lastError;
+    };
+
+    enum class CorrectionRobotStartKind {
+        None,
+        OnlineGlobalLocate,
+        GlobalLocateStandalone,
+        OnlineCorrection,
+        Offline
+    };
+
+    enum class StandaloneGlobalLocateWorkflowState {
+        Idle,
+        WaitingRobotStartGate,
+        JobRunning,
+        DrainingVision,
+        Applying,
+        Failed
+    };
+
+    void bindView();
+    void onCameraExposureRequested(int exposureUs);
+    void onLaserEnabledChanged(bool enabled);
+    void onWorkpieceSelected(int profileIndex, const QString& profileId);
+    void onOnlineCorrectionStartModeChanged(int modeIndex);
+    void onOnlineCorrectionConfigurationRequested();
+    void onOnlineCorrectionConfigurationSelected(
+        const QString& workPathFile,
+        const QString& teachPoseFile);
+    void onStartWeldTrackingRequested();
+    void onStartManualCalibrationCaptureRequested();
+    void onCaptureCalibrationBoardRequested();
+    void onDeleteLastCalibrationSampleRequested();
+    void onCaptureCalibrationLaserRequested();
+    void onPreviewAutomaticCalibrationCaptureRequested();
+    void onStartAutomaticCalibrationCaptureRequested();
+    void onFinishCalibrationCaptureRequested();
+    void onCalibrationModeSelectionReturned();
+    void onCalibrationFeaturePanelClosed();
+    void onOfflineCorrectionConfigurationRequested();
+    void onOfflineCorrectionArchiveSelected(const QString& archiveFilePath);
+    void onStartOfflineCorrectionRequested();
+    void onOfflineCorrectionFeaturePanelClosed();
+    void onOnlineCorrectionFeaturePanelClosed();
+    void onStartTeachTrajectoryRecordingRequested();
+    void onSaveTeachTrajectoryRequested(
+        const QString& outputDirectory,
+        const QString& baseName);
+    void onTeachTrajectoryFeaturePanelClosed();
+    void onLoadIbvsConfigRequested();
+    void onStartIbvsDryRunRequested();
+    void onStepIbvsDryRunRequested();
+    void onStopIbvsDryRunRequested();
+    void onRunLocalCorrectionReplayRequested();
+    void beginStandaloneGlobalLocate();
+    void startGlobalLocatePriorTimer();
+    void stopGlobalLocatePriorTimer();
+    void publishGlobalLocateVirtualPrior();
+    void handleGlobalLocateVirtualPriorResult(
+        quint64 requestId,
+        const i2r_rlc::digital_twin::DigitalTwinVisionLaserObservation& observation);
+    void handleGlobalLocateFrameVirtualPriorResult(
+        const i2r_rlc::digital_twin::DigitalTwinVisionLaserObservation& observation);
+    void handleOnlineAutoGlobalLocateVirtualPriorResult(
+        const i2r_rlc::digital_twin::DigitalTwinVisionLaserObservation& observation);
+    void handleRobotSimRealtimeVirtualPriorResult(
+        const i2r_rlc::digital_twin::DigitalTwinVisionLaserObservation& observation);
+    void handleRobotSimRealtimeVirtualReferenceResult(
+        const i2r_rlc::digital_twin::DigitalTwinVirtualReferenceResult& reference);
+    void handleRobotSimManualVirtualReferenceResult(
+        const i2r_rlc::digital_twin::DigitalTwinVirtualReferenceResult& reference);
+    void cancelStandaloneGlobalLocate();
+    void processStandaloneGlobalLocateRobotState();
+    void completeStandaloneGlobalLocateVisionDrain();
+    void applyStandaloneGlobalLocalization();
+    void handleStandaloneGlobalLocalizationResult(
+        quint64 requestId,
+        const StandaloneGlobalLocalizationResult &result);
+    void collectStandaloneGlobalLocateScanPoint(const RuntimeTrackingResult& result);
+    void collectStandaloneGlobalLocateRobotSimVirtualPoints(
+        int segmentIndex,
+        const std::vector<i2r_rlc::digital_twin::DigitalTwinPoint3D_mm>& points);
+    void finishStandaloneGlobalLocateCurrentSegment();
+    void failStandaloneGlobalLocate(const QString& message);
+    void appendGlobalLocateInfo(const QString& message);
+    void appendGlobalLocateWarning(const QString& message);
+    void resetStandaloneGlobalLocateDiagnostics();
+    QString resolveWeldmentPath(const WorkpieceProfile& profile) const;
+    void onGlobalLocateVirtualLaserConfigurationChanged();
+    void handleRobotSimConnectionStateChanged(
+        bool connected,
+        const QString& message);
+    void handleRobotSimManualConnectionStateChanged(
+        bool connected,
+        const QString& message);
+    void handleRobotSimStateSynchronizationChanged(
+        bool succeeded,
+        const QString& message);
+    void onGlobalLocateRequested();
+    void onClearLocalizationResultRequested();
+    void onRobotSimVirtualReferenceRequested(int port);
+    void onRobotSimRealSceneConnectionRequested(int port);
+    void onStopRequested();
+    void handleFrameReady(const i2r_rlc::camera::CameraFrame& frame);
+    void handleRuntimeFrameReady(const i2r_rlc::camera::CameraFrame& frame);
+    void showFrameWithCalibrationGuide(const i2r_rlc::camera::CameraFrame& frame);
+    void showCalibrationCaptureUpdate(const i2r_rlc::control::CalibrationCaptureUpdate& update);
+    void showOfflineCorrectionUpdate(const i2r_rlc::control::OfflineCorrectionUpdate& update);
+    void renderOfflineCorrectionState();
+    void showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorrectionUpdate& update);
+    void showTeachTrajectoryRecorderUpdate(
+        const i2r_rlc::control::TeachTrajectoryRecorderSnapshot& snapshot);
+    void showRuntimeTrackingResult(const i2r_rlc::ui::RuntimeTrackingResult& result);
+    /// @brief 校验完整帧上下文后，一次提交原图、仿真参考和真实检测点；不回退到最新帧。
+    bool presentCorrectionFrame(const RuntimeTrackingResult& result);
+    /// @brief 清除检测快照的叠加和帧标识，恢复无检测标记的相机预览。
+    void clearCorrectionFrameDisplay();
+    void processAutomaticCalibrationRobotState();
+    void capturePendingAutomaticCalibrationLaserImage();
+    void scheduleAutomaticCalibrationLaserCaptureIfNeeded(
+        const i2r_rlc::control::CalibrationCaptureUpdate& update);
+    void cancelPendingAutomaticCalibrationLaserCapture();
+    void applyCalibrationCaptureHardwareRequest(
+        const i2r_rlc::control::CalibrationCaptureUpdate& update);
+    void showRobotDiagnostics(
+        const i2r_rlc::robot_comm::RobotCommunicationDiagnostics& diagnostics);
+    void showRobotState(const RobotStateModel& state);
+    void showIbvsStepResult(const i2r_rlc::ibvs::IbvsOnlineStepResult& result);
+    void showLocalizationUpdate(const i2r_rlc::localization::LocalizationWorkflowUpdate& update);
+    void loadWorkpieceProfiles();
+    const WorkpieceProfile* selectedWorkpieceProfile() const;
+    bool validateSelectedOnlineTrajectory(QString* workPathFile, QString* teachPoseFile);
+    bool validateSelectedOfflineCorrectionTrajectory(QString* workPathFile, QString* teachPoseFile);
+    bool dispatchAutomaticCalibrationTemplatePoses();
+    bool dispatchAutomaticCalibrationCorrectedPoses();
+    void configureSelectedWorkpieceCorrection();
+    void configureSelectedWorkpieceOnlineCorrection();
+    void configureSelectedWorkpieceOfflineCorrection();
+    /// @brief UI 定时器以 5 Hz 刷新显示快照；不滤波、不改写算法和控制数据。
+    void renderOnlineCorrectionCoordinates();
+    void beginCorrectionRobotStartGate(
+        CorrectionRobotStartKind kind,
+        const QString& jobName);
+    void cancelPendingCorrectionRobotStart();
+    void evaluatePendingCorrectionRobotStart();
+    /// @brief 持续显示启动阻塞原因，避免普通工作流刷新覆盖等待状态。
+    void renderPendingCorrectionRobotStart();
+    void executePendingCorrectionRobotStart(
+        CorrectionRobotStartKind kind,
+        const QString& jobName);
+    void cancelOnlineAutoCorrectionWorkflow();
+    void processOnlineAutoCorrectionRobotState();
+    void completeOnlineAutoCorrectionGlobalLocateVisionDrain();
+    void applyOnlineAutoCorrectionGlobalLocalization();
+    void failOnlineAutoCorrectionWorkflow(const QString& message);
+    bool queueOnlineAutoCorrectionStart();
+    void collectOnlineAutoCorrectionScanPoint(const RuntimeTrackingResult& result);
+    void showLegacyInfoPrompt(const QString& title, const QString& message);
+    void showLegacyWarningPrompt(const QString& title, const QString& message);
+    bool confirmLegacyPrompt(const QString& title, const QString& message);
+    void appendInfo(const QString& text);
+    void appendWarning(const QString& text);
+    void renderCorrectionSyncState(
+        const CorrectionSyncPresentationState& state);
+
+    MainWidget& m_view;
+    ConfigRepository m_configRepository;
+    i2r_rlc::camera::OfflineImageCameraDevice m_offlineCamera;
+    i2r_rlc::camera::CameraService m_cameraService;
+#ifdef I2R_RLC_HAS_OPENCV
+    i2r_rlc::vision::WeldVisionPipelineOptions m_visionOptions;
+    i2r_rlc::vision::WeldVisionPipelineState m_visionState;
+#endif
+    i2r_rlc::control::CCalibrationCaptureController m_calibrationCaptureController;
+    i2r_rlc::ui::CRuntimeCoordinator m_runtimeCoordinator;
+    i2r_rlc::localization::LocalizationApplicationService m_localizationService;
+    i2r_rlc::digital_twin::NullDigitalTwinService m_digitalTwinService;
+    i2r_rlc::ibvs::IbvsOnlineService m_ibvsService;
+    i2r_rlc::camera::CameraFrame m_latestFrame;
+    QVector<WorkpieceProfile> m_workpieceProfiles;
+    int m_selectedWorkpieceIndex = -1;
+    i2r_rlc::control::CalibrationCaptureUpdate m_lastCalibrationCaptureUpdate;
+    i2r_rlc::robot_comm::RobotState m_robotState;
+    QTimer* m_onlineCoordinateTimer = nullptr;
+    control::OnlineCorrectionPoint m_onlineKcfRobotPoint;
+    control::OnlineCorrectionPoint m_onlineKcfStationPoint;
+    qint64 m_onlineKcfFrameId = -1;
+    qint64 m_lastOnlineKcfReceivedMs = 0;
+    bool m_onlineKcfLatestValid = false;
+    qint64 m_lastFrameId = -1;
+    bool m_hasLatestFrame = false;
+    bool m_onlineCorrectionConfigured = false;
+    bool m_offlineCorrectionConfigured = false;
+    i2r_rlc::control::OnlineCorrectionStartMode m_onlineCorrectionStartMode =
+        i2r_rlc::control::OnlineCorrectionStartMode::InitType;
+    i2r_rlc::control::OfflineCorrectionPhase m_offlineCorrectionPhase =
+        i2r_rlc::control::OfflineCorrectionPhase::Idle;
+    i2r_rlc::control::OfflineCorrectionUpdate m_lastOfflineCorrectionUpdate;
+    bool m_hasOfflineCorrectionUpdate = false;
+    bool m_offlineSeamWindowClosed = false;
+    int m_offlineStartCount = 0;
+    i2r_rlc::control::CAutomaticCalibrationPoseController
+        m_automaticCalibrationPoseController;
+    bool m_trackingOverlayActive = false;
+    bool m_calibrationGuideInfoEmitted = false;
+    bool m_calibrationGuideClipWarningEmitted = false;
+    long m_lastCalibrationBcalib = 0;
+    qint64 m_lastRobotPollSummaryMs = 0;
+    quint64 m_lastDetailedTransactionCount = 0;
+    quint64 m_lastPromptedRobotFailureTransactionCount = 0;
+    bool m_robotConnectionPromptPending = false;
+    bool m_laserCommandPromptPending = false;
+    bool m_teachTrajectorySavePromptPending = false;
+    bool m_offlineCompletionPromptShown = false;
+    COnlineCorrectionWorkflow m_onlineAutoCorrectionWorkflow;
+    CCorrectionRobotJobMonitor m_onlineAutoGlobalLocateJobMonitor;
+    CCorrectionRobotJobMonitor m_standaloneGlobalLocateJobMonitor;
+    StandaloneGlobalLocateWorkflowState m_standaloneGlobalLocateState =
+        StandaloneGlobalLocateWorkflowState::Idle;
+    QString m_standaloneGlobalLocateJbi;
+    QString m_standaloneGlobalLocateWeldmentPath;
+    QString m_standaloneGlobalLocateOutputDirectory;
+    quint64 m_standaloneGlobalLocateApplicationNextRequestId = 0;
+    quint64 m_standaloneGlobalLocateApplicationPendingRequestId = 0;
+    GlobalLocateVirtualLaserSource m_globalLocateVirtualLaserSource =
+        GlobalLocateVirtualLaserSource::Occt;
+    GlobalLocateVirtualPointCloudSource
+        m_globalLocateVirtualPointCloudSource =
+            GlobalLocateVirtualPointCloudSource::Weldment;
+    i2r_rlc::digital_twin::RobotSimEndpointConfig
+        m_globalLocateRobotSimEndpoint;
+    i2r_rlc::digital_twin::RobotSimSceneConfig
+        m_globalLocateRobotSimScene;
+    bool m_globalLocateVirtualLaserConfigurationConfirmed = true;
+    bool m_robotSimConnected = false;
+    bool m_robotSimConnectionPending = false;
+    QTimer* m_globalLocatePriorTimer = nullptr;
+    bool m_globalLocatePriorRequestInFlight = false;
+    quint64 m_globalLocatePriorNextRequestId = 0;
+    quint64 m_globalLocatePriorPendingRequestId = 0;
+    i2r_rlc::digital_twin::WeldmentVirtualLaserRequest
+        m_globalLocatePriorPendingRequest;
+    i2r_rlc::vision::WeldSensorCalibration m_sensorCalibration;
+    i2r_rlc::vision::PositionerCalibration m_positionerCalibration;
+    std::vector<std::vector<i2r_rlc::localization::Point3D_mm>>
+        m_standaloneGlobalLocateSegments;
+    std::vector<std::vector<i2r_rlc::localization::Point3D_mm>>
+        m_standaloneGlobalLocateRobotSimVirtualSegments;
+    std::vector<i2r_rlc::localization::Point3D_mm>
+        m_standaloneGlobalLocateCurrentSegment;
+    int m_standaloneGlobalLocateActiveSegmentIndex = 0;
+    int m_standaloneGlobalLocateLastRobotPosflag = 0;
+    int m_standaloneGlobalLocateObservedFaceCount = 0;
+    int m_standaloneGlobalLocateLastDetectionWindowState = -1;
+    int m_standaloneGlobalLocateTrackingFrameCount = 0;
+    int m_standaloneGlobalLocateTriggerRejectedFrameCount = 0;
+    int m_standaloneGlobalLocateInvalidFrameCount = 0;
+    int m_standaloneGlobalLocateValidFrameCount = 0;
+    int m_standaloneGlobalLocateDiscardedPointCount = 0;
+    int m_standaloneGlobalLocatePriorSuccessCount = 0;
+    int m_standaloneGlobalLocatePriorFailureCount = 0;
+    int m_standaloneGlobalLocateLastPriorSegmentIndex = 0;
+    bool m_standaloneGlobalLocatePriorReady = false;
+    QString m_standaloneGlobalLocateLastTrackingMessage;
+    QString m_standaloneGlobalLocateLastPriorMessage;
+    std::vector<i2r_rlc::localization::Point3D_mm> m_onlineAutoGlobalLocalizationScanPoints;
+    std::vector<i2r_rlc::localization::Point3D_mm>
+        m_onlineAutoGlobalLocalizationVirtualPoints;
+    RuntimeOnlineCorrectionConfiguration m_onlineCorrectionConfiguration;
+    RuntimeOnlineCorrectionConfiguration
+        m_onlineAutoCorrectionRunConfiguration;
+    CorrectionRobotStartKind m_pendingCorrectionRobotStartKind =
+        CorrectionRobotStartKind::None;
+    QString m_pendingCorrectionRobotJobName;
+    QString m_correctionRobotStartWaitText;
+    bool m_robotDeviceConnected = false;
+    bool m_laserEnabled = true;
+    bool m_filterEnabled = false;
+    int m_cameraExposureUs = 1500;
+    bool m_liveCameraDeviceConfigured = false;
+    bool m_robotSimManualConnectionPending = false;
+    bool m_robotSimManualConnected = false;
+    bool m_robotSimManualModeRequested = false;
+    quint16 m_robotSimManualPort = 0;
+    int m_robotSimManualSensorId = 1013;
+    bool m_hasRobotSimReference = false;
+    CorrectionSyncPresentationState m_onlineCorrectionSyncState;
+    CorrectionSyncPresentationState m_offlineCorrectionSyncState;
+    COnlineCorrectionP001Presentation m_onlineCorrectionP001Presentation;
+    RobotSimVirtualReferenceCache m_lastRobotSimReference;
+    QTimer* m_automaticCalibrationLaserTimer = nullptr;
+};
+
+} // namespace i2r_rlc::ui
+
+#endif // I2R_RLC_UI_UI_CONTROLLER_H

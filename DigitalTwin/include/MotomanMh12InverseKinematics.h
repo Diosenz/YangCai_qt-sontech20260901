@@ -3,7 +3,7 @@
  *
  * @file      MotomanMh12InverseKinematics.h
  * @brief     由真实 TCP 位姿反解 Motoman MH12 六轴关节角。
- * @details   保留 SWv1 中“控制柜 TCP -> 软件机器人模型逆解”的换算边界，
+ * @details   按 RobotSim test31 的 TCP1011 工具定义换算软件法兰，
  *            输出可直接作为 RobotSim S/L/U/R/B/T 关节值的弧度数组。
  */
 
@@ -43,6 +43,7 @@ struct MotomanMh12InverseKinematicsResult {
  * @brief Motoman MH12 有状态解析逆解器。
  *
  * 求解器会保留上一帧成功解，用于在多组合法逆解中保持关节分支连续。
+ * 当前工具安装与 RobotSim test31 的 TCP1011 一致；更换场景工具时须同步适配。
  * 对象应固定由一个工作线程使用，不支持并发调用。
  */
 class CMotomanMh12InverseKinematics final {

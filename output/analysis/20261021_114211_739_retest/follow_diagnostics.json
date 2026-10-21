@@ -1,0 +1,77 @@
+{
+  "batches": 449,
+  "attempted": 449,
+  "applied": 420,
+  "rms": {
+    "n": 449,
+    "mean_mm": 0.4556412580066815,
+    "max_mm": 1.666462133,
+    "rmse_mm": 0.5784253369066567,
+    "median_mm": 0.257070448,
+    "p95_mm": 1.2124862425999998
+  },
+  "rotation_deg": {
+    "n": 449,
+    "unit": "deg",
+    "mean": 80.09917321412354,
+    "median": 68.16468264015303,
+    "p95": 167.18878917969215,
+    "maximum": 179.97351657898074
+  },
+  "successive_rotation_change_deg": {
+    "n": 448,
+    "unit": "deg",
+    "mean": 59.43066510490077,
+    "median": 45.50155292345418,
+    "p95": 158.71437570197045,
+    "maximum": 178.5362553912059
+  },
+  "applied_rotations_above_90_deg": 149,
+  "follow_rows": 7591,
+  "all_projection_t_negative": true,
+  "projection_t_minimum": -48.79685385288372,
+  "lead_mm": {
+    "n": 7591,
+    "mean_mm": 3.3162136648343603,
+    "max_mm": 41.135455195053346,
+    "rmse_mm": 6.461464572197947,
+    "median_mm": 1.332586236122082,
+    "p95_mm": 14.98959098748758
+  },
+  "target_line_length_mm": {
+    "n": 7591,
+    "mean_mm": 1.8450354593983287,
+    "max_mm": 6.839360279172086,
+    "rmse_mm": 1.9450455616515891,
+    "median_mm": 1.9982558086616415,
+    "p95_mm": 2.4663966426317208
+  },
+  "current_to_target_line_mm": {
+    "n": 7591,
+    "mean_mm": 1.8034494824989733,
+    "max_mm": 25.286975487092597,
+    "rmse_mm": 4.242543915562526,
+    "median_mm": 0.24990054345956902,
+    "p95_mm": 10.061163595653802
+  },
+  "generated_commands": 7592,
+  "p_receipts": 2897,
+  "p_receipt_gap_ms": {
+    "n": 2896,
+    "unit": "ms",
+    "mean": 177.5110497237569,
+    "median": 175.0,
+    "p95": 228.0,
+    "maximum": 1059.0
+  },
+  "generation_gap_ms": {
+    "n": 7591,
+    "unit": "ms",
+    "mean": 67.70926096693452,
+    "median": 61.0,
+    "p95": 139.0,
+    "maximum": 1037.0
+  },
+  "p_received_all_success": true,
+  "warning": "Transform magnitudes are not physical robot/workpiece displacements. Line residuals are internal control geometry, not weld truth. P receiver reuse semantics not established."
+}

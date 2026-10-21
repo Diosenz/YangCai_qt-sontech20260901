@@ -53,13 +53,14 @@ constexpr JointArray JOINT_MAX_RAD = {
     2.3561944901923448,
     2.0 * PI};
 
-// SWv1/CDlgConnectRobotController.cpp 中真实 TCP 到软件法兰的固定工具标定。
-constexpr double TOOL_TO_FLANGE_X_M = -0.125136;
-constexpr double TOOL_TO_FLANGE_Y_M = 0.004882;
-constexpr double TOOL_TO_FLANGE_Z_M = 0.494425;
-constexpr double TOOL_TO_FLANGE_RX_RAD = 0.5225 * DEG_TO_RAD;
-constexpr double TOOL_TO_FLANGE_RY_RAD = -34.8683 * DEG_TO_RAD;
-constexpr double TOOL_TO_FLANGE_RZ_RAD = 0.1727 * DEG_TO_RAD;
+// 以 RobotSim test31 的 TCP1011 相对软件法兰定义为准；长度 m，固定轴 Rz*Ry*Rx。
+// 逆解与场景必须使用同一工具，否则关节同步后虚拟 TCP/相机不再对应输入 TCP。
+constexpr double TOOL_TO_FLANGE_X_M = -0.1258;
+constexpr double TOOL_TO_FLANGE_Y_M = 0.0047;
+constexpr double TOOL_TO_FLANGE_Z_M = 0.4902;
+constexpr double TOOL_TO_FLANGE_RX_RAD = -174.8 * DEG_TO_RAD;
+constexpr double TOOL_TO_FLANGE_RY_RAD = -145.2 * DEG_TO_RAD;
+constexpr double TOOL_TO_FLANGE_RZ_RAD = 169.2 * DEG_TO_RAD;
 
 enum class SolutionFlag {
     Invalid = -1,

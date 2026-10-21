@@ -19,6 +19,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSettings>
+#include <QTemporaryDir>
 #include <QThread>
 
 #include "OnlineLocalRegistrationWorker.h"
@@ -604,6 +605,9 @@ bool testCorrectionLimit()
 /** @brief 可手算图像入口：相机与末节重合，线在末节 z=1000、父级 TCP z=769 mm。 */
 ui::COnlineLocalRegistrationWorker::Input makeSurfaceInput(qint64 frameId, int stripeY)
 {
+    // 保留归档供失败重放；不自动清理测试生成的任何文件。
+    static QTemporaryDir archiveDirectory;
+    archiveDirectory.setAutoRemove(false);
     ui::COnlineLocalRegistrationWorker::Input input;
     input.sessionId = 41;
     input.generation = 3;
@@ -638,6 +642,13 @@ ui::COnlineLocalRegistrationWorker::Input makeSurfaceInput(qint64 frameId, int s
     input.observation.referenceObjectId = 200;
     input.observation.hasWeldPointImage_px = true;
     input.observation.weldPointImage_px = {160.0, static_cast<double>(stripeY)};
+    input.independentObservation.valid = true;
+    input.independentObservation.frameId = frameId;
+    input.independentObservation.realWeldPointInParent_mm = {
+        0.0, 0.5 * static_cast<double>(stripeY - 120), 769.0};
+    input.independentObservation.virtualWeldPointInParent_mm = {
+        0.0, 0.5 * static_cast<double>(stripeY - 120), 768.75};
+    input.archiveDirectory = archiveDirectory.path();
     // 生产走廊过滤拒绝跨度超过 100 pixel 的参考相邻点；仿真线应保持采样连续。
     for (int x = 60; x <= 260; x += 10) {
         input.observation.laserLineImagePoints_px.push_back({
@@ -663,12 +674,13 @@ bool testImageExtractionInParentTcpFrame()
     if (!second.accepted) {
         std::cerr << "image local registration: " << second.message.toStdString() << '\n';
     }
-    ok &= expect(second.attempted && second.accepted,
-        "two separated extracted laser lines must register as a local surface");
+    ok &= expect(second.attempted && !second.accepted && second.archiveSucceeded
+        && second.afterIndependentErrorMm > second.beforeIndependentErrorMm + 0.1,
+        "surface fit that moves the independent ideal stripe center away must be rejected and archived");
     ok &= expect(std::abs(second.correction.rowMajor[11] - 0.25) < 0.08,
         "real TCP z=769 must align virtual parent TCP z=768.75 by +0.25 without adding 231");
-    // Gabor/Steger 后的条纹不等于理想几何线；初值应在既有匹配范围内，
-    // 修正后应贴合。不能把理想 Z 差 0.25 当成整云最近邻初始残差。
+    // Gabor/Steger 后的表面点有切向偏差：拟合残差虽下降，独立原图中心却变差。
+    // 保留独立点的可手算真值，不能为了让 accepted 通过而随 ICP 移动它。
     ok &= expect(second.beforeResidualMm > 0.1 && second.beforeResidualMm < 5.0
         && second.afterResidualMm < 0.1,
         "same-parent image cloud must enter existing ICP capture range and align below 0.1 mm");
@@ -679,14 +691,6 @@ bool testImageExtractionInParentTcpFrame()
         << " solve_ms=" << second.solveElapsedMs
         << " before_mm=" << second.beforeResidualMm
         << " after_mm=" << second.afterResidualMm << '\n';
-    if (second.accepted) {
-        PoseFixture fixture(200);
-        const auto written = fixture.applyTransform(7, second.correction).get();
-        ok &= expect(written.succeeded && fixture.record->writes == 1,
-            "real image to local ICP to RobotSim must commit exactly once and verify");
-        ok &= expect(std::abs(fixture.record->worldPose.at(2).toDouble() - 0.25) < 0.08,
-            "image-derived normal correction must reach simulated workpiece world pose");
-    }
     return ok;
 }
 
@@ -707,6 +711,13 @@ bool testImageExtractionWithDifferentTcpOffsets()
         const auto makeInput = [&offset](qint64 frameId, int stripeY) {
             auto input = makeSurfaceInput(frameId, stripeY);
             input.trackingOptions.positionerCalibration.toolTcpInLastLinkMm = offset;
+            auto &independent = input.independentObservation;
+            independent.realWeldPointInParent_mm.x_mm -= offset.x();
+            independent.realWeldPointInParent_mm.y_mm -= offset.y();
+            independent.realWeldPointInParent_mm.z_mm = 1000.0 - offset.z();
+            independent.virtualWeldPointInParent_mm.x_mm -= offset.x();
+            independent.virtualWeldPointInParent_mm.y_mm -= offset.y();
+            independent.virtualWeldPointInParent_mm.z_mm = 999.75 - offset.z();
             for (auto &point : input.observation.laserLinePoints_mm) {
                 point.x_mm -= offset.x();
                 point.y_mm -= offset.y();
@@ -723,10 +734,12 @@ bool testImageExtractionWithDifferentTcpOffsets()
         if (offset.isZero()) {
             zeroOffsetResidualMm = result.beforeResidualMm;
         }
-        ok &= expect(result.accepted && result.afterResidualMm < 0.1
+        ok &= expect(result.attempted && !result.accepted && result.archiveSucceeded
+            && result.afterIndependentErrorMm > result.beforeIndependentErrorMm + 0.1
+            && result.afterResidualMm < 0.1
             && std::abs(result.beforeResidualMm - zeroOffsetResidualMm) < 1e-3
             && std::abs(result.correction.rowMajor[11] - 0.25) < 0.08,
-            "consistent TCP offsets must retain the zero-offset residual and the same small correction");
+            "TCP offsets must preserve solved correction and independent rejection of the biased surface fit");
     }
     return ok;
 }
@@ -746,6 +759,7 @@ bool testLocalCorrespondenceDistanceAndMotionLimit()
         worker.configure(options);
         const auto shiftedInput = [](qint64 frameId, int stripeY) {
             auto input = makeSurfaceInput(frameId, stripeY);
+            input.independentObservation.virtualWeldPointInParent_mm.z_mm -= 6.0;
             for (auto &point : input.observation.laserLinePoints_mm) {
                 point.z_mm -= 6.0;
             }
@@ -788,6 +802,7 @@ bool testAdjustableTranslationLimitAndQuality()
         worker.configure(options);
         const auto shiftedInput = [](qint64 frameId, int stripeY) {
             auto input = makeSurfaceInput(frameId, stripeY);
+            input.independentObservation.virtualWeldPointInParent_mm.z_mm -= 6.0;
             for (auto &point : input.observation.laserLinePoints_mm) {
                 point.z_mm -= 6.0;
             }
@@ -876,6 +891,52 @@ bool testImageInputFaults()
     return ok;
 }
 
+/** @brief 生产图像入口缺少独立同帧原始焊点或归档时必须拒绝，并丢弃半窗。 */
+bool testImageIndependentObservationFaults()
+{
+    bool ok = true;
+    for (int scenario = 0; scenario < 5; ++scenario) {
+        ui::COnlineLocalRegistrationWorker worker(nullptr);
+        auto options = cloudOptions();
+        options.minimumFrames = 2;
+        worker.configure(options);
+        const auto initial = worker.process(makeSurfaceInput(1, 100));
+        ok &= expect(!initial.attempted && initial.frameCount == 1,
+            "independent observation fault fixture must begin with a valid half-window");
+        auto input = makeSurfaceInput(2, 140);
+        switch (scenario) {
+        case 0:
+            input.independentObservation.valid = false;
+            break;
+        case 1:
+            input.independentObservation.frameId = 999;
+            break;
+        case 2:
+            input.independentObservation.realWeldPointInParent_mm.x_mm =
+                std::numeric_limits<double>::quiet_NaN();
+            break;
+        case 3:
+            input.independentObservation.virtualWeldPointInParent_mm.z_mm =
+                std::numeric_limits<double>::infinity();
+            break;
+        default:
+            input.archiveDirectory.clear();
+            break;
+        }
+        const auto rejected = worker.process(input);
+        ok &= expect(!rejected.attempted && !rejected.accepted && rejected.frameCount == 0,
+            "invalid independent observation or missing archive must reject production input");
+        const auto resumed = worker.process(makeSurfaceInput(3, 140));
+        ok &= expect(!resumed.attempted && resumed.frameCount == 1,
+            "invalid independent observation must discard the earlier surface half-window");
+        const auto completed = worker.process(makeSurfaceInput(4, 100));
+        ok &= expect(completed.attempted && !completed.accepted && completed.archiveSucceeded
+            && completed.afterIndependentErrorMm > completed.beforeIndependentErrorMm + 0.1,
+            "fresh inputs must solve and archive a new window while retaining independent rejection of its biased fit");
+    }
+    return ok;
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -897,6 +958,7 @@ int main(int argc, char **argv)
     ok &= testLocalCorrespondenceDistanceAndMotionLimit();
     ok &= testAdjustableTranslationLimitAndQuality();
     ok &= testImageInputFaults();
+    ok &= testImageIndependentObservationFaults();
     if (ok) {
         std::cout << "PASS: online local registration tests\n";
     }

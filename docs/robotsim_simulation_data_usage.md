@@ -25,6 +25,23 @@ RobotSim.exe
 - `Vision`、`Control`、`Camera`、`RobotComm`、测试代码等其他模块：如果需要仿真信息，应优先消费 `DigitalTwinVirtualReferenceResult` 或由上层转换后的本模块 DTO，不直接依赖 RobotSim 内部源码。
 - `UI`：当前负责把一次 RobotSim 查询结果缓存下来，并演示分发给定位和 IBVS dry-run；其他模块不应为了拿仿真数据反向依赖 UI。
 
+### MH12 TCP 同步的工具定义（2026-10-21）
+
+当前 MH12 解析逆解以 RobotSim `test31` 的 TCP1011 为准，不再使用迁移时的
+旧工具标定。工具在软件法兰中的位置为 `(-125.8, 4.7, 490.2) mm`，固定轴
+`Rz * Ry * Rx` 角为 `(-174.8, -145.2, 169.2) deg`；Link6 到软件法兰的
+100 mm 偏置仍独立保留。
+
+同步链为 `真实 TCP * inverse(场景工具) -> 软件法兰 -> MH12 关节`。
+RobotSim 按同一场景工具正解后，应恢复输入 TCP；该约束影响所有复用
+`CMotomanMh12InverseKinematics` 的全局定位、在线/离线纠偏及实时虚拟参考。
+不通过移动工件或修改真实相机标定来补偿工具定义差异。
+
+`i2r_rlc_mh12_inverse_kinematics_tests` 使用独立场景 MDH 正运动学，检查多姿态
+TCP 位置/旋转闭环、无效输入恢复和分支复位。测试不连接机器人或 RobotSim。
+此适配针对当前场景工具，不会自动读取外部 XML；以后更换工具定义时，必须同步
+核对逆解参数及正向闭环。历史采样仍按当时工具链解释，不能据此自动重写旧归档。
+
 ## 2. 所有模块统一接入原则
 
 任何模块想用 RobotSim 仿真信息，都优先遵守下面三条：

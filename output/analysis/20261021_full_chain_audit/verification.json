@@ -1,0 +1,13 @@
+{
+  "samples": 384,
+  "scenarios": 6,
+  "source_hashes_checked": 59,
+  "numerical_assertions": "passed",
+  "script_syntax": "passed",
+  "html_structure_and_local_links": "passed",
+  "scene_load_tool_and_workpiece_log_crosscheck": "passed",
+  "actual_browser_or_UI": "not used; user prohibits Computer Use",
+  "device_or_scene_commands": "none",
+  "production_changes": "none",
+  "production_build_and_runtime_fix_verification": "not performed; investigation only"
+}

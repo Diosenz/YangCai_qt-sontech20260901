@@ -276,6 +276,27 @@ target_link_libraries(i2r_rlc_online_local_registration_tests
     PRIVATE i2r_rlc_ui
 )
 
+i2r_rlc_add_test(i2r_rlc_online_local_registration_safety_tests
+    test_online_local_registration_safety.cpp
+)
+target_link_libraries(i2r_rlc_online_local_registration_safety_tests
+    PRIVATE i2r_rlc_ui
+)
+
+i2r_rlc_add_test(i2r_rlc_online_local_registration_verification_tests
+    test_online_local_registration_verification.cpp
+)
+target_link_libraries(i2r_rlc_online_local_registration_verification_tests
+    PRIVATE i2r_rlc_ui
+)
+
+i2r_rlc_add_test(i2r_rlc_local_registration_writeback_safety_tests
+    test_local_registration_writeback_safety.cpp
+)
+target_link_libraries(i2r_rlc_local_registration_writeback_safety_tests
+    PRIVATE i2r_rlc_ui
+)
+
 i2r_rlc_add_test(i2r_rlc_runtime_live_camera_flow_tests
     test_runtime_live_camera_flow.cpp
 )
@@ -1069,6 +1090,15 @@ target_link_libraries(i2r_rlc_robot_sim_virtual_reference_cache_tests
     PRIVATE
         i2r_rlc_ui
 )
+
+i2r_rlc_add_test(i2r_rlc_mh12_inverse_kinematics_tests
+    test_mh12_inverse_kinematics.cpp
+    ${CMAKE_SOURCE_DIR}/DigitalTwin/src/MotomanMh12InverseKinematics.cpp
+)
+target_include_directories(i2r_rlc_mh12_inverse_kinematics_tests
+    PRIVATE ${CMAKE_SOURCE_DIR}/DigitalTwin/include
+)
+target_link_libraries(i2r_rlc_mh12_inverse_kinematics_tests PRIVATE Eigen3::Eigen)
 
 i2r_rlc_add_test(i2r_rlc_digital_twin_tests
     test_digital_twin_service.cpp

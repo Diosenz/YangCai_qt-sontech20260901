@@ -36,6 +36,7 @@
 #include <QTimer>
 
 #include "RuntimeCoordinator.h"
+#include "AppPaths.h"
 
 namespace i2r_rlc::ui {
 
@@ -2308,6 +2309,17 @@ void CRuntimeCoordinator::beginCorrectionSession(CorrectionPurpose purpose)
     m_correctionSession.active = true;
     m_localRegistrationFaulted = false;
     resetOnlineLocalRegistration();
+    m_localRegistrationArchiveDirectory = AppPaths::fromDefaultLocation().outputDir().filePath(
+        QStringLiteral("online_local_registration/%1_session_%2")
+            .arg(QDateTime::currentDateTimeUtc().toString(QStringLiteral("yyyyMMdd_HHmmss_zzz")))
+            .arg(m_correctionSession.sessionId));
+    if (m_robotSimWorker != nullptr) {
+        const auto safetyOptions = m_localRegistrationSafetyOptions;
+        QMetaObject::invokeMethod(m_robotSimWorker,
+            [worker = m_robotSimWorker, safetyOptions]() {
+                worker->configureLocalRegistrationSafety(safetyOptions);
+            }, Qt::QueuedConnection);
+    }
 
     // KCF 工作期间独占逐帧同步通道。清除尚未派发的普通实时状态，但保留
     // m_latestRobotState，待纠偏会话结束后从最新快照恢复实时显示。
@@ -2707,7 +2719,8 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
     m_currentVisionFrame.reset();
     m_visionFrameInFlight = false;
     if (current.purpose == RuntimeTrackingPurpose::OnlineCorrection) {
-        submitOnlineLocalRegistration(current);
+        verifyOnlineLocalRegistration(current, result);
+        submitOnlineLocalRegistration(current, result);
     }
     if (isCorrection) {
         emitCorrectionSyncState(

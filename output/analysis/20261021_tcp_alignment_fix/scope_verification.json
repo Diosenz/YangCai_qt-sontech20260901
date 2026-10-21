@@ -1,0 +1,10 @@
+{
+  "cmake_existing_changes_preserved": true,
+  "protected_files_checked": [
+    "config/calibration/SENSORPARA.txt",
+    "config/calibration/RBCALIB.DAT"
+  ],
+  "robotsim_scene_unchanged": true,
+  "cpp_utf8_bom": true,
+  "backups": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\.codex_backups\\robotsim_tcp_alignment_20261021"
+}

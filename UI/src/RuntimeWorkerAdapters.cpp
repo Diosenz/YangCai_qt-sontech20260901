@@ -109,6 +109,26 @@ Eigen::Matrix4d rigidTransformToMatrix(
     return matrix;
 }
 
+/** @brief 将内部矩阵复制为可跨线程归档的值对象，不暴露 Eigen 类型。 */
+localization::RigidTransform matrixToRigidTransform(const Eigen::Matrix4d &matrix)
+{
+    localization::RigidTransform transform;
+    for (int row = 0; row < 4; ++row) {
+        for (int column = 0; column < 4; ++column) {
+            transform.rowMajor[static_cast<std::size_t>(row * 4 + column)] = matrix(row, column);
+        }
+    }
+    return transform;
+}
+
+/** @brief 事务一致性比较；容差只覆盖位姿协议的浮点序列化误差。 */
+bool localRegistrationPosesMatch(const Eigen::Matrix4d &actual, const Eigen::Matrix4d &expected)
+{
+    return actual.allFinite() && expected.allFinite()
+        && (actual.block<3, 1>(0, 3) - expected.block<3, 1>(0, 3)).norm() < 1e-3
+        && (actual.block<3, 3>(0, 0) - expected.block<3, 3>(0, 0)).norm() < 1e-5;
+}
+
 digital_twin::DigitalTwinPose6D matrixToRobotSimPose(
     const Eigen::Matrix4d &matrix)
 {
@@ -1439,6 +1459,26 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         result.sample.gapWidthMm = static_cast<float>(detected.gapWidthMm);
     }
     result.valid = detected.valid;
+    // 独立验收只能使用融合前的真实 KCF 观测；诊断归档开关不影响安全数据。
+    const auto &rawDiagnostic = detected.diagnostic;
+    const auto &rawPixel = rawDiagnostic.beforeFusionPoint;
+    const auto &rawTracker = rawDiagnostic.tracker;
+    if (detected.valid && rawDiagnostic.attempted && rawTracker.hasResponse
+        && rawTracker.completed && !rawTracker.correlationJumpRejected
+        && !rawTracker.fusionJumpRejected
+        && std::isfinite(rawPixel.x) && std::isfinite(rawPixel.y)
+        && rawPixel.x >= 0.0 && rawPixel.x < gray8.cols
+        && rawPixel.y >= 0.0 && rawPixel.y < gray8.rows) {
+        const auto independentProjection = vision::CWeldImageToSpaceProjector::projectCvPoint(
+            rawPixel, projectionContext, vision::WeldProjectionTargetFrame::PositionerTcp);
+        const auto &independent = independentProjection.spacePoint;
+        if (independentProjection.valid && independent.valid
+            && std::isfinite(independent.xMm) && std::isfinite(independent.yMm)
+            && std::isfinite(independent.zMm)) {
+            result.independentWeldPointInParent_mm = control::OnlineCorrectionPoint{
+                independent.xMm, independent.yMm, independent.zMm, true};
+        }
+    }
     if (detected.valid) {
         // 复用检测当帧的完整投影链，禁止使用 UI 收到结果时的最新机器人位姿。
         const auto robotProjection = vision::CWeldImageToSpaceProjector::projectCvPoint(
@@ -1779,6 +1819,180 @@ bool CGlobalLocatePriorWorkerAdapter::localRegistrationWriteAttempted() const
     return m_localRegistrationWriteAttempted;
 }
 
+void CGlobalLocatePriorWorkerAdapter::configureLocalRegistrationSafety(
+    const LocalRegistrationSafetyOptions &options)
+{
+    m_localRegistrationSafetyOptions = options;
+    m_localRegistrationSafety = {};
+    m_localRegistrationKeypoints.clear();
+    m_localRegistrationSafetyConfigured = true;
+}
+
+void CGlobalLocatePriorWorkerAdapter::setLocalRegistrationKeypointsInParent(
+    const std::vector<localization::Point3D_mm> &points)
+{
+    m_localRegistrationKeypoints = points;
+}
+
+CGlobalLocatePriorWorkerAdapter::LocalRegistrationSafetySnapshot
+CGlobalLocatePriorWorkerAdapter::localRegistrationSafetySnapshot() const
+{
+    return m_localRegistrationSafety;
+}
+
+digital_twin::DigitalTwinCommandResult
+CGlobalLocatePriorWorkerAdapter::markLocalRegistrationVerified(quint64 epoch)
+{
+    return verifyOrRestoreLocalRegistration(epoch, false);
+}
+
+digital_twin::DigitalTwinCommandResult
+CGlobalLocatePriorWorkerAdapter::rollbackLocalRegistrationCorrection(quint64 epoch)
+{
+    return verifyOrRestoreLocalRegistration(epoch, true);
+}
+
+digital_twin::DigitalTwinCommandResult
+CGlobalLocatePriorWorkerAdapter::verifyOrRestoreLocalRegistration(quint64 epoch, bool restore)
+{
+    m_localRegistrationWriteAttempted = false;
+    QElapsedTimer timer;
+    timer.start();
+    auto &transaction = m_localRegistrationSafety;
+    const auto eligible = [this, epoch, &transaction, &timer]() {
+        const qint64 deadline = m_localRegistrationStateDeadlineMs.load();
+        return epoch != 0 && epoch == m_localRegistrationEpoch.load()
+            && epoch == transaction.pendingEpoch && transaction.hasPendingPose
+            && transaction.hasVerifiedPose && transaction.sceneRevision == m_robotSimSceneRevision
+            && transaction.workpieceId == m_robotSimScene.workpieceId
+            && transaction.parentId == m_robotSimScene.workpieceParentId
+            && m_robotSimEndpoint.referenceObjectId == transaction.parentId
+            && m_robotSimConnected && m_robotSimConnectionMode == RobotSimConnectionMode::RealScene
+            && timer.elapsed() <= 150
+            && deadline > 0 && QDateTime::currentMSecsSinceEpoch() <= deadline;
+    };
+    if (!eligible() || transaction.rollbackAttempted
+        || (!restore && !transaction.pendingPoseConfirmed)) {
+        return {false, QStringLiteral("局部定位事务、场景、代次或机器人状态已失效，未恢复/晋升位姿。")};
+    }
+    const auto workpiece = m_robotSimService.getObjectPose(transaction.workpieceId);
+    if (!workpiece.available || !eligible()) {
+        return {false, QStringLiteral("局部定位事务工件读取失败或已撤销，未恢复/晋升位姿。")};
+    }
+    const auto parent = m_robotSimService.getObjectPose(transaction.parentId);
+    if (!parent.available || !eligible()) {
+        return {false, QStringLiteral("局部定位事务父级读取失败或已撤销，未恢复/晋升位姿。")};
+    }
+    const Eigen::Matrix4d worldFromParent = robotSimPoseToMatrix(parent.pose);
+    const Eigen::Matrix4d actual = worldFromParent.inverse() * robotSimPoseToMatrix(workpiece.pose);
+    if (!localRegistrationPosesMatch(actual,
+            rigidTransformToMatrix(transaction.pendingParentFromWorkpiece))) {
+        return {false, QStringLiteral("工件位姿已被外部修改，拒绝恢复/晋升局部定位事务。")};
+    }
+    if (!restore) {
+        transaction.verifiedParentFromWorkpiece = transaction.pendingParentFromWorkpiece;
+        transaction.verifiedByIndependentObservation = true;
+        transaction.hasPendingPose = false;
+        transaction.pendingPoseConfirmed = false;
+        transaction.message = QStringLiteral("独立新帧验证后，工件位姿已晋升为可信位姿。");
+        return {true, transaction.message};
+    }
+    // 恢复是显式事务，绝不由 stop、超时或取消回调隐式触发。
+    if (!eligible()) {
+        return {false, QStringLiteral("恢复发送前事务已撤销，未发送 SET_POSE。")};
+    }
+    m_localRegistrationWriteAttempted = true;
+    transaction.rollbackAttempted = true;
+    const Eigen::Matrix4d verified = rigidTransformToMatrix(transaction.verifiedParentFromWorkpiece);
+    const auto sent = m_robotSimService.setObjectPose(transaction.workpieceId,
+        matrixToRobotSimPose(verified), true, true);
+    if (!sent.succeeded) {
+        return {false, QStringLiteral("恢复位姿发送未确认：%1").arg(sent.message)};
+    }
+    const auto readback = m_robotSimService.getObjectPose(transaction.workpieceId);
+    if (!readback.available || !localRegistrationPosesMatch(
+            robotSimPoseToMatrix(readback.pose), worldFromParent * verified)) {
+        return {false, QStringLiteral("恢复已发送，但可信位姿回读未确认，禁止重复恢复。")};
+    }
+    transaction.hasPendingPose = false;
+    transaction.pendingPoseConfirmed = false;
+    transaction.message = QStringLiteral("已恢复并回读确认上一可信工件位姿，自动更新仍应暂停。");
+    return {true, transaction.message};
+}
+
+digital_twin::DigitalTwinCommandResult
+CGlobalLocatePriorWorkerAdapter::checkLocalRegistrationCandidate(
+    const localization::RigidTransform &current,
+    const localization::RigidTransform &candidate)
+{
+    auto &transaction = m_localRegistrationSafety;
+    const auto &options = m_localRegistrationSafetyOptions;
+    if (transaction.hasPendingPose) {
+        return {false, QStringLiteral("上一局部修正尚未几何验证，禁止连续累积写回。")};
+    }
+    if (!std::isfinite(options.maximumCumulativeTranslationMm)
+        || options.maximumCumulativeTranslationMm <= 0.0
+        || !std::isfinite(options.maximumCumulativeRotationDeg)
+        || options.maximumCumulativeRotationDeg <= 0.0
+        || !std::isfinite(options.maximumKeypointDisplacementMm)
+        || options.maximumKeypointDisplacementMm <= 0.0
+        || m_localRegistrationKeypoints.empty()) {
+        return {false, QStringLiteral("累计安全预算或独立关键点无效，拒绝局部写回。")};
+    }
+    const Eigen::Matrix4d currentMatrix = rigidTransformToMatrix(current);
+    const Eigen::Matrix4d candidateMatrix = rigidTransformToMatrix(candidate);
+    const Eigen::Matrix3d rotation = candidateMatrix.block<3, 3>(0, 0);
+    if (!currentMatrix.allFinite() || !candidateMatrix.allFinite()
+        || (rotation.transpose() * rotation - Eigen::Matrix3d::Identity()).norm() > 1e-5
+        || std::abs(rotation.determinant() - 1.0) > 1e-5
+        || (candidateMatrix.row(3) - Eigen::RowVector4d(0.0, 0.0, 0.0, 1.0)).norm() > 1e-8) {
+        return {false, QStringLiteral("候选位姿不是有限刚体变换，拒绝局部写回。")};
+    }
+    if (!transaction.hasBaseline) {
+        // 初始现场位姿是会话恢复基线；此处不表示它已经通过新采样几何验收。
+        transaction.hasBaseline = true;
+        transaction.hasVerifiedPose = true;
+        transaction.sceneRevision = m_robotSimSceneRevision;
+        transaction.workpieceId = m_robotSimScene.workpieceId;
+        transaction.parentId = m_robotSimScene.workpieceParentId;
+        transaction.baselineParentFromWorkpiece = current;
+        transaction.verifiedParentFromWorkpiece = current;
+    }
+    if (transaction.sceneRevision != m_robotSimSceneRevision
+        || transaction.workpieceId != m_robotSimScene.workpieceId
+        || transaction.parentId != m_robotSimScene.workpieceParentId
+        || !localRegistrationPosesMatch(currentMatrix,
+            rigidTransformToMatrix(transaction.verifiedParentFromWorkpiece))) {
+        return {false, QStringLiteral("场景身份或工件位姿已变更，必须显式建立新会话，拒绝累积写回。")};
+    }
+    const Eigen::Matrix4d baseline = rigidTransformToMatrix(transaction.baselineParentFromWorkpiece);
+    const Eigen::Matrix4d cumulative = candidateMatrix * baseline.inverse();
+    transaction.cumulativeTranslationMm =
+        (candidateMatrix.block<3, 1>(0, 3) - baseline.block<3, 1>(0, 3)).norm();
+    transaction.cumulativeRotationDeg = std::acos(std::clamp(
+        (cumulative.block<3, 3>(0, 0).trace() - 1.0) * 0.5, -1.0, 1.0))
+        * 180.0 / 3.14159265358979323846;
+    transaction.maximumKeypointDisplacementMm = 0.0;
+    for (const auto &point : m_localRegistrationKeypoints) {
+        const Eigen::Vector4d parentPoint(point.x_mm, point.y_mm, point.z_mm, 1.0);
+        if (!parentPoint.allFinite()) {
+            return {false, QStringLiteral("独立关键点包含非法数值，拒绝局部写回。")};
+        }
+        const Eigen::Vector4d materialPoint = currentMatrix.inverse() * parentPoint;
+        const Eigen::Vector4d targetPoint = candidateMatrix * materialPoint;
+        const double step = (targetPoint - parentPoint).head<3>().norm();
+        const double total = (targetPoint - baseline * materialPoint).head<3>().norm();
+        transaction.maximumKeypointDisplacementMm = std::max(
+            transaction.maximumKeypointDisplacementMm, std::max(step, total));
+    }
+    if (transaction.cumulativeTranslationMm > options.maximumCumulativeTranslationMm
+        || transaction.cumulativeRotationDeg > options.maximumCumulativeRotationDeg
+        || transaction.maximumKeypointDisplacementMm > options.maximumKeypointDisplacementMm) {
+        return {false, QStringLiteral("累计位姿或关键点位移超过会话预算，拒绝局部写回。")};
+    }
+    return {true, QStringLiteral("累计位姿和独立关键点预算通过。")};
+}
+
 digital_twin::DigitalTwinCommandResult
 CGlobalLocatePriorWorkerAdapter::applyWorkpieceCorrection(
     const localization::RigidTransform &virtualToRealCorrection,
@@ -1848,6 +2062,21 @@ CGlobalLocatePriorWorkerAdapter::applyWorkpieceCorrection(
         };
     }
 
+    const bool protectLocalWrite = epoch != 0 && m_localRegistrationSafetyConfigured
+        && m_localRegistrationSafetyOptions.enabled;
+    if (protectLocalWrite) {
+        if (m_localRegistrationStateDeadlineMs.load() <= 0) {
+            return {false, QStringLiteral("局部定位安全写回缺少机器人状态截止时间，拒绝发送。")};
+        }
+        const auto safety = checkLocalRegistrationCandidate(
+            matrixToRigidTransform(parentFromWorkpiece),
+            matrixToRigidTransform(correctedParentFromWorkpiece));
+        m_localRegistrationSafety.message = safety.message;
+        if (!safety.succeeded) {
+            return safety;
+        }
+    }
+
     // 网络读取期间可能已停止或切换焊缝；不可将旧模型的修正应用到新模型。
     if (epoch != 0 && (epoch != m_localRegistrationEpoch.load()
         || writebackTimer.elapsed() > 150
@@ -1857,6 +2086,15 @@ CGlobalLocatePriorWorkerAdapter::applyWorkpieceCorrection(
     }
     if (epoch != 0) {
         m_localRegistrationWriteAttempted = true;
+    }
+    if (protectLocalWrite) {
+        // 在发送前保留目标；SET_POSE/回读异常时，也不可遗失待验证事务。
+        m_localRegistrationSafety.beforeParentFromWorkpiece = matrixToRigidTransform(parentFromWorkpiece);
+        m_localRegistrationSafety.pendingParentFromWorkpiece = matrixToRigidTransform(correctedParentFromWorkpiece);
+        m_localRegistrationSafety.hasPendingPose = true;
+        m_localRegistrationSafety.pendingPoseConfirmed = false;
+        m_localRegistrationSafety.rollbackAttempted = false;
+        m_localRegistrationSafety.pendingEpoch = epoch;
     }
     const auto commandResult = m_robotSimService.setObjectPose(
         m_robotSimScene.workpieceId,
@@ -1890,6 +2128,9 @@ CGlobalLocatePriorWorkerAdapter::applyWorkpieceCorrection(
             - expectedWorldPose.block<3, 1>(0, 3)).norm() < 1e-3
         && (actualWorldPose.block<3, 3>(0, 0)
             - expectedWorldPose.block<3, 3>(0, 0)).norm() < 1e-5;
+    if (protectLocalWrite) {
+        m_localRegistrationSafety.pendingPoseConfirmed = poseConfirmed;
+    }
     return {
         poseConfirmed,
         poseConfirmed
@@ -1911,6 +2152,7 @@ void CGlobalLocatePriorWorkerAdapter::configureRobotSim(
     const digital_twin::RobotSimEndpointConfig &endpoint,
     const digital_twin::RobotSimSceneConfig &scene)
 {
+    ++m_robotSimSceneRevision;
     ++m_robotSimManualPollGeneration;
     m_robotSimService.stop();
     m_robotInverseKinematics.reset();

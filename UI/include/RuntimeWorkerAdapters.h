@@ -314,6 +314,49 @@ public:
     /// @brief 仅在 RobotSim 线程紧随写回调用读取，用于区分取消与未知写入结果。
     bool localRegistrationWriteAttempted() const;
 
+    /** @brief 会话累计预算；关键点为当前工件父级系下的真实材料点，单位 mm/degree。 */
+    struct LocalRegistrationSafetyOptions {
+        bool enabled = true;
+        double maximumCumulativeTranslationMm = 30.0;
+        double maximumCumulativeRotationDeg = 10.0;
+        double maximumKeypointDisplacementMm = 30.0;
+    };
+
+    /** @brief 仅在 worker 线程读取的事务快照；命令确认不代表几何验证通过。 */
+    struct LocalRegistrationSafetySnapshot {
+        bool hasBaseline = false;
+        bool hasVerifiedPose = false;
+        /// @brief false 表示恢复目标仍是初始可信基线，尚无新帧几何验收的修正。
+        bool verifiedByIndependentObservation = false;
+        bool hasPendingPose = false;
+        bool pendingPoseConfirmed = false;
+        bool rollbackAttempted = false;
+        quint64 pendingEpoch = 0;
+        quint64 sceneRevision = 0;
+        int workpieceId = -1;
+        int parentId = -1;
+        localization::RigidTransform baselineParentFromWorkpiece;
+        localization::RigidTransform verifiedParentFromWorkpiece;
+        localization::RigidTransform beforeParentFromWorkpiece;
+        localization::RigidTransform pendingParentFromWorkpiece;
+        double cumulativeTranslationMm = 0.0;
+        double cumulativeRotationDeg = 0.0;
+        double maximumKeypointDisplacementMm = 0.0;
+        QString message;
+    };
+
+    /** @brief 新会话开始时在 worker 线程调用；清除旧事务，初次读取作为初始可信基线。 */
+    void configureLocalRegistrationSafety(const LocalRegistrationSafetyOptions &options);
+    /** @brief 在 apply 前串行设置当前候选的父级系关键点；空集合将拒绝受保护写回。 */
+    void setLocalRegistrationKeypointsInParent(
+        const std::vector<localization::Point3D_mm> &points);
+    /** @brief 仅独立新帧几何验证通过后调用；epoch 必须仍有效且匹配 pending。 */
+    digital_twin::DigitalTwinCommandResult markLocalRegistrationVerified(quint64 epoch);
+    /** @brief 验证失败时显式恢复可信位姿；停止/取消只撤销 epoch，不自动写设备。 */
+    digital_twin::DigitalTwinCommandResult rollbackLocalRegistrationCorrection(quint64 epoch);
+    /** @brief 返回归档所需的事务值对象；仅 worker 线程调用。 */
+    LocalRegistrationSafetySnapshot localRegistrationSafetySnapshot() const;
+
 public slots:
     void generateVirtualPrior(
         quint64 requestId,
@@ -402,9 +445,21 @@ private:
     digital_twin::DigitalTwinCommandResult applyWorkpieceCorrection(
         const localization::RigidTransform &virtualToRealCorrection,
         quint64 epoch);
+    /// @brief 同线程执行验证晋升/显式恢复，共享身份、外部修改和代次门禁。
+    digital_twin::DigitalTwinCommandResult verifyOrRestoreLocalRegistration(
+        quint64 epoch, bool restore);
+    /// @brief 在写入前检查累计与关键点预算；不访问设备，不把候选晋升为可信位姿。
+    digital_twin::DigitalTwinCommandResult checkLocalRegistrationCandidate(
+        const localization::RigidTransform &current,
+        const localization::RigidTransform &candidate);
     std::atomic<quint64> m_localRegistrationEpoch{0};
     bool m_localRegistrationWriteAttempted = false;
     std::atomic<qint64> m_localRegistrationStateDeadlineMs{0};
+    LocalRegistrationSafetyOptions m_localRegistrationSafetyOptions;
+    LocalRegistrationSafetySnapshot m_localRegistrationSafety;
+    std::vector<localization::Point3D_mm> m_localRegistrationKeypoints;
+    bool m_localRegistrationSafetyConfigured = false;
+    quint64 m_robotSimSceneRevision = 0;
 
     bool buildRobotSimJointVectors(
         const robot_comm::RobotState &state,

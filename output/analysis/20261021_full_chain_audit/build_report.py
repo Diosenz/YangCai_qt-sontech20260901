@@ -1,0 +1,79 @@
+"""Generate investigation report; all production repositories remain read-only."""
+from pathlib import Path
+import json,html,hashlib
+OUT=Path(__file__).resolve().parent
+r=json.loads((OUT/'geometry_results.json').read_text(encoding='utf-8'))
+labels={'current_production':'当前生产链','scene_base_only':'仅替换场景基座','merge_reverse_base_only':'仅用 merge SRANGREVERSE','scene_sensor_extrinsic_only':'仅替换场景相机外参','scene_tool_and_sensor_chain':'加入 IK→场景 TCP 工具桥和场景相机','full_scene_chain':'完整场景链'}
+rows=''.join('<tr><td>'+labels[k]+'</td>'+''.join(f'<td>{v[m]["mean"]:.6f}</td>' for m in ['backprojection_distance_mm','forward_projection_error_px','laser_plane_normal_error_mm'])+'</tr>' for k,v in r['scenarios'].items())
+report='''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>在线纠偏整链排查｜工具链闭环、merge参考及公开案例</title><style>body{max-width:1120px;margin:30px auto;padding:0 24px;color:#203345;font:16px/1.85 system-ui,"Microsoft YaHei",sans-serif}h1{font-size:28px}h2{margin-top:32px;font-size:23px}h3{font-size:19px}table{width:100%;border-collapse:collapse;margin:18px 0}th,td{padding:9px;border-bottom:1px solid #d9e1e6;text-align:left;vertical-align:top}th{background:#f1f5f8}a{color:#0072b2}code{overflow-wrap:anywhere}pre{white-space:pre-wrap;background:#f5f7f9;padding:15px}.finding{border-left:4px solid #0072b2;padding:12px 20px;background:#f0f7fb}.limit{border-left:4px solid #d55e00;padding:12px 20px;background:#fff8f0}li{margin:8px 0}</style></head><body>
+<h1>整条链路排查：约10 mm偏差已收敛到跨系统工具变换链</h1>
+<p>日期：2026-10-21（Asia/Shanghai）。任务：继续核查前次主要发现1、2、3，参考 <code>D:/qt-sontech-merge</code> 视觉伺服，查找一手网络资料。主agent汇总三个独立子任务，并重新编写数值重放交叉验证。业务源码、场景及标定全部只读。</p>
+<p><a href="geometry_results.json">数值结果与矩阵</a> · <a href="geometry_scenarios.csv">384帧六种情景逐帧结果</a> · <a href="runtime_log_evidence.txt">现场日志证据摘录</a> · <a href="replay_geometry.py">重放脚本</a> · <a href="input_hashes.json">输入SHA-256</a> · <a href="../20261021_114211_739_retest/report.html">前次复测分析</a></p>
+<div class="finding"><b>结论更正：</b>前次“RobotSim二维/三维不自洽”应收窄为：本工程用真实TCP及手眼链解释RobotSim观测，而RobotSim相机实际经过另一套“逆解固定工具→场景工具→场景相机”链。加入完整工具桥后，同样384帧的二维反投影/原生三维差由平均10.550 mm降至0.120 mm。RobotSim点对在自身场景链下近乎自洽；尚不能宣称已经修复机器人实际精度。</div>
+<h2>1. 发现1：从TCP到虚拟相机的误差已形成数值闭环</h2>
+<h3>1.1 实际使用的两条链</h3>
+<p>真实点重建：原图像素 → division去畸变 → 与真实标定激光面求交 → SENSORPARA相机到TCP → 当帧真实TCP到机器人基座 → RBCALIB到变位机基座 → 外轴逆变换与231 mm工装TCP → 父系1063。</p>
+<p>虚拟参考：同帧真实TCP → 本工程MH12逆解按固定工具换算法兰 → 六轴关节值送RobotSim → 场景法兰/焊枪工具1011 → 场景传感器1013 → 与工件1068求交 → 同一照片点对的二维与父系1063三维。二维/三维parser原样读同一点对，未见二次缩放。</p>
+<pre>真实相机在机器人基座中的姿态 = T_realTCP · T_realCamera
+RobotSim实际相机姿态 = T_realTCP · inverse(T_IKTool) · T_sceneTCP · T_sceneCamera
+
+前次比较漏掉的桥：inverse(T_IKTool) · T_sceneTCP
+注意这不是给工件再乘一次ICP；归档原生三维已包含当时工件位姿。</pre>
+<p>逆解固定工具位置为(-125.136,4.882,494.425) mm，固定轴角(0.5225,-34.8683,0.1727)°；场景TCP1011位置为(-125.8,4.7,490.2) mm，场景Euler角(-174.8,-145.2,169.2)°。按旋转矩阵比较，工具平移相差4.28073 mm、旋转相差9.14358°，不能直接相减Euler角判断。</p>
+<p>源位置：<a href="../../../../../../../../D:/qt-sontech-merge">参考工程路径</a>仅供追溯；当前本工程 <code>DigitalTwin/src/MotomanMh12InverseKinematics.cpp:57–62</code> 固定工具参数，<code>:394–414</code> 用TCP乘工具逆变换求法兰。现场 <code>G:/RobotSimWork-Leningrad-win64/data/test31.xml:271</code> 定义TCP1011，<code>:215</code> 附近定义传感器1013。实际进程路径为该G盘运行包，不是H盘同名副本。</p>
+<h3>1.2 拆分射线一致性和光平面一致性</h3>
+<p>采用当前division模型正投影，不使用OpenCV polynomial畸变替代。正投影不强制激光面；另独立计算三维点到激光面的法向距离。三维反投影距离保留前次口径用于复核。</p>
+<table><thead><tr><th>只读重放情景</th><th>反投影↔原生3D平均差/mm</th><th>3D正投影平均差/px</th><th>激光面法向平均差/mm</th></tr></thead><tbody>SCENARIOS</tbody></table>
+<p>完整场景链的反投影最大差0.236157 mm；正投影P95=1.138311 px、最大1.400196 px；激光面最大法向差6.39×10⁻¹³ mm。剩余像素差与整像素输出的量级相容，但未读取RobotSim发端量化实现，不能断言全部由取整造成。</p>
+<p>真实KCF按当前生产链重建与归档值最大差1.21×10⁻⁷ mm；像素→激光面→像素的往返最大差1.14×10⁻¹³ px。主agent和链路子agent独立计算吻合。</p>
+<h3>1.3 已排除与仍需确认</h3>
+<ul><li>内参、畸变、像元、主点、1292×964图像范围、激光面参数，现场scene与当前SENSORPARA逐项一致，不支持把10 mm归因于分辨率或内参不同。</li><li>相机外参只有约0.18718 mm/0.06157°差，单独换它仍约10.525 mm；不足以解释主偏差。</li><li>当前SRANG的严格逆变换与场景基座几乎同矩阵，平移差2.92×10⁻⁸ mm；与merge的SRANGREVERSE差4.22×10⁻⁶ mm。换marker不是这次问题的修复。</li><li>工件1068与相机1013属于不同树分支，局部写回只改工件父级相对姿态，按当前代码不会改工具/相机标定。</li><li>现场test31.xml保存时间为2026-09-30 17:14:15，早于本轮复测；但11:42未归档完整runtime工具/相机绝对姿态。384帧几乎零激光面残差形成很强匹配证据，仍不能证明运行中从未手动调整场景。</li><li>由此定位的是跨系统工具几何不一致。哪套参数代表当前真实TCP，必须以实际工具定义/标定和场景读回确认，不能自行选择改硬编码或改场景。</li></ul>
+<h2>2. 整链审计状态</h2>
+<table><thead><tr><th>阶段</th><th>当前已核查机制</th><th>结论或限制</th></tr></thead><tbody>
+<tr><td>相机帧与机器人状态</td><td>coordinator冻结frame/session/generation、机器人状态及同步观测</td><td>软件同帧归属成立；状态是收到图像时最新值，不等于曝光硬同步。硬件时间误差仍需独立测量。</td></tr>
+<tr><td>TCP→法兰→关节</td><td>MH12解析逆解固定工具，法兰还扣100 mm末节偏置</td><td>固定工具与场景TCP不一致，是本轮约10 mm偏差的主要解释。</td></tr>
+<tr><td>关节同步与虚拟查询</td><td>同一批次SET_Q_VEC同步六轴/外轴，再GET_LSL_PHOTO及GET_WELD_SEAM_PHOTO，referenceObjectId=1063</td><td>未见批次内刻意混帧；本轮未向现场发送新请求或动作。</td></tr>
+<tr><td>照片点对与2D叠加</td><td>同一点对分别存3D和2D；UI同帧显示、共同缩放</td><td>跨系统相机链不同，不能拿红绿点偏差直接反推native3D parser错误。</td></tr>
+<tr><td>KCF与真实3D</td><td>融合前像素投影作为独立验收，使用当帧姿态和真实标定</td><td>生产投影可精确复现；检测valid不是焊缝精度保证。</td></tr>
+<tr><td>局部表面ICP</td><td>8帧局部窗、XYZ+Rz、表面残差及覆盖/独立焊点否决</td><td>局部表面与缝点目标可能不一致；先统一虚实工具链，再评价ICP策略。</td></tr>
+<tr><td>工件写回与回读</td><td>只改1068相对父1063的姿态，回读确认后等待新曝光帧</td><td>本轮只有frame3207真正写回成功；第二候选因累计预算被拒。</td></tr>
+<tr><td>几何后验与后续</td><td>连续3帧、约131 ms通过后晋升可信</td><td>可证明附近观测，不代表多方位整圈；后续采样最大17.292 mm，独立误差口径须在工具链统一后重审。</td></tr>
+<tr><td>初始化_W/_T与跟随</td><td>末扫点分别对齐段首；另一条Control轨迹ICP只释放局部目标</td><td>与工件ICP分开；局部目标更新不会持久消除启动参考整段大平移。</td></tr>
+</tbody></table>
+<p>当前实现入口：<code>UI/src/RuntimeCoordinator.cpp:2523–2565</code>同步观测归属；<code>DigitalTwin/src/RobotSimDigitalTwinService.cpp:186–204</code>批次与reference；<code>:310、804</code>点对解析；<code>UI/src/RuntimeWorkerAdapters.cpp:1460</code>融合前投影；<code>UI/src/RuntimeLocalRegistration.cpp:406、475、622</code>局部采样/后验/关键点。</p>
+<h2>3. 发现2：merge里确有可借鉴的局部ICP，但不能整体照搬</h2>
+<p><code>D:/qt-sontech-merge</code>的IBVS控制器本身解图像/LVS速度；局部点云配准是为它更新工件的独立协作流程，不是Control在线_W轨迹ICP。真实入口为RuntimeCoordinator.cpp:4038 → RuntimeWorkerAdapters.cpp:8235 → LocalizationLocalCorrectionPipeline.cpp:1443 → Coordinator.cpp:3077回写。</p>
+<table><thead><tr><th>方面</th><th>当前工程</th><th>merge参考与取舍</th></tr></thead><tbody>
+<tr><td>有效几何覆盖</td><td>8帧局部窗，求解后清空</td><td>RobotSim路径累计40个合格帧，并按新机器人state revision去重；值得参考“有效跨度”，不能机械改为40帧。仅直线焊缝精修有9 mm跨度门槛，曲线没有。</td></tr>
+<tr><td>真实线独立性</td><td>仿真ROI/走廊限制真实提线，中段覆盖较窄</td><td>600×300 ROI自引导，真实左右两侧线和交点质量门禁；双直线截面假设在曲面/反光时仍可失败。</td></tr>
+<tr><td>表面与焊缝目标</td><td>表面ICP求解，独立焊点主要用作否决</td><td>表面ICP后把独立真实/虚拟焊缝曲线加入联合精修；更直接回应“表面均值下降、焊缝却偏”的问题。但精修未采用时仍可能保留表面候选，不能说它天然保证正确。</td></tr>
+<tr><td>写回同步</td><td>持续在线纠偏、写回及新帧验证</td><td>冻结窗口、保持TCP、等待在途任务排空、cycle屏障、清旧窗后从零速恢复。可借鉴代次管理；连续焊接是否允许暂停须先确认。</td></tr>
+<tr><td>安全层</td><td>新帧后验、双向覆盖、累计预算等</td><td>merge主要外层有限值/30 mm/10°验收及位姿回读；没有当前工程同等级新帧几何后验与累计限制，不能整体替换当前安全层。</td></tr>
+<tr><td>标定与残差</td><td>SRANG逆、固定轴RzRyRx；表面单向平均NN残差</td><td>定位/IBVS用SRANGREVERSE，但本轮数值等价；其残差含真正RMS及鲁棒统计，不能直接复用门槛。</td></tr>
+</tbody></table>
+<p>可重点参考的位置：merge <code>UI/src/RuntimeCoordinator.cpp:4038–4100</code>同帧/代次/state revision；<code>RuntimeWorkerAdapters.cpp:8247–8255、8274</code>有效帧/跨度；<code>LocalizationLocalCorrectionPipeline.cpp:1506–1557</code>焊缝联合精修；<code>RuntimeCoordinator.cpp:3165–3333</code>暂停/排空/代次恢复。参考工程源码存在并不等于在本轮数据已验证有效。</p>
+<h2>4. 发现3：两工程共有启动策略，merge没有现成相位修复</h2>
+<p>两工程均取反扫最后有效点，补工装TCP后直接对齐_W/_T各自段首，整段仅平移，不按最近点重定义相位。merge的额外全局定位启动模式是另一条链，不能当作本轮InitType已执行的行为。</p>
+<p>本轮末扫点距原_W首点109.342 mm，到原_W折线最近6.650 mm，落在零基169段附近；反扫方向与该处逆向切线余弦0.987。整段平移(8.312,-108.999,-2.395) mm后，TCP到启动参考均值63.955 mm。该数据与“末扫点与文件段首同一物理相位”的前提不相容，但不证明工件完全无位移。</p>
+<p>解析量级核对（本报告推导，不是网络案例）：圆半径R、相位差Δφ的弦长为2R·sin(|Δφ|/2)。R≈143.7 mm时，109.3 mm弦长相当于约44.7°。它说明相位误当平移可以解释该量级，不能直接据此改为最近点起步。现有契约见本工程docs/online_correction_state_machine.md:104–116；merge Planner.cpp:463–482也相同。</p>
+<h2>5. 网络一手案例：支持验证方法，不替代本工程证据</h2>
+<table><thead><tr><th>资料</th><th>可借鉴内容</th><th>本项目对应动作与限制</th></tr></thead><tbody>
+<tr><td><a href="https://www.mvtec.com/doc/halcon/11/en/camera_calibration.html">MVTec官方division相机模型</a></td><td>单参数Kappa的去畸变及解析逆式。</td><td>本次重放采用对应公式，分别测试射线与激光面；Kappa不能直接当OpenCV k1。</td></tr>
+<tr><td><a href="https://github.com/opencv/opencv/issues/24780">OpenCV #24780真实投影偏差案例</a></td><td>作者最初报告完美数据仍有投影误差，后来确认是畸变参数顺序用错。</td><td>说明模型、参数语义必须闭环检查；不是已证实的库bug，也不是本工程同因证据。</td></tr>
+<tr><td><a href="https://arxiv.org/html/2211.16335v4">X-ICP：ETH原始论文</a></td><td>圆柱环境旋转退化仿真及真实场景验证；以方向约束强度限制更新。</td><td>在统一工具链后，检查本轮目标函数弱方向和多初值稳定性；LiDAR点面ICP阈值不可原样套到线激光。</td></tr>
+<tr><td><a href="https://www.open3d.org/docs/latest/tutorial/pipelines/icp_registration.html">Open3D官方ICP说明</a></td><td>覆盖fitness与匹配内点RMSE分开报告。</td><td>保留覆盖、对应区域、独立缝点和姿态连续性，不能仅靠残差验收；本工程平均NN残差不是RMSE。</td></tr>
+<tr><td><a href="https://arxiv.org/abs/2001.05119">CVPR 2020多视点配准原论文</a></td><td>低重叠、重复/对称几何可造成成对配准歧义。</td><td>参考跨方位一致性思想，不代表需要增加学习模型或依赖，也不能代替本轮起点相位定义。</td></tr>
+</tbody></table>
+<h2>6. 建议实施顺序与验收边界</h2>
+<ol><li><b>先统一工具链来源。</b>明确当前真实TCP、IK工具、RobotSim TCP1011及sensor1013之间的变换契约；使同步到RobotSim的有效相机姿态与真实投影上下文一致。不要用工件ICP吸收固定工具误差，也不要随意改相机内参/激光面。哪一套工具参数保留，须由真实标定/现场对象定义确认。</li><li><b>先做无运动验证，再谈闭环。</b>固定多组已存TCP姿态，检查同步后虚拟TCP/相机姿态，以及2D↔3D、激光面闭环；记录工具/场景版本、单位和坐标方向。本次只是只读几何重放，没有修改后生产运行验证。</li><li><b>重审局部定位效果。</b>在工具链统一的数据上比较表面ICP、加入独立焊缝约束的候选，以及跨方位有效窗口。保留当前独立验收、覆盖和累计预算，扩展后验观察方位；不因merge帧数更大就直接照搬。</li><li><b>独立核对启动相位。</b>以同一坐标链保存末扫点、_W/_T首点和最近段、方向、外轴及JBI起扫定义。只有明确“按文件相位起步”还是“按实测相位重定位”的行为约定后，再调整初始化策略。</li></ol>
+<p><b>新增现场日志交叉证据：</b>G盘长驻进程日志2367376行在11:41:05.706明确加载test31.xml；2367543/2367587行记录实际TCP1011，2367540/2367588行记录相机1013，与上述参数一致。2380853行11:43:16.234的工件修正与本轮frame3207逐值吻合，因此已确认对应本轮现场，不再仅依赖磁盘文件推测。<a href="runtime_log_evidence.txt">查看含原始行号的只读摘录</a>。完整runtime场景哈希仍未在当时归档。</p>
+<div class="limit"><b>当前完成程度：</b>几何主偏差已被源码、本轮现场日志、场景参数和384帧假设替换重放共同定位；修复方案尚未落地，也未证明纠偏实际精度改善。曝光硬同步、P命令接收端周期语义及后段原图仍有证据缺口。替换链只用于解释存档数据，不是向运行系统写入补偿。</div>
+<p>验证：两份独立实现数值一致；真实KCF复现及division往返断言通过；输入哈希前后不变。未删除文件、未使用Computer Use/鼠标、未启动构建、未发送机器人/场景命令，未修改当前或merge业务代码。新增内容仅在本目录。</p>
+<p>沿用本对话已读的 <a href="https://app.notion.com/p/3fdaa04fa8a9819195d2dc0eb65ce630">AI协作工作流</a>及<a href="https://app.notion.com/p/3faaa04fa8a981d1b419d2fc27a13cb4">修bug专项流程</a>：先固定现象，追踪整链；并行查实现/参考工程/公开证据；主agent做反例与数值复核；区分定位、候选修复、实际验收。未修改Notion。</p>
+</body></html>'''.replace('SCENARIOS',rows)
+report=report.replace('<a href="../../../../../../../../D:/qt-sontech-merge">参考工程路径</a>仅供追溯；','')
+report=report.replace('但11:42未归档完整runtime工具/相机绝对姿态。384帧几乎零激光面残差形成很强匹配证据，仍不能证明运行中从未手动调整场景。','后来已由本轮现场加载及工具参数日志交叉确认，见下方日志证据；当时未保存完整runtime场景哈希。')
+(OUT/'report.html').write_text(report,encoding='utf-8')
+hashes=json.loads((OUT/'input_hashes.json').read_text(encoding='utf-8'))
+for p,h in hashes.items(): assert hashlib.sha256(Path(p).read_bytes()).hexdigest()==h,p
+print('Report written. Input hashes verified:',len(hashes))
