@@ -281,6 +281,35 @@ OnlineCorrectionFollowResult COnlineCorrectionPathFollower::update(
 
     const OnlineCorrectionPoint thirdPoint =
         (*detectionQueue)[std::min<std::size_t>(3U, detectionQueue->size() - 1U)].point;
+    return updateReference(robotState, options, calibration, teachTrajectory,
+        OnlineCorrectionFollowReference{firstPoint, thirdPoint, gapAtCurrentPose(*detectionQueue, current)});
+}
+
+OnlineCorrectionFollowResult COnlineCorrectionPathFollower::updateReference(
+    const robot_comm::RobotState &robotState,
+    const OnlineCorrectionOptions &options,
+    const vision::PositionerCalibration &calibration,
+    const std::vector<OnlineCorrectionPoint> &teachTrajectory,
+    const OnlineCorrectionFollowReference &reference)
+{
+    OnlineCorrectionFollowResult result;
+    if (!calibration.valid || teachTrajectory.size() < 2U
+        || !isValid(reference.first) || !isValid(reference.directionPoint)) {
+        result.message = "online control reference is not configured";
+        return result;
+    }
+    const double s1Deg = static_cast<double>(robotState.curS1) / 10000.0;
+    const double s2Deg = static_cast<double>(robotState.curS2) / 10000.0;
+    const auto stationCurrent = vision::CPositionerKinematics::robotPoseToStationPose(
+        robotPose(robotState), s1Deg, s2Deg, calibration);
+    if (!stationCurrent.valid) {
+        result.message = "robot pose to positioner pose conversion failed";
+        return result;
+    }
+    const OnlineCorrectionPoint current{
+        stationCurrent.xMm, stationCurrent.yMm, stationCurrent.zMm, true};
+    const OnlineCorrectionPoint &firstPoint = reference.first;
+    const OnlineCorrectionPoint &thirdPoint = reference.directionPoint;
     Eigen::Vector3d detectionDirection = vectorOf(thirdPoint) - vectorOf(firstPoint);
     if (detectionDirection.norm() <= 1.0e-9) {
         result.message = "online detection direction is degenerate";
@@ -425,7 +454,7 @@ OnlineCorrectionFollowResult COnlineCorrectionPathFollower::update(
     command.dzUm = clampJump(static_cast<long>(std::llround(output.z())), m_lastDzUm, options);
     command.speedOverride = 10000;
     if (options.enableGapDetection) {
-        const float gap = normalizeGap(gapAtCurrentPose(*detectionQueue, current));
+        const float gap = normalizeGap(reference.gapWidthMm.value_or(0.0F));
         command.speedOverride = quantizeSpeed(
             static_cast<long>(((300.0F - gap * 60.0F) / 300.0F) * 10000.0F));
     }

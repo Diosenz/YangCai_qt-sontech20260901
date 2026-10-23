@@ -429,6 +429,8 @@ CKcfTracker::CKcfTracker(
 
 void CKcfTracker::init(const cv::Rect &roi, cv::Mat image)
 {
+    m_pendingOnlineFeatures.release();
+    m_pendingOnlineImage.release();
     m_updateDiagnostic = {};
     m_modify_flag = false;
     m_imageCount = 1;
@@ -501,6 +503,37 @@ void CKcfTracker::setFusionOptions(const KcfFusionOptions &options)
     m_peakValueMinimum = 0.85F;
 }
 
+void CKcfTracker::setOnlineObservationMode(bool enabled)
+{
+    if (enabled == m_onlineObservationMode) { return; }
+    m_onlineObservationMode = enabled;
+    m_pendingOnlineFeatures.release();
+    m_pendingOnlineImage.release();
+}
+
+void CKcfTracker::commitOnlineObservationTraining(bool accepted)
+{
+    if (!m_onlineObservationMode || m_pendingOnlineFeatures.empty()) { return; }
+    if (accepted) {
+        const cv::Rect2f currentRoi = m_roi;
+        m_roi = m_pendingOnlineRoi;
+        if (m_featureMode == KcfFeatureMode::Mkcf) {
+            if (m_numTmpl == 2) {
+                train2TMKCF(m_pendingOnlineImage, m_interp_factor, 0.0, 1.0);
+            } else {
+                train3TMKCF(m_pendingOnlineImage, m_interp_factor, 0.0, 1.0);
+            }
+            trainStandardReference(m_pendingOnlineFeatures, m_interp_factor);
+        } else {
+            train(m_pendingOnlineFeatures, m_interp_factor);
+        }
+        m_roi = currentRoi;
+        m_updateDiagnostic.trainingCommitted = true;
+    }
+    m_pendingOnlineFeatures.release();
+    m_pendingOnlineImage.release();
+}
+
 void CKcfTracker::setSimulatedTemplate(const cv::Mat &image, const cv::Rect &roi)
 {
     if (image.empty() || roi.width <= 0 || roi.height <= 0)
@@ -542,7 +575,10 @@ const CKcfUpdateDiagnostic &CKcfTracker::lastUpdateDiagnostic() const
 
 cv::Rect CKcfTracker::update(cv::Mat image)
 {
+    m_pendingOnlineFeatures.release();
+    m_pendingOnlineImage.release();
     m_updateDiagnostic = {};
+    m_updateDiagnostic.onlineObservationMode = m_onlineObservationMode;
     m_updateDiagnostic.fusionMode = m_fusionOptions.mode;
     m_updateDiagnostic.simulationWeight = m_fusionOptions.simulationWeight;
     normalizeImage(image);
@@ -729,10 +765,21 @@ cv::Rect CKcfTracker::update(cv::Mat image)
         clampRoiToImage(image);
     }
 
+    const cv::Rect2f fusedRoi = m_roi;
+    if (m_onlineObservationMode) {
+        // 融合只影响业务权重；真实相关滤波不能在仿真位置继续搜索和学习。
+        m_roi = m_updateDiagnostic.beforeFusionRoi;
+    }
     cv::Mat currentFeature = (m_featureMode == KcfFeatureMode::FusedHogGray)
         ? fusedFeat(image, 1.0F)
         : getFeatures(image, false, 1.0F);
-    if (m_featureMode == KcfFeatureMode::Mkcf)
+    if (m_onlineObservationMode) {
+        m_pendingOnlineFeatures = currentFeature;
+        if (m_featureMode == KcfFeatureMode::Mkcf) { m_pendingOnlineImage = image; }
+        m_pendingOnlineRoi = m_roi;
+        m_updateDiagnostic.trainingDeferred = true;
+    }
+    else if (m_featureMode == KcfFeatureMode::Mkcf)
     {
         if (m_numTmpl == 2)
         {
@@ -749,7 +796,7 @@ cv::Rect CKcfTracker::update(cv::Mat image)
         train(currentFeature, m_interp_factor);
     }
 
-    m_updateDiagnostic.finalRoi = m_roi;
+    m_updateDiagnostic.finalRoi = fusedRoi;
     m_updateDiagnostic.completed = true;
     ++m_imageCount;
     return toIntegerRect(m_roi);

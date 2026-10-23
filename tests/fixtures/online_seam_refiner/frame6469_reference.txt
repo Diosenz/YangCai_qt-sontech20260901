@@ -1,0 +1,9 @@
+﻿Source: output/online_correction/20261021_201400_950_启动在线ICP（稳定保护1.0）+ 自动卡尔曼/vision_images/sample_1612_session_1_frame_6469_source.png
+Lossless crop: original rectangle [380,510,640,670), no resize or contrast changes.
+Recorded original KCF: (510.686096,588.744385).
+Recorded original simulated point: (500,586).
+Human reference: actual joint approximately below the simulated point; qualitative screenshot only.
+No precise human Y annotation exists. Do not treat extrapolated intersection, endpoint midpoint or old fit as truth.
+The user subsequently selected policy C: the middle of the physical seam gap, applied to the same geometry class.
+The test preserves conservative RequireContinuous rejection, then explicitly requests GapCenter and checks original X [495,503], Y [591,593].
+The gap-center Y check validates authorized image geometry, not independently measured physical welding accuracy.

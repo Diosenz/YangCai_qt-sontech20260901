@@ -1590,6 +1590,11 @@ void CRuntimeCoordinator::connectWorkers()
         &COnlineCorrectionWorkerAdapter::onlineCorrectionUpdated,
         this,
         [this](const control::OnlineCorrectionUpdate &update) {
+            const quint64 targetSessionId = update.state.controlTarget.sessionId;
+            if (targetSessionId != 0 && (!m_correctionSession.active
+                    || targetSessionId != m_correctionSession.sessionId)) {
+                return;
+            }
             if (m_correctionSession.active
                 && m_correctionSession.purpose
                     == CorrectionPurpose::OnlineCorrection) {
@@ -2074,6 +2079,7 @@ void CRuntimeCoordinator::enqueueVisionFrame(const camera::CameraFrame &frame)
             return;
         }
         context.correctionSessionId = m_correctionSession.sessionId;
+        context.onlineControlWindowActive = m_correctionSession.onlineControlWindowActive;
     }
 
     // current 正在处理时，后到帧只能整体覆盖唯一 latest-pending 槽。
@@ -2117,6 +2123,7 @@ void CRuntimeCoordinator::dispatchPendingVisionFrame()
     m_visionFrameInFlight = true;
     FrozenVisionFrameContext &current = *m_currentVisionFrame;
     current.modelGeneration = m_localRegistrationGeneration;
+    current.workpiecePoseRevision = m_localWorkpiecePoseRevision;
     const bool isCorrection =
         current.purpose == RuntimeTrackingPurpose::OnlineCorrection
         || current.purpose == RuntimeTrackingPurpose::OfflineCorrection;
@@ -2307,7 +2314,15 @@ void CRuntimeCoordinator::beginCorrectionSession(CorrectionPurpose purpose)
     m_correctionSession.sessionId = m_nextCorrectionSessionId;
     m_correctionSession.purpose = purpose;
     m_correctionSession.active = true;
+    if (purpose == CorrectionPurpose::OnlineCorrection && m_onlineCorrectionWorker != nullptr) {
+        const quint64 sessionId = m_correctionSession.sessionId;
+        QMetaObject::invokeMethod(m_onlineCorrectionWorker,
+            [worker = m_onlineCorrectionWorker, sessionId]() {
+                worker->setControlSessionId(sessionId);
+            }, Qt::QueuedConnection);
+    }
     m_localRegistrationFaulted = false;
+    m_localRegistrationRecovery.reset();
     resetOnlineLocalRegistration();
     m_localRegistrationArchiveDirectory = AppPaths::fromDefaultLocation().outputDir().filePath(
         QStringLiteral("online_local_registration/%1_session_%2")
@@ -2483,6 +2498,8 @@ RuntimeVisionCorrelation CRuntimeCoordinator::makeVisionCorrelation(
     RuntimeVisionCorrelation correlation;
     correlation.sessionId = context.correctionSessionId;
     correlation.frameId = context.frame.frameId;
+    correlation.onlineControlWindowActive = context.onlineControlWindowActive;
+    correlation.workpiecePoseRevision = context.workpiecePoseRevision;
     if (context.purpose == RuntimeTrackingPurpose::OnlineCorrection) {
         correlation.purpose = CorrectionPurpose::OnlineCorrection;
     } else if (context.purpose == RuntimeTrackingPurpose::OfflineCorrection) {
@@ -2505,6 +2522,7 @@ bool CRuntimeCoordinator::currentFrameMatches(
         && correlation.sessionId == expected.sessionId
         && correlation.purpose == expected.purpose
         && correlation.frameId == expected.frameId
+        && correlation.workpiecePoseRevision == expected.workpiecePoseRevision
         && correlation.sessionId == m_correctionSession.sessionId
         && correlation.purpose == m_correctionSession.purpose;
 }

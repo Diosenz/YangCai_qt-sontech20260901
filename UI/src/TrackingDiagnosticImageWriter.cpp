@@ -27,7 +27,8 @@ CTrackingDiagnosticImageWriter::~CTrackingDiagnosticImageWriter()
 }
 
 QString CTrackingDiagnosticImageWriter::submit(
-    const QString &stem, const QImage &source, const QImage &enhanced)
+    const QString &stem, const QImage &source, const QImage &enhanced,
+    int bucket, qint64 bucketByteBudget)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_stopping) {
@@ -36,7 +37,10 @@ QString CTrackingDiagnosticImageWriter::submit(
     if (m_pending.size() >= 2U) {
         return QStringLiteral("queue_full");
     }
-    m_pending.push_back({stem, source, enhanced});
+    if (bucket < 0 || bucket >= 5 || bucketByteBudget <= 0) {
+        return QStringLiteral("invalid_bucket");
+    }
+    m_pending.push_back({stem, source, enhanced, bucket, bucketByteBudget});
     m_condition.notify_one();
     return QStringLiteral("queued");
 }
@@ -103,7 +107,8 @@ void CTrackingDiagnosticImageWriter::writePair(const CImagePair &pair)
     QStorageInfo storage(m_directory);
     const qint64 reserve = 512LL * 1024 * 1024;
     if (!storage.isValid() || !storage.isReady()
-        || storage.bytesAvailable() < reserve || m_writtenBytes >= m_maxBytes) {
+        || storage.bytesAvailable() < reserve || m_writtenBytes >= m_maxBytes
+        || m_bucketWrittenBytes[pair.bucket] >= pair.bucketByteBudget) {
         recordOutcome(pair.stem, QStringLiteral("budget_or_disk_limit"), 0);
         return;
     }
@@ -122,11 +127,12 @@ void CTrackingDiagnosticImageWriter::writePair(const CImagePair &pair)
     storage.refresh();
     if (!storage.isValid() || !storage.isReady()
         || bytes > m_maxBytes - m_writtenBytes
+        || bytes > pair.bucketByteBudget - m_bucketWrittenBytes[pair.bucket]
         || bytes > storage.bytesAvailable() - reserve) {
         recordOutcome(pair.stem, QStringLiteral("budget_or_disk_limit"), 0);
         return;
     }
-    const auto write = [this](const QString &name, const QByteArray &data) {
+    const auto write = [this, &pair](const QString &name, const QByteArray &data) {
         QFile file(QDir(m_directory).filePath(name));
         if (!file.open(QIODevice::WriteOnly | QIODevice::NewOnly)) {
             return false;
@@ -135,6 +141,7 @@ void CTrackingDiagnosticImageWriter::writePair(const CImagePair &pair)
         // 失败后的部分文件也占用预算，保留用于核查，不回收或覆盖。
         if (written > 0) {
             m_writtenBytes += written;
+            m_bucketWrittenBytes[pair.bucket] += written;
         }
         return written == data.size() && file.flush();
     };

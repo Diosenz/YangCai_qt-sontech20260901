@@ -35,7 +35,10 @@ add_library(i2r_rlc_ui STATIC
     include/OnlineCorrectionWorkflow.h
     include/RobotSimVirtualReferenceCache.h
     include/RuntimeCoordinator.h
+    include/OnlineLocalRegistrationStability.h
     include/OnlineLocalRegistrationWorker.h
+    include/OnlineLocalRegistrationRecovery.h
+    include/OnlineLocalSurfaceVerification.h
     include/RuntimeTrackingTypes.h
     include/TrackingFramePresentation.h
     include/RuntimeWorkerAdapters.h

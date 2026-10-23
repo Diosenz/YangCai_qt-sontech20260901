@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -318,6 +318,77 @@ WeldProjectionResult CWeldImageToSpaceProjector::projectImagePoint(
         result,
         context.robotBaseToPositionerTcp,
         "image point projected to positioner tcp frame");
+}
+
+WeldImagePoint CWeldImageToSpaceProjector::projectSpacePointToImage(
+    const WeldSpacePoint &spacePoint,
+    const WeldProjectionContext &context,
+    WeldProjectionTargetFrame sourceFrame)
+{
+    if (!spacePoint.valid || !isValidContext(context)
+        || (sourceFrame != WeldProjectionTargetFrame::Camera
+            && sourceFrame != WeldProjectionTargetFrame::Tool
+            && sourceFrame != WeldProjectionTargetFrame::RobotBase
+            && sourceFrame != WeldProjectionTargetFrame::PositionerTcp)) {
+        return {};
+    }
+    Eigen::Vector3d cameraPoint(spacePoint.xMm, spacePoint.yMm, spacePoint.zMm);
+    if (!cameraPoint.allFinite()) {
+        return {};
+    }
+    // 完整链路逆序撤销；刚体矩阵来自标定/冻结状态，不能沿用上一帧像素。
+    const auto undoTransform = [&cameraPoint](const WeldRigidTransform &transform) {
+        if (!isValidRigidTransform(transform)
+            || (transform.rotation.transpose() * transform.rotation
+                - Eigen::Matrix3d::Identity()).norm() > 1.0e-6
+            || std::fabs(transform.rotation.determinant() - 1.0) > 1.0e-6) {
+            return false;
+        }
+        cameraPoint = transform.rotation.transpose()
+            * (cameraPoint - transform.translationMm);
+        return cameraPoint.allFinite();
+    };
+    if (sourceFrame == WeldProjectionTargetFrame::PositionerTcp
+        && !undoTransform(context.robotBaseToPositionerTcp)) {
+        return {};
+    }
+    if ((sourceFrame == WeldProjectionTargetFrame::PositionerTcp
+            || sourceFrame == WeldProjectionTargetFrame::RobotBase)
+        && !undoTransform(context.toolInRobotBase)) {
+        return {};
+    }
+    if (sourceFrame != WeldProjectionTargetFrame::Camera
+        && !undoTransform(context.calibration.cameraInTool)) {
+        return {};
+    }
+    if (cameraPoint.z() <= kEpsilon) {
+        return {};
+    }
+
+    const auto &calibration = context.calibration;
+    const double uM = calibration.focalLengthM * cameraPoint.x() / cameraPoint.z();
+    const double vM = calibration.focalLengthM * cameraPoint.y() / cameraPoint.z();
+    // 正向为 r_u = r_d/(1+k*r_d^2)。选与光轴连续的主分支，使用
+    // 2/(1+sqrt(...)) 避免 k 或半径接近零时二次方程消减误差。
+    const double discriminant = 1.0 - 4.0 * calibration.kappa * (uM * uM + vM * vM);
+    if (!std::isfinite(discriminant) || discriminant <= 0.0) {
+        return {};
+    }
+    const double scale = 2.0 / (1.0 + std::sqrt(discriminant));
+    WeldImagePoint result;
+    result.xPixel = calibration.intrinsics.cxPixel + scale * uM / calibration.sxM;
+    result.yPixel = calibration.intrinsics.cyPixel + scale * vM / calibration.syM;
+    result.valid = std::isfinite(result.xPixel) && std::isfinite(result.yPixel);
+    if (!result.valid) {
+        return {};
+    }
+    const auto recovered = makeLegacyUndistortedPoint(result, calibration);
+    const double expectedX = calibration.intrinsics.cxPixel + uM / calibration.sxM;
+    const double expectedY = calibration.intrinsics.cyPixel + vM / calibration.syM;
+    if (std::hypot(recovered.xPixel - expectedX, recovered.yPixel - expectedY) > 1.0e-6) {
+        return {};
+    }
+    return result;
 }
 
 WeldProjectionResult CWeldImageToSpaceProjector::projectCvPoint(

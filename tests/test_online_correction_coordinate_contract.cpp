@@ -191,7 +191,12 @@ bool testGeometryAndLifecycle()
                                         && near(queue.back().point.zMm, 0),
                                     "ICP fallback/cache uses last-link coordinates exactly once");
                         if (index == 1) {
-                            ok &= check(!update.realtimeCommand.valid, "one sample waits for direction");
+                            ok &= check(update.realtimeCommand.valid
+                                            && update.state.controlTarget.valid
+                                            && update.state.controlTarget.source
+                                                == control::OnlineCorrectionTargetSource::PredictedReference
+                                            && queue.size() == 1,
+                                        "one measured sample uses the corrected path reference without inventing measurements");
                         }
                     }
                     const auto &command = update.realtimeCommand;

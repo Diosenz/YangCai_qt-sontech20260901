@@ -1,6 +1,6 @@
 ﻿/**
  * @file test_local_registration_writeback_safety.cpp
- * @brief 用受控内存 transport 验证累计预算、独立验收与受保护恢复；不访问设备。
+ * @brief 用受控内存transport验证保留位姿后继续修正、累计预算及旧显式恢复；不访问设备。
  */
 #include <cmath>
 #include <cstdio>
@@ -197,6 +197,117 @@ bool testRestoreLastVerifiedPose()
         && fixture.scene->writes == 3, "rollback must restore last verified pose rather than session origin");
     ok &= expect(!fixture.worker.rollbackLocalRegistrationCorrection(7).succeeded
         && fixture.scene->writes == 3, "successful rollback cannot be repeated");
+    fixture.worker.setLocalRegistrationEpoch(8);
+    fixture.refreshDeadline();
+    loc::RigidTransform next;
+    next.rowMajor[3] = 1.0;
+    ok &= expect(!fixture.worker.applyLocalRegistrationCorrection(7, next).succeeded,
+        "old candidate epoch remains rejected after confirmed rollback");
+    ok &= expect(fixture.worker.applyLocalRegistrationCorrection(8, next).succeeded
+        && fixture.scene->writes == 4
+        && std::abs(fixture.scene->pose.at(0).toDouble() - 26.0) < 1e-6,
+        "new evidence epoch may write from restored trusted pose without resetting session budgets");
+    ok &= expect(fixture.worker.markLocalRegistrationVerified(8).succeeded,
+        "post-rollback candidate can complete a new verified transaction");
+    next.rowMajor[3] = 30.0;
+    ok &= expect(!fixture.worker.applyLocalRegistrationCorrection(8, next).succeeded
+        && fixture.scene->writes == 4,
+        "recovery does not reset cumulative session translation budget");
+    return ok;
+}
+
+/** @brief 后验未通过也保留命令确认锚；无SET、无几何伪晋升且下一代仍可修正。 */
+bool testRetainConfirmedPoseAndContinue()
+{
+    SafetyFixture fixture;
+    bool ok = expect(fixture.applyTranslation(5.0).succeeded, "retain first candidate written");
+    const auto appliedPose = fixture.scene->pose;
+    ok &= expect(fixture.worker.retainLocalRegistrationCorrection(7).succeeded
+        && fixture.scene->writes == 1 && fixture.scene->pose == appliedPose
+        && !fixture.worker.localRegistrationWriteAttempted(),
+        "retain only reads and never sends a rollback SET");
+    auto retained = fixture.worker.localRegistrationSafetySnapshot();
+    ok &= expect(!retained.hasPendingPose && !retained.pendingPoseConfirmed
+        && retained.hasConfirmedPose && !retained.verifiedByIndependentObservation
+        && std::abs(retained.confirmedParentFromWorkpiece.rowMajor[3] - 25.0) < 1e-6
+        && std::abs(retained.verifiedParentFromWorkpiece.rowMajor[3] - 20.0) < 1e-6
+        && std::abs(retained.baselineParentFromWorkpiece.rowMajor[3] - 20.0) < 1e-6,
+        "first retained command is a working anchor, not a geometrically verified anchor");
+    ok &= expect(!fixture.worker.retainLocalRegistrationCorrection(7).succeeded
+        && fixture.scene->writes == 1 && fixture.scene->pose == appliedPose,
+        "repeating retained completion cannot write or promote a pose");
+    fixture.worker.setLocalRegistrationEpoch(8);
+    fixture.refreshDeadline();
+    loc::RigidTransform next;
+    next.rowMajor[3] = 2.0;
+    ok &= expect(fixture.worker.applyLocalRegistrationCorrection(8, next).succeeded
+        && fixture.scene->writes == 2 && std::abs(fixture.scene->pose[0].toDouble() - 27.0) < 1e-6,
+        "next ICP generation continues from retained current pose, not the old verified pose");
+    ok &= expect(fixture.worker.markLocalRegistrationVerified(8).succeeded,
+        "a later independently verified candidate may establish the first geometric anchor");
+    retained = fixture.worker.localRegistrationSafetySnapshot();
+    ok &= expect(retained.verifiedByIndependentObservation
+        && std::abs(retained.confirmedParentFromWorkpiece.rowMajor[3] - 27.0) < 1e-6
+        && std::abs(retained.verifiedParentFromWorkpiece.rowMajor[3] - 27.0) < 1e-6,
+        "verified completion synchronizes current and geometric anchors");
+
+    SafetyFixture established;
+    ok &= expect(established.applyTranslation(3.0).succeeded
+        && established.worker.markLocalRegistrationVerified(7).succeeded
+        && established.applyTranslation(2.0).succeeded
+        && established.worker.retainLocalRegistrationCorrection(7).succeeded,
+        "established geometric anchor can retain a later unverified working pose");
+    const auto state = established.worker.localRegistrationSafetySnapshot();
+    ok &= expect(state.verifiedByIndependentObservation && !state.hasPendingPose
+        && std::abs(state.verifiedParentFromWorkpiece.rowMajor[3] - 23.0) < 1e-6
+        && std::abs(state.confirmedParentFromWorkpiece.rowMajor[3] - 25.0) < 1e-6
+        && established.scene->writes == 2,
+        "retaining preserves the previous geometric anchor and adds no restore write");
+    return ok;
+}
+
+/** @brief 保留结案不能重置累计预算、接受外部修改或解锁未知SET。 */
+bool testRetentionKeepsBudgetsAndRejectsUnknownState()
+{
+    SafetyFixture cumulative;
+    bool ok = expect(cumulative.applyTranslation(16.0).succeeded
+        && cumulative.worker.retainLocalRegistrationCorrection(7).succeeded,
+        "first retained increment within session budget is allowed");
+    ok &= expect(!cumulative.applyTranslation(16.0).succeeded && cumulative.scene->writes == 1,
+        "retained completion does not reset the thirty-millimetre cumulative budget");
+    SafetyFixture external;
+    ok &= expect(external.applyTranslation(5.0).succeeded, "retention external-edit candidate written");
+    external.scene->pose[0] = 99.0;
+    ok &= expect(!external.worker.retainLocalRegistrationCorrection(7).succeeded
+        && external.worker.localRegistrationSafetySnapshot().hasPendingPose && external.scene->writes == 1,
+        "external edit blocks retention without overwriting or clearing pending");
+    SafetyFixture afterRetention;
+    ok &= expect(afterRetention.applyTranslation(5.0).succeeded
+        && afterRetention.worker.retainLocalRegistrationCorrection(7).succeeded,
+        "working-anchor external-edit fixture retained");
+    afterRetention.scene->pose[0] = 99.0;
+    ok &= expect(!afterRetention.applyTranslation(1.0).succeeded && afterRetention.scene->writes == 1,
+        "next candidate still detects external modification of a retained working anchor");
+    SafetyFixture unknown;
+    unknown.scene->failReadback = true;
+    ok &= expect(!unknown.applyTranslation(5.0).succeeded, "unknown retained command fixture");
+    unknown.scene->failReadback = false;
+    ok &= expect(!unknown.worker.retainLocalRegistrationCorrection(7).succeeded
+        && unknown.worker.localRegistrationSafetySnapshot().hasPendingPose
+        && !unknown.applyTranslation(1.0).succeeded && unknown.scene->writes == 1,
+        "unknown original readback cannot be silently retained to unlock another write");
+    SafetyFixture cancelled;
+    ok &= expect(cancelled.applyTranslation(5.0).succeeded, "retention cancellation fixture written");
+    cancelled.scene->beforeParentRead = [&cancelled]() { cancelled.worker.setLocalRegistrationEpoch(0); };
+    ok &= expect(!cancelled.worker.retainLocalRegistrationCorrection(7).succeeded
+        && cancelled.worker.localRegistrationSafetySnapshot().hasPendingPose && cancelled.scene->writes == 1,
+        "cancellation during read-only retention cannot clear the old transaction");
+    SafetyFixture expired;
+    ok &= expect(expired.applyTranslation(5.0).succeeded, "retention expired-state candidate written");
+    expired.worker.setLocalRegistrationStateDeadline(QDateTime::currentMSecsSinceEpoch() - 1);
+    ok &= expect(!expired.worker.retainLocalRegistrationCorrection(7).succeeded
+        && expired.scene->writes == 1 && expired.worker.localRegistrationSafetySnapshot().hasPendingPose,
+        "expired robot state forbids retention and never sends a restore");
     return ok;
 }
 
@@ -295,6 +406,9 @@ bool testSceneRevisionAloneRejectsPendingTransaction()
         "old pending snapshot and IDs must survive reconnect unchanged");
     ok &= expect(!fixture.worker.markLocalRegistrationVerified(7).succeeded,
         "scene revision alone must prevent old pending pose promotion");
+    ok &= expect(!fixture.worker.retainLocalRegistrationCorrection(7).succeeded
+        && fixture.worker.localRegistrationSafetySnapshot().hasPendingPose,
+        "scene revision alone must prevent retained completion even with matching current pose");
     ok &= expect(!fixture.worker.rollbackLocalRegistrationCorrection(7).succeeded
         && fixture.scene->writes == 1 && fixture.scene->pose == pendingPose,
         "scene revision alone must prevent rollback despite live connection and identical IDs/pose");
@@ -307,6 +421,8 @@ int main(int argc, char **argv)
     QCoreApplication application(argc, argv);
     bool ok = testPendingBlocksAndGeometryPromotion();
     ok &= testCumulativeAndRotatingKeypointBudgets();
+    ok &= testRetainConfirmedPoseAndContinue();
+    ok &= testRetentionKeepsBudgetsAndRejectsUnknownState();
     ok &= testRestoreLastVerifiedPose();
     ok &= testExternalChangesAndCancellation();
     ok &= testSceneIdentityAndUnknownWrite();

@@ -493,7 +493,7 @@ LocalizationResult LocalizationService::runLocalization(const LocalizationReques
         request.localCorrection.referenceWindowPoints_mm,
         request.localCorrection.dofMask,
         request.localCorrection.parameters,
-        RigidTransform{});
+        request.localCorrection.initialGuess);
 }
 
 } // namespace i2r_rlc::localization

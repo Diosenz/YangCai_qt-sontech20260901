@@ -529,6 +529,109 @@ i2r_rlc::control::OnlineCorrectionPlannedTrajectory makeIcpTrajectory()
     return trajectory;
 }
 
+bool testEstimatedSamplesBypassIcpAndIsolateMeasuredHistory()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionExceptionProcessor processor;
+    const auto trajectory = makeIcpTrajectory();
+    std::vector<OnlineCorrectionDetectionSample> batch;
+    for (std::size_t index = 0; index < 11U; ++index) {
+        batch.push_back(makeIcpSample(trajectory.segmentPathPoints[index], 0));
+    }
+    auto predicted = makeIcpSample(trajectory.segmentPathPoints[11], 1);
+    predicted.estimated = true;
+    batch.push_back(predicted);
+    auto result = processor.process(batch, trajectory, false);
+    bool ok = expectTrue(result.valid && !result.icpAttempted && !result.icpApplied,
+        "prediction boundary must not flush an otherwise fit-ready measured batch through ICP");
+    ok &= expectTrue(result.segmentChanged && result.samples.size() == batch.size()
+        && result.bufferedSampleCount == 0U,
+        "boundary must release measured pending points before prediction without losing seam metadata");
+    for (std::size_t index = 0; index < result.samples.size(); ++index) {
+        ok &= expectNear(result.samples[index].point.xMm, batch[index].point.xMm, 1e-12,
+            "prediction bypass must preserve ordering and original coordinates");
+        ok &= expectTrue(result.samples[index].estimated == batch[index].estimated,
+            "prediction bypass must preserve source flags");
+    }
+    processor.reset();
+    batch.pop_back();
+    result = processor.process(batch, trajectory, false);
+    ok &= expectTrue(result.icpApplied, "history isolation requires an established successful ICP window");
+    std::vector<OnlineCorrectionDetectionSample> pending;
+    pending.push_back(makeIcpSample(trajectory.segmentPathPoints[11], 0));
+    pending.push_back(makeIcpSample(trajectory.segmentPathPoints[12], 0));
+    result = processor.process(pending, trajectory, false);
+    ok &= expectTrue(result.samples.empty() && result.bufferedSampleCount == 2U,
+        "two new measured samples should remain pending before prediction");
+    predicted = makeIcpSample(trajectory.segmentPathPoints[13], 0);
+    predicted.estimated = true;
+    result = processor.process({ predicted }, trajectory, false);
+    ok &= expectTrue(!result.icpAttempted && result.samples.size() == 3U
+        && result.bufferedSampleCount == 0U,
+        "first prediction must immediately drain pending samples and isolate the old fitted history");
+    for (int index = 0; index < 360; ++index) {
+        result = processor.process({ predicted }, trajectory, false);
+        ok &= expectTrue(!result.icpAttempted && result.samples.size() == 1U
+            && result.samples.front().estimated && result.bufferedSampleCount == 0U,
+            "every prediction in a prolonged occlusion must be emitted without ICP accumulation");
+    }
+    for (std::size_t index = 14U; index < 25U; ++index) {
+        result = processor.process({ makeIcpSample(trajectory.segmentPathPoints[index], 0) },
+            trajectory, false);
+        if (index < 24U) {
+            ok &= expectTrue(!result.icpAttempted && result.samples.empty(),
+                "recovery must rebuild a fresh measured window instead of fitting old history or predictions");
+        }
+    }
+    ok &= expectTrue(result.icpAttempted && !result.batches.empty(),
+        "ICP must resume after a new measured-only window reaches the ordinary readiness threshold");
+    for (const auto &diagnostic : result.batches) {
+        for (const auto &sample : diagnostic.pendingSamples) {
+            ok &= expectTrue(!sample.estimated, "resumed ICP pending window must contain measured samples only");
+        }
+        for (const auto &point : diagnostic.fitPoints) {
+            ok &= expectTrue(point.xMm >= makeIcpSample(trajectory.segmentPathPoints[14], 0).point.xMm,
+                "resumed ICP fit must exclude all pre-occlusion history");
+        }
+    }
+    processor.reset();
+    result = processor.process({ makeIcpSample(trajectory.segmentPathPoints.front(), 0) },
+        trajectory, false);
+    ok &= expectTrue(!result.icpAttempted && result.samples.empty() && result.bufferedSampleCount == 1U,
+        "session reset after prediction and recovery must start a fresh measured window");
+    return ok;
+}
+
+bool testInitialDetectionRejectsEstimatedSamples()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    controller.configure(options, makeTrajectory(), makePositionerCalibration());
+    controller.startInitialDetection();
+    OnlineCorrectionDetectionEvent event;
+    OnlineCorrectionDetectionSample predicted;
+    predicted.point = { 80.0, 20.0, 30.0, true };
+    predicted.estimated = true;
+    event.samples.push_back(predicted);
+    auto update = controller.appendDetectionEvent(event);
+    bool ok = expectTrue(update.succeeded && update.state.initialDetectionSamples.empty()
+        && !update.command.valid,
+        "initial prediction can be displayed but must not create an O-plan observation");
+    OnlineCorrectionDetectionSample measured;
+    measured.point = { 10.0, 0.0, 0.0, true };
+    event.samples.push_back(measured);
+    update = controller.appendDetectionEvent(event);
+    ok &= expectTrue(update.state.initialDetectionSamples.size() == 1U
+        && !update.state.initialDetectionSamples.front().estimated,
+        "mixed initial batch must retain only genuine measured geometry");
+    if (!update.state.initialDetectionSamples.empty()) {
+        ok &= expectNear(update.state.initialDetectionSamples.front().point.xMm, 10.0, 1e-12,
+            "filtered initial scan must retain the measured point without substituting prediction");
+    }
+    return ok;
+}
+
 bool testExceptionProcessorAccumulatesSingleFramesAndAppliesIcp()
 {
     i2r_rlc::control::COnlineCorrectionExceptionProcessor processor;
@@ -914,6 +1017,331 @@ bool enterOnlineCorrection(
     robotState->detflag = 1;
     update = controller->onRobotStateChanged(*robotState);
     return update.phase == i2r_rlc::control::OnlineCorrectionPhase::OnlineRunning;
+}
+
+/** @brief 参考形状只作为本会话起点修正后的控制路径，不假定圆形或正向 X。 */
+i2r_rlc::control::OnlineCorrectionPlannedTrajectory makePredictionTrajectory(int shape)
+{
+    using namespace i2r_rlc::control;
+    auto trajectory = makeTrajectory();
+    if (shape == 0) {
+        trajectory.segmentPathPoints = {{0, 0, 0, true}, {10, 0, 0, true},
+            {20, 0, 0, true}, {30, 0, 0, true}, {40, 0, 0, true}};
+    } else if (shape == 1) {
+        trajectory.segmentPathPoints = {{0, 0, 0, true}, {-10, 0, 0, true},
+            {-20, 0, 0, true}, {-30, 0, 0, true}, {-40, 0, 0, true}};
+    } else {
+        trajectory.segmentPathPoints = {{0, 0, 0, true}, {8, 1, 0, true},
+            {16, 5, 0, true}, {23, 12, 0, true}, {29, 21, 0, true}};
+    }
+    trajectory.allPathPoints = trajectory.segmentPathPoints;
+    trajectory.allMatchedPathPoints = trajectory.segmentPathPoints;
+    trajectory.pathSegments = {trajectory.segmentPathPoints};
+    trajectory.segmentStartPathIndex = 0;
+    trajectory.segmentEndPathIndex = static_cast<int>(trajectory.segmentPathPoints.size()) - 1;
+    trajectory.teachPoses.back().xMm = trajectory.segmentPathPoints.back().xMm;
+    trajectory.teachPoses.back().yMm = trajectory.segmentPathPoints.back().yMm;
+    return trajectory;
+}
+
+/** @brief 完全无图时由真实 RobotState 重算目标；预测不是视觉样本。 */
+bool testControllerReferencePredictionWithoutImages()
+{
+    using namespace i2r_rlc::control;
+    bool ok = true;
+    for (int shape = 0; shape < 3; ++shape) {
+        COnlineCorrectionController controller;
+        const auto trajectory = makePredictionTrajectory(shape);
+        auto calibration = makePositionerCalibration();
+        calibration.toolTcpInLastLinkMm = Eigen::Vector3d(0, 0, 231);
+        OnlineCorrectionOptions options;
+        options.enableOnlineIcp = true;
+        controller.configure(options, trajectory, calibration);
+        i2r_rlc::robot_comm::RobotState state;
+        state.sStart = 1;
+        state.curx_r = 100000;
+        state.cury_r = 198000;
+        state.curz_r = 234000;
+        ok &= expectTrue(enterOnlineCorrection(&controller, &state, {100, 200, 3, true}),
+            "state-driven reference prediction must enter the actual online phase");
+        std::uint64_t previousGeneration = 0;
+        OnlineCorrectionPoint previousTarget;
+        for (int index = 1; index < 4; ++index) {
+            state.curx_r = static_cast<long>(std::llround(
+                (100 + trajectory.segmentPathPoints[index].xMm) * 1000));
+            state.cury_r = static_cast<long>(std::llround(
+                (198 + trajectory.segmentPathPoints[index].yMm) * 1000));
+            const auto update = controller.onRobotStateChanged(state);
+            const auto &target = update.state.controlTarget;
+            ok &= expectTrue(update.realtimeCommand.valid && update.followDiagnostic.valid
+                    && target.valid && target.source == OnlineCorrectionTargetSource::PredictedReference
+                    && target.generation > previousGeneration,
+                "fresh robot feedback must generate a new predicted target and recomputed P without image events");
+            ok &= expectTrue(update.state.onlineDetectionSamples.empty()
+                    && update.state.onlineIcp.bufferedSampleCount == 0U
+                    && !update.state.onlineIcp.attempted && update.onlineIcpBatches.empty(),
+                "control prediction cannot fabricate camera samples, pending measurements or ICP solver inputs");
+            ok &= expectNear(target.targetPointInLastLink_mm.zMm, 234.0, 1e-8,
+                "control target uses initial-corrected last-link coordinates with TCP offset applied exactly once");
+            ok &= expectNear(target.targetPointInLastLink_mm.xMm, target.geometry.futureFoot.xMm, 1e-10,
+                "authoritative target and generated P future geometry must be the same point");
+            ok &= expectNear(target.targetPointInLastLink_mm.yMm, update.followDiagnostic.futureFoot.yMm, 1e-10,
+                "UI target snapshot must identify actual recomputed control geometry");
+            if (previousTarget.valid) {
+                ok &= expectTrue(std::hypot(target.targetPointInLastLink_mm.xMm - previousTarget.xMm,
+                        target.targetPointInLastLink_mm.yMm - previousTarget.yMm) > 1.0,
+                    "predicted target must move with straight, reversed and curved robot progress");
+            }
+            previousGeneration = target.generation;
+            previousTarget = target.targetPointInLastLink_mm;
+        }
+    }
+    return ok;
+}
+
+/** @brief 新测量接管目标，随后队列耗尽仍按反馈重算，禁止重发旧 delta。 */
+bool testControllerPredictionRecoveryAndCommandRecomputation()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.enableOnlineIcp = false;
+    controller.configure(options, makePredictionTrajectory(0), makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState state;
+    state.sStart = 1;
+    state.curx_r = 10000;
+    state.cury_r = -2000;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &state, {10, 0, 0, true}),
+        "recovery test must enter online mode");
+    auto update = controller.onRobotStateChanged(state);
+    const auto firstCommand = update.realtimeCommand;
+    const auto firstGeneration = update.state.controlTarget.generation;
+    state.cury_r = 2000;
+    update = controller.onRobotStateChanged(state);
+    ok &= expectTrue(update.realtimeCommand.valid && firstCommand.valid
+            && firstCommand.dyUm * update.realtimeCommand.dyUm < 0
+            && update.state.controlTarget.generation > firstGeneration,
+        "prediction must recompute correction direction from live feedback rather than resend a cached delta");
+    OnlineCorrectionDetectionEvent recovered;
+    recovered.samples = {{{20, 1, 0, true}, std::nullopt},
+        {{25, 1, 0, true}, std::nullopt}, {{30, 1, 0, true}, std::nullopt},
+        {{35, 1, 0, true}, std::nullopt}};
+    update = controller.appendDetectionEvent(recovered);
+    ok &= expectTrue(update.realtimeCommand.valid && update.state.controlTarget.valid
+            && update.state.controlTarget.source == OnlineCorrectionTargetSource::Measured,
+        "accepted image recovery must take control ownership back from prediction");
+    state.curx_r = 49000;
+    update = controller.onRobotStateChanged(state);
+    ok &= expectTrue(update.realtimeCommand.valid && update.state.controlTarget.valid
+            && update.state.controlTarget.source == OnlineCorrectionTargetSource::PredictedReference
+            && update.state.onlineDetectionSamples.size() <= 1U,
+        "exhausted measured queue must switch to anchored reference prediction without adding queue samples");
+    return ok;
+}
+
+/** @brief 新增反馈驱动入口只有 STARTCOR 窗口允许产生普通 P，包括仍有实测队列时。 */
+bool testControllerFeedbackWindowWithMeasuredQueue()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.enableOnlineIcp = false;
+    controller.configure(options, makePredictionTrajectory(0), makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState state;
+    state.sStart = 1;
+    state.curx_r = 10000;
+    state.cury_r = -2000;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &state, {10, 0, 0, true}),
+        "feedback window test enters the actual online lifecycle");
+    OnlineCorrectionDetectionEvent event;
+    event.samples = {{{20, 1, 0, true}, std::nullopt},
+        {{25, 1, 0, true}, std::nullopt}, {{30, 1, 0, true}, std::nullopt}};
+    const auto measured = controller.appendDetectionEvent(event);
+    ok &= expectTrue(measured.realtimeCommand.valid
+            && measured.state.controlTarget.source == OnlineCorrectionTargetSource::Measured,
+        "window boundary must start with an active measured queue");
+    state.corflag = state.detflag = 0;
+    state.curx_r += 1000;
+    const auto closed = controller.onRobotStateChanged(state);
+    ok &= expectTrue(!closed.realtimeCommand.valid && !closed.state.controlTarget.valid,
+        "feedback outside STARTCOR cannot continue ordinary measured commands or retain an active target");
+    state.corflag = state.detflag = 1;
+    const auto reopened = controller.onRobotStateChanged(state);
+    ok &= expectTrue(reopened.realtimeCommand.valid && reopened.state.controlTarget.valid,
+        "a temporary closed control window can resume on a fresh STARTCOR state");
+    return ok;
+}
+
+/** @brief 预测遵守既有阶段和设备门禁，初扫/停止/终止后不生成普通 P。 */
+bool testControllerPredictionLifecycleBoundaries()
+{
+    using namespace i2r_rlc::control;
+    bool ok = true;
+    for (int boundary = 0; boundary < 6; ++boundary) {
+        COnlineCorrectionController controller;
+        OnlineCorrectionOptions options;
+        controller.configure(options, makePredictionTrajectory(0), makePositionerCalibration());
+        i2r_rlc::robot_comm::RobotState state;
+        state.sStart = 1;
+        state.curx_r = 10000;
+        state.cury_r = -2000;
+        controller.startInitialDetection();
+        auto update = controller.onRobotStateChanged(state);
+        ok &= expectTrue(!update.realtimeCommand.valid && !update.state.controlTarget.valid,
+            "initial scan cannot produce a predicted online control target");
+        controller.reset();
+        ok &= expectTrue(enterOnlineCorrection(&controller, &state, {10, 0, 0, true}),
+            "lifecycle prediction case must establish a fresh current-session anchor");
+        update = controller.onRobotStateChanged(state);
+        ok &= expectTrue(update.realtimeCommand.valid && update.state.controlTarget.valid,
+            "lifecycle boundary must be checked against an active predicted target");
+        if (boundary == 0) { state.sHold = 1; }
+        if (boundary == 1) { state.sIsAlarm = 1; }
+        if (boundary == 2) { state.sStart = 0; }
+        if (boundary == 3) { state.corflag = 3; state.detflag = 3; }
+        if (boundary < 4) {
+            update = controller.onRobotStateChanged(state);
+        } else if (boundary == 4) {
+            update = controller.reset();
+        } else {
+            update = controller.fail("explicit session invalidation");
+        }
+        ok &= expectTrue((!update.realtimeCommand.valid || update.realtimeCommand.onlineEndFlag == 1)
+                && !update.state.controlTarget.valid,
+            "hold, alarm, stop, end, reset and failure must invalidate normal predicted targets");
+        const auto late = controller.onRobotStateChanged(state);
+        ok &= expectTrue((!late.realtimeCommand.valid || late.realtimeCommand.onlineEndFlag == 1)
+                && !late.state.controlTarget.valid,
+            "late robot updates cannot revive a terminated session target");
+    }
+    return ok;
+}
+/** @brief 邻近回折分支不能仅凭欧氏距离小差异抢占当前路径进度。 */
+bool testControllerPredictionKeepsFoldedPathBranch()
+{
+    using namespace i2r_rlc::control;
+    auto trajectory = makePredictionTrajectory(0);
+    trajectory.segmentPathPoints = {{0, 0, 0, true}, {10, 0, 0, true},
+        {10, 1, 0, true}, {0, 1, 0, true}};
+    trajectory.allPathPoints = trajectory.segmentPathPoints;
+    trajectory.allMatchedPathPoints = trajectory.segmentPathPoints;
+    trajectory.pathSegments = {trajectory.segmentPathPoints};
+    trajectory.teachPoses.back().xMm = 0;
+    trajectory.teachPoses.back().yMm = 1;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    controller.configure(options, trajectory, makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState state;
+    state.sStart = 1;
+    state.curx_r = 2000;
+    state.cury_r = 510;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &state, {0, 0, 0, true}),
+        "folded path prediction test must enter online mode");
+    auto update = controller.onRobotStateChanged(state);
+    ok &= expectTrue(update.state.controlTarget.valid,
+        "nearby opposite branch cannot make the current reference unavailable");
+    ok &= expectNear(update.state.controlTarget.geometry.first.yMm, 0.0, 1e-12,
+        "reference association must retain the current lower branch despite the upper branch being 0.02 mm closer");
+    ok &= expectTrue(update.state.controlTarget.geometry.directionPoint.xMm
+            > update.state.controlTarget.geometry.first.xMm,
+        "prediction must not reverse its path tangent by jumping to the opposite nearby branch");
+    state.curx_r = 3000;
+    state.cury_r = 490;
+    update = controller.onRobotStateChanged(state);
+    ok &= expectNear(update.state.controlTarget.geometry.first.yMm, 0.0, 1e-12,
+        "alternating nearest-distance preference cannot switch ordered reference branches");
+    return ok;
+}
+
+/** @brief 未完成/未通过轨迹匹配的原图窗口不能抢先训练预测路径。 */
+bool testControllerPendingImageCannotPoisonPredictionAnchor()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.enableOnlineIcp = true;
+    controller.configure(options, makePredictionTrajectory(0), makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState state;
+    state.sStart = 1;
+    state.curx_r = 10000;
+    state.cury_r = -2000;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &state, {10, 0, 0, true}),
+        "pending-anchor test must establish a current-session corrected reference");
+    controller.onRobotStateChanged(state);
+    OnlineCorrectionDetectionEvent pending;
+    pending.samples.push_back({{20, 50, 0, true}, std::nullopt});
+    const auto update = controller.appendDetectionEvent(pending);
+    ok &= expectTrue(update.state.onlineIcp.bufferedSampleCount == 1U
+            && !update.state.onlineIcp.attempted && update.state.controlTarget.valid
+            && update.state.controlTarget.source == OnlineCorrectionTargetSource::PredictedReference,
+        "independent raw image pending in ICP must remain a measurement without prematurely becoming a reference anchor");
+    ok &= expectNear(update.state.controlTarget.targetPointInLastLink_mm.yMm, 0.0, 1e-12,
+        "unmatched raw point cannot pull the persistent prediction reference away from its trusted initial correction");
+    return ok;
+}
+
+/** @brief P 回包先更新反馈也不能吞掉运动；静止回包不产生 P 自激循环。 */
+bool testControllerPredictionFeedbackReceiptDeduplication()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    controller.configure(options, makePredictionTrajectory(0), makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState state;
+    state.sStart = 1;
+    state.curx_r = 10000;
+    state.cury_r = -2000;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &state, {10, 0, 0, true}),
+        "feedback-dedup test must enter online mode");
+    const auto first = controller.onRobotStateChanged(state);
+    const auto duplicate = controller.onRobotStateChanged(state);
+    ok &= expectTrue(first.realtimeCommand.valid && !duplicate.realtimeCommand.valid
+            && duplicate.state.controlTarget.generation == first.state.controlTarget.generation,
+        "identical control feedback cannot repeat the previous P or advance its target generation");
+    i2r_rlc::robot_comm::RobotCommandReceipt receipt;
+    receipt.type = i2r_rlc::robot_comm::RobotCommandType::RealtimeCorrection;
+    receipt.sent = true;
+    receipt.responseReceived = true;
+    receipt.completed = true;
+    state.curx_r = 15000;
+    controller.onRobotCommandReceipt(receipt, state);
+    const auto moved = controller.onRobotStateChanged(state);
+    ok &= expectTrue(moved.realtimeCommand.valid
+            && moved.state.controlTarget.generation > first.state.controlTarget.generation,
+        "feedback updated by a command receipt must still be compared with the last calculated control pose");
+    return ok;
+}
+bool testControllerEstimatedSamplesContinueCommands()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.enableOnlineIcp = true;
+    controller.configure(options, makeTrajectory(), makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState robotState;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &robotState, { 10.0, 0.0, 0.0, true }),
+        "prediction command test must enter online mode through real state transitions");
+    for (int index = 0; index < 40; ++index) {
+        // 机器人按路径前进，传感器保持 2 mm 前视；静止反馈会触发既有重复目标保护。
+        robotState.curx_r = (8 + index) * 1000;
+        const auto feedback = controller.onRobotStateChanged(robotState);
+        ok &= expectTrue(feedback.phase == OnlineCorrectionPhase::OnlineRunning,
+            "moving robot feedback must keep prediction scenario in online mode");
+        OnlineCorrectionDetectionEvent event;
+        OnlineCorrectionDetectionSample predicted;
+        predicted.point = { 10.0 + index, 1.0, 0.0, true };
+        predicted.estimated = true;
+        event.samples.push_back(predicted);
+        const auto update = controller.appendDetectionEvent(event);
+        ok &= expectTrue(update.succeeded && !update.state.onlineIcp.attempted
+            && update.state.onlineIcp.bufferedSampleCount == 0U,
+            "estimated online sample must reach following immediately with no ICP delay");
+        if (index >= 3) {
+            ok &= expectTrue(update.realtimeCommand.valid && update.followDiagnostic.valid,
+                "continued prediction must generate real correction commands after direction is established");
+        }
+    }
+    return ok;
 }
 
 bool testControllerOnlineIcpSwitchAndFlush()
@@ -1509,6 +1937,13 @@ int main(int argc, char *argv[])
     }
 
     bool ok = true;
+    ok &= testControllerReferencePredictionWithoutImages();
+    ok &= testControllerPredictionRecoveryAndCommandRecomputation();
+    ok &= testControllerPredictionLifecycleBoundaries();
+    ok &= testControllerFeedbackWindowWithMeasuredQueue();
+    ok &= testControllerPredictionKeepsFoldedPathBranch();
+    ok &= testControllerPendingImageCannotPoisonPredictionAnchor();
+    ok &= testControllerPredictionFeedbackReceiptDeduplication();
     ok &= testTrajectoryParsingAndCommandUnits();
     ok &= testTrajectoryIcpSegmentsFollowAdjacentTeachPoints();
     ok &= testReverseP001OrientationChangesOnlyFirstTeachPoint();
@@ -1518,6 +1953,8 @@ int main(int argc, char *argv[])
     ok &= testTeachPointBatchKeepsLegacyMissingStationAxes();
     ok &= testPositionerRoundTrip();
     ok &= testRbcalibGoldenTranslation();
+    ok &= testEstimatedSamplesBypassIcpAndIsolateMeasuredHistory();
+    ok &= testInitialDetectionRejectsEstimatedSamples();
     ok &= testExceptionProcessorAccumulatesSingleFramesAndAppliesIcp();
     ok &= testExceptionProcessorWaitsForDensePendingSpan();
     ok &= testExceptionProcessorDoesNotReplayOverlappingModelRange();
@@ -1526,6 +1963,7 @@ int main(int argc, char *argv[])
     ok &= testExceptionProcessorSpanFlushAndReset();
     ok &= testExceptionProcessorKeepsInsufficientSeamSides();
     ok &= testExceptionProcessorRetriesAfterSeamChange();
+    ok &= testControllerEstimatedSamplesContinueCommands();
     ok &= testControllerOnlineIcpSwitchAndFlush();
     ok &= testControllerIcpUsesGlobalAndInitialCorrectionReference();
     ok &= testPathFollowerRemovesRepeatedTarget();

@@ -49,6 +49,12 @@ struct OnlineCorrectionFollowResult {
     std::string message;
 };
 
+/** @brief 独立控制参考几何，末节系、mm；不属于视觉检测或 ICP 样本。 */
+struct OnlineCorrectionFollowReference {
+    OnlineCorrectionPoint first;
+    OnlineCorrectionPoint directionPoint;
+    std::optional<float> gapWidthMm;
+};
 /**
  * @brief 根据在线检测轨迹计算机器人实时纠偏增量。
  */
@@ -68,6 +74,16 @@ public:
         std::vector<OnlineCorrectionDetectionSample> *detectionQueue,
         bool finishing);
 
+    /**
+     * @brief 按当前反馈与独立参考几何重新计算 P，不创建或消费视觉样本。
+     * @details 预测与实测复用相同 PID、坐标变换及输出限制，不缓存或重发旧 delta。
+     */
+    OnlineCorrectionFollowResult updateReference(
+        const robot_comm::RobotState &robotState,
+        const OnlineCorrectionOptions &options,
+        const vision::PositionerCalibration &calibration,
+        const std::vector<OnlineCorrectionPoint> &teachTrajectory,
+        const OnlineCorrectionFollowReference &reference);
     /// @brief 清空检测方向、控制历史和上次输出。
     void reset();
 

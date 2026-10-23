@@ -936,6 +936,63 @@ bool testOnlineLocalIcpTranslationLimitControl()
     return ok;
 }
 
+bool testOnlineLocalIcpStabilityControl()
+{
+    i2r_rlc::ui::MainWidget widget;
+    auto* localIcp = widget.findChild<QCheckBox*>(QStringLiteral("onlineLocalIcpCheckBox"));
+    auto* stability = widget.findChild<QCheckBox*>(QStringLiteral("onlineLocalIcpStabilityCheckBox"));
+    if (localIcp == nullptr || stability == nullptr) {
+        return expectTrue(false, "online local ICP stability control should exist");
+    }
+    bool ok = expectTrue(!stability->isChecked() && !stability->isHidden()
+                             && stability->isEnabled(),
+                         "stability protection should default off and be editable before start");
+    ok &= expectTrue(stability->text() == QStringLiteral("在线 ICP 稳定更新保护")
+                         && stability->toolTip().contains(QStringLiteral("焊点明确改善"))
+                         && stability->toolTip().contains(QStringLiteral("监测历史区域"))
+                         && stability->toolTip().contains(QStringLiteral("仅作诊断"))
+                         && stability->toolTip().contains(QStringLiteral("不比较不同窗口")),
+                     "stability help should explain independent benefit and historical region protection");
+    int stabilitySignalCount = 0;
+    int processingSignalCount = 0;
+    bool lastEnabled = false;
+    QObject::connect(&widget, &i2r_rlc::ui::MainWidget::onlineLocalIcpStabilityChanged,
+        [&stabilitySignalCount, &lastEnabled](bool enabled) {
+            ++stabilitySignalCount;
+            lastEnabled = enabled;
+        });
+    QObject::connect(&widget, &i2r_rlc::ui::MainWidget::onlineProcessingOptionsChanged,
+        [&processingSignalCount](bool, int, double) {
+            ++processingSignalCount;
+        });
+    stability->setChecked(true);
+    ok &= expectTrue(stabilitySignalCount == 1 && lastEnabled && processingSignalCount == 0,
+                     "stability toggle should publish exactly one independent user update");
+    localIcp->setChecked(false);
+    ok &= expectTrue(stability->isHidden() && stability->isChecked()
+                         && stabilitySignalCount == 1 && processingSignalCount == 1,
+                     "ICP disable should hide stability protection and retain its choice");
+    localIcp->setChecked(true);
+    widget.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：运行中"));
+    stability->setChecked(false);
+    ok &= expectTrue(!stability->isHidden() && stability->isEnabled()
+                         && stabilitySignalCount == 2 && !lastEnabled && processingSignalCount == 2,
+                     "stability protection should remain independently editable during correction");
+    widget.setOnlineLocalIcpStabilityEnabled(true);
+    widget.setOnlineProcessingOptions(false, 1, 0.5);
+    ok &= expectTrue(stability->isHidden() && stability->isChecked()
+                         && stabilitySignalCount == 2 && processingSignalCount == 2,
+                     "programmatic synchronization should retain protection without user feedback");
+    widget.setOnlineProcessingOptions(true, 1, 0.5);
+    ok &= expectTrue(!stability->isHidden() && stability->isChecked()
+                         && stabilitySignalCount == 2 && processingSignalCount == 2,
+                     "programmatic ICP enable should restore the retained protection choice");
+    widget.setOnlineLocalIcpStabilityEnabled(false);
+    ok &= expectTrue(!stability->isChecked() && stabilitySignalCount == 2,
+                     "programmatic stability disable should block user feedback");
+    return ok;
+}
+
 bool testOnlineBusinessAndSyncTextRemainStable()
 {
     using i2r_rlc::control::OnlineCorrectionPhase;
@@ -1174,6 +1231,7 @@ int main(int argc, char **argv)
     ok &= testOnlineDiagnosticsKeepStableGeometry();
     ok &= testOnlineLocalIcpDistanceControl();
     ok &= testOnlineLocalIcpTranslationLimitControl();
+    ok &= testOnlineLocalIcpStabilityControl();
     ok &= testOnlineBusinessAndSyncTextRemainStable();
     ok &= testWorkpieceSelectorPanel();
     ok &= testIbvsAndLocalizationPanelsUseTwinButtonDesign();

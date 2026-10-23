@@ -102,6 +102,35 @@ bool testRotationAndNonfiniteEvidence()
         "nonfinite inverse correction must not produce verified evidence");
     return ok;
 }
+
+/** @brief 后验保留既有噪声容差，但重复、旧帧及终态调用不能重复建立可信历史。 */
+bool testToleratedWorseningAndSampleDeduplication()
+{
+    loc::RigidTransform correction;
+    correction.rowMajor[3] = 0.25;
+    Verification tolerated(correction, Verification::Options{});
+    bool ok = expect(tolerated.observe(1, true, {0.1, 0.0, 0.0}, {0.25, 0.0, 0.0})
+        == Decision::Waiting && tolerated.lastObservationGood(),
+        "existing post-write tolerance must accept 0.05 mm measurement worsening");
+    ok &= expect(tolerated.observe(1, false, {}, {}) == Decision::Waiting
+        && !tolerated.lastObservationGood(), "duplicate good frame must not create a historical sample");
+    ok &= expect(tolerated.observe(0, true, {}, {}) == Decision::Waiting
+        && !tolerated.lastObservationGood(), "old frame must not create a historical sample");
+    tolerated.observe(2, true, {0.1, 0.0, 0.0}, {0.25, 0.0, 0.0});
+    ok &= expect(tolerated.observe(3, true, {0.1, 0.0, 0.0}, {0.25, 0.0, 0.0})
+        == Decision::Verified && tolerated.lastObservationGood()
+        && std::abs(tolerated.currentErrorMm() - tolerated.previousErrorMm() - 0.05) < 1e-9,
+        "three distinct tolerated frames preserve the prior post-write verification behavior");
+    ok &= expect(tolerated.observe(4, true, {}, {}) == Decision::Verified
+        && !tolerated.lastObservationGood(), "terminal calls must not supply additional historical evidence");
+
+    Verification gain(correction, Verification::Options{});
+    gain.observe(10, true, {0.25, 0.0, 0.0}, {0.25, 0.0, 0.0});
+    gain.observe(11, true, {0.25, 0.0, 0.0}, {0.25, 0.0, 0.0});
+    ok &= expect(gain.observe(12, true, {0.25, 0.0, 0.0}, {0.25, 0.0, 0.0})
+        == Decision::Verified && gain.lastObservationGood(), "clear-gain frames still verify normally");
+    return ok;
+}
 } // namespace
 
 int main()
@@ -109,6 +138,7 @@ int main()
     bool ok = testConsecutiveGoodFramesAndDuplicates();
     ok &= testBadFramesAndConsecutiveReset();
     ok &= testRotationAndNonfiniteEvidence();
+    ok &= testToleratedWorseningAndSampleDeduplication();
     if (ok) { std::puts("PASS: online local registration verification tests"); }
     return ok ? 0 : 1;
 }

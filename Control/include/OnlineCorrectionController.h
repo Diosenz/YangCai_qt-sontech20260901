@@ -141,6 +141,12 @@ private:
      */
     void setPhase(OnlineCorrectionPhase phase, const std::string &message);
 
+    /// @brief 先使用已释放实测队列；无可用几何时以本会话校正参考重算控制目标。
+    OnlineCorrectionFollowResult followCurrentTarget();
+    /// @brief 仅独立图像几何可更新参考偏差；estimated 不反向训练预测锚。
+    void updatePredictionAnchor(const std::vector<OnlineCorrectionDetectionSample> &samples);
+    /// @brief 原子保存实际 P 使用的几何及单会话计算序号，不生成相机测量身份。
+    void recordControlTarget(const OnlineCorrectionFollowResult &follow, OnlineCorrectionTargetSource source);
     OnlineCorrectionOptions m_options;
     OnlineCorrectionPlannedTrajectory m_trajectory;
     /// @brief 本会话起点修正后的参考，只供在线 ICP 和跟随器使用。
@@ -150,6 +156,14 @@ private:
     robot_comm::RobotState m_robotState;
     COnlineCorrectionExceptionProcessor m_exceptionProcessor;
     COnlineCorrectionPathFollower m_pathFollower;
+    bool m_predictionReferenceReady = false;
+    OnlineCorrectionPoint m_predictionOffset;
+    std::optional<float> m_predictionGapWidthMm;
+    int m_predictionSegmentIndex = 0;
+    std::uint64_t m_targetGeneration = 0;
+    /// @brief 上次实际计算 P 所用反馈，独立于后续命令回包更新的 m_robotState。
+    robot_comm::RobotState m_lastControlRobotState;
+    bool m_hasControlRobotState = false;
 };
 
 } // namespace i2r_rlc::control

@@ -59,6 +59,7 @@ LocalCorrectionPipelineResult LocalizationLocalCorrectionPipeline::run(
     localizationRequest.localCorrection.dofMask = request.dofMask;
     localizationRequest.localCorrection.parameters = request.parameters;
     localizationRequest.localCorrection.currentWorkpiecePose = request.currentWorkpiecePose;
+    localizationRequest.localCorrection.initialGuess = request.initialGuess;
     localizationRequest.localCorrection.windowFrameCount = request.windowFrameCount;
 
     LocalCorrectionPipelineResult result;

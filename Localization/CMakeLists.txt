@@ -52,6 +52,7 @@ add_library(i2r_rlc_localization STATIC
     src/LocalizationLaserLineObservation.cpp
     src/LocalizationPointProjector.cpp
     src/LocalizationService.cpp
+    src/LocalizationSurfaceValidation.cpp
     src/LocalizationWorkflowController.cpp
     src/NullLocalizationVirtualReferenceProvider.cpp
     src/NullLocalizationService.cpp
@@ -65,6 +66,7 @@ add_library(i2r_rlc_localization STATIC
     include/LocalizationPipelineMath.h
     include/LocalizationPointProjector.h
     include/LocalizationService.h
+    include/LocalizationSurfaceValidation.h
     include/LocalizationTypes.h
     include/LocalizationWorkflowController.h
     include/NullLocalizationService.h

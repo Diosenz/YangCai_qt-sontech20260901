@@ -387,6 +387,12 @@ OnlineCorrectionExceptionResult COnlineCorrectionExceptionProcessor::process(
         if (!isValid(sample.point)) {
             continue;
         }
+        std::vector<OnlineCorrectionDetectionSample> bypassSamples;
+        if (sample.estimated) {
+            // 预测边界直接释放未完成的实测窗口；flush 可能触发 ICP，不能用于隔离。
+            bypassSamples.swap(m_pendingSamples);
+            m_normalSamples.clear();
+        }
         const bool seamEdge = sample.simulatedSeamIndex >= 0
             && m_lastSimulatedSeamIndex >= 0
             && sample.simulatedSeamIndex != m_lastSimulatedSeamIndex;
@@ -414,6 +420,23 @@ OnlineCorrectionExceptionResult COnlineCorrectionExceptionProcessor::process(
         }
         if (sample.scanLineChangePoint.has_value() && isValid(*sample.scanLineChangePoint)) {
             m_lastChangePoint = sample.scanLineChangePoint;
+        }
+        if (sample.estimated) {
+            bypassSamples.push_back(sample);
+            OnlineCorrectionExceptionResult bypass;
+            bypass.valid = true;
+            bypass.samples = std::move(bypassSamples);
+            bypass.message = "estimated seam continuation bypasses ICP; measured window isolated";
+            OnlineCorrectionIcpBatchDiagnostic diagnostic;
+            diagnostic.flush = true;
+            diagnostic.pendingSamples = bypass.samples;
+            diagnostic.releasedSamples = bypass.samples;
+            diagnostic.message = bypass.message;
+            bypass.batches.push_back(std::move(diagnostic));
+            appendResult(result, std::move(bypass));
+            // 保留单调相位约束，但推进跨批距离锚点，预测不进入拟合历史。
+            m_lastReleasedRawPoint = sample.point;
+            continue;
         }
         m_pendingSamples.push_back(sample);
         // 限制坏输入/静止相机窗口的内存，不让未满足条件的样本无限增长。

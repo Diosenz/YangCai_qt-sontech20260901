@@ -168,6 +168,8 @@ struct LocalCorrectionRequest {
     IcpDofMask dofMask;
     IcpParameters parameters;
     Pose6D currentWorkpiecePose;
+    /// @brief 真实云到参考云的求解初值；默认单位阵，不代表已验收的工件位姿。
+    RigidTransform initialGuess;
     int windowFrameCount = 0;
 };
 
@@ -183,6 +185,8 @@ struct LocalCorrectionPipelineRequest {
     IcpDofMask dofMask;
     IcpParameters parameters;
     Pose6D currentWorkpiecePose;
+    /// @brief 真实云到参考云的求解初值；默认单位阵，不代表已验收的工件位姿。
+    RigidTransform initialGuess;
     qint64 frameId = -1;
     int windowFrameCount = 0;
     int minimumWindowFrameCount = 1;

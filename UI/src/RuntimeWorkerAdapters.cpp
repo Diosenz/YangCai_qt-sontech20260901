@@ -1192,8 +1192,7 @@ void CVisionTrackingWorkerAdapter::configure(
     const RuntimeTrackingOptions &options,
     const vision::WeldProjectionContext &projectionContext)
 {
-    m_diagnosticFrameCount = 0;
-    m_diagnosticImageCount = 0;
+    // 同一纠偏会话暂停/继续可能重配检测器；诊断配额与限频只随实际 session 切换。
     m_options = options;
     m_options.method = RuntimeTrackingMethod::Kcf;
     m_projectionContext = projectionContext;
@@ -1260,7 +1259,12 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
     const control::TrackingTriggerDecision decision =
         control::CTrackingTriggerPolicy::evaluate(triggerInput);
     if (!decision.shouldStartTracking) {
+        if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
+            m_detector.notifyImageObservationGap();
+        }
         RuntimeTrackingResult result;
+        result.imageMeasurementOutputEnabled =
+            m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
         result.frameId = frame.frameId;
         result.posflag = m_robotState.posflag;
         result.traflag = m_robotState.traflag;
@@ -1275,6 +1279,11 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
 
     RuntimeTrackingResult result;
     if (m_options.detType != 2) {
+        if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
+            m_detector.notifyImageObservationGap();
+        }
+        result.imageMeasurementOutputEnabled =
+            m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
         result.frameId = frame.frameId;
         result.triggerAccepted = true;
         result.valid = false;
@@ -1372,6 +1381,8 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     RuntimeTrackingResult result;
     result.frameId = frame.frameId;
     result.posflag = m_robotState.posflag;
+    result.imageMeasurementOutputEnabled =
+        m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
     const bool diagnosticsEnabled = m_options.visionDiagnostics.enabled
         && m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
     if (diagnosticsEnabled) {
@@ -1385,12 +1396,14 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     const QImage image = frame.image.isNull() ? frame.previewImage : frame.image;
     const cv::Mat gray8 = qImageToGray8(image);
     if (gray8.empty()) {
+        if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
         result.message = QStringLiteral("invalid frame image");
         return result;
     }
 
     digital_twin::DigitalTwinVisionLaserObservation observation;
     if (!makeObservation(frame.frameId, &observation)) {
+        if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
         result.message = QStringLiteral("simulated observation unavailable");
         return result;
     }
@@ -1412,6 +1425,7 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
             m_options.positionerCalibration,
             m_robotState);
         if (!contextResult.valid) {
+            if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
             result.message = QStringLiteral("projection context rejected: %1")
                                  .arg(QString::fromStdString(contextResult.message));
             return result;
@@ -1419,30 +1433,70 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         projectionContext = contextResult.context;
     }
 
+    if (result.imageMeasurementOutputEnabled && projectionContext.valid) {
+        result.displayProjectionContext = projectionContext;
+        result.displayPositionerCalibration = m_options.positionerCalibration;
+    }
     vision::LegacyOnlineKcfOptions detectorOptions;
     detectorOptions.enableGapDetection = m_options.enableGapDetection;
     if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
         detectorOptions.fusion = m_options.fusion;
+        detectorOptions.enableSeamRefinement = true;
+        detectorOptions.enableSimulationGuidance = true;
+        // 反向初扫与正式跟随使用同一原图测量边界；CAD 只辅助搜索。
+        detectorOptions.enableImageMeasurementOutput = true;
+        detectorOptions.enableBoundedImageSearch = m_activeCorrelation.onlineControlWindowActive;
+        detectorOptions.enableOnlineObservationFusion = false;
+        detectorOptions.referenceRevision = m_activeCorrelation.workpiecePoseRevision;
+        // 用户明确选择实际接缝间隙中部；只对在线纠偏启用，不影响离线扫描。
+        detectorOptions.seamRefinement.heightPolicy = vision::OnlineSeamHeightPolicy::GapCenter;
     }
     const auto detected = m_detector.process(
         gray8, observation, projectionContext, detectorOptions);
     if (diagnosticsEnabled) {
         result.diagnostic->algorithm = detected.diagnostic;
         const auto &policy = m_options.visionDiagnostics;
-        const bool sampleImage = policy.imagesEnabled && policy.maxImageBytes > 0
-            && policy.imageSampleEveryN > 0 && policy.maxImagePairs > 0
-            && m_diagnosticImageCount < static_cast<quint64>(policy.maxImagePairs)
-            && (m_diagnosticFrameCount % static_cast<quint64>(policy.imageSampleEveryN)) == 0;
-        ++m_diagnosticFrameCount;
-        if (sampleImage && !detected.processedImage.empty()) {
+        if (!m_diagnosticImageSamplingClock.isValid()
+            || m_diagnosticImageSamplingSessionId != m_activeCorrelation.sessionId) {
+            m_diagnosticImageSampling = {};
+            m_diagnosticImageSamplingSessionId = m_activeCorrelation.sessionId;
+            m_diagnosticImageSamplingClock.start();
+        }
+        const auto &raw = detected.diagnostic;
+        const bool anomaly = COnlineVisionImageSampling::isAnomaly(
+            raw.beforeFusionPoint.x, raw.beforeFusionPoint.y,
+            raw.simulatedPoint.x, raw.simulatedPoint.y,
+            raw.simulatedPointAvailable && raw.attempted
+                && raw.tracker.completed && raw.tracker.hasResponse,
+            raw.tracker.correlationJumpRejected || raw.tracker.fusionJumpRejected);
+        const qint64 sampleTimeMs = m_diagnosticImageSamplingClock.elapsed();
+        const int bucket = !detected.processedImage.empty()
+            ? m_diagnosticImageSampling.select(policy,
+                m_activeCorrelation.onlineControlWindowActive, anomaly, sampleTimeMs) : -1;
+        result.diagnostic->imageSampleBucket = bucket;
+        if (bucket >= 0) {
             // Mat 数据属于检测器输出；copy 后才可跨线程交给后台写入器。
             result.diagnostic->sourceImage = image;
             result.diagnostic->enhancedImage = QImage(
                 detected.processedImage.data, detected.processedImage.cols,
                 detected.processedImage.rows, static_cast<int>(detected.processedImage.step),
                 QImage::Format_Grayscale8).copy();
-            ++m_diagnosticImageCount;
+
         }
+    }
+    result.pointSource = detected.diagnostic.continuity.source;
+    result.degradedFrames = detected.diagnostic.continuity.degradedFrames;
+    result.imageObservationAccepted = detected.diagnostic.imageObservationAccepted;
+    if (result.imageMeasurementOutputEnabled) {
+        // 初扫允许已验收 KCF 进入起点缓存；正式跟随保留其 estimated 标记，
+        // 沿用 Control 异常 ICP 的隔离门，不能因图像可用而冒充独立几何。
+        result.sample.estimated = result.imageObservationAccepted
+            && result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
+            && m_activeCorrelation.onlineControlWindowActive;
+    } else {
+        result.sample.estimated = result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
+            || result.pointSource == vision::OnlineSeamPointSource::SimulationPrediction
+            || result.pointSource == vision::OnlineSeamPointSource::GuidedEstimate;
     }
     result.imageXPixel = detected.weldPointPixel.x;
     result.imageYPixel = detected.weldPointPixel.y;
@@ -1459,13 +1513,23 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         result.sample.gapWidthMm = static_cast<float>(detected.gapWidthMm);
     }
     result.valid = detected.valid;
-    // 独立验收只能使用融合前的真实 KCF 观测；诊断归档开关不影响安全数据。
+    // 独立验收使用同帧原图精定位观测，禁止读粗 KCF 或融合后的仿真先验。
+    // 归档关闭仍须执行几何校核与投影；非在线旧路径保持原观测。
     const auto &rawDiagnostic = detected.diagnostic;
-    const auto &rawPixel = rawDiagnostic.beforeFusionPoint;
+    const auto &rawPixel = detectorOptions.enableSeamRefinement
+        ? rawDiagnostic.refinement.point : rawDiagnostic.beforeFusionPoint;
     const auto &rawTracker = rawDiagnostic.tracker;
-    if (detected.valid && rawDiagnostic.attempted && rawTracker.hasResponse
-        && rawTracker.completed && !rawTracker.correlationJumpRejected
-        && !rawTracker.fusionJumpRejected
+    if (detected.valid
+        && (!detectorOptions.enableSeamRefinement || rawDiagnostic.refinement.valid)
+        && rawDiagnostic.attempted
+        // 原图测量模式只授予已验收几何独立资格，KCF 业务点不能自证 ICP。
+        // 初扫同样不能因错误 CAD 的旧融合跳变否定已验收的原图几何。
+        && (detectorOptions.enableImageMeasurementOutput
+            ? rawDiagnostic.imageObservationAccepted
+                && result.pointSource == vision::OnlineSeamPointSource::Geometry
+            : (detectorOptions.enableOnlineObservationFusion
+                || (rawTracker.hasResponse && rawTracker.completed
+                    && !rawTracker.correlationJumpRejected && !rawTracker.fusionJumpRejected)))
         && std::isfinite(rawPixel.x) && std::isfinite(rawPixel.y)
         && rawPixel.x >= 0.0 && rawPixel.x < gray8.cols
         && rawPixel.y >= 0.0 && rawPixel.y < gray8.rows) {
@@ -1843,18 +1907,27 @@ CGlobalLocatePriorWorkerAdapter::localRegistrationSafetySnapshot() const
 digital_twin::DigitalTwinCommandResult
 CGlobalLocatePriorWorkerAdapter::markLocalRegistrationVerified(quint64 epoch)
 {
-    return verifyOrRestoreLocalRegistration(epoch, false);
+    return completeLocalRegistrationTransaction(epoch, LocalRegistrationCompletion::Verify);
+}
+
+digital_twin::DigitalTwinCommandResult
+CGlobalLocatePriorWorkerAdapter::retainLocalRegistrationCorrection(quint64 epoch)
+{
+    return completeLocalRegistrationTransaction(epoch, LocalRegistrationCompletion::Retain);
 }
 
 digital_twin::DigitalTwinCommandResult
 CGlobalLocatePriorWorkerAdapter::rollbackLocalRegistrationCorrection(quint64 epoch)
 {
-    return verifyOrRestoreLocalRegistration(epoch, true);
+    return completeLocalRegistrationTransaction(epoch, LocalRegistrationCompletion::Restore);
 }
 
 digital_twin::DigitalTwinCommandResult
-CGlobalLocatePriorWorkerAdapter::verifyOrRestoreLocalRegistration(quint64 epoch, bool restore)
+CGlobalLocatePriorWorkerAdapter::completeLocalRegistrationTransaction(
+    quint64 epoch, LocalRegistrationCompletion completion)
 {
+    const bool restore = completion == LocalRegistrationCompletion::Restore;
+    const bool retain = completion == LocalRegistrationCompletion::Retain;
     m_localRegistrationWriteAttempted = false;
     QElapsedTimer timer;
     timer.start();
@@ -1889,7 +1962,21 @@ CGlobalLocatePriorWorkerAdapter::verifyOrRestoreLocalRegistration(quint64 epoch,
             rigidTransformToMatrix(transaction.pendingParentFromWorkpiece))) {
         return {false, QStringLiteral("工件位姿已被外部修改，拒绝恢复/晋升局部定位事务。")};
     }
+    if (retain) {
+        if (!eligible()) {
+            return {false, QStringLiteral("保留结案前事务已撤销，保持待确认保护且不修改场景。")};
+        }
+        // 命令确认锚只负责下一次写回身份；后验未通过不能伪装成几何可信位姿。
+        transaction.confirmedParentFromWorkpiece = transaction.pendingParentFromWorkpiece;
+        transaction.hasConfirmedPose = true;
+        transaction.hasPendingPose = false;
+        transaction.pendingPoseConfirmed = false;
+        transaction.message = QStringLiteral("当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。");
+        return {true, transaction.message};
+    }
     if (!restore) {
+        transaction.confirmedParentFromWorkpiece = transaction.pendingParentFromWorkpiece;
+        transaction.hasConfirmedPose = true;
         transaction.verifiedParentFromWorkpiece = transaction.pendingParentFromWorkpiece;
         transaction.verifiedByIndependentObservation = true;
         transaction.hasPendingPose = false;
@@ -1916,7 +2003,9 @@ CGlobalLocatePriorWorkerAdapter::verifyOrRestoreLocalRegistration(quint64 epoch,
     }
     transaction.hasPendingPose = false;
     transaction.pendingPoseConfirmed = false;
-    transaction.message = QStringLiteral("已恢复并回读确认上一可信工件位姿，自动更新仍应暂停。");
+    transaction.confirmedParentFromWorkpiece = transaction.verifiedParentFromWorkpiece;
+    transaction.hasConfirmedPose = true;
+    transaction.message = QStringLiteral("已恢复并回读确认上一可信工件位姿，待上层冷却并重建新采样窗口。");
     return {true, transaction.message};
 }
 
@@ -1928,7 +2017,7 @@ CGlobalLocatePriorWorkerAdapter::checkLocalRegistrationCandidate(
     auto &transaction = m_localRegistrationSafety;
     const auto &options = m_localRegistrationSafetyOptions;
     if (transaction.hasPendingPose) {
-        return {false, QStringLiteral("上一局部修正尚未几何验证，禁止连续累积写回。")};
+        return {false, QStringLiteral("上一局部修正尚未结束后验事务，禁止连续累积写回。")};
     }
     if (!std::isfinite(options.maximumCumulativeTranslationMm)
         || options.maximumCumulativeTranslationMm <= 0.0
@@ -1949,7 +2038,7 @@ CGlobalLocatePriorWorkerAdapter::checkLocalRegistrationCandidate(
         return {false, QStringLiteral("候选位姿不是有限刚体变换，拒绝局部写回。")};
     }
     if (!transaction.hasBaseline) {
-        // 初始现场位姿是会话恢复基线；此处不表示它已经通过新采样几何验收。
+        // 初始现场位姿固定累计预算；命令确认锚不表示已通过新采样几何验收。
         transaction.hasBaseline = true;
         transaction.hasVerifiedPose = true;
         transaction.sceneRevision = m_robotSimSceneRevision;
@@ -1957,12 +2046,15 @@ CGlobalLocatePriorWorkerAdapter::checkLocalRegistrationCandidate(
         transaction.parentId = m_robotSimScene.workpieceParentId;
         transaction.baselineParentFromWorkpiece = current;
         transaction.verifiedParentFromWorkpiece = current;
+        transaction.confirmedParentFromWorkpiece = current;
+        transaction.hasConfirmedPose = true;
     }
     if (transaction.sceneRevision != m_robotSimSceneRevision
         || transaction.workpieceId != m_robotSimScene.workpieceId
         || transaction.parentId != m_robotSimScene.workpieceParentId
+        || !transaction.hasConfirmedPose
         || !localRegistrationPosesMatch(currentMatrix,
-            rigidTransformToMatrix(transaction.verifiedParentFromWorkpiece))) {
+            rigidTransformToMatrix(transaction.confirmedParentFromWorkpiece))) {
         return {false, QStringLiteral("场景身份或工件位姿已变更，必须显式建立新会话，拒绝累积写回。")};
     }
     const Eigen::Matrix4d baseline = rigidTransformToMatrix(transaction.baselineParentFromWorkpiece);
@@ -2833,6 +2925,11 @@ COnlineCorrectionWorkerAdapter::COnlineCorrectionWorkerAdapter(QObject *parent)
 {
 }
 
+void COnlineCorrectionWorkerAdapter::setControlSessionId(quint64 sessionId)
+{
+    m_controlSessionId = sessionId;
+}
+
 void COnlineCorrectionWorkerAdapter::configure(
     const RuntimeOnlineCorrectionConfiguration &configuration)
 {
@@ -2993,7 +3090,9 @@ void COnlineCorrectionWorkerAdapter::publishUpdate(
     if (!m_runRecorder.recordUpdate(update, m_positionerCalibration)) {
         reportRecordingFailure(QStringLiteral("在线纠偏计算结果"));
     }
-    emit onlineCorrectionUpdated(update);
+    auto published = update;
+    published.state.controlTarget.sessionId = m_controlSessionId;
+    emit onlineCorrectionUpdated(published);
     if (update.command.valid) {
         emit robotCommandReady(update.command);
     }

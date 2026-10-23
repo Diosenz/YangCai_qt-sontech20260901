@@ -84,6 +84,10 @@ struct CKcfUpdateDiagnostic {
     bool fusionApplied = false;
     bool correlationJumpRejected = false;
     bool fusionJumpRejected = false;
+    /// @brief 正式在线的独立搜索及延迟训练状态；普通调用保持关闭。
+    bool onlineObservationMode = false;
+    bool trainingDeferred = false;
+    bool trainingCommitted = false;
     double responsePeak = 0.0;
     double normalizedPeak = 0.0;
     double observationNoise = 0.0;
@@ -146,6 +150,20 @@ public:
      * 调用方须与 init/update 串行执行。
      */
     void setFusionOptions(const KcfFusionOptions &options);
+
+    /**
+     * @brief 正式在线保留原始响应 ROI 作下帧搜索，并延迟模板训练至原图验收后。
+     * @details 默认关闭。仍计算既有 Kalman/手动融合增益与融合 ROI 诊断；
+     * 不把仿真融合位置写回独立观测的搜索或训练状态。调用方须串行提交训练。
+     */
+    void setOnlineObservationMode(bool enabled);
+
+    /**
+     * @brief 接受或放弃最近一帧待训练特征；重复提交无效果，不重新执行相关检测。
+     * @details 只有调用方通过原图/方向校核的帧才可 accepted=true；最多保留一帧，
+     * 后续 update、init 或模式切换会放弃未提交内容，拒绝帧不改变模板。
+     */
+    void commitOnlineObservationTraining(bool accepted);
 
     /**
      * @brief 设置 MKCF 使用的仿真模板图像与 ROI。
@@ -475,6 +493,10 @@ private:
 
     KcfFusionOptions m_fusionOptions;
     CKcfUpdateDiagnostic m_updateDiagnostic;
+    bool m_onlineObservationMode = false;
+    cv::Mat m_pendingOnlineFeatures;
+    cv::Mat m_pendingOnlineImage;
+    cv::Rect2f m_pendingOnlineRoi;
     cv::Mat m_alphaF;
     cv::Mat m_prob;
     cv::Mat m_tmpl;

@@ -16,6 +16,7 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSettings>
@@ -24,8 +25,15 @@
 
 #include "OnlineLocalRegistrationWorker.h"
 #include "AppPaths.h"
-#include "RuntimeCoordinator.h"
+#include "OnlineLocalRegistrationVerification.h"
 #include "RuntimeWorkerAdapters.h"
+
+// 先载入依赖，仅开放协调器自身状态，验证热切换不能绕过事务及故障边界。
+#define private public
+#include "RuntimeCoordinator.h"
+#undef private
+
+bool testHistoryCollectionIndependentOfSolve();
 
 namespace {
 namespace ui = i2r_rlc::ui;
@@ -77,6 +85,8 @@ bool testRuntimeHotProcessingOptions()
         QStringLiteral("max_correspondence_distance_mm"), 10.0).toDouble();
     const double configuredTranslation = settings.value(
         QStringLiteral("maximum_translation_mm"), 30.0).toDouble();
+    const bool configuredStability = settings.value(
+        QStringLiteral("stability_protection_enabled"), false).toBool();
     ui::CRuntimeCoordinator runtime;
     runtime.start();
     bool ok = expect(runtime.onlineLocalRegistrationEnabled() == configuredEnabled,
@@ -85,6 +95,8 @@ bool testRuntimeHotProcessingOptions()
         "runtime ICP correspondence distance must initially reflect INI or default 10 mm");
     ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), configuredTranslation),
         "runtime maximum translation must reflect INI or default 30 mm");
+    ok &= expect(runtime.onlineLocalIcpStabilityEnabled() == configuredStability,
+        "runtime stability protection must reflect production INI or default false");
     ok &= expect(runtime.onlineFusionOptions().mode == KcfFusionMode::AutomaticKalman,
         "runtime must initially retain automatic Kalman fusion");
 
@@ -93,6 +105,14 @@ bool testRuntimeHotProcessingOptions()
     ok &= expect(!runtime.onlineLocalRegistrationEnabled()
         && actual.mode == KcfFusionMode::ManualWeight && near(actual.simulationWeight, 0.3),
         "running runtime must accept ICP disable and manual fusion together");
+    runtime.setOnlineLocalIcpStabilityEnabled(true);
+    ok &= expect(runtime.onlineLocalIcpStabilityEnabled()
+        && !runtime.onlineLocalRegistrationEnabled()
+        && runtime.onlineFusionOptions().mode == KcfFusionMode::ManualWeight
+        && near(runtime.onlineFusionOptions().simulationWeight, 0.3)
+        && near(runtime.onlineLocalIcpDistance(), configuredDistance)
+        && near(runtime.onlineLocalIcpTranslationLimit(), configuredTranslation),
+        "running stability update must preserve disabled ICP, fusion and geometric limits");
     runtime.setOnlineLocalIcpTranslationLimit(7.5);
     ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 7.5)
         && near(runtime.onlineLocalIcpDistance(), configuredDistance)
@@ -146,6 +166,13 @@ bool testRuntimeHotProcessingOptions()
     ok &= expect(near(runtime.onlineLocalIcpTranslationLimit(), 30.0),
         "correspondence, enable and fusion updates must not overwrite translation limit");
 
+    ok &= expect(runtime.onlineLocalIcpStabilityEnabled(),
+        "fusion, correspondence and translation updates must preserve stability protection");
+    runtime.setOnlineLocalIcpStabilityEnabled(false);
+    ok &= expect(!runtime.onlineLocalIcpStabilityEnabled()
+        && runtime.onlineLocalRegistrationEnabled()
+        && runtime.onlineFusionOptions().mode == KcfFusionMode::KcfOnly,
+        "stability disable must preserve enabled ICP and KCF-only mode");
     runtime.updateOnlineProcessingOptions(true,
         {static_cast<KcfFusionMode>(999), std::numeric_limits<double>::quiet_NaN()});
     actual = runtime.onlineFusionOptions();
@@ -172,10 +199,77 @@ bool testRuntimeHotProcessingOptions()
         runtime.setOnlineLocalIcpDistance(5.0 + index * 0.5);
         runtime.setOnlineLocalIcpTranslationLimit(5.0 + index * 0.5);
         runtime.setOnlineLocalIcpTranslationLimit(5.0 + index * 0.5);
+        runtime.setOnlineLocalIcpStabilityEnabled(index % 2 == 0);
+        runtime.setOnlineLocalIcpStabilityEnabled(index % 2 == 0);
     }
     runtime.stop();
     runtime.stop();
     QCoreApplication::processEvents();
+    return ok;
+}
+
+/** @brief 热切换必须撤销旧策略候选，但不得解除冷却、在途写回或故障保护。 */
+bool testRuntimeStabilityTransactionIsolation()
+{
+    using i2r_rlc::vision::KcfFusionMode;
+    ui::CRuntimeCoordinator runtime;
+    bool ok = expect(!ui::COnlineLocalRegistrationWorker::Options{}.stabilityProtectionEnabled
+        && !runtime.onlineLocalIcpStabilityEnabled(),
+        "stability protection must default off before startup");
+    runtime.updateOnlineProcessingOptions(false, {KcfFusionMode::ManualWeight, 0.3});
+    runtime.setOnlineLocalIcpDistance(6.5);
+    runtime.setOnlineLocalIcpTranslationLimit(7.5);
+    runtime.m_localRegistrationGeneration = 41;
+    runtime.m_pendingLocalCorrection = ui::COnlineLocalRegistrationWorker::Result{};
+    runtime.m_lastLocalRegistrationSampleMs = 120;
+    runtime.m_lastLocalRegistrationAttemptMs = 400;
+    runtime.m_localRegistrationBusy = true;
+    runtime.m_localRegistrationWritebackBusy = true;
+    runtime.m_localRegistrationFaulted = true;
+    const std::vector<ui::COnlineLocalRegistrationStability::Observation> anchors{
+        {{0.0, 0.0, 0.0}, {0.1, 0.0, 0.0}, 1}};
+    ok &= expect(runtime.m_localRegistrationStability.promote(loc::RigidTransform{}, anchors),
+        "test must establish valid historical evidence before toggling");
+    runtime.setOnlineLocalIcpStabilityEnabled(true);
+    ok &= expect(runtime.onlineLocalIcpStabilityEnabled()
+        && runtime.m_localRegistrationGeneration == 42
+        && !runtime.m_pendingLocalCorrection.has_value()
+        && runtime.m_localRegistrationStability.anchors().empty()
+        && runtime.m_lastLocalRegistrationSampleMs == -1,
+        "stability enable must advance generation, discard old candidate and rebuild history/window");
+    ok &= expect(runtime.m_lastLocalRegistrationAttemptMs == 400
+        && runtime.m_localRegistrationBusy && runtime.m_localRegistrationWritebackBusy
+        && runtime.m_localRegistrationFaulted,
+        "stability enable must preserve cooldown, in-flight operations and fault protection");
+    ok &= expect(!runtime.onlineLocalRegistrationEnabled()
+        && runtime.onlineFusionOptions().mode == KcfFusionMode::ManualWeight
+        && near(runtime.onlineFusionOptions().simulationWeight, 0.3)
+        && near(runtime.onlineLocalIcpDistance(), 6.5)
+        && near(runtime.onlineLocalIcpTranslationLimit(), 7.5),
+        "stability enable must not change independent processing options");
+
+    runtime.m_pendingLocalCorrection = ui::COnlineLocalRegistrationWorker::Result{};
+    ok &= expect(runtime.m_localRegistrationStability.promote(loc::RigidTransform{}, anchors),
+        "test must reestablish historical evidence for unchanged-option isolation");
+    runtime.setOnlineLocalIcpStabilityEnabled(true);
+    ok &= expect(runtime.m_localRegistrationGeneration == 42
+        && runtime.m_pendingLocalCorrection.has_value()
+        && runtime.m_localRegistrationStability.anchors().size() == 1,
+        "repeated unchanged stability setting must retain generation, candidate and history");
+
+    runtime.m_localRegistrationFaulted = false;
+    runtime.m_localVerification.emplace();
+    runtime.setOnlineLocalIcpStabilityEnabled(false);
+    ok &= expect(!runtime.onlineLocalIcpStabilityEnabled()
+        && runtime.m_localRegistrationGeneration == 43
+        && !runtime.m_pendingLocalCorrection.has_value()
+        && !runtime.m_localVerification.has_value()
+        && runtime.m_localRegistrationStability.anchors().empty()
+        && runtime.m_localRegistrationFaulted,
+        "stability disable during verification must invalidate transaction and retain safety fault");
+    ok &= expect(runtime.m_lastLocalRegistrationAttemptMs == 400
+        && runtime.m_localRegistrationBusy && runtime.m_localRegistrationWritebackBusy,
+        "stability disable must not release cooldown or in-flight busy guards");
     return ok;
 }
 
@@ -476,6 +570,8 @@ ui::COnlineLocalRegistrationWorker::Options cloudOptions()
 {
     ui::COnlineLocalRegistrationWorker::Options options;
     options.minimumFrames = 1;
+    // 旧几何/阈值回归固定原采样行为，新增表面图像门禁另行覆盖。
+    options.surfaceAssistedUpdatesEnabled = false;
     options.sampleIntervalMs = 0;
     options.minimumMatchIntervalMs = 0;
     // 正确性测试不依赖调试/CI 机器的求解速度，生产默认预算为 2500 ms。
@@ -891,6 +987,43 @@ bool testImageInputFaults()
     return ok;
 }
 
+/** @brief 新表面图像入口直接核对原图窄峰与冻结TCP投影，不用焊点充当云。 */
+bool testImageSurfaceSupportAndFrozenProjection()
+{
+    ui::COnlineLocalRegistrationWorker worker(nullptr);
+    auto options = cloudOptions();
+    options.surfaceAssistedUpdatesEnabled = true;
+    worker.configure(options);
+    auto input = makeSurfaceInput(2001, 100);
+    input.independentObservation.valid = false;
+    input.workpiecePoseRevision = 7;
+    input.seamImageXPixel = 160.0;
+    input.observation.laserLineImagePoints_px.clear();
+    input.observation.laserLinePoints_mm.clear();
+    for (int x = 60; x <= 260; x += 5) {
+        input.observation.laserLineImagePoints_px.push_back({static_cast<double>(x), 100.0});
+        input.observation.laserLinePoints_mm.push_back({0.5 * (x - 160), -10.0, 768.75});
+    }
+    const auto measured = worker.measureSurface(input);
+    bool ok = expect(measured.valid && measured.workpiecePoseRevision == 7
+        && measured.evidenceContext.value(QStringLiteral("raw_surface_supported_count")).toInt() >= 24
+        && measured.evidenceContext.value(QStringLiteral("raw_surface_support_gate_enabled")).toBool(),
+        "visible narrow raw shoulders can be measured without an independent seam point");
+    for (const auto &point : measured.realPoints_mm) {
+        ok &= expect(std::abs(point.z_mm - 769.0) < 1e-6,
+            "new surface pixels use frozen parent TCP projection without the 231mm double offset");
+    }
+    for (const auto &entry : measured.evidenceContext
+        .value(QStringLiteral("raw_supported_surface_image_px")).toArray()) {
+        ok &= expect(std::abs(entry.toArray().first().toDouble() - 160.0) > 24.0,
+            "estimated seam is only an exclusion mask and never a raw surface point");
+    }
+    input.frame.image.fill(0);
+    ok &= expect(!worker.measureSurface(input).valid,
+        "blank raw image cannot inherit model surface evidence");
+    return ok;
+}
+
 /** @brief 生产图像入口缺少独立同帧原始焊点或归档时必须拒绝，并丢弃半窗。 */
 bool testImageIndependentObservationFaults()
 {
@@ -942,23 +1075,45 @@ bool testImageIndependentObservationFaults()
 int main(int argc, char **argv)
 {
     QCoreApplication application(argc, argv);
+    std::cerr << "RUN: testRuntimeStartupConfiguration\n";
     bool ok = testRuntimeStartupConfiguration();
+    std::cerr << "RUN: testRuntimeHotProcessingOptions\n";
     ok &= testRuntimeHotProcessingOptions();
+    std::cerr << "RUN: testRuntimeStabilityTransactionIsolation\n";
+    ok &= testRuntimeStabilityTransactionIsolation();
+    std::cerr << "RUN: testHistoryCollectionIndependentOfSolve\n";
+    ok &= testHistoryCollectionIndependentOfSolve();
+    std::cerr << "RUN: testWorkerHotEnableIsolation\n";
     ok &= testWorkerHotEnableIsolation();
+    std::cerr << "RUN: testWriteDirectionAndReadback\n";
     ok &= testWriteDirectionAndReadback();
+    std::cerr << "RUN: testWriteRejection\n";
     ok &= testWriteRejection();
+    std::cerr << "RUN: testCancelDuringRead\n";
     ok &= testCancelDuringRead();
+    std::cerr << "RUN: testWriteAttemptOutcomeReset\n";
     ok &= testWriteAttemptOutcomeReset();
+    std::cerr << "RUN: testSmallCloudCorrection\n";
     ok &= testSmallCloudCorrection();
+    std::cerr << "RUN: testWindowAndSampleBounds\n";
     ok &= testWindowAndSampleBounds();
+    std::cerr << "RUN: testGenerationIsolationAndDegeneracy\n";
     ok &= testGenerationIsolationAndDegeneracy();
+    std::cerr << "RUN: testCorrectionLimit\n";
     ok &= testCorrectionLimit();
+    std::cerr << "RUN: testImageExtractionInParentTcpFrame\n";
     ok &= testImageExtractionInParentTcpFrame();
+    std::cerr << "RUN: testImageExtractionWithDifferentTcpOffsets\n";
     ok &= testImageExtractionWithDifferentTcpOffsets();
+    std::cerr << "RUN: testLocalCorrespondenceDistanceAndMotionLimit\n";
     ok &= testLocalCorrespondenceDistanceAndMotionLimit();
+    std::cerr << "RUN: testAdjustableTranslationLimitAndQuality\n";
     ok &= testAdjustableTranslationLimitAndQuality();
+    std::cerr << "RUN: testImageInputFaults\n";
     ok &= testImageInputFaults();
+    std::cerr << "RUN: testImageIndependentObservationFaults\n";
     ok &= testImageIndependentObservationFaults();
+    ok &= testImageSurfaceSupportAndFrozenProjection();
     if (ok) {
         std::cout << "PASS: online local registration tests\n";
     }

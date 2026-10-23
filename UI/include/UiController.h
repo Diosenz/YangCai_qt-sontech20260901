@@ -50,6 +50,7 @@ class MainWidget;
  */
 class UiController final : public QObject {
     Q_OBJECT
+    friend struct COnlineControlTargetPresentationTestAccess;
 
 public:
     explicit UiController(MainWidget& view, QObject* parent = nullptr);
@@ -111,6 +112,8 @@ private:
         quint64 trackingResultCount = 0;
         /// @brief 会话终止后拒绝迟到显示结果，直至新会话建立。
         bool acceptingFrames = false;
+        /// @brief 终止与临时暂停分开；终止会话不再接收迟到的控制目标。
+        bool terminated = false;
         QString stateText = QStringLiteral("空闲");
         QString lastError;
     };
@@ -302,6 +305,11 @@ private:
     qint64 m_onlineKcfFrameId = -1;
     qint64 m_lastOnlineKcfReceivedMs = 0;
     bool m_onlineKcfLatestValid = false;
+    /// @brief 只接收当前纠偏会话 Control 发布的目标；不作为 Vision 或 ICP 输入。
+    control::OnlineCorrectionTargetSnapshot m_onlineControlTarget;
+    int m_onlineControlTargetSegment = -1;
+    /// @brief 当前显示帧的曝光投影快照，目标更新时只做显示重投影。
+    std::optional<RuntimeTrackingResult> m_onlineControlDisplayFrame;
     qint64 m_lastFrameId = -1;
     bool m_hasLatestFrame = false;
     bool m_onlineCorrectionConfigured = false;

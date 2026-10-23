@@ -1,4 +1,6 @@
-﻿find_package(cppzmq CONFIG REQUIRED)
+﻿find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(cppzmq CONFIG REQUIRED)
 find_package(PCL CONFIG REQUIRED COMPONENTS
     common
     io
@@ -263,6 +265,10 @@ target_link_libraries(i2r_rlc_runtime_tracking_flow_tests
         i2r_rlc_ui
 )
 
+add_test(NAME i2r_rlc_online_seam_refinement_contract_tests
+    COMMAND i2r_rlc_runtime_tracking_flow_tests --seam-refinement-contract)
+i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_seam_refinement_contract_tests)
+
 i2r_rlc_add_test(i2r_rlc_online_fusion_controls_tests
     test_online_fusion_controls.cpp
 )
@@ -271,8 +277,24 @@ i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_fusion_controls_tests)
 
 i2r_rlc_add_test(i2r_rlc_online_local_registration_tests
     test_online_local_registration.cpp
+    test_online_local_registration_history_collection.cpp
 )
 target_link_libraries(i2r_rlc_online_local_registration_tests
+    PRIVATE i2r_rlc_ui
+)
+
+i2r_rlc_add_test(i2r_rlc_online_local_registration_frame_lifecycle_tests
+    test_online_local_registration_frame_lifecycle.cpp)
+target_link_libraries(i2r_rlc_online_local_registration_frame_lifecycle_tests PRIVATE i2r_rlc_ui)
+
+i2r_rlc_add_test(i2r_rlc_online_control_target_presentation_tests
+    test_online_control_target_presentation.cpp)
+target_link_libraries(i2r_rlc_online_control_target_presentation_tests PRIVATE i2r_rlc_ui)
+
+i2r_rlc_add_test(i2r_rlc_online_local_registration_surface_tests
+    test_online_local_registration_surface.cpp
+)
+target_link_libraries(i2r_rlc_online_local_registration_surface_tests
     PRIVATE i2r_rlc_ui
 )
 
@@ -283,11 +305,35 @@ target_link_libraries(i2r_rlc_online_local_registration_safety_tests
     PRIVATE i2r_rlc_ui
 )
 
+i2r_rlc_add_test(i2r_rlc_online_local_registration_stability_tests
+    test_online_local_registration_stability.cpp
+)
+target_link_libraries(i2r_rlc_online_local_registration_stability_tests
+    PRIVATE i2r_rlc_ui
+)
+
+i2r_rlc_add_test(i2r_rlc_online_local_registration_history_replay_tests
+    test_online_local_registration_history_replay.cpp
+)
+target_link_libraries(i2r_rlc_online_local_registration_history_replay_tests
+    PRIVATE i2r_rlc_ui
+)
+
 i2r_rlc_add_test(i2r_rlc_online_local_registration_verification_tests
     test_online_local_registration_verification.cpp
 )
 target_link_libraries(i2r_rlc_online_local_registration_verification_tests
     PRIVATE i2r_rlc_ui
+)
+
+i2r_rlc_add_test(i2r_rlc_online_local_surface_verification_tests
+    test_online_local_surface_verification.cpp
+)
+target_include_directories(i2r_rlc_online_local_surface_verification_tests
+    PRIVATE ${CMAKE_SOURCE_DIR}/UI/include
+)
+target_link_libraries(i2r_rlc_online_local_surface_verification_tests
+    PRIVATE Qt${QT_VERSION_MAJOR}::Core
 )
 
 i2r_rlc_add_test(i2r_rlc_local_registration_writeback_safety_tests
@@ -399,6 +445,13 @@ target_link_libraries(i2r_rlc_localization_tests
 target_compile_definitions(i2r_rlc_localization_tests
     PRIVATE
         I2R_RLC_PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+)
+
+i2r_rlc_add_test(i2r_rlc_localization_surface_validation_tests
+    test_localization_surface_validation.cpp
+)
+target_link_libraries(i2r_rlc_localization_surface_validation_tests
+    PRIVATE i2r_rlc_localization
 )
 
 i2r_rlc_add_test(i2r_rlc_ibvs_core_tests
@@ -837,6 +890,51 @@ if(I2R_RLC_ENABLE_OPENCV)
         PRIVATE
             i2r_rlc_vision
     )
+
+    i2r_rlc_add_test(i2r_rlc_online_seam_continuity_replay_tests
+        test_online_seam_continuity_replay.cpp)
+    target_link_libraries(i2r_rlc_online_seam_continuity_replay_tests PRIVATE i2r_rlc_vision)
+    target_compile_definitions(i2r_rlc_online_seam_continuity_replay_tests PRIVATE
+        I2R_RLC_PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+    set_tests_properties(i2r_rlc_online_seam_continuity_replay_tests PROPERTIES SKIP_RETURN_CODE 77)
+
+    i2r_rlc_add_test(i2r_rlc_online_seam_continuity_tests
+        test_online_seam_continuity.cpp)
+    target_link_libraries(i2r_rlc_online_seam_continuity_tests PRIVATE i2r_rlc_vision)
+
+    i2r_rlc_add_test(i2r_rlc_online_image_measurement_tests
+        test_online_image_measurement.cpp)
+    target_link_libraries(i2r_rlc_online_image_measurement_tests PRIVATE i2r_rlc_vision)
+    target_compile_definitions(i2r_rlc_online_image_measurement_tests PRIVATE
+        I2R_RLC_PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+
+    i2r_rlc_add_test(i2r_rlc_online_image_geometry_tests
+        test_online_image_geometry.cpp)
+    target_link_libraries(i2r_rlc_online_image_geometry_tests PRIVATE i2r_rlc_vision)
+    target_compile_definitions(i2r_rlc_online_image_geometry_tests PRIVATE
+        I2R_RLC_PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+
+    i2r_rlc_add_test(i2r_rlc_simulation_guided_seam_tests
+        test_simulation_guided_seam.cpp
+    )
+    target_link_libraries(i2r_rlc_simulation_guided_seam_tests
+        PRIVATE i2r_rlc_vision
+    )
+
+    i2r_rlc_add_test(i2r_rlc_online_seam_refiner_tests
+        test_online_seam_refiner.cpp
+    )
+    target_link_libraries(i2r_rlc_online_seam_refiner_tests PRIVATE i2r_rlc_vision)
+    target_compile_definitions(i2r_rlc_online_seam_refiner_tests PRIVATE
+        I2R_RLC_PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+
+    i2r_rlc_add_test(i2r_rlc_online_seam_refiner_replay_tests
+        test_online_seam_refiner_replay.cpp
+    )
+    target_link_libraries(i2r_rlc_online_seam_refiner_replay_tests PRIVATE i2r_rlc_vision)
+    target_compile_definitions(i2r_rlc_online_seam_refiner_replay_tests PRIVATE
+        I2R_RLC_PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+    set_tests_properties(i2r_rlc_online_seam_refiner_replay_tests PROPERTIES SKIP_RETURN_CODE 77)
 
     i2r_rlc_add_test(i2r_rlc_vision_kcf_tracker_tests
         test_vision_kcf_tracker.cpp

@@ -166,6 +166,94 @@ bool testArchiveFailureAndSessionBudget()
         "archive I/O failure must veto a geometrically valid correction");
     return ok;
 }
+
+/** @brief 同一实际 ICP 候选在开关两侧保持旧门禁，并按独立收益新增稳定否决。 */
+bool testStabilitySwitchAndIndependentGain()
+{
+    QTemporaryDir directory;
+    directory.setAutoRemove(false);
+    const auto run = [&directory](bool enabled, double independentRealX, qint64 frameId) {
+        Worker worker(nullptr);
+        auto configuration = options();
+        configuration.stabilityProtectionEnabled = enabled;
+        worker.configure(configuration);
+        return worker.processClouds(7, 1, frameId, makeSurface(5, 0.25), makeSurface(5, 0.0),
+            validation(directory.path(), frameId, independentRealX));
+    };
+    const auto legacyLowGain = run(false, 0.15, 1);
+    const auto stableLowGain = run(true, 0.15, 2);
+    bool ok = expect(legacyLowGain.accepted && !legacyLowGain.stabilityEvaluated
+        && stableLowGain.attempted && !stableLowGain.accepted && stableLowGain.stabilityEvaluated
+        && stableLowGain.archiveSucceeded
+        && stableLowGain.beforeIndependentErrorMm - stableLowGain.afterIndependentErrorMm < 0.1,
+        "switch off preserves a roughly 0.05 mm gain while switch on rejects insufficient independent benefit");
+    const auto legacyWorsening = run(false, 0.1, 3);
+    const auto stableWorsening = run(true, 0.1, 4);
+    ok &= expect(legacyWorsening.accepted && !stableWorsening.accepted
+        && stableWorsening.stabilityEvaluated
+        && stableWorsening.afterIndependentErrorMm > stableWorsening.beforeIndependentErrorMm,
+        "stable switch must reject slight seam worsening still allowed by the legacy 0.1 mm ceiling");
+    const auto stableGain = run(true, 0.25, 5);
+    ok &= expect(stableGain.accepted && stableGain.stabilityEvaluated
+        && stableGain.stabilityEvaluation.accepted && stableGain.archiveSucceeded
+        && stableGain.stabilityEvaluation.beforeMeanMm - stableGain.stabilityEvaluation.afterMeanMm > 0.2,
+        "roughly 0.25 mm independent gain must still authorize a covered actual ICP candidate");
+    QFile file(stableLowGain.archivePath);
+    ok &= expect(file.open(QIODevice::ReadOnly), "stable low-gain rejection must be readable from its archive");
+    const auto stableRecord = QJsonDocument::fromJson(file.readAll()).object()
+        .value(QStringLiteral("stability_protection")).toObject();
+    ok &= expect(stableRecord.value(QStringLiteral("enabled")).toBool()
+        && stableRecord.value(QStringLiteral("evaluated")).toBool()
+        && !stableRecord.value(QStringLiteral("accepted")).toBool()
+        && !stableRecord.value(QStringLiteral("reason")).toString().isEmpty()
+        && stableRecord.value(QStringLiteral("required_gain_mm")).toDouble() >= 0.2,
+        "archive must distinguish enabled, evaluated, rejected and the required independent gain");
+    return ok;
+}
+
+/** @brief 未校核历史冲突仅作监测；原验收和当前收益决定候选，归档保留冲突证据。 */
+bool testHistoricalStabilityMonitorAndArchive()
+{
+    QTemporaryDir directory;
+    directory.setAutoRemove(false);
+    auto context = validation(directory.path(), 1, 0.25);
+    using Stability = i2r_rlc::ui::COnlineLocalRegistrationStability;
+    context.stabilityAnchors.push_back(Stability::Anchor{
+        {{50.0, 0.0, 0.0}, {50.0, 0.0, 0.0}, 99}, 0.0});
+    Worker worker(nullptr);
+    auto configuration = options();
+    configuration.stabilityProtectionEnabled = true;
+    worker.configure(configuration);
+    const auto rejected = worker.processClouds(8, 1, 1,
+        makeSurface(5, 0.25), makeSurface(5, 0.0), context);
+    bool ok = expect(rejected.attempted && rejected.accepted && rejected.baseSafetyAccepted && rejected.stabilityEvaluated
+        && rejected.archiveSucceeded && rejected.afterResidualMm < rejected.beforeResidualMm * 0.95
+        && rejected.afterIndependentErrorMm < rejected.beforeIndependentErrorMm
+        && rejected.stabilityEvaluation.maximumHistoricalErrorMm > 0.1,
+        "unverified historical conflict must not freeze an otherwise useful ICP candidate");
+    QFile file(rejected.archivePath);
+    ok &= expect(file.open(QIODevice::ReadOnly), "historical rejection archive must be readable");
+    const auto record = QJsonDocument::fromJson(file.readAll()).object()
+        .value(QStringLiteral("stability_protection")).toObject();
+    const auto anchors = record.value(QStringLiteral("anchors")).toArray();
+    ok &= expect(record.value(QStringLiteral("maximum_historical_error_mm")).toDouble() > 0.1
+        && !record.value(QStringLiteral("history_enforced")).toBool(true)
+        && record.value(QStringLiteral("evidence_status")).toString() == QStringLiteral("conflicting")
+        && record.value(QStringLiteral("conflicting_region_count")).toInt() == 1
+        && anchors.size() == 1
+        && anchors.first().toObject().value(QStringLiteral("frame_id")).toString() == QStringLiteral("99")
+        && anchors.first().toObject().value(QStringLiteral("reference_error_mm")).toDouble(-1.0) == 0.0
+        && anchors.first().toObject().value(QStringLiteral("real_parent_mm")).toArray().size() == 3
+        && anchors.first().toObject().value(QStringLiteral("material_point_current_parent_mm")).toArray().size() == 3,
+        "historical archive must retain fixed baseline and both material/real observation coordinates");
+    Worker legacy(nullptr);
+    legacy.configure(options());
+    const auto allowed = legacy.processClouds(9, 1, 1,
+        makeSurface(5, 0.25), makeSurface(5, 0.0), context);
+    ok &= expect(allowed.accepted && !allowed.stabilityEvaluated,
+        "disabled stability switch must retain prior behavior even with historical input present");
+    return ok;
+}
 } // namespace
 
 int main(int argc, char **argv)
@@ -175,5 +263,7 @@ int main(int argc, char **argv)
     ok &= testIndependentImprovementAndMissingObservation();
     ok &= testPartialSurfaceCoverage();
     ok &= testArchiveFailureAndSessionBudget();
+    ok &= testStabilitySwitchAndIndependentGain();
+    ok &= testHistoricalStabilityMonitorAndArchive();
     return ok ? 0 : 1;
 }

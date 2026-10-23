@@ -21,9 +21,15 @@
 
 #include <QColor>
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QTimer>
+
+#include <Eigen/Geometry>
+
+#include "geometry/WeldImageToSpaceProjector.h"
+#include "track/LegacyOnlineKcfDetector.h"
 
 #include "CalibrationGuideOverlay.h"
 #include "RuntimeCoordinator.h"
@@ -40,6 +46,49 @@ bool expectTrue(bool condition, const char *message)
     return true;
 }
 
+/** @brief 非零畸变和完整非单位外参验证，防止过渡目标在位姿切换时被错投。 */
+bool testSpacePointInverseProjection()
+{
+    using namespace i2r_rlc::vision;
+    WeldProjectionContext context;
+    context.valid = true;
+    auto &calibration = context.calibration;
+    calibration.valid = true;
+    calibration.focalLengthM = 0.012;
+    calibration.sxM = 0.000007;
+    calibration.syM = 0.000009;
+    calibration.kappa = 1200.0;
+    calibration.intrinsics.cxPixel = 640.0;
+    calibration.intrinsics.cyPixel = 512.0;
+    calibration.laserPlaneA = 0.02;
+    calibration.laserPlaneB = -0.03;
+    calibration.laserPlaneC = -1.0;
+    calibration.cameraInTool.rotation = Eigen::AngleAxisd(0.2, Eigen::Vector3d::UnitX()).toRotationMatrix();
+    calibration.cameraInTool.translationMm = {30.0, -20.0, 10.0};
+    context.toolInRobotBase.rotation = Eigen::AngleAxisd(-0.3, Eigen::Vector3d::UnitZ()).toRotationMatrix();
+    context.toolInRobotBase.translationMm = {100.0, 200.0, -40.0};
+    context.robotBaseToPositionerTcp.rotation = Eigen::AngleAxisd(0.4, Eigen::Vector3d::UnitY()).toRotationMatrix();
+    context.robotBaseToPositionerTcp.translationMm = {-400.0, 90.0, 20.0};
+    bool ok = true;
+    const WeldImagePoint pixel{820.0, 430.0, true};
+    for (const auto frame : {WeldProjectionTargetFrame::Camera, WeldProjectionTargetFrame::Tool,
+             WeldProjectionTargetFrame::RobotBase, WeldProjectionTargetFrame::PositionerTcp}) {
+        const auto space = CWeldImageToSpaceProjector::projectImagePoint(pixel, context, frame);
+        const auto recovered = CWeldImageToSpaceProjector::projectSpacePointToImage(space.spacePoint, context, frame);
+        ok &= expectTrue(space.valid && recovered.valid
+                && std::hypot(recovered.xPixel - pixel.xPixel, recovered.yPixel - pixel.yPixel) < 1.0e-6,
+            "division distortion inverse and full rigid chain preserve pixel roundtrip in every frame");
+    }
+    ok &= expectTrue(!CWeldImageToSpaceProjector::projectSpacePointToImage(
+            {0.0, 0.0, -1000.0, true}, context, WeldProjectionTargetFrame::Camera).valid,
+        "inverse projection rejects a point behind the camera");
+    calibration.kappa = 1.0e9;
+    ok &= expectTrue(!CWeldImageToSpaceProjector::projectSpacePointToImage(
+            {1000.0, 1000.0, 1000.0, true}, context, WeldProjectionTargetFrame::Camera).valid,
+        "division inverse rejects a radial point without a real principal-branch solution");
+    return ok;
+}
+
 i2r_rlc::camera::CameraFrame makeFrame()
 {
     i2r_rlc::camera::CameraFrame frame;
@@ -49,6 +98,23 @@ i2r_rlc::camera::CameraFrame makeFrame()
     for (int y = 116; y <= 124; ++y) {
         uchar *row = frame.image.scanLine(y);
         std::fill(row + 60, row + 260, static_cast<uchar>(255));
+    }
+    frame.previewImage = frame.image;
+    return frame;
+}
+
+/** @brief 真实中心坐标已知的接缝夹具，用于正式在线几何校核。 */
+i2r_rlc::camera::CameraFrame makeOnlineSeamFrame()
+{
+    auto frame = makeFrame();
+    for (int y = 0; y < frame.image.height(); ++y) {
+        auto *row = frame.image.scanLine(y);
+        for (int x = 0; x < frame.image.width(); ++x) {
+            const double dx = x - 160.0;
+            const double centerY = 120.0 + (dx < 0.0 ? 0.28 : -0.32) * dx;
+            const double dy = y - centerY;
+            row[x] = static_cast<uchar>(15.0 + 220.0 * std::exp(-dy * dy / 2.88));
+        }
     }
     frame.previewImage = frame.image;
     return frame;
@@ -95,6 +161,8 @@ i2r_rlc::vision::WeldProjectionContext makeProjectionContext()
 struct FakeTransportState {
     std::vector<i2r_rlc::robot_comm::RobotCommandType> types;
     std::vector<std::string> requests;
+    std::vector<int> teachPointIndices;
+    std::vector<int> teachPointOfflineValues;
 };
 
 class CFakeRobotTransport final
@@ -142,10 +210,18 @@ public:
         m_record->types.push_back(type);
         m_record->requests.push_back(request);
         if (state != nullptr) {
+            const auto before = *state;
             *state = makeReadyRobotState();
             if (type == i2r_rlc::robot_comm::RobotCommandType::TeachPointUpdate) {
-                state->offline = pointIndex >= 1 ? 5 : 0;
+                const auto fields = QString::fromStdString(request).split(',');
+                const int pointCount = fields.size() > 8 ? fields[8].toInt() : 0;
+                state->offline = pointIndex + 1 == pointCount ? 5 : 4;
                 receipt.completed = state->offline == 5;
+                m_record->teachPointIndices.push_back(pointIndex);
+                m_record->teachPointOfflineValues.push_back(state->offline);
+            } else if (type == i2r_rlc::robot_comm::RobotCommandType::RealtimeCorrection) {
+                // P 回包不代替控制柜 ENDDET/程序停止边沿，由闭环夹具显式投递。
+                *state = before;
             }
         }
         return receipt;
@@ -210,7 +286,7 @@ public:
             true,
             expectResponse
                 ? (m_state->centeredObservation
-                    ? QStringLiteral("[[[[[1,2,3],[60,120]],[[4,5,6],[260,120]]]],[[160,120]]]")
+                    ? QStringLiteral("[[[[[1,2,3],[60,92]],[[2,3,4],[160,120]],[[4,5,6],[260,88]]]],[[160,120]]]")
                     : QStringLiteral(
                     "[[[[[1,2,3],[10,20]],[[4,5,6],[11,21]]]],[[12,22]]]")
                   )
@@ -602,20 +678,33 @@ bool testLatestRealtimeCommandWins(QCoreApplication &app)
 
 bool testWorkerClosedLoop(QCoreApplication &app)
 {
+    using i2r_rlc::control::OnlineCorrectionPhase;
+    using i2r_rlc::robot_comm::RobotCommandType;
     auto record = std::make_shared<FakeTransportState>();
     i2r_rlc::ui::CRobotCommWorkerAdapter robot(
         std::make_unique<CFakeRobotTransport>(record));
     i2r_rlc::ui::COnlineCorrectionWorkerAdapter control;
     i2r_rlc::ui::RuntimeOnlineCorrectionConfiguration configuration;
     makeOnlineConfigurationFiles(&configuration);
+    {
+        // 保留真实异常处理器；参考和输入都须跨过其五个下采样点初始化门槛。
+        std::ofstream workPath(configuration.trajectoryRequest.workPathFile);
+        for (int index = 0; index <= 10; ++index) {
+            workPath << index * 10 << " 0 0\n";
+        }
+    }
 
-    std::vector<i2r_rlc::control::OnlineCorrectionPhase> phases;
+    std::vector<OnlineCorrectionPhase> phases;
+    bool attemptedOnlineIcp = false;
     QObject::connect(
         &control,
         &i2r_rlc::ui::COnlineCorrectionWorkerAdapter::onlineCorrectionUpdated,
         &app,
-        [&phases](const i2r_rlc::control::OnlineCorrectionUpdate &update) {
+        [&phases, &attemptedOnlineIcp](const i2r_rlc::control::OnlineCorrectionUpdate &update) {
             phases.push_back(update.phase);
+            for (const auto &batch : update.onlineIcpBatches) {
+                attemptedOnlineIcp |= batch.attempted;
+            }
         });
     QObject::connect(
         &control,
@@ -641,71 +730,84 @@ bool testWorkerClosedLoop(QCoreApplication &app)
     robot.connectRobot();
     control.configure(configuration);
     control.startInitialDetection();
-
     i2r_rlc::ui::RuntimeTrackingResult initial;
     initial.valid = true;
-    initial.sample.point = { 10.0, 0.0, 0.0, true };
+    initial.sample.point = {10.0, 0.0, 0.0, true};
     initial.message = QStringLiteral("initial detection");
     control.appendTrackingResult(initial);
+    auto state = makeReadyRobotState();
+    state.onlineReverseCompleteFlag = 1;
+    robot.updateState(state);
 
-    auto reverseCompleted = makeReadyRobotState();
-    reverseCompleted.onlineReverseCompleteFlag = 1;
-    robot.updateState(reverseCompleted);
+    bool ok = expectTrue(!phases.empty()
+            && phases.back() == OnlineCorrectionPhase::WaitingForInitialApproach,
+        "O=4/5 acknowledgements must wait for the robot P001 approach");
+    state.corflag = 2;
+    state.detflag = 2;
+    robot.updateState(state);
+    ok &= expectTrue(phases.back() == OnlineCorrectionPhase::WaitingForOnlineStart,
+        "P001 ENDDET must wait for the subsequent STARTCOR");
+    state.corflag = 1;
+    state.detflag = 1;
+    robot.updateState(state);
+    ok &= expectTrue(phases.back() == OnlineCorrectionPhase::OnlineRunning,
+        "STARTCOR after P001 ENDDET must enter OnlineRunning");
 
-    for (int index = 0; index < 4; ++index) {
+    for (int index = 0; index < 16; ++index) {
         i2r_rlc::ui::RuntimeTrackingResult online;
         online.valid = true;
-        online.sample.point = {
-            10.0 + static_cast<double>(index) * 10.0,
-            1.0,
-            0.0,
-            true
-        };
+        online.sample.point = {10.0 + static_cast<double>(index) * 5.0, 1.0, 0.0, true};
         online.simulatedSeamIndex = 0;
         online.message = QStringLiteral("online detection");
         control.appendTrackingResult(online);
     }
     app.processEvents(QEventLoop::AllEvents, 100);
-    control.finishOnlineSegment();
+    // 最终 ENDDET 关闭检测窗口，P 回包仍不能代替 detflag 清零和主程序停止。
+    state.corflag = 3;
+    state.detflag = 3;
+    robot.updateState(state);
     app.processEvents(QEventLoop::AllEvents, 100);
+    ok &= expectTrue(phases.back() != OnlineCorrectionPhase::Completed,
+        "final P acknowledgement must keep the session alive before robot program stop");
+    state.corflag = 0;
+    state.detflag = 0;
+    robot.updateState(state);
+    ok &= expectTrue(phases.back() == OnlineCorrectionPhase::WaitingForRobotProgramStop,
+        "final detection reset must wait for the running main program to stop");
+    state.sStart = 0;
+    robot.updateState(state);
     robot.disconnectRobot();
 
-    const auto teachPointCount = static_cast<int>(std::count(
-        record->types.begin(),
-        record->types.end(),
-        i2r_rlc::robot_comm::RobotCommandType::TeachPointUpdate));
-    const auto realtimeCount = static_cast<int>(std::count(
-        record->types.begin(),
-        record->types.end(),
-        i2r_rlc::robot_comm::RobotCommandType::RealtimeCorrection));
+    int teachPointCount = 0;
+    int realtimeCount = 0;
+    bool ordinaryPFound = false;
     bool finalPFound = false;
+    std::vector<qint64> teachXValues;
     for (std::size_t index = 0; index < record->types.size(); ++index) {
-        if (record->types[index]
-                == i2r_rlc::robot_comm::RobotCommandType::RealtimeCorrection
-            && record->requests[index].rfind("P 1,0,1,0,0,0,0,0,1,", 0) == 0) {
-            finalPFound = true;
+        const auto fields = QString::fromStdString(record->requests[index]).split(',');
+        if (record->types[index] == RobotCommandType::TeachPointUpdate) {
+            ++teachPointCount;
+            if (fields.size() > 9) { teachXValues.push_back(fields[9].toLongLong()); }
+        }
+        if (record->types[index] == RobotCommandType::RealtimeCorrection && fields.size() > 8) {
+            ++realtimeCount;
+            ordinaryPFound |= fields[8] == QStringLiteral("0");
+            finalPFound |= fields[8] == QStringLiteral("1")
+                && record->requests[index].rfind("P 1,0,1,0,0,0,0,0,1,", 0) == 0;
         }
     }
-
-    bool ok = true;
-    ok &= expectTrue(teachPointCount == 2,
-                     "closed loop should send every O teach point in index order");
-    ok &= expectTrue(realtimeCount >= 2,
-                     "closed loop should send a normal P and a final P");
-    ok &= expectTrue(finalPFound,
-                     "segment finish should send P with Online_endflag=1");
-    ok &= expectTrue(
-        std::find(
-            phases.begin(),
-            phases.end(),
-            i2r_rlc::control::OnlineCorrectionPhase::OnlineRunning)
-            != phases.end(),
-        "offline==5 should enter OnlineRunning");
-    ok &= expectTrue(
-        !phases.empty()
-            && phases.back()
-                == i2r_rlc::control::OnlineCorrectionPhase::Completed,
-        "final P acknowledgement should complete the worker closed loop");
+    ok &= expectTrue(teachPointCount == 2
+            && record->teachPointIndices == std::vector<int>{0, 1}
+            && record->teachPointOfflineValues == std::vector<int>{4, 5}
+            && teachXValues == std::vector<qint64>{10000, 110000},
+        "closed loop must send P001/P002 in index order with the expected O coordinates and 4/5 receipts");
+    ok &= expectTrue(attemptedOnlineIcp,
+        "online samples must cross the real exception processor initialization threshold");
+    ok &= expectTrue(realtimeCount >= 2 && ordinaryPFound && finalPFound,
+        "closed loop must send both an ordinary P and a final P with Online_endflag=1");
+    ok &= expectTrue(!phases.empty() && phases.back() == OnlineCorrectionPhase::Completed
+            && std::find(phases.begin(), phases.end(), OnlineCorrectionPhase::Error) == phases.end(),
+        "ENDDET, final P, detection reset and main program stop must complete without error");
     return ok;
 }
 
@@ -738,7 +840,12 @@ bool testStoppedOnlineTrackingDropsLateResults(QCoreApplication &app)
         &CRuntimeCoordinator::correctionSyncUpdated,
         &loop,
         [&startedSessionIds](const i2r_rlc::ui::CorrectionSyncUpdate &update) {
-            if (update.state == i2r_rlc::ui::CorrectionSyncState::Idle) {
+            if (update.state == i2r_rlc::ui::CorrectionSyncState::Idle
+                && update.sessionId != 0
+                && update.purpose == i2r_rlc::ui::CorrectionPurpose::OnlineCorrection
+                && std::find(startedSessionIds.begin(), startedSessionIds.end(), update.sessionId)
+                    == startedSessionIds.end()) {
+                // 会话建立和同会话窗口启动都可能发 Idle，不得把事件数当会话数。
                 startedSessionIds.push_back(update.sessionId);
             }
         });
@@ -781,7 +888,7 @@ bool testStoppedOnlineTrackingDropsLateResults(QCoreApplication &app)
         robotSimSynchronized,
         "late-result test requires real-scene RobotSim synchronization");
     ok &= expectTrue(
-        startedSessionIds.size() >= 2U
+        startedSessionIds.size() == 2U
             && startedSessionIds[0] != 0
             && startedSessionIds[1] > startedSessionIds[0],
         "stop and restart should create a newer nonzero correction session");
@@ -1061,7 +1168,7 @@ bool testOnlineCalibrationSnapshot(QCoreApplication &app)
         std::ofstream(configuration.rbcalibFile) << "////SRANG 900,20,30,0,0,0\n";
         runtime.startOnlineTracking();
         QTimer::singleShot(100, &loop, [&]() {
-            auto frame = makeFrame();
+            auto frame = makeOnlineSeamFrame();
             frame.frameId = 900 + session;
             runtime.publishCameraFrame(frame);
         });
@@ -1097,11 +1204,464 @@ bool testOnlineCalibrationSnapshot(QCoreApplication &app)
     return ok;
 }
 
+/** @brief 真实 Vision worker 重配保留会话采样；相机时间跃迁不提前释放异常配额。 */
+bool testVisionImageSamplingSessionAndMonotonicClock(QCoreApplication &app)
+{
+    using namespace i2r_rlc;
+    ui::CVisionTrackingWorkerAdapter worker;
+    ui::RuntimeTrackingOptions options;
+    options.detType = 2;
+    options.virtualStatus = control::TrackingVirtualStatus::OnlineRecord;
+    options.fusion.mode = vision::KcfFusionMode::KcfOnly;
+    options.visionDiagnostics.imageSampleEveryN = 1;
+    std::vector<ui::RuntimeTrackingResult> results;
+    QObject::connect(&worker, &ui::CVisionTrackingWorkerAdapter::trackingResultReady,
+        &app, [&results](const ui::RuntimeTrackingResult &result) { results.push_back(result); });
+    worker.configure(options, makeProjectionContext());
+    worker.startTracking();
+    qint64 frameId = 0;
+    bool ok = true;
+    const auto submit = [&](quint64 sessionId, bool onlineWindow, double simulatedX, qint64 cameraMs) {
+        // 采样时钟测试先由可验收原图建立 KCF，不能再借 CAD 模板制造目标。
+        auto frame = makeOnlineSeamFrame();
+        frame.frameId = ++frameId;
+        frame.timestamp = QDateTime::fromMSecsSinceEpoch(cameraMs);
+        digital_twin::DigitalTwinVisionLaserObservation observation;
+        observation.valid = true;
+        observation.frameId = frame.frameId;
+        observation.hasWeldPointImage_px = true;
+        observation.weldPointImage_px = {simulatedX, 120.0};
+        observation.laserLineImagePoints_px = {{80.0, 120.0}, {240.0, 120.0}};
+        ui::RuntimeVisionCorrelation correlation;
+        correlation.sessionId = sessionId;
+        correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
+        correlation.frameId = frame.frameId;
+        correlation.onlineControlWindowActive = onlineWindow;
+        const auto count = results.size();
+        worker.submitFrameWithRobotStateObservationAndCorrelation(
+            frame, makeReadyRobotState(), -1, observation, correlation);
+        ok &= expectTrue(results.size() == count + 1 && results.back().diagnostic.has_value()
+                && results.back().diagnostic->algorithm.attempted,
+            "sampling regression must execute a real KCF frame with diagnostic evidence");
+        return results.size() == count + 1 ? results.back() : ui::RuntimeTrackingResult{};
+    };
+    const auto bucket = [](const ui::RuntimeTrackingResult &result) {
+        return result.diagnostic.has_value() ? result.diagnostic->imageSampleBucket : -2;
+    };
+    const auto isAnomaly = [](const ui::RuntimeTrackingResult &result) {
+        if (!result.diagnostic.has_value()) { return false; }
+        const auto &raw = result.diagnostic->algorithm;
+        return ui::COnlineVisionImageSampling::isAnomaly(raw.beforeFusionPoint.x,
+            raw.beforeFusionPoint.y, raw.simulatedPoint.x, raw.simulatedPoint.y,
+            raw.simulatedPointAvailable && raw.attempted
+                && raw.tracker.completed && raw.tracker.hasResponse,
+            raw.tracker.correlationJumpRejected || raw.tracker.fusionJumpRejected);
+    };
+    for (int index = 0; index < 3; ++index) {
+        ok &= expectTrue(bucket(submit(100, false, 160.0, 1000 + index)) == 0,
+            "startup must expose exactly its three initial samples");
+    }
+    worker.stopTracking();
+    worker.configure(options, makeProjectionContext());
+    worker.startTracking();
+    const auto resumedStartup = submit(100, false, 160.0, 1000000000000LL);
+    ok &= expectTrue(bucket(resumedStartup) == -1
+            && resumedStartup.diagnostic.has_value()
+            && resumedStartup.diagnostic->sourceImage.isNull(),
+        "same-session configure and pause/resume must retain exhausted startup quota");
+
+    const auto initial = submit(200, true, 160.0, 0);
+    ok &= expectTrue(bucket(initial) == 1, "new session must reset the regular image sampling schedule");
+    const auto firstAnomaly = submit(200, true, 220.0, 1000);
+    ok &= expectTrue(isAnomaly(firstAnomaly) && bucket(firstAnomaly) == 4,
+        "raw KCF deviation fixture must trigger the first immediate anomaly");
+    const auto forwardClock = submit(200, true, 220.0, 1000000000000LL);
+    ok &= expectTrue(isAnomaly(forwardClock) && bucket(forwardClock) != 4,
+        "camera clock forward jump must not release the worker monotonic anomaly cooldown");
+    const auto backwardClock = submit(200, true, 220.0, 0);
+    ok &= expectTrue(isAnomaly(backwardClock) && bucket(backwardClock) != 4,
+        "camera clock reset must not reset the worker anomaly cooldown");
+
+    worker.stopTracking();
+    worker.configure(options, makeProjectionContext());
+    worker.startTracking();
+    auto resumedIdentity = submit(200, true, 160.0, 0);
+    for (int attempt = 0; attempt < 160 && !resumedIdentity.imageObservationAccepted; ++attempt) {
+        resumedIdentity = submit(200, true, 160.0, attempt + 1);
+    }
+    ok &= expectTrue(resumedIdentity.valid && resumedIdentity.imageObservationAccepted,
+        "resumed sampling fixture establishes a fresh raw identity before testing anomaly cooldown");
+    const auto resumedAnomaly = submit(200, true, 220.0, 2000000000000LL);
+    ok &= expectTrue(isAnomaly(resumedAnomaly) && bucket(resumedAnomaly) != 4,
+        "same-session configure must preserve the monotonic origin and anomaly cooldown");
+    const auto nextSession = submit(201, true, 220.0, 2000000000001LL);
+    ok &= expectTrue(isAnomaly(nextSession) && bucket(nextSession) == 4,
+        "actual session change must release the new session first-anomaly sample");
+    const auto newStartup = submit(300, false, 160.0, 0);
+    ok &= expectTrue(bucket(newStartup) == 0,
+        "actual session change must restore the new startup image quota");
+    worker.stopTracking();
+    return ok;
+}
+/** @brief 精定位纠正粗 KCF 锚偏差时，不能把错误粗 ROI 特征提交给模板。 */
+bool testOnlineTrainingRequiresConsistentRawRoi()
+{
+    using namespace i2r_rlc;
+    auto frame = makeOnlineSeamFrame();
+    const cv::Mat image(frame.image.height(), frame.image.width(), CV_8UC1,
+        frame.image.bits(), frame.image.bytesPerLine());
+    digital_twin::DigitalTwinVisionLaserObservation observation;
+    observation.valid = true;
+    observation.hasWeldPointImage_px = true;
+    // 模板激光与真实原图重合，但模型焊点锚错误偏右 20 px；精定位仍应恢复真实拐点。
+    observation.weldPointImage_px = {180.0, 120.0};
+    observation.laserLineImagePoints_px = {{30.0, 83.6}, {160.0, 120.0}, {300.0, 75.2}};
+    vision::LegacyOnlineKcfOptions options;
+    options.enableSeamRefinement = true;
+    options.enableSimulationGuidance = true;
+    options.enableOnlineObservationFusion = true;
+    options.fusion.mode = vision::KcfFusionMode::KcfOnly;
+    vision::CLegacyOnlineKcfDetector detector;
+    const auto result = detector.process(image, observation, makeProjectionContext(), options);
+    const auto &diagnostic = result.diagnostic;
+    bool ok = expectTrue(result.valid && diagnostic.refinement.valid
+            && std::abs(diagnostic.refinement.point.x - 160.0) < 1.5
+            && cv::norm(diagnostic.beforeFusionPoint - diagnostic.refinement.point) > 8.0,
+        "raw ROI mismatch fixture must preserve accepted true geometry despite a wrong model weld anchor");
+    ok &= expectTrue(diagnostic.tracker.completed && diagnostic.tracker.hasResponse
+            && diagnostic.tracker.trainingDeferred && !diagnostic.tracker.trainingCommitted,
+        "accepted original-image refinement cannot train a mismatched coarse KCF patch");
+    if (!ok) {
+        std::cerr << "training admission: valid=" << result.valid
+            << " raw=" << diagnostic.beforeFusionPoint
+            << " geometry=" << diagnostic.refinement.point
+            << " refinement=" << diagnostic.refinement.valid
+            << " deferred=" << diagnostic.tracker.trainingDeferred
+            << " committed=" << diagnostic.tracker.trainingCommitted << '\n';
+    }
+    return ok;
+}
+
+/** @brief 实际 worker 两阶段均以当前图像定点，错误 CAD 与缺图不能新增测量。 */
+bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+{
+    using namespace i2r_rlc;
+    bool ok = true;
+    for (const bool diagnostics : {false, true}) {
+        ui::CVisionTrackingWorkerAdapter worker;
+        ui::RuntimeTrackingOptions options;
+        options.detType = 2;
+        options.virtualStatus = control::TrackingVirtualStatus::OnlineRecord;
+        options.fusion.mode = vision::KcfFusionMode::ManualWeight;
+        options.fusion.simulationWeight = 1.0;
+        options.visionDiagnostics.enabled = diagnostics;
+        options.sensorCalibration.valid = true;
+        options.sensorCalibration.focalLengthM = 0.01;
+        options.sensorCalibration.sxM = options.sensorCalibration.syM = 0.00001;
+        options.sensorCalibration.cxPixel = 160.0;
+        options.sensorCalibration.cyPixel = 120.0;
+        options.sensorCalibration.laserPlaneC = -1.0;
+        options.positionerCalibration.valid = true;
+        std::vector<ui::RuntimeTrackingResult> results;
+        QObject::connect(&worker, &ui::CVisionTrackingWorkerAdapter::trackingResultReady,
+            &app, [&](const ui::RuntimeTrackingResult &result) { results.push_back(result); });
+        ui::COnlineCorrectionWorkerAdapter initialControl;
+        ui::RuntimeOnlineCorrectionConfiguration initialConfiguration;
+        makeOnlineConfigurationFiles(&initialConfiguration);
+        std::optional<control::OnlineCorrectionUpdate> initialUpdate;
+        QObject::connect(&initialControl, &ui::COnlineCorrectionWorkerAdapter::onlineCorrectionUpdated,
+            &app, [&](const control::OnlineCorrectionUpdate &update) { initialUpdate = update; });
+        const auto initialConnection = QObject::connect(&worker,
+            &ui::CVisionTrackingWorkerAdapter::trackingResultReady,
+            &initialControl, &ui::COnlineCorrectionWorkerAdapter::appendTrackingResult);
+        initialControl.configure(initialConfiguration);
+        initialControl.startInitialDetection();
+        worker.configure(options, makeProjectionContext());
+        worker.startTracking();
+        qint64 frameId = 0;
+        quint64 poseRevision = 1;
+        bool onlineWindow = false;
+        double simulatedX = 180.0;
+        double imageShiftX = 0.0;
+        bool hasCadImageHint = true;
+        bool hideCenter = false;
+        bool symmetricCrossSection = false;
+        bool emptyImage = false;
+        const auto submit = [&](bool blank) {
+            auto frame = makeOnlineSeamFrame();
+            frame.frameId = ++frameId;
+            frame.timestamp = QDateTime::fromMSecsSinceEpoch(1700000000000LL + frameId * 100);
+            if (imageShiftX != 0.0) {
+                QImage shifted(frame.image.size(), QImage::Format_Grayscale8);
+                shifted.fill(15);
+                for (int y = 0; y < shifted.height(); ++y) {
+                    for (int x = 0; x < shifted.width(); ++x) {
+                        const int sourceX = x - static_cast<int>(imageShiftX);
+                        if (sourceX >= 0 && sourceX < frame.image.width()) {
+                            shifted.scanLine(y)[x] = frame.image.constScanLine(y)[sourceX];
+                        }
+                    }
+                }
+                frame.image = shifted;
+            }
+            if (symmetricCrossSection) {
+                for (int y = 0; y < frame.image.height(); ++y) {
+                    for (int x = 0; x < frame.image.width(); ++x) {
+                        const double stripeY = 120.0 - 0.45 * std::abs(x - 160.0 - imageShiftX);
+                        const double dy = y - stripeY;
+                        frame.image.scanLine(y)[x] = static_cast<uchar>(
+                            14.0 + 210.0 * std::exp(-dy * dy / 3.38));
+                    }
+                }
+            }
+            if (hideCenter) {
+                const int centerX = 160 + static_cast<int>(imageShiftX);
+                for (int y = 0; y < frame.image.height(); ++y) {
+                    for (int x = std::max(0, centerX - 8);
+                         x < std::min(frame.image.width(), centerX + 9); ++x) {
+                        frame.image.scanLine(y)[x] = 14;
+                    }
+                }
+            }
+            if (blank) { frame.image.fill(0); }
+            frame.previewImage = frame.image;
+            if (emptyImage) { frame.image = {}; frame.previewImage = {}; }
+            digital_twin::DigitalTwinVisionLaserObservation observation;
+            observation.valid = true;
+            observation.frameId = frame.frameId;
+            observation.hasWeldPointImage_px = true;
+            observation.weldPointImage_px = {simulatedX, 120.0};
+            const double modelShift = simulatedX - 180.0;
+            observation.laserLineImagePoints_px = {
+                {30.0 + modelShift, 78.0}, {simulatedX, 120.0}, {300.0 + modelShift, 81.6}};
+            if (!hasCadImageHint) {
+                observation.hasWeldPointImage_px = false;
+                observation.laserLineImagePoints_px.clear();
+            }
+            ui::RuntimeVisionCorrelation correlation;
+            correlation.sessionId = diagnostics ? 710 : 711;
+            correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
+            correlation.onlineControlWindowActive = onlineWindow;
+            correlation.frameId = frame.frameId;
+            correlation.workpiecePoseRevision = poseRevision;
+            worker.submitFrameWithRobotStateObservationAndCorrelation(
+                frame, makeReadyRobotState(), -1, observation, correlation);
+            const auto result = results.empty() ? ui::RuntimeTrackingResult{} : results.back();
+            if (onlineWindow && result.diagnostic.has_value()) {
+                const auto &algorithm = result.diagnostic->algorithm;
+                if (algorithm.attempted) {
+                    ok &= expectTrue(algorithm.boundedImageSearchEnabled
+                            && algorithm.imageRefinementCallCount <= 2,
+                        "every attempted formal online frame retains the bounded current-image refinement budget");
+                } else {
+                    ok &= expectTrue(algorithm.imageRefinementCallCount == 0,
+                        "preflight rejection cannot perform any image refinement work");
+                }
+            }
+            return result;
+        };
+        // 正式在线扩大搜索分帧执行；固定首帧/第三帧不是重获时限合同。
+        // 有限上界覆盖两路各至多 32 个提案及提示点；任何提前接纳仍由原断言验收。
+        const auto awaitIndependentMeasurement = [&]() {
+            ui::RuntimeTrackingResult result;
+            for (int attempt = 0; attempt < 160; ++attempt) {
+                result = submit(false);
+                if (result.valid && result.pointSource == vision::OnlineSeamPointSource::Geometry) {
+                    break;
+                }
+                ok &= expectTrue(!result.independentWeldPointInParent_mm.valid,
+                    "unfinished bounded search cannot publish an independent ICP sample");
+            }
+            return result;
+        };
+        const auto expectMeasured = [&](const ui::RuntimeTrackingResult &result,
+                                        double expectedX, const char *message) {
+            ok &= expectTrue(result.valid && result.sample.point.valid
+                    && result.imageMeasurementOutputEnabled && result.imageObservationAccepted
+                    && !result.sample.estimated
+                    && std::abs(result.imageXPixel - expectedX) <= 1.5
+                    && std::abs(result.sample.point.xMm - (expectedX - 160.0)) <= 1.5,
+                message);
+            ok &= expectTrue(result.diagnostic.has_value() == diagnostics,
+                "measurement provenance must survive disabled diagnostic payload");
+            if (result.diagnostic.has_value()) {
+                const auto &algorithm = result.diagnostic->algorithm;
+                ok &= expectTrue(algorithm.imageMeasurementOutputEnabled
+                        && algorithm.imageObservationAccepted
+                        && std::abs(algorithm.finalPoint.x - result.imageXPixel) < 1e-9,
+                    "diagnostic identity and displayed measurement must agree");
+            }
+        };
+        const auto expectMissing = [&](const ui::RuntimeTrackingResult &result,
+                                       const char *message) {
+            ok &= expectTrue(!result.valid && !result.sample.point.valid
+                    && !result.detectedRobotBasePoint.valid
+                    && !result.detectedStationBasePoint.valid
+                    && !result.independentWeldPointInParent_mm.valid
+                    && result.imageMeasurementOutputEnabled && !result.imageObservationAccepted,
+                message);
+        };
+        expectMissing(submit(true), "initial reverse scan cannot create an initial point from CAD alone");
+        const auto first = submit(false);
+        expectMeasured(first, 160.0, "reverse scan must use original-image geometry despite full CAD weight");
+        ok &= expectTrue(first.independentWeldPointInParent_mm.valid,
+            "accepted reverse-scan geometry remains independently projected");
+        imageShiftX = 3.0;
+        const auto lastInitial = submit(false);
+        expectMeasured(lastInitial, 163.0, "later reverse-scan image supplies a fresh measured starting sample");
+        expectMissing(submit(true), "reverse-scan blank tail cannot append a newer simulated starting point");
+        ok &= expectTrue(initialUpdate.has_value()
+                && initialUpdate->state.initialDetectionSamples.size() == 2
+                && std::abs(initialUpdate->state.initialDetectionSamples.back().point.xMm - 3.0) <= 1.5,
+            "real control input retains last accepted reverse-scan image point and appends nothing for blank tail");
+        QObject::disconnect(initialConnection);
+        initialControl.reset();
+        // 实际反扫完成会停 Vision，STARTCOR 再 configure/start；不假设模板跨阶段保留。
+        worker.stopTracking();
+        worker.configure(options, makeProjectionContext());
+        worker.startTracking();
+        onlineWindow = true;
+        simulatedX = 250.0;
+        const auto firstOnline = awaitIndependentMeasurement();
+        expectMeasured(firstOnline, 163.0, "online entry retains image measurement while CAD remains misaligned");
+        ok &= expectTrue(firstOnline.independentWeldPointInParent_mm.valid,
+            "clear online geometry retains independent ICP identity");
+        for (const auto mode : {vision::KcfFusionMode::KcfOnly,
+                               vision::KcfFusionMode::ManualWeight,
+                               vision::KcfFusionMode::AutomaticKalman}) {
+            vision::KcfFusionOptions fusion;
+            fusion.mode = mode;
+            fusion.simulationWeight = 0.1;
+            worker.updateOnlineFusionOptions(fusion);
+            expectMeasured(submit(false), 163.0,
+                "legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD");
+        }
+        ++poseRevision;
+        simulatedX = 290.0;
+        expectMissing(submit(true), "CAD update on a missing frame cannot project a transition estimate");
+        expectMeasured(submit(false), 163.0,
+            "new CAD revision cannot displace a fresh accepted image measurement");
+        worker.stopTracking();
+        worker.startTracking();
+        expectMissing(submit(true), "restart without a current image cannot seed business output from simulation");
+        expectMeasured(awaitIndependentMeasurement(), 163.0,
+            "restart with distant CAD must recover from actual image evidence");
+        // 同帧运输仍成功，仅仿真图像提示缺失；不能由此剥夺原图检测资格。
+        worker.stopTracking();
+        worker.startTracking();
+        hasCadImageHint = false;
+        const auto noHint = awaitIndependentMeasurement();
+        expectMeasured(noHint, 163.0,
+            "same-frame transport without CAD image hints still allows original-image recovery");
+        const auto secondNoHint = submit(false);
+        expectMeasured(secondNoHint, 163.0, "missing CAD image hint cannot contaminate the next image measurement");
+        if (secondNoHint.diagnostic.has_value()) {
+            ok &= expectTrue(!secondNoHint.diagnostic->algorithm.simulatedPointAvailable
+                    && secondNoHint.diagnostic->imageSampleBucket != 4,
+                "missing CAD hint cannot manufacture a CAD deviation anomaly against default coordinates");
+        }
+        worker.stopTracking();
+        worker.startTracking();
+        hasCadImageHint = true;
+        imageShiftX = 0.0;
+        simulatedX = 180.0;
+        onlineWindow = false;
+        symmetricCrossSection = true;
+        expectMeasured(submit(false), 160.0, "clear image initializes raw KCF identity for stage admission test");
+        hideCenter = true;
+        const auto initialKcf = submit(false);
+        ok &= expectTrue(initialKcf.valid && initialKcf.imageObservationAccepted
+                && initialKcf.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
+                && !initialKcf.sample.estimated && !initialKcf.independentWeldPointInParent_mm.valid,
+            "image-quality accepted KCF is admissible during initial scan without claiming independent geometry");
+        hideCenter = false;
+        worker.stopTracking();
+        worker.configure(options, makeProjectionContext());
+        worker.startTracking();
+        onlineWindow = true;
+        expectMeasured(awaitIndependentMeasurement(), 160.0,
+            "formal online KCF fallback starts from its own freshly accepted raw-image identity");
+        hideCenter = true;
+        const auto onlineKcf = submit(false);
+        ok &= expectTrue(onlineKcf.valid && onlineKcf.imageObservationAccepted
+                && onlineKcf.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
+                && onlineKcf.sample.estimated && !onlineKcf.independentWeldPointInParent_mm.valid,
+            "same image-quality KCF in formal online remains excluded from Control and local independent ICP");
+        hideCenter = false;
+        expectMeasured(submit(false), 160.0, "original geometry recovers after a quality-KCF interval");
+        imageShiftX = 100.0;
+        auto pendingFar = submit(false);
+        expectMissing(pendingFar, "far raw image needs consecutive independent identity confirmations");
+        if (diagnostics) {
+            // 先实际进入第一帧身份确认，再插入缺帧；不能仅在生成提案时宣称确认被清除。
+            for (int attempt = 0; attempt < 160
+                 && !pendingFar.diagnostic->algorithm.rawRefinement.valid; ++attempt) {
+                pendingFar = submit(false);
+                expectMissing(pendingFar, "pending far search cannot bypass three fresh-image identity confirmations");
+            }
+            ok &= expectTrue(pendingFar.diagnostic->algorithm.rawRefinement.valid,
+                "far search reaches a current-image candidate before the interruption");
+        }
+        emptyImage = true;
+        expectMissing(submit(false), "invalid image input interrupts pending image identity confirmations");
+        emptyImage = false;
+        int confirmedFreshCandidates = 0;
+        const auto observeFarConfirmation = [&](const ui::RuntimeTrackingResult &result) {
+            if (!diagnostics) { return; }
+            const auto &raw = result.diagnostic->algorithm.rawRefinement;
+            confirmedFreshCandidates = raw.valid ? confirmedFreshCandidates + 1 : 0;
+            if (confirmedFreshCandidates < 3) {
+                expectMissing(result,
+                    "post-gap far candidate needs three consecutive new image confirmations after search completes");
+            }
+        };
+        const auto firstFarAfterGap = submit(false);
+        observeFarConfirmation(firstFarAfterGap);
+        expectMissing(firstFarAfterGap, "first far image after invalid input cannot inherit prior confirmation");
+        const auto secondFarAfterGap = submit(false);
+        observeFarConfirmation(secondFarAfterGap);
+        expectMissing(secondFarAfterGap, "second far image after invalid input is still unconfirmed");
+        ui::RuntimeTrackingResult recoveredFar;
+        for (int attempt = 0; attempt < 160; ++attempt) {
+            recoveredFar = submit(false);
+            observeFarConfirmation(recoveredFar);
+            if (recoveredFar.valid) { break; }
+        }
+        expectMeasured(recoveredFar, 260.0,
+            "bounded far search eventually recovers from fresh independent images after the input gap");
+        if (diagnostics) {
+            ok &= expectTrue(confirmedFreshCandidates >= 3,
+                "far acceptance is supported by three consecutive independently refined new frames");
+        }
+        worker.stopTracking();
+        options.sensorCalibration.focalLengthM = 0.0;
+        worker.configure(options, makeProjectionContext());
+        worker.startTracking();
+        expectMissing(submit(false),
+            "invalid same-exposure projection context cannot publish any 3D measurement");
+        worker.stopTracking();
+    }
+    return ok;
+}
 } // namespace
 
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+
+    if (argc > 1 && std::string_view(argv[1]) == "--seam-refinement-contract") {
+        return testSpacePointInverseProjection() && testOnlineTrainingRequiresConsistentRawRoi()
+            && testOnlineRefinedProjectionAndRecovery(app) ? 0 : 1;
+    }
+    if (argc > 1 && std::string_view(argv[1]) == "--worker-closed-loop-contract") {
+        return testWorkerClosedLoop(app) ? 0 : 1;
+    }
+    if (argc > 1 && std::string_view(argv[1]) == "--session-restart-contract") {
+        return testStoppedOnlineTrackingDropsLateResults(app) ? 0 : 1;
+    }
+    if (argc > 1 && std::string_view(argv[1]) == "--image-sampling-contract") {
+        return testVisionImageSamplingSessionAndMonotonicClock(app) ? 0 : 1;
+    }
 
     if (argc > 1 && std::string_view(argv[1]) == "--calibration-contract") {
         return testOnlineCalibrationSnapshot(app) ? 0 : 1;
@@ -1276,6 +1836,9 @@ int main(int argc, char **argv)
     ok &= expectTrue(digitalTwinFallbackCallbacks.empty(),
                      "DigitalTwin observation must be preferred over legacy callbacks");
 
+    ok &= testOnlineTrainingRequiresConsistentRawRoi();
+    ok &= testOnlineRefinedProjectionAndRecovery(app);
+    ok &= testVisionImageSamplingSessionAndMonotonicClock(app);
     ok &= testInjectedRobotSimTransportIsUsed(app);
     ok &= testOnlineCalibrationSnapshot(app);
     ok &= testCorrectionSessionPausesAndResumesRealtimeRobotSim(app);

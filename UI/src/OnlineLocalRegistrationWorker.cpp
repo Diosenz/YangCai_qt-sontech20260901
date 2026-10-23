@@ -11,6 +11,9 @@
 #include <Eigen/Eigenvalues>
 
 #include <QDir>
+#include <QBuffer>
+#include <QCryptographicHash>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -19,6 +22,8 @@
 
 #include "LocalizationPipelineMath.h"
 #include "RuntimeWorkerAdapters.h"
+#include "geometry/WeldImageToSpaceProjector.h"
+#include "geometry/WeldProjectionContextBuilder.h"
 
 namespace i2r_rlc::ui {
 namespace {
@@ -175,6 +180,79 @@ QJsonObject independentJson(
         {QStringLiteral("virtual_weld_parent_mm"), pointJson(observation.virtualWeldPointInParent_mm)}};
 }
 
+bool usableIndependent(const COnlineLocalRegistrationWorker::IndependentObservation &observation,
+    qint64 frameId)
+{
+    return observation.valid && observation.frameId == frameId
+        && finitePoint(observation.realWeldPointInParent_mm)
+        && finitePoint(observation.virtualWeldPointInParent_mm);
+}
+
+QJsonObject surfaceMetricsJson(const localization::surface_validation::Metrics &metrics)
+{
+    return {{QStringLiteral("valid"), metrics.valid},
+        {QStringLiteral("real_to_virtual_mean_mm"), metrics.realToVirtualMeanMm},
+        {QStringLiteral("virtual_to_real_mean_mm"), metrics.virtualToRealMeanMm},
+        {QStringLiteral("robust_symmetric_residual_mm"), metrics.robustSymmetricResidualMm},
+        {QStringLiteral("real_coverage_ratio"), metrics.realCoverageRatio},
+        {QStringLiteral("virtual_coverage_ratio"), metrics.virtualCoverageRatio}};
+}
+
+localization::surface_validation::Options surfaceOptions(
+    const COnlineLocalRegistrationWorker::Options &options)
+{
+    localization::surface_validation::Options result;
+    result.coverageDistanceMm = options.coverageDistanceMm;
+    result.minimumBidirectionalCoverage = options.minimumBidirectionalCoverage;
+    result.maximumResidualMm = options.maximumResidualMm;
+    result.minimumImprovementRatio = options.minimumImprovementRatio;
+    result.maximumHoldoutWorseningMm = options.maximumIndependentWorseningMm;
+    return result;
+}
+
+/** @brief 原图窄亮带支持，只排除缺峰和宽饱和反光，不宣称识别所有反射。 */
+bool rawSurfaceSupport(const QImage &gray, double pixelX, double pixelY,
+    bool &widePeak)
+{
+    widePeak = false;
+    if (!std::isfinite(pixelX) || !std::isfinite(pixelY) || gray.isNull()
+        || pixelX < 0.0 || pixelX >= gray.width()
+        || pixelY < 16.0 || pixelY >= gray.height() - 16.0) { return false; }
+    const int x = static_cast<int>(std::lround(pixelX));
+    const int centerY = static_cast<int>(std::lround(pixelY));
+    if (gray.isNull() || x < 0 || x >= gray.width() || centerY < 16
+        || centerY + 16 >= gray.height()) { return false; }
+    int background = 255;
+    int peak = -1;
+    int peakY = centerY;
+    for (int y = centerY - 16; y <= centerY + 16; ++y) {
+        const int value = gray.constScanLine(y)[x];
+        background = std::min(background, value);
+        if (std::abs(y - centerY) <= 3 && value > peak) {
+            peak = value;
+            peakY = y;
+        }
+    }
+    if (peak - background < 40) { return false; }
+    int leftBackground = 255;
+    int rightBackground = 255;
+    for (int y = centerY - 16; y <= peakY - 5; ++y) {
+        leftBackground = std::min(leftBackground, static_cast<int>(gray.constScanLine(y)[x]));
+    }
+    for (int y = peakY + 5; y <= centerY + 16; ++y) {
+        rightBackground = std::min(rightBackground, static_cast<int>(gray.constScanLine(y)[x]));
+    }
+    if (peak - leftBackground < 40 || peak - rightBackground < 40) { return false; }
+    const double threshold = background + 0.5 * (peak - background);
+    int width = 1;
+    for (int y = peakY - 1; y >= centerY - 16
+        && gray.constScanLine(y)[x] > threshold; --y) { ++width; }
+    for (int y = peakY + 1; y <= centerY + 16
+        && gray.constScanLine(y)[x] > threshold; ++y) { ++width; }
+    widePeak = width > 12;
+    return !widePeak;
+}
+
 } // namespace
 
 COnlineLocalRegistrationWorker::COnlineLocalRegistrationWorker(QObject *parent)
@@ -221,36 +299,21 @@ void COnlineLocalRegistrationWorker::reset()
     m_clock.restart();
 }
 
-COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::process(const Input &input)
+COnlineLocalRegistrationWorker::SurfaceFrameResult
+COnlineLocalRegistrationWorker::measureSurface(const Input &input) const
 {
-    QElapsedTimer timer;
-    timer.start();
-    Result result;
-    result.sessionId = input.sessionId;
-    result.generation = input.generation;
+    SurfaceFrameResult result;
     result.frameId = input.frame.frameId;
-    if (!m_options.enabled || input.sessionId == 0
-        || !isUsableCorrectionObservationForFrame(input.frame.frameId, input.observation)
+    result.workpiecePoseRevision = input.workpiecePoseRevision;
+    if (!isUsableCorrectionObservationForFrame(input.frame.frameId, input.observation)
         || !input.trackingOptions.positionerCalibration.valid) {
-        result.message = QStringLiteral("局部定位输入缺少同帧参考或有效变位机标定。");
+        result.message = QStringLiteral("表面缺少同帧参考或有效变位机标定。");
         return result;
     }
-    if (!input.independentObservation.valid
-        || input.independentObservation.frameId != input.frame.frameId
-        || !finitePoint(input.independentObservation.realWeldPointInParent_mm)
-        || !finitePoint(input.independentObservation.virtualWeldPointInParent_mm)
-        || input.archiveDirectory.trimmed().isEmpty()) {
-        // 独立检测缺失时不积累旧窗；不能把仿真融合点当作独立真实点替代。
-        reset();
-        result.message = QStringLiteral("独立焊点观测或局部配准归档目录无效，暂停更新并清窗。");
-        return result;
-    }
-
     try {
         RuntimeTrackingOptions options = input.trackingOptions;
         options.globalLocateLineExtraction = true;
         options.requireDetectionWindow = false;
-        // 在线会话窗口由 coordinator 门控；保留播放/保持/启动真实状态门禁。
         options.testStart = 0;
         options.detType = 2;
         options.visionDiagnostics.enabled = false;
@@ -263,42 +326,187 @@ COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::process(c
         extractor.startTracking();
         RuntimeVisionCorrelation correlation;
         correlation.frameId = input.frame.frameId;
+        correlation.workpiecePoseRevision = input.workpiecePoseRevision;
         auto observation = input.observation;
         observation.positioningSegmentIndex = -1;
         extractor.submitFrameWithRobotStateObservationAndCorrelation(
             input.frame, input.robotState, -1, observation, correlation);
         if (!extracted.valid || !extracted.triggerAccepted) {
-            result.message = QStringLiteral("局部真实表面提取跳过：%1").arg(extracted.message);
-            result.elapsedMs = timer.elapsed();
+            result.message = QStringLiteral("真实母材表面提取跳过：%1").arg(extracted.message);
             return result;
         }
-        std::vector<Point> realPoints;
-        realPoints.reserve(extracted.linePoints.size());
-        // 提取结果已在变位机 TCP 系；工件父级 1063 本身包含末节到 TCP 的偏移。
-        // 与该父级参考下的仿真点直接匹配，不能再加 toolTcpInLastLinkMm。
-        for (const auto &p : extracted.linePoints) {
-            if (p.valid) {
-                realPoints.push_back({p.xMm, p.yMm, p.zMm});
+        // 预焊凸起附近不参与整体位姿拟合。中心来自业务参考，只作排除掩膜，
+        // 绝不把该估计点写进真实表面或独立焊点。
+        const double seamX = input.seamImageXPixel >= 0.0
+            ? input.seamImageXPixel : input.observation.weldPointImage_px.x_px;
+        if (m_options.surfaceAssistedUpdatesEnabled && !std::isfinite(seamX)) {
+            result.message = QStringLiteral("母材排除掩膜缺少有限同帧参考位置。");
+            return result;
+        }
+        if (!m_options.surfaceAssistedUpdatesEnabled) {
+            // 显式关闭新支路时保留旧点云来源、采样和独立焊点验收行为。
+            for (const auto &point : extracted.linePoints) {
+                if (point.valid) {
+                    result.realPoints_mm.push_back({point.xMm, point.yMm, point.zMm});
+                }
             }
         }
-        std::vector<Point> virtualPoints;
-        virtualPoints.reserve(observation.laserLinePoints_mm.size());
-        for (const auto &p : observation.laserLinePoints_mm) {
-            virtualPoints.push_back({p.x_mm, p.y_mm, p.z_mm});
+        auto projectionContext = input.projectionContext;
+        const auto built = vision::CWeldProjectionContextBuilder::build(
+            options.sensorCalibration, options.positionerCalibration, input.robotState);
+        if (!built.valid) {
+            result.message = QStringLiteral("母材同帧投影上下文无效：%1")
+                .arg(QString::fromStdString(built.message));
+            return result;
         }
-        CloudValidationContext validation;
-        validation.independentObservation = input.independentObservation;
-        validation.archiveDirectory = input.archiveDirectory;
-        result = processClouds(input.sessionId, input.generation, input.frame.frameId,
-            realPoints, virtualPoints, validation);
-        result.elapsedMs = timer.elapsed();
-        return result;
+        projectionContext = built.context;
+        const QImage rawImage = (input.frame.image.isNull()
+            ? input.frame.previewImage : input.frame.image)
+            .convertToFormat(QImage::Format_Grayscale8);
+        int rawCandidates = 0;
+        int rawSupported = 0;
+        int rawWideRejected = 0;
+        int rawOtherRejected = 0;
+        QJsonArray supportedPixels;
+        // 不按压缩后的三维点索引反查像素：单点投影失败会使两列索引错位。
+        // 每个被采样的原图像素独立应用与提取器相同的冻结姿态/标定链。
+        for (std::size_t index = 0; index < extracted.realLaserLineImagePoints_px.size(); index += 5U) {
+            if (!m_options.surfaceAssistedUpdatesEnabled) { break; }
+            const auto &pixel = extracted.realLaserLineImagePoints_px[index];
+            if (std::abs(pixel.x_px - seamX) <= 24.0) { continue; }
+            ++rawCandidates;
+            bool widePeak = false;
+            if (!rawSurfaceSupport(rawImage, pixel.x_px, pixel.y_px, widePeak)) {
+                if (widePeak) { ++rawWideRejected; }
+                else { ++rawOtherRejected; }
+                continue;
+            }
+            ++rawSupported;
+            const auto projected = vision::CWeldImageToSpaceProjector::projectCvPoint(
+                cv::Point2d(pixel.x_px, pixel.y_px), projectionContext,
+                vision::WeldProjectionTargetFrame::PositionerTcp);
+            if (projected.valid && projected.spacePoint.valid) {
+                const auto &point = projected.spacePoint;
+                result.realPoints_mm.push_back({point.xMm, point.yMm, point.zMm});
+                supportedPixels.append(QJsonArray{pixel.x_px, pixel.y_px});
+            }
+        }
+        const auto &virtualPixels = input.observation.laserLineImagePoints_px;
+        for (std::size_t i = 0; i < input.observation.laserLinePoints_mm.size(); ++i) {
+            if (m_options.surfaceAssistedUpdatesEnabled
+                && virtualPixels.size() == input.observation.laserLinePoints_mm.size()
+                && std::abs(virtualPixels[i].x_px - input.observation.weldPointImage_px.x_px) <= 24.0) {
+                continue;
+            }
+            const auto &point = input.observation.laserLinePoints_mm[i];
+            result.virtualPoints_mm.push_back({point.x_mm, point.y_mm, point.z_mm});
+        }
+        result.realPoints_mm = boundedPoints(result.realPoints_mm, m_options.maximumPointsPerCloud);
+        result.virtualPoints_mm = boundedPoints(result.virtualPoints_mm, m_options.maximumPointsPerCloud);
+        const auto metricsOptions = surfaceOptions(m_options);
+        result.metrics = localization::surface_validation::measure(
+            result.realPoints_mm, result.virtualPoints_mm, metricsOptions);
+        result.valid = m_options.surfaceAssistedUpdatesEnabled
+            ? result.metrics.valid && rawSupported >= 24 && rawCandidates > 0
+                && static_cast<double>(rawSupported) / rawCandidates >= 0.6
+            : result.realPoints_mm.size() >= 10U && result.virtualPoints_mm.size() >= 10U;
+        QJsonArray virtualImage;
+        for (const auto &point : virtualPixels) { virtualImage.append(QJsonArray{point.x_px, point.y_px}); }
+        const auto &state = input.robotState;
+        std::vector<Point> originalVirtual;
+        originalVirtual.reserve(input.observation.laserLinePoints_mm.size());
+        for (const auto &point : input.observation.laserLinePoints_mm) {
+            originalVirtual.push_back({point.x_mm, point.y_mm, point.z_mm});
+        }
+        QJsonArray verifiedPose;
+        if (input.lastVerifiedWorkpiecePose.has_value()) {
+            for (double value : input.lastVerifiedWorkpiecePose->rowMajor) { verifiedPose.append(value); }
+        }
+        result.evidenceContext = QJsonObject{
+            {QStringLiteral("capture_time_ms"), input.frame.timestamp.isValid()
+                ? QString::number(input.frame.timestamp.toMSecsSinceEpoch()) : QString()},
+            {QStringLiteral("workpiece_pose_revision"), QString::number(input.workpiecePoseRevision)},
+            {QStringLiteral("workpiece_id"), input.workpieceId},
+            {QStringLiteral("parent_id"), input.parentId},
+            {QStringLiteral("reference_object_id"), input.observation.referenceObjectId},
+            {QStringLiteral("scene_name"), input.sceneName},
+            {QStringLiteral("seam_index"), input.observation.seamIndex},
+            {QStringLiteral("geometry_correspondence_verified"), false},
+            {QStringLiteral("last_verified_parent_from_workpiece"), verifiedPose},
+            {QStringLiteral("virtual_laser_image_px"), virtualImage},
+            {QStringLiteral("virtual_laser_parent_mm"), cloudJson(originalVirtual)},
+            {QStringLiteral("raw_supported_surface_image_px"), supportedPixels},
+            {QStringLiteral("raw_surface_candidate_count"), rawCandidates},
+            {QStringLiteral("raw_surface_supported_count"), rawSupported},
+            {QStringLiteral("raw_surface_wide_peak_rejected_count"), rawWideRejected},
+            {QStringLiteral("raw_surface_other_rejected_count"), rawOtherRejected},
+            {QStringLiteral("raw_surface_minimum_contrast_gray"), 40},
+            {QStringLiteral("raw_surface_maximum_peak_width_px"), 12},
+            {QStringLiteral("raw_surface_minimum_support_ratio"), 0.6},
+            {QStringLiteral("raw_surface_support_gate_enabled"), m_options.surfaceAssistedUpdatesEnabled},
+            {QStringLiteral("surface_seam_exclusion_half_width_px"),
+                m_options.surfaceAssistedUpdatesEnabled ? 24 : 0},
+            {QStringLiteral("real_seam_exclusion_center_x_px"), seamX},
+            {QStringLiteral("virtual_pixel_point_pairing_available"),
+                virtualPixels.size() == input.observation.laserLinePoints_mm.size()},
+            {QStringLiteral("robot_pose_mm_deg"), QJsonArray{
+                state.curx_r / 1000.0, state.cury_r / 1000.0, state.curz_r / 1000.0,
+                state.curRx_r / 10000.0, state.curRy_r / 10000.0, state.curRz_r / 10000.0,
+                state.curS1 / 10000.0, state.curS2 / 10000.0}}};
+        result.message = result.valid ? QStringLiteral("同帧真实母材表面已提取。")
+            : QStringLiteral("母材表面不足，不使用估计焊点替代。");
     } catch (const std::exception &error) {
-        result.message = QStringLiteral("局部表面提取异常：%1")
-            .arg(QString::fromUtf8(error.what()));
+        result.message = QStringLiteral("母材表面提取异常：%1").arg(QString::fromUtf8(error.what()));
+    }
+    return result;
+}
+
+COnlineLocalRegistrationWorker::SurfaceFrameResult
+COnlineLocalRegistrationWorker::measureSurfaceForVerification(const Input &input,
+    const std::vector<Point> &frozenVirtual,
+    const localization::RigidTransform &correction) const
+{
+    auto result = measureSurface(input);
+    if (result.valid) {
+        auto options = surfaceOptions(m_options);
+        // 只作用于在线后验；当前模型须先支持有限续展，真实覆盖/绝对残差不放宽。
+        options.maximumModelContinuationMm = std::min(10.0, m_options.maximumCorrespondenceDistanceMm);
+        options.maximumModelPlaneDeviationMm = std::max(1e-6, std::min(0.05,
+            m_options.maximumIndependentWorseningMm * 0.5));
+        result.comparison = localization::surface_validation::compareFreshSurfaceWithCurrentReference(
+            result.realPoints_mm, result.virtualPoints_mm, frozenVirtual, correction, options);
+    }
+    return result;
+}
+
+COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::process(const Input &input)
+{
+    QElapsedTimer timer;
+    timer.start();
+    Result result;
+    result.sessionId = input.sessionId;
+    result.generation = input.generation;
+    result.frameId = input.frame.frameId;
+    if (!m_options.enabled || input.sessionId == 0) { return result; }
+    const auto surface = measureSurface(input);
+    if (!surface.valid) {
+        reset();
+        result.message = surface.message;
         result.elapsedMs = timer.elapsed();
         return result;
     }
+    CloudValidationContext validation;
+    validation.independentObservation = input.independentObservation;
+    validation.archiveDirectory = input.archiveDirectory;
+    validation.stabilityAnchors = input.stabilityAnchors;
+    validation.hasVerifiedWorkpiecePose = input.lastVerifiedWorkpiecePose.has_value();
+    validation.workpiecePoseRevision = input.workpiecePoseRevision;
+    validation.sourceImage = input.frame.image.isNull() ? input.frame.previewImage : input.frame.image;
+    validation.evidenceContext = surface.evidenceContext;
+    result = processClouds(input.sessionId, input.generation, input.frame.frameId,
+        surface.realPoints_mm, surface.virtualPoints_mm, validation);
+    result.elapsedMs = timer.elapsed();
+    return result;
 }
 
 COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::processClouds(
@@ -325,12 +533,14 @@ COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::processCl
     result.generation = generation;
     result.frameId = frameId;
     result.independentObservation = validation.independentObservation;
+    result.workpiecePoseRevision = validation.workpiecePoseRevision;
     if (!m_options.enabled || sessionId == 0) { return result; }
+    const bool independentUsable = usableIndependent(validation.independentObservation, frameId);
+    const bool surfaceEligible = m_options.surfaceAssistedUpdatesEnabled
+        && validation.hasVerifiedWorkpiecePose && validation.workpiecePoseRevision > 0;
     if (validation.requireIndependentObservation
-        && (!validation.independentObservation.valid
-            || validation.independentObservation.frameId != frameId
-            || !finitePoint(validation.independentObservation.realWeldPointInParent_mm)
-            || !finitePoint(validation.independentObservation.virtualWeldPointInParent_mm)
+        && ((!independentUsable && !surfaceEligible)
+            || (validation.independentObservation.valid && !independentUsable)
             || validation.archiveDirectory.trimmed().isEmpty())) {
         reset();
         result.message = QStringLiteral("独立观测不完整、不同帧或归档目录缺失，拒绝并清窗。");
@@ -358,6 +568,11 @@ COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::processCl
     frame.rawReal = realPointsInParent_mm;
     frame.rawReference = virtualPointsInParent_mm;
     frame.independentObservation = validation.independentObservation;
+    frame.evidenceContext = validation.evidenceContext;
+    frame.hasVerifiedWorkpiecePose = validation.hasVerifiedWorkpiecePose;
+    frame.workpiecePoseRevision = validation.workpiecePoseRevision;
+    // 每次尝试只留第一张原图；图像共享只读，后续帧不累计额外图像预算。
+    if (m_frames.empty()) { frame.sourceImage = validation.sourceImage; }
     frame.real = boundedPoints(realPointsInParent_mm, m_options.maximumPointsPerCloud);
     frame.reference = boundedPoints(virtualPointsInParent_mm, m_options.maximumPointsPerCloud);
     frame.capturedMs = now;
@@ -369,19 +584,37 @@ COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::processCl
     m_frames.push_back(std::move(frame));
     const qint64 maximumAgeMs = std::max<qint64>(5000,
         static_cast<qint64>(m_options.minimumFrames) * m_options.sampleIntervalMs * 4);
-    while (m_frames.size() > static_cast<std::size_t>(m_options.maximumFrames)
+    const bool useSurfaceWindow = validation.requireIndependentObservation
+        && m_options.surfaceAssistedUpdatesEnabled
+        && (surfaceEligible || std::any_of(m_frames.begin(), m_frames.end(), [](const CloudFrame &item) {
+            return item.hasVerifiedWorkpiecePose;
+        }));
+    const int maximumFrames = useSurfaceWindow
+        ? std::max(8, m_options.maximumFrames) : m_options.maximumFrames;
+    while (m_frames.size() > static_cast<std::size_t>(maximumFrames)
         || (!m_frames.empty() && now - m_frames.front().capturedMs > maximumAgeMs)) {
         m_frames.pop_front();
     }
     result.frameCount = static_cast<int>(m_frames.size());
     result.pointCount = static_cast<int>(std::max(
         m_frames.back().real.size(), m_frames.back().reference.size()));
-    if (result.frameCount < m_options.minimumFrames
+    // 建立可信位姿后统一走表面验收；不能因恰好有焊点而重新耦合到焊点后验。
+    const bool needsSurfaceWindow = useSurfaceWindow;
+    const int minimumFrames = needsSurfaceWindow
+        ? std::max(8, m_options.minimumFrames) : m_options.minimumFrames;
+    if (result.frameCount < minimumFrames
         || (m_lastMatchMs >= 0 && now - m_lastMatchMs < m_options.minimumMatchIntervalMs)) {
         return result;
     }
     result.attempted = true;
     m_lastMatchMs = now;
+    if (needsSurfaceWindow) {
+        std::deque<CloudFrame> attemptedFrames;
+        attemptedFrames.swap(m_frames);
+        result = processSurfaceWindow(attemptedFrames, validation, result);
+        result.elapsedMs = timer.elapsed();
+        return result;
+    }
     localization::LocalCorrectionPipelineRequest request;
     request.frameId = frameId;
     request.windowFrameCount = result.frameCount;
@@ -495,8 +728,224 @@ COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::processCl
         result.solveElapsedMs = solveTimer.elapsed();
         result.message = QStringLiteral("局部配准异常：%1").arg(QString::fromUtf8(error.what()));
     }
+    result.baseSafetyAccepted = result.accepted;
+    if (m_options.stabilityProtectionEnabled && result.accepted) {
+        std::vector<COnlineLocalRegistrationStability::Observation> current;
+        for (const auto &item : attemptedFrames) {
+            const auto &observation = item.independentObservation;
+            current.push_back({observation.realWeldPointInParent_mm,
+                observation.virtualWeldPointInParent_mm, observation.frameId});
+        }
+        result.stabilityEvaluated = true;
+        result.stabilityEvaluation = COnlineLocalRegistrationStability::evaluate(
+            current, validation.stabilityAnchors, result.correction,
+            result.beforeResidualMm, m_options.maximumIndependentErrorMm);
+        result.accepted = result.stabilityEvaluation.accepted;
+        result.message = QStringLiteral("%1 焊点均值 %2→%3 mm，要求收益 %4 mm；历史 %5 区，预测最大误差 %6 mm（未写入），冲突 %7 区，跨度 %8 mm，历史几何未校核。")
+            .arg(result.stabilityEvaluation.reason)
+            .arg(result.stabilityEvaluation.beforeMeanMm, 0, 'f', 4)
+            .arg(result.stabilityEvaluation.afterMeanMm, 0, 'f', 4)
+            .arg(result.stabilityEvaluation.requiredGainMm, 0, 'f', 4)
+            .arg(result.stabilityEvaluation.historicalCount)
+            .arg(result.stabilityEvaluation.maximumHistoricalErrorMm, 0, 'f', 4)
+            .arg(result.stabilityEvaluation.worsenedRegionCount)
+            .arg(result.stabilityEvaluation.spatialSpanMm, 0, 'f', 1);
+    }
     archiveAttempt(attemptedFrames, request, preprocessedRealPoints, validation, result);
     result.elapsedMs = timer.elapsed();
+    return result;
+}
+
+COnlineLocalRegistrationWorker::Result
+COnlineLocalRegistrationWorker::processSurfaceWindow(const std::deque<CloudFrame> &frames,
+    const CloudValidationContext &validation, Result result)
+{
+    result.surfaceOnly = true;
+    result.workpiecePoseRevision = validation.workpiecePoseRevision;
+    localization::LocalCorrectionPipelineRequest request;
+    request.frameId = result.frameId;
+    request.dofMask = {true, true, true, false, false, true};
+    request.parameters.maximumIterations = m_options.maximumIterations;
+    request.parameters.maxCorrespondenceDistance_mm = m_options.maximumCorrespondenceDistanceMm;
+    request.parameters.enableSorFilter = true;
+    const auto reject = [&](const QString &message) {
+        result.accepted = false;
+        result.message = message;
+        archiveAttempt(frames, request, {}, validation, result);
+        return result;
+    };
+    if (frames.size() < 8U || !m_options.surfaceAssistedUpdatesEnabled
+        || validation.workpiecePoseRevision == 0
+        || !std::all_of(frames.begin(), frames.end(), [&validation](const CloudFrame &frame) {
+            return frame.hasVerifiedWorkpiecePose
+                && frame.workpiecePoseRevision == validation.workpiecePoseRevision;
+        })) {
+        return reject(QStringLiteral("表面窗要求已有可信位姿、同位姿修订及至少8个完整帧。"));
+    }
+    localization::surface_validation::Request surfaceRequest;
+    surfaceRequest.options = surfaceOptions(m_options);
+    const std::size_t trainingCount = frames.size() - 2U;
+    for (std::size_t index = 0; index < frames.size(); ++index) {
+        auto &real = index < trainingCount ? request.realWindowPoints_mm
+            : surfaceRequest.holdoutReal_mm;
+        auto &reference = index < trainingCount ? request.virtualWindowPoints_mm
+            : surfaceRequest.holdoutVirtual_mm;
+        real.insert(real.end(), frames[index].real.begin(), frames[index].real.end());
+        reference.insert(reference.end(), frames[index].reference.begin(), frames[index].reference.end());
+    }
+    request.realWindowPoints_mm = boundedPoints(request.realWindowPoints_mm, m_options.maximumPointsPerCloud);
+    request.virtualWindowPoints_mm = boundedPoints(request.virtualWindowPoints_mm, m_options.maximumPointsPerCloud);
+    surfaceRequest.trainingReal_mm = request.realWindowPoints_mm;
+    surfaceRequest.trainingVirtual_mm = request.virtualWindowPoints_mm;
+    surfaceRequest.holdoutReal_mm = boundedPoints(surfaceRequest.holdoutReal_mm, m_options.maximumPointsPerCloud);
+    surfaceRequest.holdoutVirtual_mm = boundedPoints(surfaceRequest.holdoutVirtual_mm, m_options.maximumPointsPerCloud);
+    // 只用训练云提供平移初值，避免旧LM在纯轴向、重复采样时停在单位阵。
+    // 初值不参与验收；最终候选仍需可观测投影、原始云收益及留出/新帧检查。
+    const auto center = [](const std::vector<Point> &cloud) {
+        Eigen::Vector3d value = Eigen::Vector3d::Zero();
+        for (const auto &point : cloud) {
+            value += Eigen::Vector3d(point.x_mm, point.y_mm, point.z_mm);
+        }
+        return (value / static_cast<double>(cloud.size())).eval();
+    };
+    const Eigen::Vector3d realToVirtualSeed = center(request.virtualWindowPoints_mm)
+        - center(request.realWindowPoints_mm);
+    request.initialGuess.rowMajor[3] = realToVirtualSeed.x();
+    request.initialGuess.rowMajor[7] = realToVirtualSeed.y();
+    request.initialGuess.rowMajor[11] = realToVirtualSeed.z();
+    request.windowFrameCount = static_cast<int>(trainingCount);
+    request.minimumWindowFrameCount = request.windowFrameCount;
+    result.pointCount = static_cast<int>(std::max(request.realWindowPoints_mm.size(),
+        request.virtualWindowPoints_mm.size()));
+    QElapsedTimer solveTimer;
+    solveTimer.start();
+    std::vector<Point> preprocessedRealPoints;
+    try {
+        // 求解只读前N-2帧；末两帧不传入PCL或模式投影的法向估计。
+        const auto solved = m_pipeline.run(request);
+        preprocessedRealPoints = solved.icpResult.preprocessedRealPoints_mm;
+        result.correction = solved.virtualToRealCorrectionTransform;
+        if (solved.status != localization::LocalizationStatus::Succeeded
+            || !solved.icpResult.hasPoseCorrection) {
+            result.solveElapsedMs = solveTimer.elapsed();
+            result.message = QStringLiteral("母材训练配准未求得候选：%1").arg(solved.message);
+            archiveAttempt(frames, request, preprocessedRealPoints, validation, result);
+            return result;
+        }
+        surfaceRequest.candidateVirtualToReal = result.correction;
+        result.originalSurfaceCorrection = result.correction;
+        result.surfaceValidation = localization::surface_validation::evaluate(surfaceRequest);
+        if (result.surfaceValidation.hasObservableCorrection) {
+            result.correction = result.surfaceValidation.observableVirtualToReal;
+        }
+        const auto &checked = result.surfaceValidation;
+        result.beforeResidualMm = checked.trainingBefore.robustSymmetricResidualMm;
+        result.afterResidualMm = checked.trainingAfter.robustSymmetricResidualMm;
+        result.realCoverageRatio = std::min(checked.trainingAfter.realCoverageRatio,
+            checked.holdoutAfter.realCoverageRatio);
+        result.virtualCoverageRatio = std::min(checked.trainingAfter.virtualCoverageRatio,
+            checked.holdoutAfter.virtualCoverageRatio);
+        const auto corrected = localization::pipeline_math::transformPoints(
+            request.virtualWindowPoints_mm, result.correction);
+        std::vector<Point> matchedReal;
+        std::vector<Point> matchedVirtual;
+        coveredPoints(request.realWindowPoints_mm, corrected, m_options.coverageDistanceMm, matchedReal);
+        coveredPoints(corrected, request.realWindowPoints_mm, m_options.coverageDistanceMm, matchedVirtual);
+        result.matchedSpreadRatio = std::min(matchedSpread(request.realWindowPoints_mm, matchedReal),
+            matchedSpread(corrected, matchedVirtual));
+        const auto fullResidualWithinBudget = [this](const localization::surface_validation::Metrics &metrics) {
+            return metrics.valid && metrics.realToVirtualMeanMm <= m_options.maximumResidualMm
+                && metrics.virtualToRealMeanMm <= m_options.maximumResidualMm;
+        };
+        const auto &matrix = result.correction.rowMajor;
+        const double translation = std::sqrt(matrix[3] * matrix[3]
+            + matrix[7] * matrix[7] + matrix[11] * matrix[11]);
+        const double rotation = std::abs(std::atan2(matrix[4], matrix[0]))
+            * 180.0 / 3.14159265358979323846;
+        result.solveElapsedMs = solveTimer.elapsed();
+        result.accepted = checked.accepted
+            && fullResidualWithinBudget(checked.trainingAfter)
+            && fullResidualWithinBudget(checked.holdoutAfter)
+            && result.matchedSpreadRatio >= m_options.minimumMatchedSpreadRatio
+            && translation <= m_options.maximumTranslationMm
+            && rotation <= m_options.maximumRotationDeg
+            && result.solveElapsedMs <= m_options.maximumSolveTimeMs;
+        // 仅作当前冻结模型参考的位移预算，不宣称这些激光交点具有固定材料身份。
+        result.safetyKeypointsInParent_mm = request.virtualWindowPoints_mm;
+        result.surfaceVerificationReference_mm = request.virtualWindowPoints_mm;
+        auto preflightOptions = surfaceOptions(m_options);
+        preflightOptions.maximumModelContinuationMm = std::min(10.0, m_options.maximumCorrespondenceDistanceMm);
+        preflightOptions.maximumModelPlaneDeviationMm = std::max(1e-6, std::min(0.05,
+            m_options.maximumIndependentWorseningMm * 0.5));
+        const auto movedHoldoutReference = localization::pipeline_math::transformPoints(
+            surfaceRequest.holdoutVirtual_mm, result.correction);
+        // 这里只验证末两帧有冻结面支持；刚体变换旧切片不是写后CAD重新求交真值。
+        result.surfaceVerificationPreflight = localization::surface_validation::compareFreshSurfaceWithCurrentReference(
+            surfaceRequest.holdoutReal_mm, movedHoldoutReference,
+            request.virtualWindowPoints_mm, result.correction, preflightOptions);
+        result.solveElapsedMs = solveTimer.elapsed();
+        result.accepted = result.accepted && result.surfaceVerificationPreflight.valid
+            && result.solveElapsedMs <= m_options.maximumSolveTimeMs;
+        result.safetyKeypointsInParent_mm.insert(result.safetyKeypointsInParent_mm.end(),
+            surfaceRequest.holdoutVirtual_mm.begin(), surfaceRequest.holdoutVirtual_mm.end());
+        result.message = result.accepted
+            ? QStringLiteral("母材表面可观测投影及完整帧留出通过；不使用估计焊点自证，待新帧表面后验。")
+            : QStringLiteral("母材表面投影、留出、完整两向残差、跨度或幅度/耗时未通过：%1")
+                .arg(checked.message);
+        if (!result.surfaceVerificationPreflight.valid) {
+            result.message += QStringLiteral(" 写前冻结面配对支持不足，取消本次写回（状态=%1，实测支持=%2，模型支持=%3）。")
+                .arg(static_cast<int>(result.surfaceVerificationPreflight.status))
+                .arg(result.surfaceVerificationPreflight.supportedRatio, 0, 'f', 3)
+                .arg(result.surfaceVerificationPreflight.currentModelSupportedRatio, 0, 'f', 3);
+        }
+        // 缺失观测允许表面支路工作，但不能因此丢弃同窗其他真实焊点的反证。
+        // 始终检查最终投影候选，不用PCL原矩阵或估计焊点替代这些原图点。
+        for (const auto &frame : frames) {
+            const auto &independent = frame.independentObservation;
+            if (!usableIndependent(independent, frame.frameId)) { continue; }
+            const auto correctedWeld = localization::pipeline_math::transformPoints(
+                {independent.virtualWeldPointInParent_mm}, result.correction);
+            const double before = pointDistance(independent.realWeldPointInParent_mm,
+                independent.virtualWeldPointInParent_mm);
+            const double after = pointDistance(independent.realWeldPointInParent_mm,
+                correctedWeld.front());
+            result.beforeIndependentErrorMm = std::max(result.beforeIndependentErrorMm, before);
+            result.afterIndependentErrorMm = std::max(result.afterIndependentErrorMm, after);
+            if (!std::isfinite(after) || after > m_options.maximumIndependentErrorMm
+                || after > before + m_options.maximumIndependentWorseningMm) {
+                result.accepted = false;
+                result.message = QStringLiteral("表面窗已有真实焊点否决最终投影候选：frame=%1，前=%2 mm，后=%3 mm。")
+                    .arg(frame.frameId).arg(before).arg(after);
+            }
+        }
+        result.baseSafetyAccepted = result.accepted;
+        if (m_options.stabilityProtectionEnabled && result.accepted) {
+            std::vector<COnlineLocalRegistrationStability::Observation> current;
+            for (const auto &frame : frames) {
+                const auto &independent = frame.independentObservation;
+                if (usableIndependent(independent, frame.frameId)) {
+                    current.push_back({independent.realWeldPointInParent_mm,
+                        independent.virtualWeldPointInParent_mm, frame.frameId});
+                }
+            }
+            if (!current.empty()) {
+                result.stabilityEvaluated = true;
+                result.stabilityEvaluation = COnlineLocalRegistrationStability::evaluate(
+                    current, validation.stabilityAnchors, result.correction,
+                    result.beforeResidualMm, m_options.maximumIndependentErrorMm);
+                result.accepted = result.stabilityEvaluation.accepted;
+                result.message += QStringLiteral(" 有效实测焊点子集收益：%1。")
+                    .arg(result.stabilityEvaluation.reason);
+            } else {
+                result.message += QStringLiteral(" 本窗无独立焊点，未执行焊点收益评估；仅表面训练/留出提供验收。 ");
+            }
+        }
+    } catch (const std::exception &error) {
+        result.accepted = false;
+        result.solveElapsedMs = solveTimer.elapsed();
+        result.message = QStringLiteral("母材表面训练/验收异常：%1").arg(QString::fromUtf8(error.what()));
+    }
+    archiveAttempt(frames, request, preprocessedRealPoints, validation, result);
     return result;
 }
 
@@ -527,6 +976,46 @@ bool COnlineLocalRegistrationWorker::archiveAttempt(const std::deque<CloudFrame>
     if (!directory.exists() && !directory.mkpath(QStringLiteral("."))) {
         return fail(QStringLiteral("无法创建归档目录。"));
     }
+    result.archivePath = directory.absoluteFilePath(QStringLiteral("local_icp_%1_%2_%3.json")
+        .arg(result.sessionId).arg(result.frameId)
+        .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
+    QJsonObject sourceImageRecord{
+        {QStringLiteral("saved"), false},
+        {QStringLiteral("policy"), QStringLiteral("at_most_one_original_image_per_attempt")}};
+    QImage sourceImage = validation.sourceImage;
+    qint64 sourceFrameId = result.frameId;
+    for (const auto &frame : frames) {
+        if (!frame.sourceImage.isNull()) {
+            sourceImage = frame.sourceImage;
+            sourceFrameId = frame.frameId;
+            break;
+        }
+    }
+    if (!sourceImage.isNull()) {
+        if (static_cast<quint64>(sourceImage.width()) * sourceImage.height() > 16U * 1024U * 1024U) {
+            return fail(QStringLiteral("原图尺寸超出单次证据预算。"));
+        }
+        QByteArray pngBytes;
+        QBuffer buffer(&pngBytes);
+        if (!buffer.open(QIODevice::WriteOnly) || !sourceImage.save(&buffer, "PNG")) {
+            return fail(QStringLiteral("无法编码原图证据。"));
+        }
+        const QString imagePath = result.archivePath + QStringLiteral(".source.png");
+        QSaveFile imageFile(imagePath);
+        imageFile.setDirectWriteFallback(false);
+        if (!imageFile.open(QIODevice::WriteOnly)
+            || imageFile.write(pngBytes) != pngBytes.size() || !imageFile.commit()) {
+            return fail(QStringLiteral("原图证据写入失败：%1").arg(imageFile.errorString()));
+        }
+        sourceImageRecord = QJsonObject{
+            {QStringLiteral("saved"), true},
+            {QStringLiteral("frame_id"), QString::number(sourceFrameId)},
+            {QStringLiteral("file"), QFileInfo(imagePath).fileName()},
+            {QStringLiteral("encoded_bytes"), pngBytes.size()},
+            {QStringLiteral("sha256"), QString::fromLatin1(
+                QCryptographicHash::hash(pngBytes, QCryptographicHash::Sha256).toHex())},
+            {QStringLiteral("policy"), QStringLiteral("at_most_one_original_image_per_attempt")}};
+    }
     QJsonArray rawFrames;
     for (const auto &frame : frames) {
         rawFrames.append(QJsonObject{
@@ -534,17 +1023,90 @@ bool COnlineLocalRegistrationWorker::archiveAttempt(const std::deque<CloudFrame>
             {QStringLiteral("captured_ms"), QString::number(frame.capturedMs)},
             {QStringLiteral("raw_real_parent_mm"), cloudJson(frame.rawReal)},
             {QStringLiteral("raw_virtual_parent_mm"), cloudJson(frame.rawReference)},
-            {QStringLiteral("independent"), independentJson(frame.independentObservation)}});
+            {QStringLiteral("independent"), independentJson(frame.independentObservation)},
+            {QStringLiteral("evidence_context"), frame.evidenceContext}});
     }
     QJsonArray matrix;
     for (double value : result.correction.rowMajor) { matrix.append(value); }
+    QJsonArray initialGuessMatrix;
+    for (double value : request.initialGuess.rowMajor) { initialGuessMatrix.append(value); }
+    QJsonArray originalSurfaceMatrix;
+    for (double value : result.originalSurfaceCorrection.rowMajor) { originalSurfaceMatrix.append(value); }
+    QJsonArray trainingFrameIds;
+    QJsonArray holdoutFrameIds;
+    std::vector<Point> holdoutReal;
+    std::vector<Point> holdoutVirtual;
+    if (result.surfaceOnly && frames.size() >= 2U) {
+        for (std::size_t index = 0; index < frames.size(); ++index) {
+            if (index + 2U < frames.size()) {
+                trainingFrameIds.append(QString::number(frames[index].frameId));
+            } else {
+                holdoutFrameIds.append(QString::number(frames[index].frameId));
+                holdoutReal.insert(holdoutReal.end(), frames[index].real.begin(), frames[index].real.end());
+                holdoutVirtual.insert(holdoutVirtual.end(), frames[index].reference.begin(), frames[index].reference.end());
+            }
+        }
+        holdoutReal = boundedPoints(holdoutReal, m_options.maximumPointsPerCloud);
+        holdoutVirtual = boundedPoints(holdoutVirtual, m_options.maximumPointsPerCloud);
+    }
+    QJsonArray modeStrengths;
+    for (double value : result.surfaceValidation.relativeModeStrengths) { modeStrengths.append(value); }
     const auto correctedVirtual = localization::pipeline_math::transformPoints(
         request.virtualWindowPoints_mm, result.correction);
+    QJsonArray stabilityAnchors;
+    for (const auto &anchor : validation.stabilityAnchors) {
+        stabilityAnchors.append(QJsonObject{
+            {QStringLiteral("frame_id"), QString::number(anchor.observation.frameId)},
+            {QStringLiteral("real_parent_mm"), pointJson(anchor.observation.realPoint)},
+            {QStringLiteral("material_point_current_parent_mm"), pointJson(anchor.observation.virtualPoint)},
+            {QStringLiteral("reference_error_mm"), anchor.referenceErrorMm},
+            {QStringLiteral("sample_count"), anchor.sampleCount},
+            {QStringLiteral("last_frame_id"), QString::number(anchor.lastFrameId)},
+            {QStringLiteral("last_observed_error_mm"), anchor.lastObservedErrorMm},
+            {QStringLiteral("geometry_correspondence_verified"), false}});
+    }
     QJsonObject record{
-        {QStringLiteral("schema_version"), 1},
+        {QStringLiteral("schema_version"), 4},
+        {QStringLiteral("history_policy_version"), 2},
+        {QStringLiteral("base_safety_accepted"), result.baseSafetyAccepted},
         {QStringLiteral("session_id"), QString::number(result.sessionId)},
         {QStringLiteral("generation"), QString::number(result.generation)},
         {QStringLiteral("frame_id"), QString::number(result.frameId)},
+        {QStringLiteral("workpiece_pose_revision"), QString::number(result.workpiecePoseRevision)},
+        {QStringLiteral("training_real_to_virtual_initial_guess_row_major"), initialGuessMatrix},
+        {QStringLiteral("source_image"), sourceImageRecord},
+        {QStringLiteral("surface_only"), result.surfaceOnly},
+        {QStringLiteral("surface_postverification_preflight"), QJsonObject{
+            {QStringLiteral("valid"), result.surfaceVerificationPreflight.valid},
+            {QStringLiteral("status"), static_cast<int>(result.surfaceVerificationPreflight.status)},
+            {QStringLiteral("frozen_patch_count"), result.surfaceVerificationPreflight.frozenPatchCount},
+            {QStringLiteral("current_model_supported_count"), result.surfaceVerificationPreflight.currentModelSupportedPointCount},
+            {QStringLiteral("current_model_supported_ratio"), result.surfaceVerificationPreflight.currentModelSupportedRatio},
+            {QStringLiteral("real_supported_count"), result.surfaceVerificationPreflight.supportedPointCount},
+            {QStringLiteral("real_supported_ratio"), result.surfaceVerificationPreflight.supportedRatio},
+            {QStringLiteral("maximum_model_continuation_mm"), std::min(10.0, m_options.maximumCorrespondenceDistanceMm)},
+            {QStringLiteral("maximum_model_plane_deviation_mm"), std::max(1e-6, std::min(0.05,
+                m_options.maximumIndependentWorseningMm * 0.5))},
+            {QStringLiteral("semantics"), QStringLiteral("frozen_holdout_supportability_not_fresh_cad_rerender")}}},
+        {QStringLiteral("surface_validation"), QJsonObject{
+            {QStringLiteral("accepted"), result.surfaceValidation.accepted},
+            {QStringLiteral("projected"), result.surfaceValidation.projected},
+            {QStringLiteral("observable_rank"), result.surfaceValidation.observableRank},
+            {QStringLiteral("relative_mode_strengths"), modeStrengths},
+            {QStringLiteral("mode_strength_semantics"), QStringLiteral("per_cloud_sorted_spectrum_minimum_not_common_eigenmode_spectrum")},
+            {QStringLiteral("pcl_candidate_virtual_to_real_row_major"), originalSurfaceMatrix},
+            {QStringLiteral("training_frame_ids"), trainingFrameIds},
+            {QStringLiteral("holdout_frame_ids"), holdoutFrameIds},
+            {QStringLiteral("training_before"), surfaceMetricsJson(result.surfaceValidation.trainingBefore)},
+            {QStringLiteral("training_after"), surfaceMetricsJson(result.surfaceValidation.trainingAfter)},
+            {QStringLiteral("holdout_before"), surfaceMetricsJson(result.surfaceValidation.holdoutBefore)},
+            {QStringLiteral("holdout_after"), surfaceMetricsJson(result.surfaceValidation.holdoutAfter)},
+            {QStringLiteral("holdout_real_parent_mm"), cloudJson(holdoutReal)},
+            {QStringLiteral("holdout_virtual_parent_mm"), cloudJson(holdoutVirtual)},
+            {QStringLiteral("safety_reference_keypoints_parent_mm"), cloudJson(result.safetyKeypointsInParent_mm)},
+            {QStringLiteral("safety_keypoint_semantics"), QStringLiteral("frozen_model_reference_displacement_budget_not_verified_material_identity")},
+            {QStringLiteral("reference_semantics"), QStringLiteral("rigidly_transformed_frozen_laser_slice_approximation_not_cad_rerender")},
+            {QStringLiteral("message"), result.surfaceValidation.message}}},
         {QStringLiteral("coordinate_frame"), QStringLiteral("workpiece_parent_tcp_mm")},
         {QStringLiteral("dof_xyz_rx_ry_rz"), QJsonArray{true, true, true, false, false, true}},
         {QStringLiteral("raw_frames"), rawFrames},
@@ -559,6 +1121,28 @@ bool COnlineLocalRegistrationWorker::archiveAttempt(const std::deque<CloudFrame>
         {QStringLiteral("diagnostic_corrected_virtual_to_real"), diagnosticCorrespondences(
             correctedVirtual, request.realWindowPoints_mm, m_options.coverageDistanceMm)},
         {QStringLiteral("virtual_to_real_row_major"), matrix},
+        {QStringLiteral("stability_protection"), QJsonObject{
+            {QStringLiteral("enabled"), m_options.stabilityProtectionEnabled},
+            {QStringLiteral("evaluated"), result.stabilityEvaluated},
+            {QStringLiteral("accepted"), result.stabilityEvaluation.accepted},
+            {QStringLiteral("reason"), result.stabilityEvaluation.reason},
+            {QStringLiteral("before_mean_weld_error_mm"), result.stabilityEvaluation.beforeMeanMm},
+            {QStringLiteral("after_mean_weld_error_mm"), result.stabilityEvaluation.afterMeanMm},
+            {QStringLiteral("required_gain_mm"), result.stabilityEvaluation.requiredGainMm},
+            {QStringLiteral("maximum_historical_error_mm"), result.stabilityEvaluation.maximumHistoricalErrorMm},
+            {QStringLiteral("history_enforced"), result.stabilityEvaluation.historyEnforced},
+            {QStringLiteral("region_count"), result.stabilityEvaluation.regionCount},
+            {QStringLiteral("correspondence_semantics"), QStringLiteral("unverified_laser_seam_intersection_pairs_not_material_identity")},
+            {QStringLiteral("evidence_status"), result.stabilityEvaluation.evidenceStatus},
+            {QStringLiteral("historical_before_mean_mm"), result.stabilityEvaluation.historyBeforeMeanMm},
+            {QStringLiteral("historical_after_mean_mm"), result.stabilityEvaluation.historyAfterMeanMm},
+            {QStringLiteral("historical_before_max_mm"), result.stabilityEvaluation.historyBeforeMaxMm},
+            {QStringLiteral("historical_after_max_mm"), result.stabilityEvaluation.historyAfterMaxMm},
+            {QStringLiteral("conflicting_region_count"), result.stabilityEvaluation.worsenedRegionCount},
+            {QStringLiteral("invalid_region_count"), result.stabilityEvaluation.invalidHistoricalRegionCount},
+            {QStringLiteral("spatial_span_mm"), result.stabilityEvaluation.spatialSpanMm},
+            {QStringLiteral("history_capacity_reached"), validation.stabilityAnchors.size() >= 64U},
+            {QStringLiteral("anchors"), stabilityAnchors}}},
         {QStringLiteral("before_residual_mm"), result.beforeResidualMm},
         {QStringLiteral("after_residual_mm"), result.afterResidualMm},
         {QStringLiteral("before_independent_error_mm"), result.beforeIndependentErrorMm},
@@ -587,9 +1171,6 @@ bool COnlineLocalRegistrationWorker::archiveAttempt(const std::deque<CloudFrame>
             {QStringLiteral("maximum_rotation_deg"), m_options.maximumRotationDeg},
             {QStringLiteral("maximum_residual_mm"), m_options.maximumResidualMm},
             {QStringLiteral("minimum_improvement_ratio"), m_options.minimumImprovementRatio}}}};
-    result.archivePath = directory.absoluteFilePath(QStringLiteral("local_icp_%1_%2_%3.json")
-        .arg(result.sessionId).arg(result.frameId)
-        .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
     QSaveFile file(result.archivePath);
     file.setDirectWriteFallback(false);
     if (!file.open(QIODevice::WriteOnly)) { return fail(file.errorString()); }

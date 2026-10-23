@@ -40,6 +40,7 @@ struct TrackingFramePresentation;
  */
 class MainWidget final : public QWidget {
     Q_OBJECT
+    friend struct COnlineControlTargetPresentationTestAccess;
 
 public:
     explicit MainWidget(QWidget* parent = nullptr);
@@ -77,6 +78,8 @@ signals:
     void onlineLocalIcpDistanceChanged(double distanceMm);
     /// @brief 用户热调整单次局部 ICP 合成平移长度上限，单位 mm；超限时整次拒绝。
     void onlineLocalIcpTranslationLimitChanged(double translationMm);
+    /// @brief 用户热切换局部 ICP 稳定更新保护；与在线 ICP 总开关相互独立。
+    void onlineLocalIcpStabilityChanged(bool enabled);
 
     /**
      * @brief 用户确认选择当前工件。
@@ -265,6 +268,8 @@ public slots:
     void setOnlineLocalIcpDistance(double distanceMm);
     /// @brief 在 UI 线程回填局部 ICP 平移修正上限，单位 mm，不发出用户变更信号。
     void setOnlineLocalIcpTranslationLimit(double translationMm);
+    /// @brief 在 UI 线程回填稳定更新保护开关，不发出用户变更信号。
+    void setOnlineLocalIcpStabilityEnabled(bool enabled);
     /// @brief 更新在线纠偏最终 P001 的独立诊断文本。
     void setOnlineCorrectionP001Text(const QString& text);
     /**
@@ -381,6 +386,7 @@ private:
     QLabel* m_offlineCorrectionStateLabel = nullptr;
     QLabel* m_onlineCorrectionStateLabel = nullptr;
     QCheckBox* m_onlineLocalIcpCheckBox = nullptr;
+    QCheckBox* m_onlineLocalIcpStabilityCheckBox = nullptr;
     QWidget* m_onlineLocalIcpDistanceRow = nullptr;
     QDoubleSpinBox* m_onlineLocalIcpDistanceSpinBox = nullptr;
     QWidget* m_onlineLocalIcpTranslationRow = nullptr;

@@ -31,6 +31,7 @@
 #define I2R_RLC_CONTROL_ONLINE_CORRECTION_TYPES_H
 
 #include <array>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
@@ -194,6 +195,8 @@ struct OnlineCorrectionDetectionSample {
     int simulatedSeamIndex = -1;
     /// @brief 旧 sim_scan_line_change_point 等价输入，单位 mm；无效时不触发曲线切换。
     std::optional<OnlineCorrectionPoint> scanLineChangePoint;
+    /// @brief true 为粗跟踪/仿真续接估计；可供在线跟随，不进入初始扫描或 ICP 拟合。
+    bool estimated = false;
 };
 
 /**
@@ -286,6 +289,29 @@ struct OnlineCorrectionFollowDiagnostic {
     double s2Deg = 0.0;
 };
 
+/** @brief 控制目标来源；预测只供实时跟随，不代表新增视觉测量。 */
+enum class OnlineCorrectionTargetSource {
+    Unavailable,
+    Measured,
+    PredictedReference
+};
+
+/**
+ * @brief 控制线程持有的唯一目标快照，位置为变位机末节系、mm。
+ * @details targetPointInLastLink_mm 等于实际 P 几何中的 futureFoot；不能当作
+ *          原图独立点或输入异常 ICP。UI 若需父级 TCP 点应扣除 toolTcp 偏置。
+ */
+struct OnlineCorrectionTargetSnapshot {
+    bool valid = false;
+    OnlineCorrectionTargetSource source = OnlineCorrectionTargetSource::Unavailable;
+    /// @brief Runtime worker 注入当前纠偏会话，仅供 UI 隔离；Controller 不生成该 ID。
+    std::uint64_t sessionId = 0;
+    /// @brief 同会话目标计算序号；reset 后从零重新建立。
+    std::uint64_t generation = 0;
+    OnlineCorrectionPoint targetPointInLastLink_mm;
+    OnlineCorrectionFollowDiagnostic geometry;
+    int taughtPointIndex = -1;
+};
 /** @brief 最近一次在线轨迹 ICP 诊断；只在控制线程更新。 */
 struct OnlineCorrectionIcpStatus {
     bool enabled = false;
@@ -340,6 +366,8 @@ struct OnlineCorrectionSessionState {
     int teachPointSendIndex = 0;
     /// @brief 首批示教点总数，用于只接受最终 O 命令的 offline==5 确认。
     int initialTeachPointCount = 0;
+    /// @brief 当前控制目标的唯一权威快照，与检测/ICP 样本身份分离。
+    OnlineCorrectionTargetSnapshot controlTarget;
     /// @brief 最近一次 getSeamIndex()。
     int simulatedSeamIndex = -1;
     /// @brief 当前锁存的分段结束类型。

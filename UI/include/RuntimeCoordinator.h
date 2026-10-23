@@ -39,7 +39,9 @@
 #include <QThread>
 
 #include "OnlineLocalRegistrationWorker.h"
+#include "OnlineLocalRegistrationRecovery.h"
 #include "OnlineLocalRegistrationVerification.h"
+#include "OnlineLocalSurfaceVerification.h"
 #include "RuntimeWorkerAdapters.h"
 
 namespace i2r_rlc::ui {
@@ -122,6 +124,10 @@ public:
     void updateOnlineProcessingOptions(bool localEnabled, const vision::KcfFusionOptions &fusion);
     /// @brief UI 线程读取当前定位开关，不代表现场配准一定可用。
     bool onlineLocalRegistrationEnabled() const;
+    /// @brief UI 线程读取可选稳定更新保护；不以历史最低表面残差冻结更新。
+    bool onlineLocalIcpStabilityEnabled() const;
+    /// @brief 热切换收益和历史区域否决保护；撤销旧候选，不能撤销已发送事务。
+    void setOnlineLocalIcpStabilityEnabled(bool enabled);
     /// @brief UI 线程调整局部 ICP 最大对应距离，mm；撤销旧窗口，后续采样应用。
     void setOnlineLocalIcpDistance(double distanceMm);
     /// @brief UI 线程读取已归一化到 [0.1,10] mm 的局部 ICP 对应距离。
@@ -394,6 +400,9 @@ signals:
     void onlineCorrectionStartFailed(const QString &message);
 
 private:
+    // 测试友元只构造无设备状态，避免宏改写 private 导致 MSVC 方法符号不一致。
+    friend struct CRuntimeCoordinatorHistoryTestAccess;
+
     /// @brief 按值组装在线 Vision 参数；仅覆盖在线会话标定，不改其他跟踪用途。
     RuntimeTrackingOptions onlineTrackingOptions() const;
     enum class OnlineCorrectionStartPhase {
@@ -420,8 +429,11 @@ private:
         qint64 robotStateReceivedMs = -1;
         RuntimeTrackingPurpose purpose = RuntimeTrackingPurpose::None;
         quint64 correctionSessionId = 0;
+        /// @brief 与相机帧一起冻结的诊断阶段，不以后到的业务状态补写。
+        bool onlineControlWindowActive = false;
         /// @brief RobotSim 查询派发时的模型代次，隔离写回前后的局部表面。
         quint64 modelGeneration = 0;
+        quint64 workpiecePoseRevision = 0;
         int localizationSegmentIndex = -1;
         quint64 requestId = 0;
         std::optional<digital_twin::DigitalTwinVisionLaserObservation>
@@ -514,11 +526,16 @@ private:
     void startLocalRegistrationWorker();
     /// @brief 撤销旧窗口、候选修正及网络写回代次；不停止机器人运动。
     void resetOnlineLocalRegistration();
+    /// @brief 成功晋升或已确认回滚可保留可信位姿；回滚另行清空材料点历史。
+    void resetOnlineLocalRegistration(bool preserveStabilityHistory);
     /// @brief 从已完成的同帧上下文低频投递表面采样，繁忙时跳过且不排队。
     void submitOnlineLocalRegistration(const FrozenVisionFrameContext &context,
         const RuntimeTrackingResult &trackingResult);
     /// @brief 使用写回完成后新采集的同帧独立点确认效果；验证期间禁止继续配准写回。
     void verifyOnlineLocalRegistration(const FrozenVisionFrameContext &context,
+        const RuntimeTrackingResult &trackingResult);
+    /// @brief 写回后新曝光的真实母材验证，不进入求解窗口或使用估计焊点。
+    void submitOnlineLocalSurfaceVerification(const FrozenVisionFrameContext &context,
         const RuntimeTrackingResult &trackingResult);
     /// @brief 在仿真通道空隙确认后验结果或尝试受保护恢复；停止/换会话不触发恢复。
     bool finishOnlineLocalRegistrationVerification();
@@ -537,8 +554,11 @@ private:
     std::optional<COnlineLocalRegistrationWorker::Result> m_pendingLocalCorrection;
     QElapsedTimer m_localRegistrationClock;
     qint64 m_lastLocalRegistrationSampleMs = -1;
+    qint64 m_lastLocalHistorySampleMs = -1;
     /// @brief 跨模型写回代次保留的配准冷却，防止清窗重置 worker 时钟后过频求解。
     qint64 m_lastLocalRegistrationAttemptMs = -1;
+    /// @brief 已确认回滚后的冷却及曝光下界，不能被普通清窗缩短。
+    COnlineLocalRegistrationRecovery m_localRegistrationRecovery;
     qint64 m_localRegistrationInputMs = -1;
     quint64 m_localRegistrationGeneration = 0;
     quint64 m_localRegistrationRequestId = 0;
@@ -549,6 +569,12 @@ private:
     bool m_localRegistrationRobotStateFresh = false;
     CGlobalLocatePriorWorkerAdapter::LocalRegistrationSafetyOptions m_localRegistrationSafetyOptions;
     QString m_localRegistrationArchiveDirectory;
+    /// @brief 仅 coordinator 线程所有；采集与写回解耦，姿态只随已确认事务推进。
+    COnlineLocalRegistrationStability m_localRegistrationStability;
+    /// @brief 最近一次后验晋升回读的位姿；不是当前帧重新读回的场景真值。
+    std::optional<localization::RigidTransform> m_lastVerifiedLocalWorkpiecePose;
+    /// @brief 实际或未确认的工件写入/恢复递增；不同于采样窗口代次。
+    quint64 m_localWorkpiecePoseRevision = 1;
     struct LocalVerification {
         quint64 sessionId = 0;
         quint64 generation = 0;
@@ -556,8 +582,15 @@ private:
         qint64 sourceFrameId = -1;
         QString archivePath;
         QJsonArray samples;
+        localization::RigidTransform correction;
+        std::vector<localization::Point3D_mm> surfaceVerificationReference_mm;
+        bool stabilityProtectionEnabled = false;
+        qint64 lastObservedFrameId = -1;
+        std::vector<COnlineLocalRegistrationStability::Observation> verifiedGoodFrames;
         std::optional<COnlineLocalRegistrationVerification> check;
-        bool rollbackRequested = false;
+        std::optional<COnlineLocalSurfaceVerification> surfaceCheck;
+        quint64 workpiecePoseRevision = 0;
+        bool retainRequested = false;
     };
     std::optional<LocalVerification> m_localVerification;
 

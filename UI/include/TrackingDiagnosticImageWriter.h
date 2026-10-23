@@ -5,6 +5,7 @@
 #ifndef I2R_RLC_UI_TRACKING_DIAGNOSTIC_IMAGE_WRITER_H
 #define I2R_RLC_UI_TRACKING_DIAGNOSTIC_IMAGE_WRITER_H
 
+#include <array>
 #include <condition_variable>
 #include <deque>
 #include <mutex>
@@ -25,8 +26,10 @@ class CTrackingDiagnosticImageWriter final {
 public:
     CTrackingDiagnosticImageWriter(const QString &directory, qint64 maxBytes);
     ~CTrackingDiagnosticImageWriter();
-    /// @brief 非阻塞入队；返回 queued、queue_full 或 stopped。
-    QString submit(const QString &stem, const QImage &source, const QImage &enhanced);
+    /// @brief 非阻塞入队；桶预算仅约束压缩后写入，不在调用线程编码图像。
+    /// @return queued、queue_full、stopped 或 invalid_bucket。
+    QString submit(const QString &stem, const QImage &source, const QImage &enhanced,
+        int bucket, qint64 bucketByteBudget);
     /// @brief 排空有界队列并回收线程；仅在会话结束或重配时调用。
     void stop();
     /// @brief 返回后台编码/写入错误；预算和队列跳过不视为错误。
@@ -37,6 +40,8 @@ private:
         QString stem;
         QImage source;
         QImage enhanced;
+        int bucket = -1;
+        qint64 bucketByteBudget = 0;
     };
     void run();
     void writePair(const CImagePair &pair);
@@ -46,6 +51,7 @@ private:
     QString m_directory;
     qint64 m_maxBytes = 0;
     qint64 m_writtenBytes = 0;
+    std::array<qint64, 5> m_bucketWrittenBytes{};
     bool m_stopping = false;
     std::mutex m_mutex;
     std::condition_variable m_condition;

@@ -116,6 +116,10 @@ struct RuntimeVisionCorrelation {
     quint64 sessionId = 0;
     CorrectionPurpose purpose = CorrectionPurpose::None;
     qint64 frameId = -1;
+    /// @brief 相机帧冻结时的正式在线窗口状态，仅供诊断采样；不改变关联键语义。
+    bool onlineControlWindowActive = false;
+    /// @brief 冻结查询时的工件位姿版本；不同于采样窗口代次。
+    quint64 workpiecePoseRevision = 0;
 };
 
 /**
@@ -296,6 +300,8 @@ struct CRuntimeTrackingDiagnostic {
     qint64 processingStartedMs = -1;
     qint64 processingFinishedMs = -1;
     robot_comm::RobotState robotState;
+    /// @brief 只读采样桶：-1=未采样，0=启动，1~3=在线采样进度层，4=异常。
+    int imageSampleBucket = -1;
     QImage sourceImage;
     QImage enhancedImage;
 };
@@ -316,17 +322,27 @@ struct RuntimeTrackingResult {
     std::optional<CRuntimeTrackingDiagnostic> diagnostic;
     /// @brief 纠偏显示必须具备的完整上下文；禁止缺失时改用 UI 最新相机帧。
     std::optional<RuntimeTrackingFrameContext> frameContext;
+    /// @brief 同曝光投影只供控制目标显示；不得由显示重投影生成新的测量样本。
+    std::optional<vision::WeldProjectionContext> displayProjectionContext;
+    /// @brief 与投影上下文配套的会话标定快照，避免显示采用后来修改的 TCP 偏置。
+    std::optional<vision::PositionerCalibration> displayPositionerCalibration;
     /// @brief 焊缝图像点 X，单位 pixel。
+    vision::OnlineSeamPointSource pointSource = vision::OnlineSeamPointSource::Unavailable;
+    int degradedFrames = 0;
+    /// @brief true 表示最终输出仅允许当前图像验收的测量，关闭诊断仍保留来源身份。
+    bool imageMeasurementOutputEnabled = false;
+    /// @brief 当前帧原图几何或图像质量验收 KCF 已通过；不代表独立几何资格。
+    bool imageObservationAccepted = false;
     double imageXPixel = 0.0;
     /// @brief 焊缝图像点 Y，单位 pixel。
     double imageYPixel = 0.0;
     /// @brief 空间检测样本；无有效投影时 point.valid=false。
     control::OnlineCorrectionDetectionSample sample;
-    /// @brief 检测当帧投影的原始 KCF 点，机器人固定基座坐标，单位 mm；仅供显示。
+    /// @brief 检测当帧最终业务点的投影，机器人固定基座坐标，单位 mm；仅供显示。
     control::OnlineCorrectionPoint detectedRobotBasePoint;
-    /// @brief 同一 KCF 点的 RBCALIB 固定变位机基座坐标，单位 mm；不含外轴旋转。
+    /// @brief 同一最终检测点的 RBCALIB 固定变位机基座坐标，单位 mm；不含外轴旋转。
     control::OnlineCorrectionPoint detectedStationBasePoint;
-    /// @brief 同帧融合前 KCF 点投影至工件父级 TCP 系；仅有效原始跟踪可用于独立验收。
+    /// @brief 同帧融合前原图精定位点投影至工件父级 TCP 系；在线几何校核失败时无效。
     control::OnlineCorrectionPoint independentWeldPointInParent_mm;
     /// @brief 整条真实激光线重建的空间点列（全局定位专用），单位 mm。
     /// 与在线纠偏的单点 sample 互斥：非空时 sample.point 仅作参考。

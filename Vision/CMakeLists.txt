@@ -1,4 +1,4 @@
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui)
+﻿find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui)
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(tinysplinecxx CONFIG REQUIRED)
@@ -85,6 +85,8 @@ if(I2R_RLC_ENABLE_OPENCV)
         src/feature/ActiveContourWeldFeatureDetector.cpp
         src/feature/ContourControlPointTools.cpp
         src/feature/GapFeatureDetector.cpp
+        src/feature/OnlineSeamRefiner.cpp
+        src/feature/SimulationGuidedSeamEstimator.cpp
         src/feature/GrooveEdgeDetector.cpp
         src/feature/PointCloudGapWidthDetector.cpp
         src/feature/WeldEndpointDetector.cpp
@@ -112,6 +114,8 @@ if(I2R_RLC_ENABLE_OPENCV)
         src/stripe/WeldSkeletonFeatureTools.cpp
         src/track/FilterKalman.cpp
         src/track/KcfTracker.cpp
+        src/track/OnlineSeamContinuity.cpp
+        include/track/OnlineSeamContinuity.h
         src/track/LegacyOnlineKcfDetector.cpp
         src/track/KcfFftTools.cpp
         src/track/KcfFhog.cpp
@@ -120,6 +124,8 @@ if(I2R_RLC_ENABLE_OPENCV)
         include/feature/ActiveContourWeldFeatureDetector.h
         include/feature/ContourControlPointTools.h
         include/feature/GapFeatureDetector.h
+        include/feature/OnlineSeamRefiner.h
+        include/feature/SimulationGuidedSeamEstimator.h
         include/feature/GrooveEdgeDetector.h
         include/feature/PointCloudGapWidthDetector.h
         include/feature/WeldEndpointDetector.h
@@ -164,6 +170,11 @@ endif()
 
 add_library(i2r_rlc_vision STATIC
     ${I2R_RLC_VISION_SOURCES}
+)
+
+set_target_properties(i2r_rlc_vision
+    PROPERTIES
+        AUTOMOC OFF
 )
 
 target_include_directories(i2r_rlc_vision

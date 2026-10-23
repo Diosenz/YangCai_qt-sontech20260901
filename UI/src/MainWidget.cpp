@@ -499,6 +499,13 @@ MainWidget::MainWidget(QWidget* parent)
     m_onlineLocalIcpCheckBox->setChecked(true);
     m_onlineLocalIcpCheckBox->setToolTip(tr("可在运行中调整；关闭后停止新的局部配准和位姿写回。"));
     onlineDetailsLayout->addWidget(m_onlineLocalIcpCheckBox);
+    m_onlineLocalIcpStabilityCheckBox = new QCheckBox(tr("在线 ICP 稳定更新保护"), onlineDetailsWidget);
+    m_onlineLocalIcpStabilityCheckBox->setObjectName(QStringLiteral("onlineLocalIcpStabilityCheckBox"));
+    m_onlineLocalIcpStabilityCheckBox->setChecked(false);
+    m_onlineLocalIcpStabilityCheckBox->setToolTip(tr(
+        "可在启动前设置或运行中切换；启用后要求焊点明确改善，并监测历史区域。"
+        "历史几何未校核，仅作诊断，不作硬否决；不比较不同窗口的历史最低表面残差。"));
+    onlineDetailsLayout->addWidget(m_onlineLocalIcpStabilityCheckBox);
     m_onlineLocalIcpDistanceRow = new QWidget(onlineDetailsWidget);
     m_onlineLocalIcpDistanceRow->setObjectName(QStringLiteral("onlineLocalIcpDistanceRow"));
     auto* localIcpDistanceLayout = new QHBoxLayout(m_onlineLocalIcpDistanceRow);
@@ -535,9 +542,9 @@ MainWidget::MainWidget(QWidget* parent)
     onlineDetailsLayout->addWidget(m_onlineLocalIcpTranslationRow);
     m_onlineFusionModeComboBox = new QComboBox(onlineDetailsWidget);
     m_onlineFusionModeComboBox->setObjectName(QStringLiteral("onlineFusionModeComboBox"));
-    m_onlineFusionModeComboBox->addItems({tr("自动卡尔曼"), tr("手动比例"), tr("仅 KCF（关闭融合）")});
+    m_onlineFusionModeComboBox->addItems({tr("自动卡尔曼"), tr("手动比例"), tr("仅真实检测（关闭融合）")});
     m_onlineFusionModeComboBox->setToolTip(tr(
-        "自动卡尔曼：沿用响应自适应融合；手动比例：按下方权重融合仿真与 KCF；仅 KCF：关闭位置融合。"));
+        "自动卡尔曼：按响应自适应融合仿真与原图精定位；手动比例：按下方权重融合；仅真实检测：输出原图接缝精定位点。"));
     onlineDetailsLayout->addWidget(m_onlineFusionModeComboBox);
     auto* fusionWeights = new QWidget(onlineDetailsWidget);
     auto* fusionWeightLayout = new QGridLayout(fusionWeights);
@@ -555,11 +562,11 @@ MainWidget::MainWidget(QWidget* parent)
         spinBox->setKeyboardTracking(false);
         spinBox->setEnabled(false);
         spinBox->setValue(50.0);
-        spinBox->setToolTip(tr("仅手动比例模式可编辑；仿真与 KCF 百分比之和为 100%。"));
+        spinBox->setToolTip(tr("仅手动比例模式可编辑；仿真与真实检测百分比之和为 100%。"));
     }
     fusionWeightLayout->addWidget(new QLabel(tr("仿真"), fusionWeights), 0, 0);
     fusionWeightLayout->addWidget(m_onlineSimulationWeightSpinBox, 0, 1);
-    fusionWeightLayout->addWidget(new QLabel(tr("KCF"), fusionWeights), 0, 2);
+    fusionWeightLayout->addWidget(new QLabel(tr("真实检测"), fusionWeights), 0, 2);
     fusionWeightLayout->addWidget(m_onlineKcfWeightSpinBox, 0, 3);
     onlineDetailsLayout->addWidget(fusionWeights);
     auto* coordinates = new QWidget(onlineDetailsWidget);
@@ -571,7 +578,7 @@ MainWidget::MainWidget(QWidget* parent)
     const QStringList axes{tr("X"), tr("Y"), tr("Z")};
     const QStringList titles{
         tr("TCP · 机器人基（mm）"), tr("TCP · 变位机基（mm）"),
-        tr("KCF焊缝 · 机器人基（mm）"), tr("KCF焊缝 · 变位机基（mm）")};
+        tr("检测焊缝 · 机器人基（mm）"), tr("检测焊缝 · 变位机基（mm）")};
     for (int axis = 0; axis < 3; ++axis) {
         auto* label = new QLabel(axes.at(axis), coordinates);
         label->setAlignment(Qt::AlignCenter);
@@ -898,10 +905,13 @@ MainWidget::MainWidget(QWidget* parent)
     };
     connect(m_onlineLocalIcpCheckBox, &QCheckBox::toggled,
             this, [this, emitProcessingOptions](bool enabled) {
+                m_onlineLocalIcpStabilityCheckBox->setVisible(enabled);
                 m_onlineLocalIcpDistanceRow->setVisible(enabled);
                 m_onlineLocalIcpTranslationRow->setVisible(enabled);
                 emitProcessingOptions();
             });
+    connect(m_onlineLocalIcpStabilityCheckBox, &QCheckBox::toggled,
+            this, &MainWidget::onlineLocalIcpStabilityChanged);
     connect(m_onlineLocalIcpDistanceSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
             this, &MainWidget::onlineLocalIcpDistanceChanged);
     connect(m_onlineLocalIcpTranslationSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
@@ -1256,6 +1266,7 @@ void MainWidget::setOnlineProcessingOptions(
     const double weight = std::isfinite(simulationWeight)
         ? std::clamp(simulationWeight, 0.0, 1.0) : 0.5;
     m_onlineLocalIcpCheckBox->setChecked(localEnabled);
+    m_onlineLocalIcpStabilityCheckBox->setVisible(localEnabled);
     m_onlineLocalIcpDistanceRow->setVisible(localEnabled);
     m_onlineLocalIcpTranslationRow->setVisible(localEnabled);
     m_onlineFusionModeComboBox->setCurrentIndex(mode);
@@ -1277,6 +1288,12 @@ void MainWidget::setOnlineLocalIcpTranslationLimit(double translationMm)
     const QSignalBlocker blocker(m_onlineLocalIcpTranslationSpinBox);
     m_onlineLocalIcpTranslationSpinBox->setValue(std::isfinite(translationMm)
         ? std::clamp(translationMm, 0.01, 30.0) : 30.0);
+}
+
+void MainWidget::setOnlineLocalIcpStabilityEnabled(bool enabled)
+{
+    const QSignalBlocker blocker(m_onlineLocalIcpStabilityCheckBox);
+    m_onlineLocalIcpStabilityCheckBox->setChecked(enabled);
 }
 
 void MainWidget::setOnlineCorrectionP001Text(const QString& text)

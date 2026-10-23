@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cmath>
+#include <cstdio>
 #include <condition_variable>
 #include <filesystem>
 #include <fstream>
@@ -92,10 +94,15 @@ i2r_rlc::camera::CameraFrame makeFrame(qint64 frameId)
     i2r_rlc::camera::CameraFrame frame;
     frame.frameId = frameId;
     frame.image = QImage(320, 240, QImage::Format_Grayscale8);
-    frame.image.fill(0);
-    for (int y = 116; y <= 124; ++y) {
+    // 在线结果须有真实接缝几何；同步测试不再用没有折点的水平亮带。
+    for (int y = 0; y < frame.image.height(); ++y) {
         uchar *row = frame.image.scanLine(y);
-        std::fill(row + 60, row + 260, static_cast<uchar>(255));
+        for (int x = 0; x < frame.image.width(); ++x) {
+            const double dx = x - 160.0;
+            const double stripeY = 120.0 + (dx < 0.0 ? 0.28 : -0.32) * dx;
+            const double dy = y - stripeY;
+            row[x] = static_cast<uchar>(15.0 + 220.0 * std::exp(-dy * dy / 2.88));
+        }
     }
     frame.previewImage = frame.image;
     return frame;
@@ -191,7 +198,6 @@ public:
         int pointIndex,
         robot_comm::RobotState *state) override
     {
-        Q_UNUSED(request);
         Q_UNUSED(pointIndex);
         {
             std::lock_guard<std::mutex> lock(m_record->mutex);
@@ -207,7 +213,10 @@ public:
         if (state != nullptr) {
             *state = makeReachableState();
             if (type == robot_comm::RobotCommandType::TeachPointUpdate) {
-                state->offline = pointIndex >= 1 ? 5 : 0;
+                // 和生产O编码共用批次数量语义，中间点回4，末点才回5。
+                const auto fields = QString::fromStdString(request).split(',');
+                const int pointCount = fields.size() > 8 ? fields[8].toInt() : 0;
+                state->offline = pointIndex + 1 == pointCount ? 5 : 4;
                 receipt.completed = state->offline == 5;
             }
         }
@@ -314,7 +323,7 @@ public:
         return {
             true,
             QStringLiteral(
-                "[[[[[1,2,3],[100,120]],[[4,5,6],[220,120]]]],[[160,120]]]") ,
+                "[[[[[1,2,3],[60,92]],[[2,3,4],[160,120]],[[4,5,6],[260,88]]]],[[160,120]]]") ,
             QStringLiteral("scripted valid"),
             0};
     }
@@ -418,6 +427,14 @@ struct CorrectionFixture {
             [this](bool succeeded, const QString &) {
                 robotSimSynchronized = succeeded;
             });
+        QObject::connect(
+            &runtime,
+            &ui::CRuntimeCoordinator::statusMessage,
+            [this](const QString &message) {
+                if (message == QStringLiteral("vision tracking started")) {
+                    ++visionStartCount;
+                }
+            });
     }
 
     TestMode mode;
@@ -434,6 +451,8 @@ struct CorrectionFixture {
     std::string offlineArchivePath;
     bool robotSimConnected = false;
     bool robotSimSynchronized = false;
+    int visionStartCount = 0;
+    int expectedVisionStartCount = 0;
 
     void start(
         bool publishState,
@@ -441,7 +460,19 @@ struct CorrectionFixture {
         bool connectRobotForCommands = false)
     {
         runtime.start();
-        runtime.configureTracking({}, makeProjectionContext());
+        ui::RuntimeTrackingOptions trackingOptions;
+        // 正式在线会注入本会话RBCALIB，必须同时提供完整的SENSORPARA；
+        // 单独传旧projectionContext不能替代动态标定构建所需的输入。
+        trackingOptions.sensorCalibration.valid = true;
+        trackingOptions.sensorCalibration.focalLengthM = 0.01;
+        trackingOptions.sensorCalibration.sxM = 0.00001;
+        trackingOptions.sensorCalibration.syM = 0.00001;
+        trackingOptions.sensorCalibration.cxPixel = 160.0;
+        trackingOptions.sensorCalibration.cyPixel = 120.0;
+        trackingOptions.sensorCalibration.laserPlaneC = -1.0;
+        trackingOptions.sensorCalibration.cameraZInToolM = -1.0;
+        trackingOptions.positionerCalibration.valid = true;
+        runtime.configureTracking(trackingOptions, makeProjectionContext());
         if (mode == TestMode::Online) {
             runtime.configureOnlineCorrection(createOnlineConfiguration());
             if (connectRobotForCommands) {
@@ -473,10 +504,18 @@ struct CorrectionFixture {
 
     void startCorrection()
     {
+        expectedVisionStartCount = visionStartCount + 1;
         if (mode == TestMode::Online) {
             runtime.startOnlineTracking();
         } else {
             runtime.startOfflineCorrectionDetection();
+            // Offline 必须先经过真实停止状态预检，WaitingForDetection 本身
+            // 不代表 Vision 已启动；状态按序排在 startDetection 之后。
+            auto stopped = makeReachableState();
+            stopped.sStart = 0;
+            stopped.traflag = 0;
+            stopped.OfflineRun = 0;
+            runtime.publishRobotState(stopped);
         }
     }
 
@@ -498,14 +537,13 @@ struct CorrectionFixture {
             runtime.configureOfflineCorrectionArchive(offlineArchivePath);
         }
         startCorrection();
-        waitForDetection();
     }
 
     bool waitForDetection()
     {
         const bool ready = waitUntil([this]() {
             if (mode == TestMode::Online) {
-                return std::any_of(
+                return visionStartCount >= expectedVisionStartCount && std::any_of(
                     onlineUpdates.begin(),
                     onlineUpdates.end(),
                     [](const i2r_rlc::control::OnlineCorrectionUpdate &update) {
@@ -514,7 +552,7 @@ struct CorrectionFixture {
                                 == i2r_rlc::control::OnlineCorrectionPhase::InitialDetectionRunning;
                     });
             }
-            return std::any_of(
+            return visionStartCount >= expectedVisionStartCount && std::any_of(
                 offlineUpdates.begin(),
                 offlineUpdates.end(),
                 [](const i2r_rlc::control::OfflineCorrectionUpdate &update) {
@@ -530,6 +568,10 @@ struct CorrectionFixture {
         while (settleTimer.elapsed() < 80) {
             QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
             QThread::msleep(2);
+        }
+        if (ready && mode == TestMode::Offline) {
+            // 只有真实 Vision startTracking 已完成，才开放扫描窗口和测试帧。
+            runtime.publishRobotState(makeReachableState());
         }
         return ready;
     }
@@ -580,6 +622,12 @@ struct CorrectionFixture {
 
 bool testNoRobotStateDoesNotQuery(TestMode mode)
 {
+    if (mode == TestMode::Offline) {
+        // Offline 公开入口必须先用 RobotState 完成预检，无法同时构造
+        // “从未有状态且已经 armed”。缺状态门由 Online 共用 dispatch 验证。
+        std::printf("NOT APPLICABLE: offline no-state after public preflight is unreachable; shared dispatch is covered by --online\n");
+        return true;
+    }
     CorrectionFixture fixture(mode);
     fixture.start(false, false);
     const int before = fixture.queryCount();
@@ -758,6 +806,8 @@ bool testStopAndRestartRejectsLateQueryAndVision(TestMode mode)
         fixture.waitForBlockedQuery(),
         "old-session query should be blocked before stop");
     fixture.restartCorrection();
+    ok &= expectTrue(fixture.waitForDetection(),
+        "restarted correction must complete its actual Vision arming");
     fixture.runtime.publishCameraFrame(makeFrame(400));
     fixture.releaseBlockedQuery();
     ok &= expectTrue(
@@ -795,8 +845,11 @@ bool testStopAndRestartRejectsLateVisionResult(TestMode mode)
         "old-session Vision should enter the deterministic synchronization hook");
 
     fixture.restartCorrection();
-    fixture.runtime.publishCameraFrame(makeFrame(600));
+    // 旧 Vision 调用阻塞其线程；先解除旧调用，再等新会话真正 armed。
     releaseBlockedVision(visionState);
+    ok &= expectTrue(fixture.waitForDetection(),
+        "restarted correction must arm after the old Vision call returns");
+    fixture.runtime.publishCameraFrame(makeFrame(600));
     ok &= expectTrue(
         waitUntil([&fixture]() {
             return std::any_of(
@@ -854,7 +907,8 @@ bool testOnlineNoTargetIsSynchronizationSuccess()
     CorrectionFixture fixture(TestMode::Online);
     fixture.start(true, true);
     auto noTargetState = makeReachableState();
-    noTargetState.traflag = 0;
+    // 初始扫描仍需STARTDETPRG窗口；无目标由空白图表示，不伪造窗口关闭。
+    noTargetState.traflag = 1;
     fixture.runtime.publishRobotState(noTargetState);
     fixture.runtime.publishCameraFrame(makeBlankFrame(800));
     const bool consumed = waitUntil([&fixture]() {
@@ -871,7 +925,12 @@ bool testOnlineNoTargetIsSynchronizationSuccess()
         fixture.trackingResults.begin(),
         fixture.trackingResults.end(),
         [](const ui::RuntimeTrackingResult &result) {
-            return result.frameId == 800 && !result.valid;
+            return result.frameId == 800 && !result.valid
+                && result.imageMeasurementOutputEnabled && !result.imageObservationAccepted
+                && !result.sample.point.valid
+                && !result.independentWeldPointInParent_mm.valid
+                && !result.detectedRobotBasePoint.valid && !result.detectedStationBasePoint.valid
+                && result.pointSource == i2r_rlc::vision::OnlineSeamPointSource::Unavailable;
         });
     fixture.stop();
     return expectTrue(
@@ -879,7 +938,7 @@ bool testOnlineNoTargetIsSynchronizationSuccess()
                "online no-target must consume a synchronized frame without counting a failure")
         && expectTrue(
                noTargetResult,
-               "online no-target must remain a Vision business result");
+               "online blank frame succeeds in synchronization but cannot manufacture a CAD or historical measurement");
 }
 
 bool testOnlineInternalPauseKeepsSession()
@@ -890,10 +949,43 @@ bool testOnlineInternalPauseKeepsSession()
     bool ok = expectTrue(
         waitUntil([&fixture]() { return !fixture.trackingResults.empty(); }),
         "online initial detection should consume its synchronized frame");
+    if (!fixture.trackingResults.empty()) {
+        const auto &initial = fixture.trackingResults.back();
+        ok &= expectTrue(initial.valid && initial.sample.point.valid,
+            "online pause fixture must provide a valid initial weld point");
+        if (!initial.valid || !initial.sample.point.valid) {
+            std::cerr << "pause fixture initial frame=" << initial.frameId
+                      << " trigger=" << initial.triggerAccepted
+                      << " valid=" << initial.valid << " message="
+                      << initial.message.toStdString() << '\n';
+        }
+    }
 
     auto reverseComplete = makeReachableState();
     reverseComplete.onlineReverseCompleteFlag = 1;
     fixture.runtime.publishRobotState(reverseComplete);
+    ok &= expectTrue(waitUntil([&fixture]() {
+        return std::any_of(fixture.onlineUpdates.begin(), fixture.onlineUpdates.end(),
+            [](const i2r_rlc::control::OnlineCorrectionUpdate &update) {
+                return update.phase
+                    == i2r_rlc::control::OnlineCorrectionPhase::WaitingForInitialApproach;
+            });
+    }, 5000), "online O acknowledgement must wait for the P001 approach");
+    auto approachComplete = makeReachableState();
+    approachComplete.corflag = 2;
+    approachComplete.detflag = 2;
+    fixture.runtime.publishRobotState(approachComplete);
+    ok &= expectTrue(waitUntil([&fixture]() {
+        return std::any_of(fixture.onlineUpdates.begin(), fixture.onlineUpdates.end(),
+            [](const i2r_rlc::control::OnlineCorrectionUpdate &update) {
+                return update.phase
+                    == i2r_rlc::control::OnlineCorrectionPhase::WaitingForOnlineStart;
+            });
+    }), "P001 ENDDET must precede the online STARTCOR window");
+    auto onlineStart = makeReachableState();
+    onlineStart.corflag = 1;
+    onlineStart.detflag = 1;
+    fixture.runtime.publishRobotState(onlineStart);
     const bool resumed = waitUntil([&fixture]() {
             return std::any_of(
                 fixture.onlineUpdates.begin(),
@@ -905,7 +997,18 @@ bool testOnlineInternalPauseKeepsSession()
         }, 5000);
     ok &= expectTrue(
         resumed,
-        "online O acknowledgement should resume Vision in the same run");
+        "online O acknowledgement and STARTCOR should resume Vision in the same run");
+    if (!resumed) {
+        for (const auto &update : fixture.onlineUpdates) {
+            std::cerr << "pause fixture phase=" << static_cast<int>(update.phase)
+                      << " success=" << update.succeeded << " message="
+                      << update.message << '\n';
+        }
+        std::lock_guard<std::mutex> lock(fixture.robot->mutex);
+        for (const auto command : fixture.robot->commands) {
+            std::cerr << "pause fixture command=" << static_cast<int>(command) << '\n';
+        }
+    }
 
     fixture.runtime.publishCameraFrame(makeFrame(811));
     ok &= expectTrue(

@@ -36,6 +36,8 @@
 #include <vector>
 
 #include <QObject>
+#include <QElapsedTimer>
+#include <QSize>
 #include <QString>
 #include <QStringList>
 #include <QTimer>
@@ -257,8 +259,10 @@ private:
     bool makeObservation(
         qint64 frameId,
         digital_twin::DigitalTwinVisionLaserObservation *observation);
-    quint64 m_diagnosticFrameCount = 0;
-    quint64 m_diagnosticImageCount = 0;
+    COnlineVisionImageSampling m_diagnosticImageSampling;
+    quint64 m_diagnosticImageSamplingSessionId = 0;
+    /// @brief 仅诊断节流使用的本机单调时间；不参与帧/会话关联身份。
+    QElapsedTimer m_diagnosticImageSamplingClock;
     RuntimeTrackingOptions m_options;
     vision::WeldProjectionContext m_projectionContext;
     robot_comm::RobotState m_robotState;
@@ -328,6 +332,9 @@ public:
         bool hasVerifiedPose = false;
         /// @brief false 表示恢复目标仍是初始可信基线，尚无新帧几何验收的修正。
         bool verifiedByIndependentObservation = false;
+        /// @brief 当前命令已回读的工作位姿，与几何可信位姿分离；用于下一候选外部修改检查。
+        bool hasConfirmedPose = false;
+        localization::RigidTransform confirmedParentFromWorkpiece;
         bool hasPendingPose = false;
         bool pendingPoseConfirmed = false;
         bool rollbackAttempted = false;
@@ -352,7 +359,13 @@ public:
         const std::vector<localization::Point3D_mm> &points);
     /** @brief 仅独立新帧几何验证通过后调用；epoch 必须仍有效且匹配 pending。 */
     digital_twin::DigitalTwinCommandResult markLocalRegistrationVerified(quint64 epoch);
-    /** @brief 验证失败时显式恢复可信位姿；停止/取消只撤销 epoch，不自动写设备。 */
+    /**
+     * @brief 正式在线后验失败/超时后只读确认并保留当前位姿，解除pending以继续采样。
+     * @details 不发送SET、不晋升几何可信、不重置初始基线或累计预算；未知写入拒绝结案。
+     * 仅RobotSim worker线程调用，epoch、场景身份及机器人状态须仍有效。
+     */
+    digital_twin::DigitalTwinCommandResult retainLocalRegistrationCorrection(quint64 epoch);
+    /** @brief 受控显式恢复接口；在线纠偏不再调用，停止/取消也不自动写设备。 */
     digital_twin::DigitalTwinCommandResult rollbackLocalRegistrationCorrection(quint64 epoch);
     /** @brief 返回归档所需的事务值对象；仅 worker 线程调用。 */
     LocalRegistrationSafetySnapshot localRegistrationSafetySnapshot() const;
@@ -445,9 +458,10 @@ private:
     digital_twin::DigitalTwinCommandResult applyWorkpieceCorrection(
         const localization::RigidTransform &virtualToRealCorrection,
         quint64 epoch);
-    /// @brief 同线程执行验证晋升/显式恢复，共享身份、外部修改和代次门禁。
-    digital_twin::DigitalTwinCommandResult verifyOrRestoreLocalRegistration(
-        quint64 epoch, bool restore);
+    enum class LocalRegistrationCompletion { Verify, Retain, Restore };
+    /// @brief 同线程结案；保留只读、几何晋升和旧显式恢复共享严格事务身份检查。
+    digital_twin::DigitalTwinCommandResult completeLocalRegistrationTransaction(
+        quint64 epoch, LocalRegistrationCompletion completion);
     /// @brief 在写入前检查累计与关键点预算；不访问设备，不把候选晋升为可信位姿。
     digital_twin::DigitalTwinCommandResult checkLocalRegistrationCandidate(
         const localization::RigidTransform &current,
@@ -557,6 +571,8 @@ public:
     explicit COnlineCorrectionWorkerAdapter(QObject *parent = nullptr);
 
 public slots:
+    /// @brief 协调器在开始会话时按队列设置；只为目标发布附加会话身份。
+    void setControlSessionId(quint64 sessionId);
     void configure(const RuntimeOnlineCorrectionConfiguration &configuration);
     /// @brief 配置在线控制器并返回轨迹与 RBCALIB 是否均可用于本轮启动。
     bool configureForStart(
@@ -594,6 +610,7 @@ private:
     void reportRecordingFailure(const QString &context);
 
     control::COnlineCorrectionController m_controller;
+    quint64 m_controlSessionId = 0;
     robot_comm::RobotState m_robotState;
     RuntimeOnlineCorrectionConfiguration m_configuration;
     vision::PositionerCalibration m_positionerCalibration;

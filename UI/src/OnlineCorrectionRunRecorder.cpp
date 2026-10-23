@@ -100,6 +100,13 @@ QString boolText(const bool value)
     return value ? QStringLiteral("1") : QStringLiteral("0");
 }
 
+/** @brief 记录层防止新增辅助来源因调用方漏标而被归档为独立实测。 */
+bool estimatedPoint(const RuntimeTrackingResult &result)
+{
+    return result.sample.estimated
+        || result.pointSource == vision::OnlineSeamPointSource::GuidedEstimate;
+}
+
 QString numberText(const double value, const int precision = 6)
 {
     return QString::number(value, 'f', precision);
@@ -142,6 +149,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
     m_visionDiagnosticOptions = configuration.visionDiagnostics;
     m_visionDiagnosticCount = 0;
     m_imageSubmissionCount = 0;
+    m_imageBucketSubmissionCounts = {};
     m_imageErrorReported = false;
     m_active = false;
     m_sessionDirectory.clear();
@@ -220,7 +228,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
                 "vision_y_mm\tvision_z_mm\tgap_width_mm\tseam_index\tdx_um\t"
                 "dy_um\tdz_um\tspeed_override\tspeed_mode\tonline_end_flag\t"
                 "sent\tresponse_received\tcompleted\terror_code\trequest\t"
-                "response\tmessage\n"))
+                "response\tmessage\testimated\tpoint_source\tdegraded_frames\n"))
         && createSessionFile(
             QString::fromLatin1(kActualRobotPathFileName),
             QStringLiteral(
@@ -238,7 +246,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
         && createSessionFile(
             QString::fromLatin1(kIcpPointsFileName),
             QStringLiteral("batch_index\tkind\tpoint_index\tx_mm\ty_mm\tz_mm\tvalid\t"
-                           "gap_width_mm\tseam_index\n"))
+                           "gap_width_mm\tseam_index\testimated\n"))
         && createSessionFile(
             QString::fromLatin1(kFollowTargetsFileName),
             QStringLiteral(
@@ -265,7 +273,25 @@ bool COnlineCorrectionRunRecorder::beginSession(
         "positioner_tcp_x_mm\tpositioner_tcp_y_mm\tpositioner_tcp_z_mm\trobot_base_x_mm\trobot_base_y_mm\trobot_base_z_mm\tstation_base_x_mm\tstation_base_y_mm\t"
         "station_base_z_mm\trobot_x_mm\trobot_y_mm\trobot_z_mm\trobot_rx_deg\trobot_ry_deg\trobot_rz_deg\ts1_deg\t"
         "s2_deg\ttraflag\tcorflag\tdetflag\tposflag\tjob_line\tsource_image\tenhanced_image\t"
-        "image_request_status\tmessage\n"))) {
+        "image_request_status\timage_sample_bucket\tmessage\t"
+        "geometry_enabled\tgeometry_attempted\tgeometry_horizontal_valid\tgeometry_valid\tgeometry_status\t"
+        "geometry_x_px\tgeometry_y_px\tgeometry_left_x_px\tgeometry_left_y_px\tgeometry_right_x_px\tgeometry_right_y_px\t"
+        "geometry_support_ratio\tgeometry_fit_rms_px\tgeometry_x_platform_width_px\tgeometry_height_jump_px\t"
+        "geometry_quality_score\tgeometry_left_support_columns\tgeometry_right_support_columns\tgeometry_elapsed_ms\t"
+        "coarse_final_x_px\tcoarse_final_y_px\tgeometry_ambiguous_column_ratio\tpoint_source\tdegraded_frames\ttransition_limited\testimated\t"
+        "guided_attempted\tguided_valid\tguided_has_trusted_anchor\tguided_prediction_budget_valid\t"
+        "guided_shoulder_support\tguided_gap_center_supported\tguided_ambiguous\tguided_raw_jump_rejected\t"
+        "guided_degraded_frames\tguided_anchor_age_ms\tguided_reference_travel_px\t"
+        "guided_left_support_columns\tguided_right_support_columns\tguided_ambiguous_columns\tguided_max_branch_rms_px\t"
+        "guided_prediction_x_px\tguided_prediction_y_px\tguided_x_px\tguided_y_px\tworkpiece_pose_revision\t"
+        "online_observation_fusion_enabled\traw_geometry_horizontal_valid\traw_geometry_valid\traw_geometry_status\t"
+        "raw_geometry_x_px\traw_geometry_y_px\tcoarse_observation_quality\tcoarse_observation_used\t"
+        "observation_weight_x\tobservation_weight_y\tguided_reacquisition_pending\tguided_reacquired\t"
+        "guided_reacquisition_blocked_previous_branch\tguided_reacquisition_frames\t"
+        "guided_image_continuity_active\tguided_image_observation_quality\tguided_model_translation_suppressed\t"
+        "kcf_online_observation_mode\tkcf_training_deferred\tkcf_training_committed\t"
+        "geometry_has_branch_directions\tgeometry_left_slope\tgeometry_right_slope\tkcf_real_search_fallback_used\t"
+        "image_measurement_output_enabled\timage_observation_accepted\timage_search_expanded\n"))) {
             if (errorMessage != nullptr) *errorMessage = m_lastError;
             return false;
         }
@@ -298,13 +324,15 @@ bool COnlineCorrectionRunRecorder::beginSession(
     m_active = true;
     const bool summaryWritten =
         appendSummary(QStringLiteral("session_state"), QStringLiteral("running"))
-        && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("1"))
+        && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("7"))
         && appendSummary(QStringLiteral("vision_diagnostics_enabled"), boolText(m_visionDiagnosticOptions.enabled))
         && appendSummary(QStringLiteral("vision_images_enabled"), boolText(m_visionDiagnosticOptions.imagesEnabled))
         && appendSummary(QStringLiteral("vision_image_sample_every_n"), QString::number(m_visionDiagnosticOptions.imageSampleEveryN))
         && appendSummary(QStringLiteral("vision_max_image_pairs"), QString::number(m_visionDiagnosticOptions.maxImagePairs))
         && appendSummary(QStringLiteral("vision_max_image_bytes"), QString::number(m_visionDiagnosticOptions.maxImageBytes))
-        && appendSummary(QStringLiteral("icp_diagnostics_schema"), QStringLiteral("1"))
+        && appendSummary(QStringLiteral("vision_image_sampling_policy"),
+                         QStringLiteral("startup/online_sampling_early/middle/late/anomaly=3/6/6/6/9; quadratic_backoff; anomaly_minimum_interval_ms=60000; raw_deviation_px=10; layers_are_not_physical_seam_segments"))
+        && appendSummary(QStringLiteral("icp_diagnostics_schema"), QStringLiteral("2"))
         && appendSummary(QStringLiteral("start_time"), timestampText())
         && appendSummary(
             QStringLiteral("start_timestamp_ms"),
@@ -417,7 +445,8 @@ bool COnlineCorrectionRunRecorder::recordTrackingResult(
         optionalNumberText(result.sample.gapWidthMm),
         QString::number(result.simulatedSeamIndex),
         {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
-        sanitizeField(result.message)
+        sanitizeField(result.message), boolText(estimatedPoint(result)),
+        QString::number(static_cast<int>(result.pointSource)), QString::number(result.degradedFrames)
     };
     const bool written = appendFields(
         QString::fromLatin1(kRealtimeCorrectionFileName), fields);
@@ -461,10 +490,11 @@ bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
         fields << (valid ? numberText(point.x) : QString())
                << (valid ? numberText(point.y) : QString());
     };
-    addImagePoint(algorithm.simulatedPoint, algorithm.attempted);
+    addImagePoint(algorithm.simulatedPoint, algorithm.simulatedPointAvailable);
     addImagePoint(algorithm.responsePoint, tracker.completed);
     addImagePoint(algorithm.beforeFusionPoint, tracker.completed);
-    addImagePoint(algorithm.finalPoint, tracker.completed);
+    addImagePoint(hasContext ? algorithm.finalPoint
+        : cv::Point2d(result.imageXPixel, result.imageYPixel), result.valid);
     fields << (tracker.hasResponse ? numberText(tracker.responsePeak, 12) : QString());
     for (const double value : {tracker.normalizedPeak, tracker.observationNoise,
                               tracker.gainX, tracker.gainY, 1.0 - tracker.gainX, 1.0 - tracker.gainY}) {
@@ -496,11 +526,21 @@ bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
     if (!m_imageWriter) {
         imageStatus = QStringLiteral("disabled");
     } else if (!diagnostic.sourceImage.isNull() && !diagnostic.enhancedImage.isNull()) {
-        if (m_imageSubmissionCount < static_cast<quint64>(m_visionDiagnosticOptions.maxImagePairs)) {
+        const int bucket = diagnostic.imageSampleBucket;
+        const bool stageMatches = bucket >= 0 && bucket < 5
+            && ((bucket == 0 && !result.correlation.onlineControlWindowActive)
+                || (bucket > 0 && result.correlation.onlineControlWindowActive));
+        if (!stageMatches) {
+            imageStatus = QStringLiteral("invalid_sampling_context");
+        } else if (m_imageSubmissionCount < static_cast<quint64>(m_visionDiagnosticOptions.maxImagePairs)
+            && m_imageBucketSubmissionCounts[bucket]
+                < COnlineVisionImageSampling::pairBudget(m_visionDiagnosticOptions, bucket)) {
             const QString stem = QStringLiteral("sample_%1_session_%2_frame_%3")
                 .arg(m_visionDiagnosticCount).arg(result.correlation.sessionId).arg(result.frameId);
-            imageStatus = m_imageWriter->submit(stem, diagnostic.sourceImage, diagnostic.enhancedImage);
+            imageStatus = m_imageWriter->submit(stem, diagnostic.sourceImage, diagnostic.enhancedImage,
+                bucket, COnlineVisionImageSampling::byteBudget(m_visionDiagnosticOptions, bucket));
             ++m_imageSubmissionCount;
+            ++m_imageBucketSubmissionCounts[bucket];
             if (imageStatus == QStringLiteral("queued")) {
                 sourcePath = QStringLiteral("vision_images/%1_source.png").arg(stem);
                 enhancedPath = QStringLiteral("vision_images/%1_enhanced.png").arg(stem);
@@ -509,7 +549,75 @@ bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
             imageStatus = QStringLiteral("pair_limit");
         }
     }
-    fields << sourcePath << enhancedPath << imageStatus << sanitizeField(result.message);
+    fields << sourcePath << enhancedPath << imageStatus
+           << (diagnostic.imageSampleBucket >= 0 ? QString::number(diagnostic.imageSampleBucket) : QString())
+           << sanitizeField(result.message);
+    const auto &geometry = algorithm.refinement;
+    fields << boolText(algorithm.seamRefinementEnabled)
+           << boolText(algorithm.refinementAttempted)
+           << boolText(geometry.horizontalValid) << boolText(geometry.valid)
+           << (algorithm.refinementAttempted
+               ? QString::number(static_cast<int>(geometry.status)) : QString());
+    addImagePoint(geometry.point, geometry.valid);
+    addImagePoint(geometry.leftEndpoint, geometry.horizontalValid);
+    addImagePoint(geometry.rightEndpoint, geometry.horizontalValid);
+    for (const double value : {geometry.supportRatio, geometry.fitRmsPixel,
+                              geometry.xUncertaintyPixel, geometry.heightJumpPixel,
+                              geometry.confidence}) {
+        fields << (algorithm.refinementAttempted ? numberText(value) : QString());
+    }
+    fields << (algorithm.refinementAttempted ? QString::number(geometry.leftSupportColumns) : QString())
+           << (algorithm.refinementAttempted ? QString::number(geometry.rightSupportColumns) : QString())
+           << (algorithm.refinementAttempted ? numberText(algorithm.refinementElapsedMs) : QString());
+    addImagePoint(algorithm.coarseFinalPoint, tracker.completed);
+    fields << (algorithm.refinementAttempted ? numberText(geometry.ambiguousColumnRatio) : QString());
+    fields << QString::number(static_cast<int>(result.pointSource))
+           << QString::number(result.degradedFrames)
+           << boolText(algorithm.continuity.transitionLimited) << boolText(estimatedPoint(result));
+    const auto &guided = algorithm.guided;
+    fields << boolText(guided.attempted) << boolText(guided.valid)
+           << boolText(guided.hasTrustedAnchor) << boolText(guided.predictionBudgetValid)
+           << boolText(guided.hasRawShoulderSupport) << boolText(guided.localGapCenterSupported)
+           << boolText(guided.ambiguous) << boolText(guided.rawJumpRejected)
+           << QString::number(guided.degradedFrames)
+           << QString::number(guided.anchorAgeMs) << numberText(guided.referenceTravelPixel)
+           << QString::number(guided.leftSupportColumns) << QString::number(guided.rightSupportColumns)
+           << QString::number(guided.ambiguousColumns) << numberText(guided.maximumBranchRmsPixel);
+    addImagePoint(guided.prediction, guided.valid);
+    addImagePoint(guided.point, guided.valid);
+    fields << QString::number(result.correlation.workpiecePoseRevision);
+    // 原图候选与接受后的几何分别保存，避免时序否决掩盖本帧真实检测。
+    const auto &rawGeometry = algorithm.rawRefinement;
+    fields << boolText(algorithm.onlineObservationFusionEnabled)
+           << boolText(rawGeometry.horizontalValid) << boolText(rawGeometry.valid)
+           << (algorithm.refinementAttempted
+               ? QString::number(static_cast<int>(rawGeometry.status)) : QString());
+    addImagePoint(rawGeometry.point, rawGeometry.valid);
+    fields << (algorithm.onlineObservationFusionEnabled
+                   ? numberText(algorithm.coarseObservationQuality) : QString())
+           << boolText(algorithm.coarseObservationUsed)
+           << (algorithm.onlineObservationFusionEnabled
+                   ? numberText(algorithm.continuity.observationWeightX) : QString())
+           << (algorithm.onlineObservationFusionEnabled
+                   ? numberText(algorithm.continuity.observationWeightY) : QString())
+           << boolText(guided.reacquisitionPending) << boolText(guided.reacquired)
+           << boolText(guided.reacquisitionBlockedByPreviousBranch)
+           << QString::number(guided.reacquisitionFrames)
+           << boolText(guided.imageContinuityActive) << numberText(guided.imageObservationQuality)
+           << boolText(guided.modelTranslationSuppressed)
+           << boolText(algorithm.tracker.onlineObservationMode)
+           << boolText(algorithm.tracker.trainingDeferred)
+           << boolText(algorithm.tracker.trainingCommitted)
+           << boolText(algorithm.refinement.valid && algorithm.refinement.hasBranchDirections)
+           << (algorithm.refinement.valid && algorithm.refinement.hasBranchDirections
+               ? numberText(algorithm.refinement.leftSlope) : QString())
+           << (algorithm.refinement.valid && algorithm.refinement.hasBranchDirections
+               ? numberText(algorithm.refinement.rightSlope) : QString())
+           << boolText(algorithm.realSearchFallbackUsed)
+           // 测量身份是运行链值对象的一部分，不能因可选诊断关闭而丢失。
+           << boolText(result.imageMeasurementOutputEnabled)
+           << boolText(result.imageObservationAccepted)
+           << boolText(algorithm.imageSearchExpanded);
     const bool written = appendFields(QString::fromLatin1(kVisionDiagnosticFileName), fields);
     if (m_imageWriter && !m_imageErrorReported && !m_imageWriter->lastError().isEmpty()) {
         m_imageErrorReported = true;
@@ -738,29 +846,29 @@ bool COnlineCorrectionRunRecorder::recordIcpDiagnostics(
         const auto appendPoint = [&pointRows, &batchIndex](
             const QString &kind, std::size_t index,
             const control::OnlineCorrectionPoint &point,
-            const std::optional<float> &gap, const QString &seam) {
+            const std::optional<float> &gap, const QString &seam, const QString &estimated) {
             const QStringList row{
                 batchIndex, kind, QString::number(static_cast<qulonglong>(index)),
                 numberText(point.xMm), numberText(point.yMm), numberText(point.zMm),
-                boolText(point.valid), optionalNumberText(gap), seam
+                boolText(point.valid), optionalNumberText(gap), seam, estimated
             };
             pointRows += row.join('\t').toUtf8() + '\n';
         };
         for (std::size_t index = 0; index < batch.fitPoints.size(); ++index) {
-            appendPoint(QStringLiteral("fit_input"), index, batch.fitPoints[index], {}, {});
+            appendPoint(QStringLiteral("fit_input"), index, batch.fitPoints[index], {}, {}, {});
         }
         for (std::size_t index = 0; index < batch.modelPoints.size(); ++index) {
-            appendPoint(QStringLiteral("reference_model"), index, batch.modelPoints[index], {}, {});
+            appendPoint(QStringLiteral("reference_model"), index, batch.modelPoints[index], {}, {}, {});
         }
         for (std::size_t index = 0; index < batch.pendingSamples.size(); ++index) {
             const auto &sample = batch.pendingSamples[index];
             appendPoint(QStringLiteral("raw_pending"), index, sample.point,
-                        sample.gapWidthMm, QString::number(sample.simulatedSeamIndex));
+                        sample.gapWidthMm, QString::number(sample.simulatedSeamIndex), boolText(sample.estimated));
         }
         for (std::size_t index = 0; index < batch.releasedSamples.size(); ++index) {
             const auto &sample = batch.releasedSamples[index];
             appendPoint(QStringLiteral("released_target"), index, sample.point,
-                        sample.gapWidthMm, QString::number(sample.simulatedSeamIndex));
+                        sample.gapWidthMm, QString::number(sample.simulatedSeamIndex), boolText(sample.estimated));
         }
     }
     if (!batchRows.isEmpty()) {
@@ -926,6 +1034,12 @@ bool COnlineCorrectionRunRecorder::appendFields(
     const QString &fileName,
     const QStringList &fields)
 {
+    // Non-vision events have no sample provenance; keep the appended columns empty.
+    if (fileName == QString::fromLatin1(kRealtimeCorrectionFileName) && fields.size() == 23) {
+        auto row = fields;
+        row << QString() << QString() << QString();
+        return appendData(fileName, row.join('\t').toUtf8() + '\n');
+    }
     return appendData(fileName, fields.join('\t').toUtf8() + '\n');
 }
 

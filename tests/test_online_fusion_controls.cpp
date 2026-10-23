@@ -193,6 +193,54 @@ void testInvalidOptionsAndJumpGuard()
         "manual weight bypassed original fusion jump guard");
 }
 
+void testIndependentOnlineObservationAndDeferredTraining()
+{
+    CKcfTracker tracker(false, true, false, false);
+    initialize(tracker);
+    tracker.setFusionOptions({KcfFusionMode::ManualWeight, 0.25});
+    tracker.setOnlineObservationMode(true);
+    const cv::Mat before = tracker.m_tmpl.clone();
+    setPrior(tracker, 80.0, 66.0);
+    tracker.update(makeFrame(2, 1));
+    auto diagnostic = tracker.lastUpdateDiagnostic();
+    require(diagnostic.onlineObservationMode && diagnostic.trainingDeferred
+        && !diagnostic.trainingCommitted && diagnostic.fusionApplied
+        && std::abs(diagnostic.gainX - 0.75) < 1e-12
+        && tracker.m_roi == diagnostic.beforeFusionRoi
+        && cv::norm(before, tracker.m_tmpl, cv::NORM_INF) < 1e-12,
+        "online search lost raw ROI, existing fusion gain, or deferred template training");
+    tracker.commitOnlineObservationTraining(false);
+    require(cv::norm(before, tracker.m_tmpl, cv::NORM_INF) < 1e-12
+        && !tracker.lastUpdateDiagnostic().trainingCommitted,
+        "rejected online image polluted the KCF template");
+    tracker.setFusionOptions({KcfFusionMode::ManualWeight, 1.0});
+    setPrior(tracker, 140.0, 120.0);
+    auto changed = makeFrame(3, 1);
+    cv::rectangle(changed, cv::Rect(76, 64, 8, 7), cv::Scalar(255), -1);
+    tracker.update(changed);
+    diagnostic = tracker.lastUpdateDiagnostic();
+    require(diagnostic.fusionJumpRejected && diagnostic.hasResponse && diagnostic.completed
+        && tracker.m_roi == diagnostic.beforeFusionRoi,
+        "an inaccurate simulated prior suppressed the independent online search ROI");
+    tracker.commitOnlineObservationTraining(true);
+    require(tracker.lastUpdateDiagnostic().trainingCommitted
+        && cv::norm(before, tracker.m_tmpl, cv::NORM_INF) > 1e-9,
+        "accepted original-image evidence failed to commit the pending real template");
+    const cv::Mat committed = tracker.m_tmpl.clone();
+    tracker.commitOnlineObservationTraining(true);
+    require(cv::norm(committed, tracker.m_tmpl, cv::NORM_INF) < 1e-12,
+        "repeated online training commit changed the model twice");
+    tracker.setOnlineObservationMode(false);
+    tracker.setFusionOptions({KcfFusionMode::ManualWeight, 0.5});
+    setPrior(tracker, 75.0, 64.0);
+    tracker.update(makeFrame(4, 2));
+    diagnostic = tracker.lastUpdateDiagnostic();
+    require(!diagnostic.onlineObservationMode && !diagnostic.trainingDeferred
+        && tracker.m_roi == diagnostic.finalRoi
+        && cv::norm(committed, tracker.m_tmpl, cv::NORM_INF) > 1e-9,
+        "default tracker path stopped training or retaining its original fused ROI");
+}
+
 } // namespace
 
 int main()
@@ -205,6 +253,7 @@ int main()
         testSwitchWithoutTemplateReset();
         testManualZeroCoordinate();
         testInvalidOptionsAndJumpGuard();
+        testIndependentOnlineObservationAndDeferredTraining();
         std::puts("online fusion controls passed");
         return 0;
     }

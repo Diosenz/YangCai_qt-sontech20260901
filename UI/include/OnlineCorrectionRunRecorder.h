@@ -8,6 +8,7 @@
 #ifndef I2R_RLC_UI_ONLINE_CORRECTION_RUN_RECORDER_H
 #define I2R_RLC_UI_ONLINE_CORRECTION_RUN_RECORDER_H
 
+#include <array>
 #include <memory>
 
 #include <QByteArray>
@@ -84,6 +85,7 @@ private:
     std::unique_ptr<CTrackingDiagnosticImageWriter> m_imageWriter;
     quint64 m_visionDiagnosticCount = 0;
     quint64 m_imageSubmissionCount = 0;
+    std::array<int, 5> m_imageBucketSubmissionCounts{};
     bool m_imageErrorReported = false;
 
     /// @brief 批次点列合并写入，避免逐点开关文件；仅由在线 worker 调用。

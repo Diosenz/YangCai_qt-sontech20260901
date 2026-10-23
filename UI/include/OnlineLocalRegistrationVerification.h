@@ -39,6 +39,8 @@ public:
         const localization::Point3D_mm &realPoint,
         const localization::Point3D_mm &virtualPoint)
     {
+        // 重复、旧帧及终态调用都不产生新的可信历史样本。
+        m_lastObservationGood = false;
         if (frameId <= m_lastFrameId) { return m_decision; }
         m_lastFrameId = frameId;
         if (m_decision != Decision::Waiting) { return m_decision; }
@@ -56,6 +58,7 @@ public:
             && std::isfinite(m_previousErrorMm)
             && m_currentErrorMm <= m_options.maximumErrorMm
             && m_currentErrorMm <= m_previousErrorMm + m_options.maximumWorseningMm;
+        m_lastObservationGood = good;
         if (good) {
             ++m_goodFrames;
             m_badFrames = 0;
@@ -72,9 +75,20 @@ public:
         return m_decision;
     }
 
+    /** @brief 记录已消费但曝光状态过旧的帧；打断连续证据而不判为恶化。 */
+    void skipObservation(qint64 frameId)
+    {
+        m_lastObservationGood = false;
+        if (m_decision != Decision::Waiting || frameId <= m_lastFrameId) { return; }
+        m_lastFrameId = frameId;
+        m_goodFrames = 0;
+    }
+
     Decision decision() const { return m_decision; }
     double currentErrorMm() const { return m_currentErrorMm; }
     double previousErrorMm() const { return m_previousErrorMm; }
+    /// @brief 最近一份不同新帧是否通过冻结的验收门槛，供可信历史采样。
+    bool lastObservationGood() const { return m_lastObservationGood; }
 
 private:
     static double distance(const localization::Point3D_mm &a,
@@ -91,6 +105,7 @@ private:
     Decision m_decision = Decision::Waiting;
     double m_currentErrorMm = 0.0;
     double m_previousErrorMm = 0.0;
+    bool m_lastObservationGood = false;
 };
 
 } // namespace i2r_rlc::ui

@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -40,8 +40,8 @@ namespace i2r_rlc::vision {
 /**
  * @brief 图像点到焊接观测空间点的最小重建工具。
  *
- * 当前实现只做针孔相机射线与显式观测平面的求交，使用 Eigen 完成矩阵与向量
- * 计算；不依赖 HALCON，不访问真实相机、机器人或全局标定状态。
+ * 使用 legacy division 畸变、相机射线与显式激光平面求交，并提供已知空间点的
+ * 逆相机投影。使用 Eigen 完成刚体链路，不访问真实设备或全局标定状态。
  */
 class CWeldImageToSpaceProjector {
 public:
@@ -57,6 +57,20 @@ public:
         const WeldProjectionContext &context,
         WeldProjectionTargetFrame targetFrame =
             WeldProjectionTargetFrame::RobotBase);
+
+    /**
+     * @brief 将已知空间点沿完整相机链路反投影到像素，失败时 valid=false。
+     * @param spacePoint sourceFrame 中的空间点，单位 mm。
+     * @param context 当前曝光帧冻结的标定与机器人位姿。
+     * @param sourceFrame 输入空间点坐标系。
+     * @return legacy division 畸变模型主分支的像素；不保证点落在当前激光截面上。
+     *
+     * 用于业务目标的跨位姿过渡，不产生独立实测或当前截面交点。
+     */
+    static WeldImagePoint projectSpacePointToImage(
+        const WeldSpacePoint &spacePoint,
+        const WeldProjectionContext &context,
+        WeldProjectionTargetFrame sourceFrame);
 
     /**
      * @brief 按完整投影链路将 OpenCV 图像点转换为空间点。

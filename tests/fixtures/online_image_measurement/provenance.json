@@ -1,0 +1,16 @@
+[
+  {
+    "frameId": 1120,
+    "file": "frame_1120_source.png",
+    "source": "output/online_correction/20261023_152507_499/vision_images/sample_31_session_1_frame_1120_source.png",
+    "sha256": "9898C4827FC823AAFD0706708985F119F8FBF948BBF44752865CCC89D6F82F04",
+    "provenance": "Original archived raw image, byte-for-byte copy. No crop or enhancement. Visual fixture, not labeled physical ground truth."
+  },
+  {
+    "frameId": 2148,
+    "file": "frame_2148_source.png",
+    "source": "output/online_correction/20261023_152507_499/vision_images/sample_297_session_1_frame_2148_source.png",
+    "sha256": "4BF7FCEDA99AA8742E105396316780B4A199A48068E2A475D985CCF3052DCA61",
+    "provenance": "Original archived raw image, byte-for-byte copy. No crop or enhancement. Visual fixture, not labeled physical ground truth."
+  }
+]
