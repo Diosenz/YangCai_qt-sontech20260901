@@ -84,6 +84,7 @@ class EvidenceSession:
         self.budget_provenance_failures = []
         self.reference_mapping = None
         self.identity_history = None
+        self.reference_identity_conflict = False
         self.recovery_active = False
         self.recovery_count = 0
         self.recovery_candidate = None
@@ -92,6 +93,7 @@ class EvidenceSession:
     def _seed_continuation(self, frame):
         """新独立几何才重置预算；参考映射与真实锚点分开保存。"""
         self.travel = 0.0
+        self.reference_identity_conflict = False
         self.last_progress = progress_sample(frame)
         self.last_timestamp = frame.get('timestamp_ms')
         self.budget_provenance_failures = []
@@ -151,7 +153,10 @@ class EvidenceSession:
             if self.travel >= self.config['max_prediction_travel_mm']:
                 failures.append('travel_budget_exhausted')
         reference = reference_sample(frame)
-        if reference is None or self.reference_mapping is None:
+        if self.reference_identity_conflict:
+            failures.append('reference_identity_conflict')
+            result['reference_alignment']='identity_conflict'
+        elif reference is None or self.reference_mapping is None:
             failures.append('reference_geometry_unavailable')
         elif reference[0] != self.reference_mapping['revision']:
             mapping = self.reference_mapping
@@ -179,6 +184,8 @@ class EvidenceSession:
                 mapping['exposure'] = frame['frame_id']
         if self.reference_mapping is not None:
             predicted = self.reference_mapping['estimate']
+            if self.reference_identity_conflict:
+                predicted=result.get('identity_evidence',{}).get('reference_proposal_pixel',predicted)
             size = self.context_key[1] if self.context_key is not None else ()
             if (not finite_point(predicted) or len(size) != 2
                     or not 0 <= predicted[0] < size[0] or not 0 <= predicted[1] < size[1]):
@@ -197,9 +204,7 @@ class EvidenceSession:
     def _identity(self, frame, raw):
         """独立几何入锚前验收身份；外观与参考都不能自行建立可靠锚。"""
         reconstruction=raw.get('checkpoint_reconstruction')
-        if reconstruction is not None and not reconstruction['valid']:
-            return dict(geometry_accepted=False, appearance_accepted=False,
-                        reasons=['trusted_checkpoint_reconstruction_failed'])
+        seed_failed=reconstruction is not None and not reconstruction['valid']
         if self.identity_history is None:
             return dict(geometry_accepted=True, appearance_accepted=False, reasons=[],
                         status='initial_acquisition_without_prior_target')
@@ -209,7 +214,11 @@ class EvidenceSession:
         current=reference_sample(frame)
         if previous and current and previous[0]==current[0]:
             expected=[p+c-h for p,c,h in zip(expected,current[1],previous[1])]
-        return inspect_identity(self.identity_history,raw,expected,self.config)
+        evidence=inspect_identity(self.identity_history,raw,expected,self.config)
+        if seed_failed:
+            evidence.update(geometry_accepted=False,appearance_accepted=False)
+            evidence['reasons'].append('trusted_checkpoint_reconstruction_failed')
+        return evidence
 
     def _recovery_decision(self, frame, raw, result, fresh, geometry):
         """新几何先确认同一目标；过渡不更新锚点，也不为旧预测续期。"""
@@ -292,6 +301,8 @@ class EvidenceSession:
             self._account_exposure(frame)
         identity_evidence=self._identity(frame,raw)
         result['identity_evidence']=identity_evidence
+        if 'reference_motion_exceeds_identity_corridor' in identity_evidence.get('reasons',[]):
+            self.reference_identity_conflict = True
         geometry = (identity_evidence['geometry_accepted'] and raw.get('available') is True and raw.get('image_observation_accepted') is True
                     and raw.get('trust')=='independent_geometry' and raw.get('image_source')=='geometry'
                     and finite_point(raw.get('final_pixel')) and finite_point(raw.get('positioner_tcp_mm'),3))

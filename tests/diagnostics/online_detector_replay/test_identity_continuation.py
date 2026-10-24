@@ -83,11 +83,20 @@ class IdentityContinuationTests(unittest.TestCase):
 
     def test_relative_reference_cannot_authorize_far_similar_appearance_as_same_target(self):
         rows=self.run_sequence({'anchor':[(360,260,150)],
-            'lure':[(360,260,150),(210,330,255)]},
+            'lure':[(360,260,150),(210,330,255)], 'blank':[],
+            'returned-1':[(360,260,150)], 'returned-2':[(360,260,150)]},
             extra=lambda index,name: {'reference_point_at_exposure':[210,330]} if name=='lure' else {})
-        row=rows[-1]
-        self.assertFalse(row['source']=='appearance_tracking' and row['final_pixel'][0]<300,
-                         'a moved reference cannot authorize a far lookalike as the historical target')
+        row=rows[2]
+        self.assertFalse(row['available'],
+                         'a moved reference cannot drag the final KCF point to a far lookalike')
+        self.assertEqual(row['anchor']['frame_id'],2)
+        self.assertIn('reference_identity_conflict',row['prediction_failures'])
+        self.assertFalse(rows[3]['available'])
+        self.assertIn('reference_identity_conflict',rows[3]['prediction_failures'])
+        self.assertEqual(rows[3]['prediction_elapsed_ms'],200)
+        self.assertAlmostEqual(rows[3]['prediction_travel_mm'],.2)
+        self.assertTrue(rows[-1]['can_independent_validate'])
+        self.assertEqual(rows[-1]['anchor']['frame_id'],6)
 
 
     def test_initial_confirmation_requires_consistent_target_before_first_anchor(self):

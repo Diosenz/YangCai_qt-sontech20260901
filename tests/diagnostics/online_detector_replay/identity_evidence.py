@@ -31,16 +31,19 @@ def _binary():
 def inspect_identity(historical, raw, expected, config):
     """仅接收可靠像素历史、当前原图及非真值相对参考，不读取评估标签。"""
     candidate=raw.get('raw_measurement_pixel')
+    reference_proposal=list(expected)
     reference_displacement=math.dist(expected,historical['pixel'])
     reference_motion_rejected=reference_displacement > config['identity_corridor_pixel']
     if reference_motion_rejected:
         expected=list(historical['pixel'])
-    evidence={'expected_pixel':expected, 'candidate_pixel':candidate, 'reasons':[],
+    evidence={'expected_pixel':expected, 'reference_proposal_pixel':reference_proposal, 'candidate_pixel':candidate, 'reasons':[],
               'parameters_field_validated':False, 'geometry_accepted':False,
               'appearance_accepted':False, 'appearance_pixel':None}
     request={'historical_image':historical['image'], 'historical_pixel':historical['pixel'],
              'current_image':raw.get('image_png_base64'), 'expected_pixel':expected,
              'candidate_pixel':candidate, 'corridor_pixel':int(config['identity_corridor_pixel'])}
+    if reference_motion_rejected:
+        evidence['reasons'].append('reference_motion_exceeds_identity_corridor')
     process=subprocess.run([str(_binary())],input=json.dumps(request),capture_output=True,text=True)
     if process.returncode:
         evidence['reasons'].append('identity_pixels_unavailable')
@@ -60,8 +63,6 @@ def inspect_identity(historical, raw, expected, config):
         evidence['reasons'].append('multiple_plausible_historical_matches')
     if candidate and math.dist(candidate,evidence['matched_pixel'])>4:
         evidence['reasons'].append('candidate_disagrees_with_historical_match')
-    if reference_motion_rejected:
-        evidence['reasons'].append('reference_motion_exceeds_identity_corridor')
     evidence['geometry_accepted']=bool(candidate and not evidence['reasons'])
     # KCF 的真实响应和当前图像的局部历史匹配同时成立才形成外观支持；没有空间资格。
     peak=raw.get('kcf_response_peak')
