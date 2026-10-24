@@ -143,13 +143,28 @@ def render(report):
                 row['evaluation']['scenario'],row['source'],row['final_pixel'],row['evaluation']['final_pixel_error'],
                 row['released_positioner_tcp_mm'],row['tcp_comparison']['tcp_record_id'],row['message']]
         rows.append('<tr>'+''.join('<td>'+html.escape(str(v))+'</td>' for v in values)+'</tr>')
-    return '''<!doctype html><meta charset="utf-8"><title>组合离线回放</title>
-<style>body{font:15px system-ui;margin:24px;background:#f7f8fa;color:#18212b}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccd2db;padding:7px;text-align:left}pre{white-space:pre-wrap}tr:nth-child(even){background:#edf1f6}a{color:#1557a5}</style>
+    counts=report['summary']
+    def percentage(key):
+        value=counts[key]
+        return f'{value:.2%}' if value is not None else '未知'
+    concise=(f"共 {counts['total_records']} 条：实测 {counts['measured_records']}（{percentage('measured_ratio')}），"
+             f"估计 {counts['estimated_records']}（{percentage('estimated_ratio')}），"
+             f"不可用 {counts['unavailable_records']}（{percentage('unavailable_ratio')}）。")
+    intervals=[]
+    for interval in counts['failure_intervals']:
+        first,last=interval['first_record_index']+1,interval['last_record_index']+1
+        label=f'第 {first} 条' if first==last else f'第 {first}–{last} 条'
+        begin,end=interval['first_exposure_ms'],interval['last_exposure_ms']
+        timing=f'（{begin}–{end} ms）' if begin is not None and end is not None else '（曝光时间未知）'
+        intervals.append(label+timing)
+    failures='不可用区间：'+('；'.join(intervals) if intervals else '无')+'。全部输入均纳入分母。'
+    return '''<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>组合离线回放</title>
+<style>*{box-sizing:border-box}body{font:15px system-ui;margin:clamp(12px,3vw,24px);background:#f7f8fa;color:#18212b;overflow-wrap:anywhere}h1{font-size:clamp(22px,3vw,30px)}.summary{background:#edf1f6;border-radius:6px;padding:12px;line-height:1.6}.summary p{margin:0 0 6px}.table-scroll{max-width:100%;overflow-x:auto;border:1px solid #ccd2db}table{border-collapse:collapse;width:100%;min-width:1100px}td,th{border:1px solid #ccd2db;padding:7px;text-align:left;max-width:360px}pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;max-height:60vh;overflow:auto}details{margin-top:10px}summary{cursor:pointer}tr:nth-child(even){background:#edf1f6}a{color:#1557a5}</style>
 <h1>实测 KCF 为主：组合离线回放</h1>
 <p>实际 process → 身份/母材/恢复证据 → 空间资格 → 独立校验 → 实测参考 → 轨迹 ICP 对照。TCP仅为执行记录，合成TCP不是真值。现场最大横向偏差仍待定。</p>
 <p><a href="detector/viewer.html">原图与检测</a> · <a href="report.json">完整分层记录</a> · <a href="report.md">验收及生产清单</a> · <a href="reproducibility.json">版本/配置/哈希</a></p>
-<h2>全部输入统计</h2><pre>'''+html.escape(json.dumps(report['summary'],ensure_ascii=False,indent=2))+'''</pre>
-<h2>逐记录追溯</h2><table><thead><tr><th>序号</th><th>观测</th><th>曝光</th><th>时间ms</th><th>参考版本</th><th>评分场景</th><th>来源</th><th>最终像素</th><th>误差px</th><th>释放参考mm</th><th>后续同材料TCP</th><th>诊断</th></tr></thead><tbody>'''+''.join(rows)+'''</tbody></table>
+<h2>全部输入统计</h2><div class="summary"><p>'''+html.escape(concise)+'''</p><p>'''+html.escape(failures)+'''</p><details><summary>展开完整统计与分层误差</summary><pre>'''+html.escape(json.dumps(report['summary'],ensure_ascii=False,indent=2))+'''</pre></details></div>
+<h2>逐记录追溯</h2><p>表格可在下方区域横向滚动，完整字段保留。</p><div class="table-scroll" role="region" aria-label="逐记录追溯表" tabindex="0"><table><thead><tr><th>序号</th><th>观测</th><th>曝光</th><th>时间ms</th><th>参考版本</th><th>评分场景</th><th>来源</th><th>最终像素</th><th>误差px</th><th>释放参考mm</th><th>后续同材料TCP</th><th>诊断</th></tr></thead><tbody>'''+''.join(rows)+'''</tbody></table></div>
 <p>未知值保留None/null。缺少曝光、工件路径或材料位置时不配对；不按最近点或同时刻产生精度结论。候选参数未现场标定，无运动发送。</p>'''
 
 
