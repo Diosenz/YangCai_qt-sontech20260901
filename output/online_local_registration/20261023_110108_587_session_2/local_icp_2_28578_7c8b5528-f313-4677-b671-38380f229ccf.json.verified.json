@@ -1,0 +1,212 @@
+{
+    "auto_rollback_enabled": false,
+    "baseline_parent_from_workpiece": [
+        1,
+        2.8387241750647376e-17,
+        0,
+        -6.027105347861377e-20,
+        2.8387241750647376e-17,
+        1,
+        0,
+        3.867995486633852e-19,
+        0,
+        -3.3881317890172014e-21,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+    ],
+    "before_parent_from_workpiece": [
+        1,
+        2.8387241750647376e-17,
+        0,
+        -6.027105347861377e-20,
+        2.8387241750647376e-17,
+        1,
+        0,
+        3.867995486633852e-19,
+        0,
+        -3.3881317890172014e-21,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+    ],
+    "confirmed_parent_from_workpiece": [
+        0.9999852673851739,
+        0.005421728448225561,
+        0,
+        -2.910861953170426,
+        -0.005421728448225503,
+        0.9999852673851739,
+        0,
+        -4.336599492337679,
+        0,
+        -3.3881317890172014e-21,
+        1,
+        -3.187469959259033,
+        0,
+        0,
+        0,
+        1
+    ],
+    "cumulative_rotation_deg": 0.31101266938611705,
+    "cumulative_translation_mm": 6.118756181491247,
+    "current_pose_geometrically_verified": true,
+    "epoch": "26",
+    "has_confirmed_pose": true,
+    "has_pending_pose": false,
+    "maximum_keypoint_displacement_mm": 6.093880884427874,
+    "message": "独立新帧验证后，工件位姿已晋升为可信位姿。",
+    "parent_id": 1063,
+    "pending_parent_from_workpiece": [
+        0.9999852673851739,
+        0.005421728448225561,
+        0,
+        -2.910861953170426,
+        -0.005421728448225503,
+        0.9999852673851739,
+        0,
+        -4.336599492337679,
+        0,
+        -3.3881317890172014e-21,
+        1,
+        -3.187469959259033,
+        0,
+        0,
+        0,
+        1
+    ],
+    "pending_pose_confirmed": false,
+    "phase": "verified",
+    "post_write_samples": [
+        {
+            "accepted_observation": true,
+            "capture_time_ms": "1792753325719",
+            "counterfactual_previous_error_mm": 6.843341243669686,
+            "current_error_mm": 1.0063960909138525,
+            "frame_id": "28632",
+            "real_parent_mm": [
+                -90.42301346119928,
+                -110.69213895555833,
+                22.16361645904101
+            ],
+            "stability_protection_enabled": true,
+            "valid": true,
+            "virtual_parent_mm": [
+                -90.07050070722406,
+                -110.6823338788943,
+                23.106204232440973
+            ]
+        },
+        {
+            "accepted_observation": true,
+            "capture_time_ms": "1792753325818",
+            "counterfactual_previous_error_mm": 6.8292062999357865,
+            "current_error_mm": 0.9716272781192324,
+            "frame_id": "28635",
+            "real_parent_mm": [
+                -90.20801809032116,
+                -110.87994645513982,
+                22.199807317747116
+            ],
+            "stability_protection_enabled": true,
+            "valid": true,
+            "virtual_parent_mm": [
+                -89.85887033025308,
+                -110.85545069513454,
+                23.106204232441
+            ]
+        },
+        {
+            "accepted_observation": true,
+            "capture_time_ms": "1792753325950",
+            "counterfactual_previous_error_mm": 6.935572168653517,
+            "current_error_mm": 1.0424909804941844,
+            "frame_id": "28639",
+            "real_parent_mm": [
+                -90.11827014678477,
+                -111.078894089725,
+                22.15359791906269
+            ],
+            "stability_protection_enabled": true,
+            "valid": true,
+            "virtual_parent_mm": [
+                -89.70661170030392,
+                -110.97956645225972,
+                23.10620423244103
+            ]
+        }
+    ],
+    "retained_without_geometric_verification": false,
+    "rollback_attempted": false,
+    "scene_revision": "1",
+    "succeeded": true,
+    "verification_kind": "independent_seam",
+    "verified_by_independent_observation": true,
+    "verified_good_observations": [
+        {
+            "frame_id": "28632",
+            "real_parent_mm": [
+                -90.42301346119928,
+                -110.69213895555833,
+                22.16361645904101
+            ],
+            "virtual_parent_mm": [
+                -90.07050070722406,
+                -110.6823338788943,
+                23.106204232440973
+            ]
+        },
+        {
+            "frame_id": "28635",
+            "real_parent_mm": [
+                -90.20801809032116,
+                -110.87994645513982,
+                22.199807317747116
+            ],
+            "virtual_parent_mm": [
+                -89.85887033025308,
+                -110.85545069513454,
+                23.106204232441
+            ]
+        },
+        {
+            "frame_id": "28639",
+            "real_parent_mm": [
+                -90.11827014678477,
+                -111.078894089725,
+                22.15359791906269
+            ],
+            "virtual_parent_mm": [
+                -89.70661170030392,
+                -110.97956645225972,
+                23.10620423244103
+            ]
+        }
+    ],
+    "verified_parent_from_workpiece": [
+        0.9999852673851739,
+        0.005421728448225561,
+        0,
+        -2.910861953170426,
+        -0.005421728448225503,
+        0.9999852673851739,
+        0,
+        -4.336599492337679,
+        0,
+        -3.3881317890172014e-21,
+        1,
+        -3.187469959259033,
+        0,
+        0,
+        0,
+        1
+    ],
+    "workpiece_id": 1068,
+    "workpiece_pose_revision": "4"
+}
