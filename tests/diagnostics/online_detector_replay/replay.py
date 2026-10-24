@@ -69,6 +69,8 @@ document.getElementById('detail').textContent=JSON.stringify(r,null,2);}slider.o
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('manifest', type=pathlib.Path)
+    parser.add_argument('--evidence', action='store_true', help='apply offline evidence contract; not production control')
+    parser.add_argument('--policy-config', type=pathlib.Path)
     parser.add_argument('--output', type=pathlib.Path, required=True)
     parser.add_argument('--cache', type=pathlib.Path, default=ROOT/'output/analysis/detector_replay_build')
     args = parser.parse_args()
@@ -80,6 +82,13 @@ def main():
         raise RuntimeError(result.stderr)
     rows = [json.loads(line) for line in result.stdout.splitlines()]
     inputs = [json.loads(line) for line in args.manifest.read_text().splitlines() if line.strip()]
+    if args.policy_config and not args.evidence:
+        raise ValueError('--policy-config requires --evidence')
+    if args.evidence:
+        from evidence_session import EvidenceSession
+        config = json.loads(args.policy_config.read_text()) if args.policy_config else None
+        session = EvidenceSession(config)
+        rows = [session.process(frame, raw) for frame, raw in zip(inputs, rows)]
     args.output.mkdir(parents=True)
     portable_inputs = []
     for index, (row, original) in enumerate(zip(rows, inputs)):
@@ -104,7 +113,9 @@ def main():
                 'baseline_production_diff': subprocess.check_output(
                     ['git', 'diff', '--name-only', '430aaa204fd5319dd7f697d3de2b4e1faddbb06f', '--',
                      'Vision', 'DigitalTwin/include'], cwd=ROOT, text=True).splitlines(),
-                'msvc_validated': False}
+                'msvc_validated': False, 'evidence_policy_enabled': args.evidence,
+                'evidence_policy_sha256': hashlib.sha256((HERE/'evidence_session.py').read_bytes()).hexdigest() if args.evidence else None,
+                'policy_config': session.config if args.evidence else None, 'policy_parameters_field_validated': False}
     (args.output/'metadata.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2)+'\n')
     print(json.dumps({'frames': len(rows), 'available': sum(row['available'] for row in rows), 'output': str(args.output)}))
 

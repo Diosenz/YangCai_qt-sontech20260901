@@ -72,3 +72,15 @@ TCP 正在跟随检测点，不能把 TCP 自身当作独立检测真值。
 `DetectorReplay.cpp` 是主要会话入口；后续行为在相同公开 process/result 边界验收，
 不依赖内部调用顺序。当前固定生产源没有修改；复用时保留 baseline 元数据与 raw/final 分离，
 不得把后处理日志标记误称为已撤销实际 KCF 训练。真实新帧资格和训练资格由后续任务实现。
+
+## 可选离线证据会话（任务03）
+
+增加 `--evidence` 可启用最终业务证据契约。默认仍输出原始生产基线。
+`--policy-config` 读取显式候选配置，目前支持 `anchor_confirmation_frames`（默认2）。
+确认帧必须是严格递增的有效曝光ID，独立几何由生产最终接纳结果决定；
+仿真点缺失不拦截有效几何。重复/未知曝光、无效投影不刷新可靠锚点。
+源结果完整保留在 `raw_detector`；`anchor`、`anchor_refreshed`、`can_independent_validate`
+和 `confirmation_count` 是离线契约结果。参数未现场标定，首次确认期间会不可用。
+
+此阶段尚未实现续接、恢复与模板回滚。生产检测器仍按原规则运行；
+业务后置拒绝不意味着撤销了原始KCF训练，不能声称任务06已实现。
