@@ -3,7 +3,8 @@ import copy
 import math
 
 DEFAULT_CONFIG = {'anchor_confirmation_frames': 2, 'max_prediction_ms': None,
-                  'max_prediction_travel_mm': None, 'recovery_confirmation_frames': 2,
+                  'max_prediction_travel_mm': None, 'enable_mother_constraints': False,
+                  'mother_options': {}, 'recovery_confirmation_frames': 2,
                   'max_recovery_step_pixel': None, 'max_reacquisition_distance_pixel': None}
 
 
@@ -62,6 +63,10 @@ class EvidenceSession:
             value = self.config[key]
             if value is not None and (not finite_number(value) or value <= 0):
                 raise ValueError(key + ' must be a positive unvalidated candidate limit or null')
+        if not isinstance(self.config['enable_mother_constraints'], bool):
+            raise ValueError('enable_mother_constraints must be boolean')
+        if not isinstance(self.config['mother_options'], dict):
+            raise ValueError('mother_options must be candidate option object')
         self.anchor = None
         self.last_frame_id = None
         self.pending = 0
@@ -71,6 +76,8 @@ class EvidenceSession:
         self.last_timestamp = None
         self.budget_provenance_failures = []
         self.reference_mapping = None
+        self.mother_model = None
+
         self.recovery_active = False
         self.recovery_count = 0
         self.recovery_candidate = None
@@ -181,6 +188,24 @@ class EvidenceSession:
                       mode='predicted', availability_scope='pixel_only_prediction',
                       message='bounded relative-reference prediction; not a measured weld point; no spatial/control qualification')
 
+    def _mother_constraints(self, frame, raw):
+        """历史几何只提供搜索提案；实际母材线、残差及中心一致性来自原图。"""
+        from mother_observation import observe
+        proposal = self.anchor['pixel'] if self.anchor else raw.get('final_pixel')
+        mapping = self.reference_mapping
+        current = reference_sample(frame)
+        if mapping is not None:
+            proposal = list(mapping['estimate'])
+            if current is not None and current[0] == mapping['revision']:
+                proposal = [p + a - b for p, a, b in zip(proposal, current[1], mapping['point'])]
+            elif (current is not None
+                  and frame.get('previous_reference_revision') == mapping['revision']
+                  and matching_exposure(frame.get('previous_reference_exposure_frame_id'), frame.get('frame_id'))
+                  and finite_point(frame.get('previous_reference_point_at_exposure'))):
+                proposal = [p + a - b for p, a, b in zip(proposal,
+                    frame['previous_reference_point_at_exposure'], mapping['point'])]
+        return observe(raw, proposal, self.mother_model, self.config['mother_options'], raw.get('final_pixel'))
+
     def _recovery_decision(self, frame, raw, result, fresh, geometry):
         """新几何先确认同一目标；过渡不更新锚点，也不为旧预测续期。"""
         self.recovery_transition_target = None
@@ -245,6 +270,7 @@ class EvidenceSession:
         key = (frame.get('seam_index'), tuple(raw.get('image_size') or []))
         if self.context_key is not None and key != self.context_key and raw.get('image_size'):
             self.anchor = None
+            self.mother_model = None
             self.pending = 0
             self.recovery_active = False
             self.recovery_count = 0
@@ -262,6 +288,18 @@ class EvidenceSession:
         geometry = (raw.get('available') is True and raw.get('image_observation_accepted') is True
                     and raw.get('trust')=='independent_geometry' and raw.get('image_source')=='geometry'
                     and finite_point(raw.get('final_pixel')) and finite_point(raw.get('positioner_tcp_mm'),3))
+        mother = self._mother_constraints(frame, raw) if self.config['enable_mother_constraints'] else None
+        result['mother_observation'] = copy.deepcopy(mother)
+        if mother is not None and geometry:
+            candidate = mother.get('estimated_pixel')
+            consistent = (mother.get('center_supported') and mother.get('left', {}).get('valid')
+                          and mother.get('right', {}).get('valid') and finite_point(candidate)
+                          and math.dist(candidate, raw['final_pixel'])
+                              <= mother.get('options', {}).get('candidate_geometry_tolerance_px', 3.0))
+            if not consistent:
+                geometry = False
+                result['mother_geometry_rejected'] = True
+
         geometry = self._recovery_decision(frame, raw, result, fresh, geometry)
         if fresh and geometry:
             self.pending += 1
@@ -274,6 +312,8 @@ class EvidenceSession:
                                    progress_reference=frame.get('progress_reference'),
                                    progress_provenance=frame.get('progress_provenance'))
                 self._seed_continuation(frame)
+                if mother is not None:
+                    self.mother_model = copy.deepcopy(mother['learned_model'])
                 result.update(available=True, final_pixel=list(raw['final_pixel']),
                               positioner_tcp_mm=list(raw['positioner_tcp_mm']),
                               source='geometry',trust='independent_geometry', mode='measured',
@@ -306,6 +346,17 @@ class EvidenceSession:
                           space_available=True, control_eligible=False,
                           prediction_travel_known=progress_sample(frame) is not None,
                           prediction_time_known=finite_number(frame.get('timestamp_ms')))
+        if (mother is not None and not result['anchor_refreshed'] and result['available']
+                and result.get('source') != 'recovery_transition'
+                and not (self.recovery_active and mother.get('center_supported')
+                         and raw.get('trust') == 'independent_geometry')
+                and mother.get('support_rank', 0) > 0 and finite_point(mother.get('estimated_pixel'))):
+            result.update(final_pixel=list(mother['estimated_pixel']), source='mother_material_estimate',
+                          mode='auxiliary_estimate', trust='estimated_not_independent',
+                          availability_scope='pixel_only_estimate', can_independent_validate=False,
+                          space_available=False, control_eligible=False, positioner_tcp_mm=None,
+                          message='current outer mother pixels constrain historical target; not a measured hidden seam')
+
         result['recovery_measurement_pixel'] = (list(raw['final_pixel'])
             if raw.get('trust') == 'independent_geometry' and finite_point(raw.get('final_pixel')) else None)
         result['recovery_confirmation_count'] = self.recovery_count
