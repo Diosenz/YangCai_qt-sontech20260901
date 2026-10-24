@@ -4,7 +4,7 @@
  */
 #include <cmath>
 #include <cstdlib>
-#include <iostream>
+#include <cstdio>
 #include <stdexcept>
 
 #include <QFile>
@@ -94,8 +94,8 @@ int main(int argc, char **argv)
             throw std::runtime_error("write-before verdict differs from archive");
         }
         match(evaluated.trainingAfter.robustSymmetricResidualMm, input["after_residual_mm"].toDouble());
-        std::cout << "PREWRITE accepted=" << evaluated.accepted
-                  << " rank=" << evaluated.observableRank << "/4\n";
+        std::fprintf(stdout, "PREWRITE accepted=%d rank=%d/4\n",
+            evaluated.accepted ? 1 : 0, evaluated.observableRank);
         Check::Options checkOptions;
         checkOptions.maximumResidualMm = request.options.maximumResidualMm;
         checkOptions.minimumBidirectionalCoverage = request.options.minimumBidirectionalCoverage;
@@ -122,22 +122,19 @@ int main(int argc, char **argv)
             if (!probe && static_cast<int>(check.lastObservationStatus()) != sample["observation_status"].toInt()) {
                 throw std::runtime_error("post-write observation status differs from archive");
             }
-            std::cout << "POST frame=" << frame << " real_coverage=" << measured.realCoverageRatio
-                      << " paired_support=" << paired.supportedRatio
-                      << " paired_before=" << paired.previousResidualMm
-                      << " paired_after=" << paired.currentResidualMm
-                      << " status=" << static_cast<int>(check.lastObservationStatus())
-                      << " decision=" << static_cast<int>(check.decision()) << "\n";
+            std::fprintf(stdout, "POST frame=%lld real_coverage=%.6g paired_support=%.6g paired_before=%.6g paired_after=%.6g status=%d decision=%d\n",
+                static_cast<long long>(frame), measured.realCoverageRatio, paired.supportedRatio,
+                paired.previousResidualMm, paired.currentResidualMm,
+                static_cast<int>(check.lastObservationStatus()), static_cast<int>(check.decision()));
         }
         const bool verified = check.decision() == Check::Decision::Verified;
-        std::cout << (verified ? "GREEN" : "RED")
-                  << " written_pose_geometry_verified=" << verified
-                  << " archived_retained=" << retained["retained_without_geometric_verification"].toBool()
-                  << " coverage_limit=" << request.options.minimumBidirectionalCoverage
-                  << " numerical_metrics_match_archive=1\n";
+        std::fprintf(stdout, "%s written_pose_geometry_verified=%d archived_retained=%d coverage_limit=%.6g numerical_metrics_match_archive=1\n",
+            verified ? "GREEN" : "RED", verified ? 1 : 0,
+            retained["retained_without_geometric_verification"].toBool() ? 1 : 0,
+            request.options.minimumBidirectionalCoverage);
         return verified ? 0 : 1;
     } catch (const std::exception &error) {
-        std::cerr << error.what() << "\n";
+        std::fprintf(stderr, "%s\n", error.what());
         return 2;
     }
 }

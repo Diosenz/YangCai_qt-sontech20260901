@@ -6,15 +6,19 @@ import sys
 import pathlib
 import tempfile
 import unittest
+import copy
 
 from control_replay import ControlReplaySession
 
 
 def measured(frame, point):
-    return dict(frame_id=frame, available=True, mode='measured', source='geometry',
+    return dict(frame_id=frame, kind='synthetic', available=True, mode='measured', source='geometry',
                 trust='independent_geometry', can_independent_validate=True,
                 fresh_exposure=True, anchor_refreshed=True, anchor={'frame_id':frame}, positioner_tcp_mm=point,
-                raw_detector={'positioner_tcp_mm':point, 'image_observation_accepted':True})
+                raw_detector={'positioner_tcp_mm':point,'frame_id':frame,'available':True,
+                    'kind':'synthetic','projection_kind':'synthetic_identity_1mm_per_pixel',
+                    'image_observation_accepted':True,'image_source':'geometry','source':'geometry',
+                    'trust':'independent_geometry','accepted_image_pixel':[360,260]})
 
 
 def context():
@@ -111,6 +115,24 @@ class ControlReplayTests(unittest.TestCase):
         result=ControlReplaySession().replay([measured(1,[2,2,0]),stale],context())
         self.assertFalse(result['follow']['valid'])
         self.assertEqual(len(result['released_positioner_tcp_mm']),1)
+
+    def test_contradictory_raw_evidence_cannot_be_relabelled_for_control(self):
+        def complete(frame,point):
+            row=measured(frame,point)
+            row['raw_detector'].update(frame_id=frame,available=True,image_source='geometry',
+                source='geometry',trust='independent_geometry',accepted_image_pixel=[360,260])
+            return row
+        changes=[{'frame_id':99},{'available':False},{'image_observation_accepted':False},
+                 {'image_source':'kcf_identity'},{'trust':'tracked_not_independent'},
+                 {'accepted_image_pixel':None},{'positioner_tcp_mm':[12,-3,0]}]
+        for patch in changes:
+            with self.subTest(patch=patch):
+                rows=[complete(1,[2,2,0]),complete(2,[12,2,0])]
+                rows[1]['raw_detector'].update(copy.deepcopy(patch))
+                result=ControlReplaySession().replay(rows,context())
+                self.assertEqual(len(result['released_positioner_tcp_mm']),1)
+                self.assertFalse(result['follow']['valid'])
+                self.assertFalse(result['release_diagnostics'][1]['accepted'])
 
     def test_actual_icp_model_replacement_is_compared_to_measured_release(self):
         rows=[measured(i+1,[float(i),2+.03*i*i+(.35 if i%2 else -.25),.02*i*i])
