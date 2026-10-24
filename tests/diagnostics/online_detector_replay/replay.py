@@ -47,24 +47,42 @@ def build(cache):
 
 
 def viewer(rows, manifest):
+    def diagnostic_preview(value, key=''):
+        # 仅构造HTML展示副本；原始results及原图字节完全保留。
+        if isinstance(value, dict):
+            return {name: diagnostic_preview(item, name) for name, item in value.items()}
+        if isinstance(value, list):
+            return [diagnostic_preview(item) for item in value]
+        if isinstance(value, str):
+            if 'base64' in key.lower() or value.startswith('data:image/'):
+                return '[图像编码已折叠，' + str(len(value)) + '字符；完整证据见results.jsonl]'
+            if len(value) > 1200:
+                return value[:1200] + '[展示已截短；完整证据见results.jsonl]'
+        return value
+
     rendered = []
     for row in rows:
         data = None
         if row.get('display_image'):
             data = 'data:image/png;base64,' + base64.b64encode(
                 (manifest / row['display_image']).read_bytes()).decode()
-        rendered.append({'row': row, 'image': data})
+        rendered.append({'row': diagnostic_preview(row), 'image': data})
     payload = json.dumps(rendered, ensure_ascii=False).replace('<', '\\u003c')
-    return '''<!doctype html><meta charset="utf-8"><title>真实检测入口离线回放</title>
-<style>body{font:16px system-ui;margin:24px;background:#18212b;color:#eef}svg{width:70%;background:#050505;vertical-align:top}pre{display:inline-block;width:28%;white-space:pre-wrap;font-size:12px}input{width:70%}</style>
-<h1>真实检测入口：图像分支离线回放</h1><p>真实 process + KCF + 几何 + 投影；排除 PCL 间隙检测及设备控制。绿色：可用 KCF；橙色：原始几何候选。候选列表仅为公开诊断，不是全部候选。</p>
-<input id="slider" type="range" min="0" value="0"><span id="index"></span><br>
-<svg id="canvas" viewBox="0 0 640 480"></svg><pre id="detail"></pre>
+    return '''<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>真实检测入口离线回放</title>
+<style>*{box-sizing:border-box}body{font:16px system-ui;margin:clamp(12px,3vw,24px);background:#18212b;color:#eef;overflow-wrap:anywhere}h1{font-size:clamp(22px,3vw,30px)}a{color:#9bdbff}.controls{display:flex;align-items:center;gap:12px;margin:16px 0}.controls input{flex:1;min-width:0}.layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:20px;align-items:start}.layout>*{min-width:0}svg{display:block;width:100%;height:auto;background:#050505}.status{background:#243240;padding:12px;border-radius:6px;margin-bottom:12px;line-height:1.6}.status strong{display:block}details{border:1px solid #526270;border-radius:6px;padding:10px}summary{cursor:pointer}pre{margin-bottom:0;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-size:12px;max-height:65vh;overflow:auto}@media(max-width:850px){.layout{grid-template-columns:minmax(0,1fr)}pre{max-height:50vh}}</style>
+<h1>真实检测入口：图像分支离线回放</h1><p>真实 process + KCF + 几何 + 投影；排除 PCL 间隙及设备控制。</p>
+<p>绿色：已接纳独立几何像素；黄色：估计或跟踪像素；橙色：原始几何候选。颜色仅说明像素来源，不授予空间、独立校验或控制资格；以当前状态为准。</p>
+<div class="controls"><input id="slider" aria-label="回放记录" type="range" min="0" value="0"><span id="index"></span></div>
+<div class="layout"><svg id="canvas" aria-label="当前图像及KCF位置" viewBox="0 0 640 480"></svg><section><div class="status" id="status" aria-live="polite"></div><details><summary>展开当前诊断（图像编码已折叠）</summary><pre id="detail"></pre></details><p><a href="results.jsonl">完整逐帧原始证据 JSONL</a></p></section></div>
 <script>const frames=''' + payload + ''';
+const sourceLabels={geometry:'原图几何',mother_material_estimate:'母材估计',bounded_prediction:'有限预测',appearance_tracking:'外观续跟',recovery_transition:'恢复过渡',unavailable:'不可用'};
 const slider=document.getElementById('slider'),canvas=document.getElementById('canvas');slider.max=Math.max(0,frames.length-1);
 function draw(){const f=frames[+slider.value];if(!f)return;document.getElementById('index').textContent=(+slider.value+1)+' / '+frames.length;const r=f.row;canvas.innerHTML='';
+const independent=r.available===true&&r.source==='geometry'&&r.trust==='independent_geometry';
+const status=document.getElementById('status');status.replaceChildren();const title=document.createElement('strong');title.textContent='来源：'+(sourceLabels[r.source]||r.source||'未知')+'（'+(r.source||'unknown')+'）';status.append(title);
+for(const text of ['像素可用：'+(r.available===true?'是':'否')+'；独立实测：'+(independent?'是':'否'),'独立焊点校验资格：'+(r.can_independent_validate===true?'是':'否')+'；空间可用：'+(r.space_available===true?'是':'否'),'检测输出控制资格：'+(r.control_eligible===true?'是':'否')+'；本回放不发送运动']){const line=document.createElement('div');line.textContent=text;status.append(line);}
 if(f.image){const image=document.createElementNS('http://www.w3.org/2000/svg','image');image.setAttribute('href',f.image);image.setAttribute('width',r.image_size[0]);image.setAttribute('height',r.image_size[1]);canvas.append(image);canvas.setAttribute('viewBox','0 0 '+r.image_size.join(' '));}
-for(const [key,color] of [['raw_measurement_pixel','orange'],['final_pixel','lime']]){const p=r[key];if(!p)continue;const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',p[0]);c.setAttribute('cy',p[1]);c.setAttribute('r',6);c.setAttribute('fill','none');c.setAttribute('stroke',color);c.setAttribute('stroke-width',2);canvas.append(c);}
+for(const [key,color] of [['raw_measurement_pixel','orange'],['final_pixel',independent?'lime':'#ffe066']]){const p=r[key];if(!p)continue;const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('cx',p[0]);c.setAttribute('cy',p[1]);c.setAttribute('r',6);c.setAttribute('fill','none');c.setAttribute('stroke',color);c.setAttribute('stroke-width',2);canvas.append(c);}
 document.getElementById('detail').textContent=JSON.stringify(r,null,2);}slider.oninput=draw;draw();</script>'''
 
 
