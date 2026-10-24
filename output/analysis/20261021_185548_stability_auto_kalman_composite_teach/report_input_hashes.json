@@ -1,0 +1,9 @@
+{
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_185548_stability_auto_kalman_composite_teach\\metrics.csv": "d55793f5c8f65fb607496ff39c28854886e0e4a9a0d88eef742fb776924370b2",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_201400_stability10_auto_kalman_composite_teach\\metrics.csv": "9419ca52f406194fbd24217e4a51e495c3f9b88558a716d11ea008e464b5ae76",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_185548_stability_auto_kalman_composite_teach\\local_registration_summary.json": "eae7b186bf52076b83cf33eedff4b333f7e0e03eba444e64f6d8b9735cb036d8",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_201400_stability10_auto_kalman_composite_teach\\local_registration_summary.json": "fdb94e855d08e68943e5e9f3e857ec3cb8681a4d9c2ed25f7fee4669ae8e47b3",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261021_185548_548_启动在线ICP（稳定保护）+ 自动卡尔曼\\vision_images\\sample_307_session_1_frame_2171_source.png": "b168035bc31cddec40d9e9b6a6384c0e304b1b40df94f76285e4c0e26a76bfc0",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261021_185548_548_启动在线ICP（稳定保护）+ 自动卡尔曼\\vision_images\\sample_307_session_1_frame_2171_enhanced.png": "84962814b0cec29739af3e62eb3e21fe454601e85a6af10f58d9fc368191b533",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_185548_stability_auto_kalman_composite_teach\\build_report.py": "5e2decd4a6102096b134d35cb91b36379d607838c9774db390b587f35a28e6ac"
+}

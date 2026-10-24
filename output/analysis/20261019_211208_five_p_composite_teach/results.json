@@ -1,0 +1,331 @@
+{
+  "session": "20261019_211208_621_采用CFKONTEST3五个P点测试结果",
+  "summary": {
+    "session_state": "error",
+    "start_time": "2026-10-19T21:12:08.623",
+    "start_timestamp_ms": "1792415528621",
+    "start_mode": "init_type",
+    "enable_online_icp": "true",
+    "work_path_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+    "teach_pose_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+    "rbcalib_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT",
+    "initial_match_max_distance_mm": "15.000000",
+    "initial_match_direction_sample_count": "32",
+    "initial_match_min_scan_span_mm": "2.000000",
+    "initial_match_min_reverse_direction_cosine": "0.250000",
+    "initial_match_min_remaining_length_mm": "10.000000",
+    "end_time": "2026-10-19T21:18:47.702",
+    "end_timestamp_ms": "1792415927702",
+    "duration_ms": "399081",
+    "robot_state_count": "4151",
+    "tracking_result_count": "3692",
+    "corrected_path_point_count": "1368",
+    "initial_command_count": "5",
+    "realtime_command_count": "3155",
+    "command_receipt_count": "1298",
+    "message": "在线纠偏超时：等待机器人主程序停止超过120秒。当前sStart=1, corflag=0, detflag=0, offline=0, JBI行=21。"
+  },
+  "coordinate_frame": "变位机末节随动坐标系；日志视觉已在工具TCP系，Z加回231 mm；TCP逐点消除S1/S2旋转",
+  "source_counts": {
+    "robot": 4151,
+    "vision_samples": 3692,
+    "valid_tcp": 2582,
+    "valid_recorded_vision": 3188,
+    "waiting_stop_tcp": 1097,
+    "initial_teach_points": 5
+  },
+  "recorded_vision_semantics": "Recorded visual result, not proven raw KCF; before-fusion pixels, gains, and fusion flags unavailable",
+  "original_circle": {
+    "center": [
+      4.4923579817409,
+      8.909365552413297,
+      253.90759389704337
+    ],
+    "normal": [
+      -0.0008325817897459309,
+      0.0015759231292623577,
+      0.9999984116356657
+    ],
+    "radius_mm": 142.03533963525268
+  },
+  "current_circle": {
+    "center": [
+      -1.8019771543832288,
+      -3.4851749093818594,
+      250.6411742902453
+    ],
+    "normal": [
+      0.0023558835526501223,
+      0.0027161935479490806,
+      0.9999935360317569
+    ],
+    "radius_mm": 142.03533963525268
+  },
+  "fitted_circles": {
+    "TCP": {
+      "center": [
+        -2.7650518626008775,
+        -3.5865566313540524,
+        250.66271741502564
+      ],
+      "radius_mm": 141.20235585404188,
+      "normal": [
+        0.0029356102636941645,
+        0.002933949931223423,
+        0.9999913870279988
+      ]
+    },
+    "recorded_vision": {
+      "center": [
+        -1.8019771543832288,
+        -3.4851749093818594,
+        250.6411742902453
+      ],
+      "radius_mm": 140.89317269514558,
+      "normal": [
+        0.0023558835526501223,
+        0.0027161935479490806,
+        0.9999935360317569
+      ]
+    }
+  },
+  "alignment": {
+    "rotation": [
+      [
+        0.9999949168410542,
+        4.156278939109924e-06,
+        0.003188459624709919
+      ],
+      [
+        -7.79201039272587e-06,
+        0.999999349865281,
+        0.0011402667669221697
+      ],
+      [
+        -0.003188452812514869,
+        -0.0011402858152754854,
+        0.9999942667420259
+      ]
+    ],
+    "translation": [
+      -7.103923442110838,
+      -12.684022056197175,
+      -3.2404809944564477
+    ],
+    "normal_alignment_deg": 0.19401676345227867,
+    "axial_rotation_is_identifiable": false,
+    "scale": 1.0
+  },
+  "metrics": {
+    "TCP": {
+      "n": 2582,
+      "mean_mm": 1.360963203290684,
+      "max_mm": 3.456528199109317,
+      "rmse_mm": 1.5437425802798193,
+      "median_mm": 1.1843717987915805,
+      "p95_mm": 2.7368485030379164,
+      "within_2mm_fraction": 0.7873741285824942,
+      "within_3mm_fraction": 0.9779240898528273,
+      "above_3mm_count": 57,
+      "max_time": "21:13:09.941"
+    },
+    "recorded_vision": {
+      "n": 3188,
+      "mean_mm": 1.383818538649622,
+      "max_mm": 6.550276946876938,
+      "rmse_mm": 1.5551442839578995,
+      "median_mm": 1.268258586641411,
+      "p95_mm": 2.599434279347264,
+      "within_2mm_fraction": 0.8177540777917189,
+      "within_3mm_fraction": 0.9780426599749059,
+      "above_3mm_count": 70,
+      "max_time": "21:16:29.538"
+    }
+  },
+  "components": [
+    {
+      "trajectory": "TCP",
+      "radial_mean_mm": -0.7844624856978875,
+      "radial_rmse_mm": 1.422371765557315,
+      "plane_mean_mm": 0.021892668013997807,
+      "plane_rmse_mm": 0.5999997622618974,
+      "delta_x_rmse_mm": 1.1528655082602406,
+      "delta_y_rmse_mm": 0.8320018720556338,
+      "delta_z_rmse_mm": 0.6015107305183938
+    },
+    {
+      "trajectory": "recorded_vision",
+      "radial_mean_mm": -1.1431811217294845,
+      "radial_rmse_mm": 1.3651668810157147,
+      "plane_mean_mm": -0.003228978753229902,
+      "plane_rmse_mm": 0.7448443669013786,
+      "delta_x_rmse_mm": 1.10735748607502,
+      "delta_y_rmse_mm": 0.7983555740651292,
+      "delta_z_rmse_mm": 0.7448902733421064
+    }
+  ],
+  "holdout": {
+    "folds": [
+      {
+        "held_out_fold": 0,
+        "training_count": 1562,
+        "center": [
+          -1.9214404572780839,
+          -3.5843441657050494,
+          250.67681555435703
+        ],
+        "normal": [
+          0.0022706260524118695,
+          0.0028448536175436218,
+          0.9999933755106706
+        ],
+        "n": 1626,
+        "mean_mm": 1.4903800008251848,
+        "max_mm": 5.288639161641942,
+        "rmse_mm": 1.6606563183105412,
+        "median_mm": 1.423011782358517,
+        "p95_mm": 2.794444834457255
+      },
+      {
+        "held_out_fold": 1,
+        "training_count": 1626,
+        "center": [
+          -1.7122047929672033,
+          -3.365883941306197,
+          250.61294581291043
+        ],
+        "normal": [
+          0.0025678288320093853,
+          0.0026667395967368,
+          0.9999931473540269
+        ],
+        "n": 1562,
+        "mean_mm": 1.284355641212364,
+        "max_mm": 6.537579717565567,
+        "rmse_mm": 1.46896162653944,
+        "median_mm": 1.149903773176986,
+        "p95_mm": 2.5826809001661446
+      }
+    ],
+    "pooled": {
+      "n": 3188,
+      "mean_mm": 1.3894358196096184,
+      "max_mm": 6.537579717565567,
+      "rmse_mm": 1.569661023109434,
+      "median_mm": 1.2623067008879727,
+      "p95_mm": 2.668333660304465
+    }
+  },
+  "reference_sensitivity": [
+    {
+      "omitted_source": "20230608CHUFENGKOU",
+      "radius_mm": 142.49790128317656,
+      "trajectory": "TCP",
+      "n": 2582,
+      "mean_mm": 1.6755555075332973,
+      "max_mm": 3.5264567104781945,
+      "rmse_mm": 1.8228628452346087,
+      "median_mm": 1.5510331123610166,
+      "p95_mm": 3.037602036084147
+    },
+    {
+      "omitted_source": "20230608CHUFENGKOU",
+      "radius_mm": 142.49790128317656,
+      "trajectory": "recorded_vision",
+      "n": 3188,
+      "mean_mm": 1.7762563491048295,
+      "max_mm": 6.7830762247323,
+      "rmse_mm": 1.9209426095389495,
+      "median_mm": 1.6843743205297663,
+      "p95_mm": 3.027304798050166
+    },
+    {
+      "omitted_source": "20250606CHUFENGKOU",
+      "radius_mm": 142.1497795577252,
+      "trajectory": "TCP",
+      "n": 2582,
+      "mean_mm": 1.4328651568020554,
+      "max_mm": 3.3574734523382777,
+      "rmse_mm": 1.604925326024932,
+      "median_mm": 1.2720023720022018,
+      "p95_mm": 2.7720019669677844
+    },
+    {
+      "omitted_source": "20250606CHUFENGKOU",
+      "radius_mm": 142.1497795577252,
+      "trajectory": "recorded_vision",
+      "n": 3188,
+      "mean_mm": 1.4760342087357894,
+      "max_mm": 6.605621241401436,
+      "rmse_mm": 1.641103701070707,
+      "median_mm": 1.371279045703289,
+      "p95_mm": 2.700579226874429
+    },
+    {
+      "omitted_source": "20260308CHUFENGKOU",
+      "radius_mm": 142.0189064095522,
+      "trajectory": "TCP",
+      "n": 2582,
+      "mean_mm": 1.3510567665159423,
+      "max_mm": 3.4708298653109937,
+      "rmse_mm": 1.5354571654441636,
+      "median_mm": 1.1740425548467797,
+      "p95_mm": 2.7256019228277406
+    },
+    {
+      "omitted_source": "20260308CHUFENGKOU",
+      "radius_mm": 142.0189064095522,
+      "trajectory": "recorded_vision",
+      "n": 3188,
+      "mean_mm": 1.370933994701336,
+      "max_mm": 6.542455596863579,
+      "rmse_mm": 1.5431044968031158,
+      "median_mm": 1.2542314119923597,
+      "p95_mm": 2.586092343125111
+    },
+    {
+      "omitted_source": "20260404CHUFENGKOU1",
+      "radius_mm": 141.47477129055676,
+      "trajectory": "TCP",
+      "n": 2582,
+      "mean_mm": 1.108298429989759,
+      "max_mm": 3.953754043892454,
+      "rmse_mm": 1.348290899278295,
+      "median_mm": 0.8848354331685968,
+      "p95_mm": 2.8633772022842128
+    },
+    {
+      "omitted_source": "20260404CHUFENGKOU1",
+      "radius_mm": 141.47477129055676,
+      "trajectory": "recorded_vision",
+      "n": 3188,
+      "mean_mm": 1.023671887290631,
+      "max_mm": 6.30222172926361,
+      "rmse_mm": 1.2045946682643853,
+      "median_mm": 0.8538600514751731,
+      "p95_mm": 2.1330834758145323
+    }
+  ],
+  "coverage_deg": 353.2549759414719,
+  "visual_endpoint_gap_mm": 17.142996400709652,
+  "valid_window": {
+    "tcp_start": "21:13:00.502",
+    "tcp_end": "21:16:47.344",
+    "vision_start": "21:13:00.494",
+    "vision_end": "21:16:47.477"
+  },
+  "verification": {
+    "tcp_frame_roundtrip_max_mm": 1.0302869668521453e-13,
+    "prior_saved_tcp_max_difference_mm": 1.8474111129762605e-13,
+    "prior_saved_vision_max_difference_mm": 2.842170943040401e-14,
+    "initial_corrected_path_shape_max_difference_mm": 3.256115871121665e-14
+  },
+  "measurement_smoothing": false,
+  "reference_status": "同一历史综合圆；位姿由本组记录视觉估计；融合状态未知；不是独立真值",
+  "limitations": [
+    "No diagnostic images, before-fusion pixels, camera timestamps, weights or ICP batch records in this session.",
+    "Visual timestamps are recorder times, not verified capture times; no time pairing used.",
+    "Session ended with robot-stop handshake timeout. Active-data geometry does not establish successful workflow completion.",
+    "Five O command records confirm five initial points; this dataset cannot isolate the causal effect of five P points."
+  ]
+}

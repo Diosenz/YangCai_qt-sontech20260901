@@ -1,0 +1,20 @@
+{
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261019_211208_621_采用CFKONTEST3五个P点测试结果\\session_summary.txt": "507f9fa63b69e7b7c02d3e00a214c85b7e3aee8028a827b21285687378ba37a9",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261019_211208_621_采用CFKONTEST3五个P点测试结果\\actual_robot_path.txt": "69a89f7ee446689925a886b302d2a3c210812e8edede866d81b95b3bf11a185e",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261019_211208_621_采用CFKONTEST3五个P点测试结果\\realtime_correction.txt": "f0c5ca11b90f63e2604829ee31208c69842fed2b510c078e29f1ef9d6d0eb965",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261019_211208_621_采用CFKONTEST3五个P点测试结果\\initial_correction.txt": "6ea5ba7a9ed61a96be06cf34fab641f2ef642370f0c8fea5846ce1c09bb76077",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\data\\WorkPiece\\20260404CHUFENGKOU1_W.txt": "2001f5d9e4d14e8ca14da584d47b9c870a9f2fcb8c8912c7d37d014267ba09b2",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\data\\WorkPiece\\20260404CHUFENGKOU1_T.txt": "93d9710b8451cc0405b8a51f6d0f4c2e4a0d327d49b4ca5b8b873e2022df97ab",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\config\\calibration\\RBCALIB.DAT": "de9f57d91ad4af7e413dc8a3511be313ee99938444b21832eb284131f4651ea5",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261019_211208_621_station_base\\tcp_coordinates.csv": "31dfee68b4d37cf3509dcd28d50c47fb36879166f1551b6aad15efabc262631f",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261019_211208_621_station_base\\kcf_coordinates.csv": "04972978911e9bd6c2919dbcf9aca7a4d10f20e901f818719f905d46252091e5",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_positive20_teach_synthesis\\synthesized_original_circle.json": "2134ee954a3832c87172be5e8fd37433ff19d4bae68d4f8d541d333f085b40bd",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_positive20_teach_synthesis\\results.json": "598313199f45a9000a380000d19102119561af2417e2d0e0d4758c5eb32f2af7",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_positive20_teach_synthesis\\20261021CHUFENGKOU20_SYNTH_ANALYSIS_W.txt": "a18a6be6eef67dbf61d628aab5b9ea8f84c443265c50cc80b96233e4d7782e66",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261019_211208_five_p_composite_teach\\analyze.py": "e1eb942f80fafd5c973162e662ebf0f0196bc808e411fea4c7de868c61dcb48b",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261020_evening_comparison\\assets\\geometry.py": "661beb3441249e691b5ebddc108a2b735be526ae1146f05233a5ed687131dd22",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_152328_050_retest\\prior_notion_workflow_snapshot.json": "381effed8149504f959acc57ad1bf8b23e0e9f10719285e3332fea3fa09df095",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\OnlineCorrectionRunRecorder.cpp": "32472954faa85c887bc97391ce23838c541c1fda8c6ff69047dd7fb2afc84212",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\src\\geometry\\WeldProjectionContextBuilder.cpp": "cc36668851c76f41d312adf9195de8641c0b953487bf69a9dc0823c8e1dc1fd4",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\src\\geometry\\PositionerKinematics.cpp": "9f89d6728c9c00cef3e82fec88c5f0e3992a20891ce2f770feb03aa3e2dc87b4"
+}

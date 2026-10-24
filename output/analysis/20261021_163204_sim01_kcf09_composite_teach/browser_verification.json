@@ -1,0 +1,36 @@
+{
+  "status": "passed",
+  "browser": "Edge headless",
+  "local_3d_render": "passed",
+  "controls_verified_by": "DOM events, no mouse input",
+  "axes": {
+    "traces": 9,
+    "canvas": 3
+  },
+  "report": {
+    "title": "在线纠偏｜仿真0.1 KCF0.9｜综合示教参考误差分析",
+    "overflow": false,
+    "iframes": [
+      "index.html",
+      "axis_fluctuations.html"
+    ]
+  },
+  "mobile": {
+    "overflow": false
+  },
+  "errors": [],
+  "trace_counts": [
+    5855,
+    7597,
+    7597,
+    1441,
+    1441,
+    1368,
+    1368
+  ],
+  "zscale_and_independent_selectors": "passed",
+  "view_presets": "passed",
+  "coordinate_immutability": "passed",
+  "mouse_used": false,
+  "manual_drag_zoom_pan": "not performed"
+}

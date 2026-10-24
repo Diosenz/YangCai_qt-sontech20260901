@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "input_hashes_verified": 21,
+  "independent_scalar_geometry_checks": 96,
+  "metrics_and_component_identities": "passed",
+  "event_counts": "passed",
+  "viewer_coordinates": "passed",
+  "rigid_transform": "passed",
+  "local_links_checked": 21,
+  "reference_radius_fixed_mm": 142.03533963525268,
+  "mouse_used": false,
+  "production_code_modified": false
+}

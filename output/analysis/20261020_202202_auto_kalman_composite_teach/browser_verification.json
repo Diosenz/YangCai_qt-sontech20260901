@@ -1,0 +1,36 @@
+{
+  "status": "passed",
+  "browser": "Edge headless",
+  "local_3d_render": "passed",
+  "controls_verified_by": "DOM events, no mouse input",
+  "axes": {
+    "traces": 9,
+    "canvas": 3
+  },
+  "report": {
+    "title": "自动卡尔曼在线纠偏｜20261020 202202｜移动后综合示教误差分析",
+    "overflow": false,
+    "iframes": [
+      "index.html",
+      "axis_fluctuations.html"
+    ]
+  },
+  "mobile": {
+    "overflow": false
+  },
+  "errors": [],
+  "trace_counts": [
+    7717,
+    7418,
+    7418,
+    1441,
+    1441,
+    1368,
+    1368
+  ],
+  "zscale_and_independent_selectors": "passed",
+  "view_presets": "passed",
+  "coordinate_immutability": "passed",
+  "mouse_used": false,
+  "manual_drag_zoom_pan": "not performed"
+}

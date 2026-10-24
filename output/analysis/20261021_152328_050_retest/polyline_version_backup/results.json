@@ -1,0 +1,550 @@
+{
+  "session": "20261021_152328_050",
+  "summary": {
+    "session_state": "completed",
+    "vision_diagnostics_schema": "1",
+    "vision_diagnostics_enabled": "1",
+    "vision_images_enabled": "1",
+    "vision_image_sample_every_n": "15",
+    "vision_max_image_pairs": "30",
+    "vision_max_image_bytes": "33554432",
+    "icp_diagnostics_schema": "1",
+    "start_time": "2026-10-21T15:23:28.075",
+    "start_timestamp_ms": "1792567408050",
+    "start_mode": "init_type",
+    "enable_online_icp": "true",
+    "work_path_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+    "teach_pose_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+    "rbcalib_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT",
+    "initial_match_max_distance_mm": "15.000000",
+    "initial_match_direction_sample_count": "32",
+    "initial_match_min_scan_span_mm": "2.000000",
+    "initial_match_min_reverse_direction_cosine": "0.250000",
+    "initial_match_min_remaining_length_mm": "10.000000",
+    "end_time": "2026-10-21T15:33:38.166",
+    "end_timestamp_ms": "1792568018166",
+    "duration_ms": "610116",
+    "robot_state_count": "6710",
+    "tracking_result_count": "7841",
+    "corrected_path_point_count": "1368",
+    "initial_command_count": "5",
+    "realtime_command_count": "7332",
+    "command_receipt_count": "2928",
+    "icp_batch_count": "427",
+    "vision_diagnostic_count": "7841",
+    "vision_image_submission_count": "30",
+    "message": "online correction completed after robot program stopped"
+  },
+  "reference_status": "Estimated reference, NOT independent ground truth",
+  "method": "Original teach polyline rigidly translated and plane-normal aligned to angle-balanced raw before_fusion KCF. No scaling, radius change, smoothing, outlier deletion or axial yaw fit.",
+  "coordinate_frame": "Positioner last-link/material frame. Undo each sample Ry(S1)Rz(S2). Vision parent-TCP coordinates restored by +[0,0,231] mm. Original W is already in this last-link frame.",
+  "units": "mm",
+  "original_count": 1368,
+  "tcp_count": 5848,
+  "raw_kcf_count": 7522,
+  "online_vision_total": 7522,
+  "raw_kcf_coverage_deg": 359.7319678739963,
+  "original_circle": {
+    "center": [
+      4.4923579817409,
+      8.909365552413297,
+      253.90759389704337
+    ],
+    "radius_mm": 143.71704466934042,
+    "normal": [
+      -0.0008325817897459309,
+      0.0015759231292623577,
+      0.9999984116356657
+    ]
+  },
+  "raw_kcf_circle": {
+    "center": [
+      -0.5089636594170857,
+      -1.6744511336382506,
+      253.47836713213812
+    ],
+    "radius_mm": 142.02252412316037,
+    "normal": [
+      -0.003378426987442156,
+      0.0001363809245872316,
+      0.9999942837993296
+    ]
+  },
+  "tcp_circle": {
+    "center": [
+      -0.552911366533998,
+      -1.7111309949471605,
+      253.49562633791976
+    ],
+    "radius_mm": 142.08429657254229,
+    "normal": [
+      -0.00335226723443064,
+      9.887088938165256e-05,
+      0.999994376248655
+    ]
+  },
+  "alignment": {
+    "rotation": [
+      [
+        0.9999967593171549,
+        -7.043011050544475e-06,
+        -0.002545840840308527
+      ],
+      [
+        3.378174860963926e-06,
+        0.9999989638559856,
+        -0.0014395400456990032
+      ],
+      [
+        0.002545848341147228,
+        0.0014395267803107457,
+        0.9999957232002908
+      ]
+    ],
+    "translation": [
+      -4.354836011882936,
+      -10.218312481314683,
+      -0.4524029854054561
+    ],
+    "normal_alignment_deg": 0.1675706407131008,
+    "axial_rotation_is_identifiable": false,
+    "scale": 1.0
+  },
+  "radius_difference_kcf_minus_original_mm": -1.6945205461800583,
+  "metrics": {
+    "TCP_to_estimated_moved_teach": {
+      "n": 5848,
+      "mean_mm": 1.7109622525781167,
+      "max_mm": 4.126195470548994,
+      "rmse_mm": 1.8506295302975229,
+      "median_mm": 1.6247813413011498,
+      "p95_mm": 2.8685791602122714,
+      "max_time": "15:28:50.894"
+    },
+    "raw_KCF_to_estimated_moved_teach": {
+      "n": 7522,
+      "mean_mm": 1.7928666562258808,
+      "max_mm": 5.107644008094428,
+      "rmse_mm": 1.9314421230917902,
+      "median_mm": 1.7246851908460827,
+      "p95_mm": 2.9811998296418505,
+      "max_time": "15:26:41.282"
+    },
+    "final_vision_to_estimated_moved_teach": {
+      "n": 7522,
+      "mean_mm": 1.808064502989152,
+      "max_mm": 4.983019161197721,
+      "rmse_mm": 1.9461049387485732,
+      "median_mm": 1.7402855902034304,
+      "p95_mm": 3.0016721841334437,
+      "max_time": "15:24:11.958"
+    },
+    "TCP_to_original_teach": {
+      "n": 5848,
+      "mean_mm": 7.602942950236165,
+      "max_mm": 15.182737189648089,
+      "rmse_mm": 8.4732027718258,
+      "median_mm": 7.865174267305235,
+      "p95_mm": 13.492815299931307,
+      "max_time": "15:28:50.894"
+    },
+    "TCP_to_startup_teach": {
+      "n": 5848,
+      "mean_mm": 60.82483832783332,
+      "max_mm": 101.13121029909279,
+      "rmse_mm": 68.18912734954198,
+      "median_mm": 66.09304060527708,
+      "p95_mm": 98.58734414367423,
+      "max_time": "15:25:51.329"
+    },
+    "TCP_to_raw_KCF_polyline": {
+      "n": 5848,
+      "mean_mm": 0.3399821811879053,
+      "max_mm": 2.520944297772159,
+      "rmse_mm": 0.518848366230083,
+      "median_mm": 0.2145622564118873,
+      "p95_mm": 1.3410727872356263,
+      "max_time": "15:27:07.907"
+    }
+  },
+  "reference_alternatives": [
+    {
+      "reference": "translation_only",
+      "trajectory": "TCP",
+      "n": 5848,
+      "mean_mm": 1.7302909025561355,
+      "max_mm": 4.238679511592125,
+      "rmse_mm": 1.8746993230691986,
+      "median_mm": 1.6495400809668928,
+      "p95_mm": 2.8716775055292296
+    },
+    {
+      "reference": "translation_only",
+      "trajectory": "raw_KCF",
+      "n": 7522,
+      "mean_mm": 1.8091557509156884,
+      "max_mm": 5.175670485105625,
+      "rmse_mm": 1.9536323721766145,
+      "median_mm": 1.7424227563802335,
+      "p95_mm": 3.0322991660379857
+    },
+    {
+      "reference": "center_normal_rigid",
+      "trajectory": "TCP",
+      "n": 5848,
+      "mean_mm": 1.7109622525781167,
+      "max_mm": 4.126195470548994,
+      "rmse_mm": 1.8506295302975229,
+      "median_mm": 1.6247813413011498,
+      "p95_mm": 2.8685791602122714
+    },
+    {
+      "reference": "center_normal_rigid",
+      "trajectory": "raw_KCF",
+      "n": 7522,
+      "mean_mm": 1.7928666562258808,
+      "max_mm": 5.107644008094428,
+      "rmse_mm": 1.9314421230917902,
+      "median_mm": 1.7246851908460827,
+      "p95_mm": 2.9811998296418505
+    }
+  ],
+  "cross_validation_folds": [
+    {
+      "held_out_fold": 0,
+      "fit_count": 3796,
+      "evaluate_count": 3726,
+      "center": [
+        -0.6201557927028727,
+        -1.795742629543105,
+        253.48970416039043
+      ],
+      "normal": [
+        -0.003382363353866198,
+        0.00022242039562267446,
+        0.999994255057153
+      ],
+      "n": 3726,
+      "mean_mm": 1.8482087065098356,
+      "max_mm": 5.148835312670945,
+      "rmse_mm": 2.0159713766003153,
+      "median_mm": 1.7197382895769766,
+      "p95_mm": 3.3036560791902296
+    },
+    {
+      "held_out_fold": 1,
+      "fit_count": 3726,
+      "evaluate_count": 3796,
+      "center": [
+        -0.4121081662974526,
+        -1.5663446146074254,
+        253.46431987452897
+      ],
+      "normal": [
+        -0.0033382246075746975,
+        0.00010566725962182777,
+        0.9999944225298958
+      ],
+      "n": 3796,
+      "mean_mm": 1.7396043319953163,
+      "max_mm": 4.887762375120226,
+      "rmse_mm": 1.8622910949185656,
+      "median_mm": 1.7163279953579655,
+      "p95_mm": 2.861878048143463
+    }
+  ],
+  "cross_validation_pooled": {
+    "n": 7522,
+    "mean_mm": 1.7934011811632369,
+    "max_mm": 5.148835312670945,
+    "rmse_mm": 1.9399384268853068,
+    "median_mm": 1.717993831017596,
+    "p95_mm": 3.110422101033655
+  },
+  "cross_validation_reference_displacement": {
+    "n": 2736,
+    "mean_mm": 0.15553941490507206,
+    "max_mm": 0.16625932897856902,
+    "rmse_mm": 0.15583810894810327,
+    "median_mm": 0.15561365155622925,
+    "p95_mm": 0.1661757019465612
+  },
+  "tcp_phase_metrics": [
+    {
+      "phase": "before_first_verified",
+      "start": "15:24:12.051",
+      "end": "15:24:15.490",
+      "n": 36,
+      "mean_mm": 3.84996182158353,
+      "max_mm": 4.050683704548128,
+      "rmse_mm": 3.8509084848593558,
+      "median_mm": 3.800818255555604,
+      "p95_mm": 4.026064030849154
+    },
+    {
+      "phase": "after_first_verified",
+      "start": "15:24:15.616",
+      "end": "15:32:47.349",
+      "n": 5812,
+      "mean_mm": 1.6977131155367893,
+      "max_mm": 4.126195470548994,
+      "rmse_mm": 1.8314443010690775,
+      "median_mm": 1.6197561981300344,
+      "p95_mm": 2.82878630486856
+    }
+  ],
+  "local_registration": {
+    "batches": 98,
+    "accepted_candidates": 37,
+    "verified_writebacks": 37,
+    "verified": [
+      {
+        "file": "local_icp_1_2779_4353c5ed-0e59-4ce9-9d79-96faa333f408.json.verified.json",
+        "time_ms": 1792567455588,
+        "count": 3,
+        "mean_error_mm": 1.4532600132380946
+      },
+      {
+        "file": "local_icp_1_2947_430d8fe4-a3ca-465a-bb8d-485ded0d09a5.json.verified.json",
+        "time_ms": 1792567461099,
+        "count": 3,
+        "mean_error_mm": 0.7073566326697632
+      },
+      {
+        "file": "local_icp_1_4560_674f0ba4-128b-4ac6-8b71-813677b2195f.json.verified.json",
+        "time_ms": 1792567515285,
+        "count": 3,
+        "mean_error_mm": 1.4397709801023704
+      },
+      {
+        "file": "local_icp_1_4749_d6d80b88-872f-4c88-aa40-4fc7cd15a110.json.verified.json",
+        "time_ms": 1792567520301,
+        "count": 3,
+        "mean_error_mm": 1.0287955151395163
+      },
+      {
+        "file": "local_icp_1_5991_aadfdf52-a8ba-4d8e-8510-0ee4e463b49a.json.verified.json",
+        "time_ms": 1792567561419,
+        "count": 3,
+        "mean_error_mm": 2.22202372936987
+      },
+      {
+        "file": "local_icp_1_6457_de15f072-8884-4a1f-b552-25d5caab5431.json.verified.json",
+        "time_ms": 1792567576796,
+        "count": 3,
+        "mean_error_mm": 1.4042428536762024
+      },
+      {
+        "file": "local_icp_1_6769_d4261696-b847-4be0-95bd-9c4d8f076e9e.json.verified.json",
+        "time_ms": 1792567587059,
+        "count": 3,
+        "mean_error_mm": 1.4078983951690134
+      },
+      {
+        "file": "local_icp_1_6924_3cb09407-a9d6-4345-aa16-6248180d044d.json.verified.json",
+        "time_ms": 1792567592108,
+        "count": 3,
+        "mean_error_mm": 1.6582762733603795
+      },
+      {
+        "file": "local_icp_1_7707_e7a81233-8f88-4e54-b478-2eab5b42065d.json.verified.json",
+        "time_ms": 1792567617881,
+        "count": 3,
+        "mean_error_mm": 1.9383971179478767
+      },
+      {
+        "file": "local_icp_1_8169_8e3472db-47c5-4f80-b54b-bd8febf15af7.json.verified.json",
+        "time_ms": 1792567633324,
+        "count": 3,
+        "mean_error_mm": 1.8554776799566142
+      },
+      {
+        "file": "local_icp_1_8330_797e2f52-0f67-4f19-a656-1c61a5981863.json.verified.json",
+        "time_ms": 1792567638902,
+        "count": 3,
+        "mean_error_mm": 1.2238808103902599
+      },
+      {
+        "file": "local_icp_1_8667_485439c5-f2b4-442f-b597-28bb1417f5ba.json.verified.json",
+        "time_ms": 1792567649561,
+        "count": 3,
+        "mean_error_mm": 1.7571630814807866
+      },
+      {
+        "file": "local_icp_1_8983_0433f9dc-a519-452b-b1df-e37372009013.json.verified.json",
+        "time_ms": 1792567660021,
+        "count": 3,
+        "mean_error_mm": 2.078902530248019
+      },
+      {
+        "file": "local_icp_1_9772_68b8a79c-0634-4dd0-b469-4d0024ee66b7.json.verified.json",
+        "time_ms": 1792567686191,
+        "count": 3,
+        "mean_error_mm": 2.5489105314436156
+      },
+      {
+        "file": "local_icp_1_9930_e68b8169-9aca-4516-bfee-5632b0c6147f.json.verified.json",
+        "time_ms": 1792567691305,
+        "count": 3,
+        "mean_error_mm": 2.3433366140187815
+      },
+      {
+        "file": "local_icp_1_10084_3e497435-7c88-4ade-baea-1f4590382790.json.verified.json",
+        "time_ms": 1792567696552,
+        "count": 3,
+        "mean_error_mm": 2.257659362906002
+      },
+      {
+        "file": "local_icp_1_10552_27e998f7-3637-4b17-a18c-bf78761341d6.json.verified.json",
+        "time_ms": 1792567712095,
+        "count": 3,
+        "mean_error_mm": 1.5726311687838492
+      },
+      {
+        "file": "local_icp_1_10713_d1a40d6d-392b-458a-a6f1-97123c879aac.json.verified.json",
+        "time_ms": 1792567717078,
+        "count": 3,
+        "mean_error_mm": 1.5697394947040566
+      },
+      {
+        "file": "local_icp_1_11185_a8efff59-72d2-4e02-9bd0-4d5e2122130e.json.verified.json",
+        "time_ms": 1792567732951,
+        "count": 3,
+        "mean_error_mm": 1.1068120097607945
+      },
+      {
+        "file": "local_icp_1_11846_ea8be938-e6fe-4770-b337-0c1b9c6f5240.json.verified.json",
+        "time_ms": 1792567755324,
+        "count": 3,
+        "mean_error_mm": 1.5373456136705268
+      },
+      {
+        "file": "local_icp_1_12370_8d1f7357-f2b0-48a6-91f5-bff6e4f7a36c.json.verified.json",
+        "time_ms": 1792567772649,
+        "count": 3,
+        "mean_error_mm": 1.219719436559908
+      },
+      {
+        "file": "local_icp_1_13010_5070e407-f933-48b3-9f6a-2952f7a19c0c.json.verified.json",
+        "time_ms": 1792567792878,
+        "count": 3,
+        "mean_error_mm": 1.3734845247169842
+      },
+      {
+        "file": "local_icp_1_13459_cb7b6ede-17dc-415f-8413-ec724b4accb7.json.verified.json",
+        "time_ms": 1792567807596,
+        "count": 3,
+        "mean_error_mm": 1.9425540154790941
+      },
+      {
+        "file": "local_icp_1_13757_9ed33e75-d3d3-45b2-a50f-0619fb28fa49.json.verified.json",
+        "time_ms": 1792567817727,
+        "count": 3,
+        "mean_error_mm": 1.8966710991787623
+      },
+      {
+        "file": "local_icp_1_13913_aa2c5ec9-02c3-492e-a7a4-e457dbbb9b1e.json.verified.json",
+        "time_ms": 1792567822909,
+        "count": 3,
+        "mean_error_mm": 1.6296260314100959
+      },
+      {
+        "file": "local_icp_1_14232_296efcb5-f677-4203-82ad-94c730d2d4e2.json.verified.json",
+        "time_ms": 1792567833435,
+        "count": 3,
+        "mean_error_mm": 2.0819893317370113
+      },
+      {
+        "file": "local_icp_1_14390_467c4584-9d7b-4869-84d7-ed0ed1d91320.json.verified.json",
+        "time_ms": 1792567838979,
+        "count": 3,
+        "mean_error_mm": 1.5441704864330206
+      },
+      {
+        "file": "local_icp_1_14724_0cca5bd6-5335-461f-a226-56e9c636d62b.json.verified.json",
+        "time_ms": 1792567849572,
+        "count": 3,
+        "mean_error_mm": 1.3577257879776596
+      },
+      {
+        "file": "local_icp_1_15350_2c13e16a-40d4-4991-a79a-ee30e6608d81.json.verified.json",
+        "time_ms": 1792567870493,
+        "count": 3,
+        "mean_error_mm": 2.1966263415085936
+      },
+      {
+        "file": "local_icp_1_15675_5ba12529-1416-45a2-9fd1-1ada1d2fc2cd.json.verified.json",
+        "time_ms": 1792567880889,
+        "count": 3,
+        "mean_error_mm": 1.288564803564956
+      },
+      {
+        "file": "local_icp_1_16005_9f74da95-687c-4437-87ee-4e0c262a3c75.json.verified.json",
+        "time_ms": 1792567892339,
+        "count": 3,
+        "mean_error_mm": 1.0876318870338422
+      },
+      {
+        "file": "local_icp_1_16176_49efb6b3-d09f-41bb-8bd0-46ce917fd44a.json.verified.json",
+        "time_ms": 1792567898016,
+        "count": 3,
+        "mean_error_mm": 0.34899509417218594
+      },
+      {
+        "file": "local_icp_1_16681_2d37ead9-cf2b-43f7-94f8-e58ccc87ad80.json.verified.json",
+        "time_ms": 1792567914350,
+        "count": 3,
+        "mean_error_mm": 0.5427138422927005
+      },
+      {
+        "file": "local_icp_1_16999_8e13ad16-d3bd-4fc3-ae87-da781874eed6.json.verified.json",
+        "time_ms": 1792567924448,
+        "count": 3,
+        "mean_error_mm": 1.2512724694806214
+      },
+      {
+        "file": "local_icp_1_17926_f43fd20a-6091-4fd8-b4e9-0d8f0c772c8f.json.verified.json",
+        "time_ms": 1792567955502,
+        "count": 3,
+        "mean_error_mm": 1.8335445303326754
+      },
+      {
+        "file": "local_icp_1_18091_7bc5d558-b49b-461f-81f7-b11f7ff5f50a.json.verified.json",
+        "time_ms": 1792567960715,
+        "count": 3,
+        "mean_error_mm": 1.5850547034894482
+      },
+      {
+        "file": "local_icp_1_18252_365f2a69-7ff2-44c0-a92e-12b1becd294e.json.verified.json",
+        "time_ms": 1792567966094,
+        "count": 3,
+        "mean_error_mm": 1.4930022063693489
+      }
+    ],
+    "model_translation_min": [
+      -12.037261473224843,
+      -9.197800478076728,
+      -3.910632908344269
+    ],
+    "model_translation_max": [
+      8.881031114636317,
+      11.305184258284566,
+      0.0
+    ]
+  },
+  "verification": {
+    "final_projection_max_mm": 9.156030446547578e-07,
+    "positioner_replay_max_mm": 8.766522948515567e-07,
+    "raw_kcf_archive_replay_max_mm": 1.2404828654470752e-07,
+    "raw_kcf_archive_replay_count": 784
+  },
+  "limitations": [
+    "KCF reference alignment shares observations with KCF evaluation, so systematic pose bias can be absorbed. Cross-validation does not eliminate shared calibration/detector bias.",
+    "A rigid transform cannot remove radius or shape differences.",
+    "Circle yaw is not identifiable from center/normal; choose the minimal rotation, no yaw optimization.",
+    "All valid online samples retained; means are sample weighted, not arc-length weighted.",
+    "Nearest point on actual recorded finite polyline; no timestamps paired between TCP and vision; tangential lag is not evaluated.",
+    "Current calibration files checked by replay, but no complete historical calibration snapshot exists.",
+    "RobotSim pose is an evolving estimator output; no independent measured pose or displaced teaching trajectory was supplied."
+  ]
+}

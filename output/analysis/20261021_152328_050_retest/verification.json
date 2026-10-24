@@ -1,0 +1,16 @@
+{
+  "input_hashes_verified": 186,
+  "metric_tables": "passed",
+  "independent_scalar_point_segment_checks": 59,
+  "rigid_transform_and_viewer_coordinate_checks": "passed",
+  "cross_validation": "passed",
+  "numeric_projection_replay": {
+    "final_projection_max_mm": 9.156030446547578e-07,
+    "positioner_replay_max_mm": 8.766522948515567e-07,
+    "raw_kcf_archive_replay_max_mm": 1.2404828654470752e-07,
+    "raw_kcf_archive_replay_count": 784
+  },
+  "static_preview": "inspected",
+  "browser_ui": "not performed; no mouse or Computer Use",
+  "production_files": "unchanged; only new analysis artifacts"
+}

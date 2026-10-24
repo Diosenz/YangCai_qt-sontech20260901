@@ -1,0 +1,3 @@
+﻿file,succeeded,independently_verified,phase,rollback_attempted,samples,good_samples,time_ms,time,cumulative_translation_mm,cumulative_rotation_deg,maximum_keypoint_displacement_mm,message
+local_icp_1_2244_017bc1e3-35bc-4c96-82f8-e57e21ab142a.json.verified.json,True,True,verified,False,3,3,1792580196455,18:56:36.455,5.929619756887059,0.6805306552446311,6.008928347197529,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_2422_6f3fdcfd-3842-4067-9088-e5bd2b83a974.json.verified.json,True,True,verified,False,3,3,1792580201900,18:56:41.900,6.60904197131188,0.7698565095139328,6.824659513573862,独立新帧验证后，工件位姿已晋升为可信位姿。

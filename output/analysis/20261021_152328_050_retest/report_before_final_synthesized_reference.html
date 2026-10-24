@@ -1,0 +1,18 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>在线纠偏复测｜拟合圆评价</title><style>body{max-width:1200px;margin:35px auto;padding:0 25px;font:16px/1.8 system-ui,"Microsoft YaHei";color:#203345}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border-bottom:1px solid #dce5ec;padding:9px;text-align:left}th{background:#edf4fa}.note{padding:15px;background:#eaf5f0}img{max-width:100%}a{color:#0072b2}pre{background:#f5f7f9;padding:15px;white-space:pre-wrap}</style>
+<h1>在线纠偏复测：改用示教拟合圆评价</h1><p>会话 20261021_152328_050；2026-10-21 15:23–15:33。<a href="index.html">四轨迹交互图</a> · <a href="metrics.csv">统计表</a> · <a href="results.json">完整结果</a></p>
+<p class="note"><b>按用户最新要求，主要误差全部改为点到移动后原始示教拟合圆的最短三维距离。</b>仿真工件模型由测绘得到，真实工件制造误差也较大，用户认可约2～3 mm偏差可接受。因此半径差仅作几何描述，不再作为需要优先排查的问题；不凭它判断局部配准或控制异常。</p>
+<h2>结果与可接受范围</h2><table><tr><th>轨迹</th><th>点数</th><th>平均/mm</th><th>最大/mm</th><th>RMSE/mm</th><th>P95/mm</th><th>≤2 mm</th><th>≤3 mm</th><th>最大值时刻</th></tr><tr><td>TCP</td><td>5848</td><td>1.7262</td><td>4.1316</td><td>1.8767</td><td>2.8814</td><td>62.26%</td><td>96.20%</td><td>15:24:15.303</td></tr><tr><td>原始KCF</td><td>7522</td><td>1.8018</td><td>4.9609</td><td>1.9495</td><td>2.9571</td><td>58.65%</td><td>95.52%</td><td>15:24:11.958</td></tr><tr><td>融合后视觉（补充）</td><td>7522</td><td>1.8167</td><td>4.9609</td><td>1.9638</td><td>2.9829</td><td>57.74%</td><td>95.24%</td><td>15:24:11.958</td></tr></table>
+<p>TCP平均 1.726 mm、RMSE 1.877 mm；KCF平均 1.802 mm、RMSE 1.949 mm。结合用户给出的约2～3 mm可接受量级，<b>本轮整体表现可接受</b>，同时保留局部峰值事实：TCP有222点、KCF有337点超过3 mm。用户未将3 mm定义为严格的逐点最大误差限值，因此不据此宣称整段所有点均达标，也不将少量超出直接判为整轮失败。</p>
+<h2>拟合圆和移动方式</h2><p>保留上一版的圆拟合方法与定位变换，确保本次只改变评价几何：原始示教经2°角度分箱代表点拟合三维圆；圆心/法线按融合前KCF整圈估计结果刚体移动，<b>半径仍为原始示教拟合半径 143.717045 mm</b>，没有改用KCF自身半径。移动后圆心为 [-0.5089636594170854, -1.6744511336382502, 253.47836713213812] mm；单位法线为 [-0.0033784269874421575, 0.00013638092458723156, 0.9999942837993296]。<a href="moved_teach_circle.json">圆参数</a> · <a href="teach_to_estimated_current_transform.csv">刚体变换</a>。</p>
+<p>四条主要显示曲线为原始示教拟合圆、TCP原始轨迹、KCF原始轨迹、移动后示教拟合圆；两组原始示教点仍可作为补充切换，默认显示拟合圆。TCP、KCF未拟合、平滑或删去异常点。圆不依赖绕自身法线的相位角，因此上一版原始非圆轨迹物理相位的不确定性不再影响本次圆距离。</p>
+<h2>误差口径</h2><pre>c：移动后圆心；n：圆平面单位法线；r：原始示教拟合半径
+h = (p-c)·n
+ρ = ||(p-c)-h n||
+e = sqrt((ρ-r)²+h²)
+平均误差 = mean(e)；最大误差 = max(e)；RMSE = sqrt(mean(e²))</pre>
+<p>这是到空间连续圆周的解析最短距离，包含径向与离面分量；不是仅径向差，也不是到圆盘、圆的显示采样点或显示折线的距离。统计仍为逐记录样本加权，沿用全部有效在线TCP 5848 点、原始KCF 7522 点和同帧坐标变换；不评价沿缝时序滞后与工具姿态角。逐点CSV包含径向、离面分量及圆周垂足，便于复算。</p>
+<h2>对上一版判断的修正</h2><p>原始示教拟合半径 143.717 mm，KCF拟合半径 142.023 mm，差约 1.695 mm。在测绘建模与真实工件制造误差背景下，这个差异不能直接归因于检测或纠偏故障；当前无须单独优先追查。评价重点改为整体误差水平、2/3 mm范围内的比例、局部峰值及其连续性。TCP与KCF接近表示几何一致性较好，不单凭接近程度判断绝对精度。</p>
+<img src="preview.png" alt="拟合圆四轨迹和解析圆距离统计">
+<h2>参考性质与验证</h2><p>移动后示教圆仍由KCF估计位置，是本轮比较参考，未新增独立测量真值。用前一版相同的交替扇区留出参考改按圆计算，KCF留出均值 1.8021 mm、RMSE 1.9584 mm；留出验证减少直接拟合复用，不能消除共享标定/检测偏差。</p>
+<p>原始采集、标定回放与输入哈希沿用已验证结果。新增圆距离已与另一实现逐点交叉检查，并检查圆周垂足的平面/半径约束、已知答案合成点和稠密圆周独立搜索。静态图已检查；不使用鼠标，真实浏览器交互未验收。<a href="circle_verification.json">本次验证</a> · <a href="input_hashes.json">原始输入哈希</a> · <a href="circle_input_hashes.json">本次复算输入哈希</a>。</p>
+<p>只更新派生分析产物，未修改业务源码和原始数据，未删除文件。旧折线口径成果保存在 <a href="polyline_version_backup/report.html">上一版报告快照</a>（旧页内相对附件路径需回到父目录查阅），不再作为本版主要结论。复现本版请运行同目录 <code>revise_circle.py</code>；旧 <code>analyze.py/build_report.py</code> 是原折线流程，不用于生成本版。</p></html>

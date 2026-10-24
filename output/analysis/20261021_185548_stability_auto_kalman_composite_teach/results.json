@@ -1,0 +1,497 @@
+{
+  "session": "20261021_185548_548_启动在线ICP（稳定保护）+ 自动卡尔曼",
+  "summary": {
+    "session_state": "completed",
+    "vision_diagnostics_schema": "1",
+    "vision_diagnostics_enabled": "1",
+    "vision_images_enabled": "1",
+    "vision_image_sample_every_n": "15",
+    "vision_max_image_pairs": "30",
+    "vision_max_image_bytes": "33554432",
+    "icp_diagnostics_schema": "1",
+    "start_time": "2026-10-21T18:55:48.567",
+    "start_timestamp_ms": "1792580148548",
+    "start_mode": "init_type",
+    "enable_online_icp": "true",
+    "work_path_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt",
+    "teach_pose_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt",
+    "rbcalib_file": "H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT",
+    "initial_match_max_distance_mm": "15.000000",
+    "initial_match_direction_sample_count": "32",
+    "initial_match_min_scan_span_mm": "2.000000",
+    "initial_match_min_reverse_direction_cosine": "0.250000",
+    "initial_match_min_remaining_length_mm": "10.000000",
+    "end_time": "2026-10-21T19:05:58.878",
+    "end_timestamp_ms": "1792580758877",
+    "duration_ms": "610329",
+    "robot_state_count": "6718",
+    "tracking_result_count": "7445",
+    "corrected_path_point_count": "1368",
+    "initial_command_count": "5",
+    "realtime_command_count": "6971",
+    "command_receipt_count": "2932",
+    "icp_batch_count": "430",
+    "vision_diagnostic_count": "7445",
+    "vision_image_submission_count": "30",
+    "message": "online correction completed after robot program stopped"
+  },
+  "coordinate_frame": "变位机末节随动坐标系（材料系），逐点消除S1/S2旋转；与变位机工具TCP系相差Z=231 mm",
+  "source_counts": {
+    "robot": 6718,
+    "diagnostics": 7445,
+    "valid_tcp": 5856,
+    "valid_raw_kcf": 7138
+  },
+  "original_circle": {
+    "center": [
+      4.4923579817409,
+      8.909365552413297,
+      253.90759389704337
+    ],
+    "normal": [
+      -0.0008325817897459309,
+      0.0015759231292623577,
+      0.9999984116356657
+    ],
+    "radius_mm": 142.03533963525268
+  },
+  "current_circle": {
+    "center": [
+      -0.5829926848541069,
+      -1.689080907697348,
+      253.4504749918118
+    ],
+    "normal": [
+      -0.0033143792680101177,
+      0.00015933481965135776,
+      0.9999944947360876
+    ],
+    "radius_mm": 142.03533963525268
+  },
+  "fitted_circles": {
+    "TCP": {
+      "center": [
+        -0.589889664659893,
+        -1.6952805137533582,
+        253.48091685994567
+      ],
+      "radius_mm": 141.95738180685737,
+      "normal": [
+        -0.0033613444937910697,
+        0.0002865852264894997,
+        0.9999943095998605
+      ]
+    },
+    "raw_KCF": {
+      "center": [
+        -0.5829926848541069,
+        -1.689080907697348,
+        253.4504749918118
+      ],
+      "radius_mm": 141.97062562877758,
+      "normal": [
+        -0.0033143792680101177,
+        0.00015933481965135776,
+        0.9999944947360876
+      ]
+    },
+    "final_vision": {
+      "center": [
+        -0.6111305386563901,
+        -1.7112208797899042,
+        253.4491627743374
+      ],
+      "radius_mm": 141.92088159594974,
+      "normal": [
+        -0.0032800835693241504,
+        0.0001394577723442536,
+        0.9999946107871325
+      ]
+    }
+  },
+  "alignment": {
+    "rotation": [
+      [
+        0.9999969203230842,
+        -6.848382980125229e-06,
+        -0.0024817931918137606
+      ],
+      [
+        3.332712376455999e-06,
+        0.9999989966357069,
+        -0.001416586203685371
+      ],
+      [
+        0.0024818004029959363,
+        0.001416573569954654,
+        0.9999959169847048
+      ]
+    ],
+    "translation": [
+      -4.4451296789529255,
+      -10.23877049798292,
+      -0.4798521042582138
+    ],
+    "normal_alignment_deg": 0.1637302671720369,
+    "axial_rotation_is_identifiable": false,
+    "scale": 1.0
+  },
+  "metrics": {
+    "TCP": {
+      "n": 5856,
+      "mean_mm": 0.7375716564198362,
+      "max_mm": 2.5700347036307365,
+      "rmse_mm": 0.8472340138594571,
+      "median_mm": 0.6778005752743259,
+      "p95_mm": 1.5370020242200195,
+      "within_2mm_fraction": 0.9892418032786885,
+      "within_3mm_fraction": 1.0,
+      "above_3mm_count": 0,
+      "max_time": "18:56:32.760"
+    },
+    "raw_KCF": {
+      "n": 7138,
+      "mean_mm": 0.7250246663850173,
+      "max_mm": 3.986869660066572,
+      "rmse_mm": 0.8578291217878757,
+      "median_mm": 0.66326528976629,
+      "p95_mm": 1.4529452897918043,
+      "within_2mm_fraction": 0.9808069487251331,
+      "within_3mm_fraction": 0.9942560941440179,
+      "above_3mm_count": 41,
+      "max_time": "18:56:32.363"
+    },
+    "final_vision": {
+      "n": 7138,
+      "mean_mm": 0.7185627909657506,
+      "max_mm": 3.986869660066572,
+      "rmse_mm": 0.8485475396539438,
+      "median_mm": 0.6547960616112186,
+      "p95_mm": 1.4508336083072693,
+      "within_2mm_fraction": 0.9820678061081536,
+      "within_3mm_fraction": 0.9948164752031381,
+      "above_3mm_count": 37,
+      "max_time": "18:56:32.363"
+    }
+  },
+  "components": [
+    {
+      "trajectory": "TCP",
+      "radial_mean_mm": -0.08851489738967301,
+      "radial_rmse_mm": 0.7085573755377136,
+      "plane_mean_mm": 0.03158738240281867,
+      "plane_rmse_mm": 0.4644910330797709,
+      "delta_x_rmse_mm": 0.5454443442625366,
+      "delta_y_rmse_mm": 0.45210004463105985,
+      "delta_z_rmse_mm": 0.4646520108608289
+    },
+    {
+      "trajectory": "raw_KCF",
+      "radial_mean_mm": -0.10736479794547557,
+      "radial_rmse_mm": 0.7092201029058078,
+      "plane_mean_mm": 0.014036400679583387,
+      "plane_rmse_mm": 0.482573981708123,
+      "delta_x_rmse_mm": 0.5325431762776498,
+      "delta_y_rmse_mm": 0.4681851902018166,
+      "delta_z_rmse_mm": 0.482774476606996
+    },
+    {
+      "trajectory": "final_vision",
+      "radial_mean_mm": -0.16085113309142632,
+      "radial_rmse_mm": 0.7069863772382734,
+      "plane_mean_mm": 0.012740382644322671,
+      "plane_rmse_mm": 0.46925812667684363,
+      "delta_x_rmse_mm": 0.5395139951897255,
+      "delta_y_rmse_mm": 0.4567135017054479,
+      "delta_z_rmse_mm": 0.4694362080273847
+    }
+  ],
+  "fusion": {
+    "applied_count": 6998,
+    "valid_online_count": 7138,
+    "weights_available_count": 6998,
+    "raw_final_pixel_max_px": 19.01864599999999,
+    "movement_mm": {
+      "n": 7138,
+      "mean_mm": 0.05586483630067303,
+      "max_mm": 1.998549358615269,
+      "rmse_mm": 0.10938969367217978,
+      "median_mm": 0.050899100466593156,
+      "p95_mm": 0.10483160416782575
+    },
+    "geometry_rmse_change_mm": -0.009281582133931932,
+    "correlation_jump_rejected": 0,
+    "fusion_jump_rejected": 0,
+    "weight_stats": {
+      "kcf_weight_x": {
+        "n": 6998,
+        "min": 0.75,
+        "median": 0.988987949585,
+        "max": 0.99808263263
+      },
+      "kcf_weight_y": {
+        "n": 6998,
+        "min": 0.75,
+        "median": 0.988987949585,
+        "max": 0.99808263263
+      },
+      "prior_weight_x": {
+        "n": 6998,
+        "min": 0.00191736737,
+        "median": 0.011012050414999999,
+        "max": 0.25
+      },
+      "prior_weight_y": {
+        "n": 6998,
+        "min": 0.00191736737,
+        "median": 0.011012050414999999,
+        "max": 0.25
+      },
+      "normalized_peak": {
+        "n": 6998,
+        "min": 0.0,
+        "median": 0.665593008924,
+        "max": 0.946733070316
+      },
+      "observation_noise": {
+        "n": 6998,
+        "min": 5.8000595e-05,
+        "median": 0.0003377349565,
+        "max": 0.01
+      }
+    },
+    "improved_count": 3680,
+    "worsened_count": 3318,
+    "unchanged_count": 140,
+    "template_reinitialized_count": 140,
+    "kalman_seeded_count": 140
+  },
+  "comparison": [
+    {
+      "trajectory": "TCP",
+      "previous_mean_mm": 0.9372984276667092,
+      "current_mean_mm": 0.7375716564198362,
+      "mean_change_mm": -0.199726771246873,
+      "previous_rmse_mm": 1.0832241179496644,
+      "current_rmse_mm": 0.8472340138594571,
+      "rmse_change_mm": -0.23599010409020738,
+      "previous_max_mm": 2.96836615788426,
+      "current_max_mm": 2.5700347036307365
+    },
+    {
+      "trajectory": "raw_KCF",
+      "previous_mean_mm": 0.915718456738716,
+      "current_mean_mm": 0.7250246663850173,
+      "mean_change_mm": -0.1906937903536987,
+      "previous_rmse_mm": 1.1062673186878194,
+      "current_rmse_mm": 0.8578291217878757,
+      "rmse_change_mm": -0.24843819689994362,
+      "previous_max_mm": 7.202327547175883,
+      "current_max_mm": 3.986869660066572
+    },
+    {
+      "trajectory": "final_vision",
+      "previous_mean_mm": 0.915718456738716,
+      "current_mean_mm": 0.7185627909657506,
+      "mean_change_mm": -0.1971556657729654,
+      "previous_rmse_mm": 1.1062673186878194,
+      "current_rmse_mm": 0.8485475396539438,
+      "rmse_change_mm": -0.25771977903387555,
+      "previous_max_mm": 7.202327547175883,
+      "current_max_mm": 3.986869660066572
+    }
+  ],
+  "holdout": {
+    "folds": [
+      {
+        "held_out_fold": 0,
+        "training_count": 3569,
+        "center": [
+          -0.6957796792233766,
+          -1.8377327291200802,
+          253.4813072409469
+        ],
+        "normal": [
+          -0.003178215798513152,
+          2.0393197481705094e-05,
+          0.9999949492514729
+        ],
+        "n": 3569,
+        "mean_mm": 0.8121758356834656,
+        "max_mm": 3.939422877169778,
+        "rmse_mm": 0.9802141022172303,
+        "median_mm": 0.7315323975313757,
+        "p95_mm": 1.8070989105377955
+      },
+      {
+        "held_out_fold": 1,
+        "training_count": 3569,
+        "center": [
+          -0.4321628116047387,
+          -1.5524241638268959,
+          253.41075550912007
+        ],
+        "normal": [
+          -0.0033373977184141647,
+          0.00016059268049078979,
+          0.9999944179776507
+        ],
+        "n": 3569,
+        "mean_mm": 0.6963804351879744,
+        "max_mm": 3.9243360597704995,
+        "rmse_mm": 0.7922589664717627,
+        "median_mm": 0.6346179404130227,
+        "p95_mm": 1.340668243511696
+      }
+    ],
+    "pooled": {
+      "n": 7138,
+      "mean_mm": 0.7542781354357201,
+      "max_mm": 3.939422877169778,
+      "rmse_mm": 0.8912053512351787,
+      "median_mm": 0.6927815411032827,
+      "p95_mm": 1.51476590773257
+    }
+  },
+  "reference_sensitivity": [
+    {
+      "omitted_source": "20230608CHUFENGKOU",
+      "radius_mm": 142.49790128317656,
+      "trajectory": "TCP",
+      "n": 5856,
+      "mean_mm": 0.8497928651788721,
+      "max_mm": 2.9393249078135217,
+      "rmse_mm": 1.0068048201986444,
+      "median_mm": 0.7232671694058608,
+      "p95_mm": 1.8851813829404351
+    },
+    {
+      "omitted_source": "20230608CHUFENGKOU",
+      "radius_mm": 142.49790128317656,
+      "trajectory": "raw_KCF",
+      "n": 7138,
+      "mean_mm": 0.8548730049340294,
+      "max_mm": 4.241994734508858,
+      "rmse_mm": 1.02428499747422,
+      "median_mm": 0.7241094867304915,
+      "p95_mm": 1.8165825531230366
+    },
+    {
+      "omitted_source": "20250606CHUFENGKOU",
+      "radius_mm": 142.1497795577252,
+      "trajectory": "TCP",
+      "n": 5856,
+      "mean_mm": 0.7477669913985151,
+      "max_mm": 2.658683358356223,
+      "rmse_mm": 0.8666955902078859,
+      "median_mm": 0.6703318317875249,
+      "p95_mm": 1.6104387260388822
+    },
+    {
+      "omitted_source": "20250606CHUFENGKOU",
+      "radius_mm": 142.1497795577252,
+      "trajectory": "raw_KCF",
+      "n": 7138,
+      "mean_mm": 0.739726429435442,
+      "max_mm": 4.0465651499326984,
+      "rmse_mm": 0.8795117602108506,
+      "median_mm": 0.6652532818297052,
+      "p95_mm": 1.5327907378039427
+    },
+    {
+      "omitted_source": "20260308CHUFENGKOU",
+      "radius_mm": 142.0189064095522,
+      "trajectory": "TCP",
+      "n": 5856,
+      "mean_mm": 0.7370383913748499,
+      "max_mm": 2.5574731961698314,
+      "rmse_mm": 0.8456750880651551,
+      "median_mm": 0.6784829549648901,
+      "p95_mm": 1.5275825059923225
+    },
+    {
+      "omitted_source": "20260308CHUFENGKOU",
+      "radius_mm": 142.0189064095522,
+      "trajectory": "raw_KCF",
+      "n": 7138,
+      "mean_mm": 0.7238078269180087,
+      "max_mm": 3.978494315452187,
+      "rmse_mm": 0.8559276565110098,
+      "median_mm": 0.6622763665294245,
+      "p95_mm": 1.4408914097291738
+    },
+    {
+      "omitted_source": "20260404CHUFENGKOU1",
+      "radius_mm": 141.47477129055676,
+      "trajectory": "TCP",
+      "n": 5856,
+      "mean_mm": 0.8527492221970706,
+      "max_mm": 2.341650391282663,
+      "rmse_mm": 0.9658183288249451,
+      "median_mm": 0.8274367087628094,
+      "p95_mm": 1.6029910989722562
+    },
+    {
+      "omitted_source": "20260404CHUFENGKOU1",
+      "radius_mm": 141.47477129055676,
+      "trajectory": "raw_KCF",
+      "n": 7138,
+      "mean_mm": 0.8214830978073895,
+      "max_mm": 4.267280325215276,
+      "rmse_mm": 0.9642287369377994,
+      "median_mm": 0.7507906205894321,
+      "p95_mm": 1.5719906218479367
+    }
+  ],
+  "coverage_deg": 359.6739763255307,
+  "archive": {
+    "batch_count": 430,
+    "attempted": 430,
+    "applied": 366,
+    "not_applied": 64,
+    "enabled": 430,
+    "released_departure_max_mm": 1.6430662627341286,
+    "batch_mean_departure_median_mm": 0.12078863314566654,
+    "semantic": "online trajectory prediction ICP, not surface-localization SET_POSE evidence"
+  },
+  "local_registration": {
+    "archive": "20261021_105548_492_session_1",
+    "candidate_count": 90,
+    "schema_versions": [
+      2
+    ],
+    "accepted_count": 2,
+    "rejected_count": 88,
+    "writeback_record_count": 2,
+    "verification_record_count": 2,
+    "verified_success_count": 2,
+    "rollback_attempted_count": 0,
+    "stability_enabled_count": 90,
+    "stability_evaluated_count": 68,
+    "stability_reject_count": 66,
+    "base_status_counts": {
+      "inferred_pass_from_stability_evaluated": 68,
+      "not_recorded_not_inferred": 22
+    },
+    "evaluated_history_not_enforced_count": 0,
+    "evaluated_conflict_count": 0,
+    "raw_archive_replay_count": 720,
+    "raw_archive_replay_max_mm": 1.2470055125088463e-07
+  },
+  "image_sampling": {
+    "pairs": 30,
+    "image_diagnostic_schema": "1",
+    "buckets": {},
+    "first_saved_time": "18:56:04.379",
+    "last_saved_time": "18:56:41.767"
+  },
+  "verification": {
+    "final_projection_max_mm": 9.070792243297793e-07,
+    "positioner_replay_max_mm": 9.005471757157882e-07,
+    "raw_final_pixel_max_px": 19.01864599999999,
+    "raw_final_spatial_max_mm": 1.998549358615269
+  },
+  "workflow_source": "Prior saved Notion page snapshots dated 2026-10-19 and 2026-10-18; public URL supplied this turn could not be read",
+  "measurement_smoothing": false,
+  "reference_status": "固定历史综合圆；位姿由本轮融合前KCF事后估计；不是独立真值"
+}

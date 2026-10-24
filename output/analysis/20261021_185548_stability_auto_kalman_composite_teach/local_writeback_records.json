@@ -1,0 +1,36 @@
+[
+  {
+    "file": "local_icp_1_2244_017bc1e3-35bc-4c96-82f8-e57e21ab142a.json.writeback.json",
+    "cumulative_rotation_deg": 0.6805306552446311,
+    "cumulative_translation_mm": 5.929619756887059,
+    "epoch": "13",
+    "has_pending_pose": true,
+    "maximum_keypoint_displacement_mm": 6.008928347197529,
+    "message": "定位矩阵已写回并确认 RobotSim 工件 1068。",
+    "parent_id": 1063,
+    "pending_pose_confirmed": true,
+    "phase": "writeback",
+    "rollback_attempted": false,
+    "scene_revision": "1",
+    "succeeded": true,
+    "verified_by_independent_observation": false,
+    "workpiece_id": 1068
+  },
+  {
+    "file": "local_icp_1_2422_6f3fdcfd-3842-4067-9088-e5bd2b83a974.json.writeback.json",
+    "cumulative_rotation_deg": 0.7698565095139328,
+    "cumulative_translation_mm": 6.60904197131188,
+    "epoch": "14",
+    "has_pending_pose": true,
+    "maximum_keypoint_displacement_mm": 6.824659513573862,
+    "message": "定位矩阵已写回并确认 RobotSim 工件 1068。",
+    "parent_id": 1063,
+    "pending_pose_confirmed": true,
+    "phase": "writeback",
+    "rollback_attempted": false,
+    "scene_revision": "1",
+    "succeeded": true,
+    "verified_by_independent_observation": true,
+    "workpiece_id": 1068
+  }
+]

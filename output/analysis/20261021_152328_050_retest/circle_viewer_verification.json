@@ -1,0 +1,9 @@
+{
+  "javascript_syntax": "passed",
+  "stubbed_control_handlers": "passed",
+  "independent_teach_switches": "passed",
+  "zscale_does_not_change_coordinates": "passed",
+  "view_buttons": "passed",
+  "actual_browser_ui": "not performed",
+  "mouse": "not used"
+}

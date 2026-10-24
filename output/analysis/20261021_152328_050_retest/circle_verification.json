@@ -1,0 +1,11 @@
+{
+  "known_answer_points": "passed",
+  "all_point_geometry_cross_check": "passed",
+  "circle_foot_plane_and_radius_constraints": "passed",
+  "dense_angular_search": "passed",
+  "radius_preserved": true,
+  "reference_geometry": "analytical continuous circle",
+  "original_data_and_code": "unchanged",
+  "actual_browser_ui": "not performed",
+  "mouse": "not used"
+}
