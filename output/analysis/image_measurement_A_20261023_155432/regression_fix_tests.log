@@ -1,0 +1,9 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 15: i2r_rlc_runtime_tracking_flow_tests
+1/2 Test #15: i2r_rlc_runtime_tracking_flow_tests ....................   Passed    6.41 sec
+    Start 28: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+2/2 Test #28: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...   Passed    2.59 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   9.01 sec

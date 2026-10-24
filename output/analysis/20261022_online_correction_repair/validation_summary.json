@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-22",
+  "scope": "Only formal online correction; initial reverse scan, offline correction, global localization and normal IBVS unchanged",
+  "computer_use": "Stopped immediately after user prohibition; no later calls; Developer CLI explicitly authorized",
+  "builds": [
+    {
+      "log": "build_1.log",
+      "exit": 0
+    },
+    {
+      "log": "build_2.log",
+      "exit": 0
+    }
+  ],
+  "tests_initial": {
+    "log": "tests_1.log",
+    "passed": 10,
+    "failed": 0,
+    "seconds": 14.56
+  },
+  "review_counterexample_red": {
+    "log": "reacquisition_red_test.log",
+    "failed": 1,
+    "seconds": 2.54,
+    "cause": "18px brighter competing V replaced still-visible measured anchor"
+  },
+  "tests_final_affected": {
+    "log": "tests_2.log",
+    "passed": 6,
+    "failed": 0,
+    "seconds": 3.28
+  },
+  "selected_unique_tests_latest_status": {
+    "passed": 10,
+    "failed": 0
+  },
+  "native_surface_replay": {
+    "archive_transactions": 39,
+    "frame_12680_eligible": 3,
+    "new_eligible": 59,
+    "new_pair_valid": 59,
+    "old_pair_valid": 0,
+    "preflight_pass_transactions": 37,
+    "samples": 117,
+    "log": "native_surface_replay_2.jsonl",
+    "all_three_eligible_transactions": 15,
+    "limitations": "Frozen archived comparator replay, not a new camera/control/ICP closed-loop run. Unsupported cases remain unverified; not a physical accuracy or live rollback-rate claim."
+  },
+  "independent_review": "Three subagent tasks: local posterior implementation, online KCF implementation, read-only scope/continuity/transaction review; final increments reviewed, no unresolved findings",
+  "source_backup": "output/backups/online_correction_repair_20261022/main_baseline",
+  "main_executable": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe",
+  "main_executable_sha256": "22f674838bd2e434c2c5aef99a620706d97f0ccaa120b2e29d26cb7f2d5b38da",
+  "hardware_execution": "No camera, real robot or live RobotSim loop started",
+  "remaining_limits": [
+    "No fresh field closed-loop validation",
+    "Unknown surface evidence still bounded by 5-second timeout",
+    "Coarse KCF remains estimated and cannot serve independent verification",
+    "Existing unrelated offline full-gate results not rerun or claimed passed"
+  ]
+}

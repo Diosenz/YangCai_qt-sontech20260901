@@ -1,0 +1,55 @@
+{
+  "evidence_kind": "synthetic_independently_specified_physical_seam",
+  "prototype_source_sha256": "14a6332c95f0091569a98352cdda21d731c7b1ab628f1af8d64ad173ce59e50a",
+  "actual_seam_apex_px": [
+    138.0,
+    134.0
+  ],
+  "actual_profile_slopes": [
+    0.45,
+    -0.45
+  ],
+  "actual_signal_peak_above_background": 215,
+  "reflection_apex_px": [
+    120.0,
+    160.0
+  ],
+  "reflection_profile_slopes": [
+    0.35,
+    -0.3
+  ],
+  "reflection_signal_peak_above_background": 180,
+  "nominal_model_apex_px": [
+    120,
+    140
+  ],
+  "nominal_model_slopes": [
+    0.35,
+    -0.3
+  ],
+  "sigma_px": 1.3,
+  "result": {
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      120.0,
+      160.0
+    ],
+    "dx": 0,
+    "dy": 20,
+    "score": 0.25186567164179086,
+    "alternate_margin": 1.8589552238805969,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "image_supported_model_alignment",
+    "fitting_exclusion_half_width_px": 24
+  },
+  "physical_seam_error_px": 31.622776601683793,
+  "false_accept": true,
+  "expected_behavior": "真实线和反光线同时有支撑，模型形状偏好不能单独确认真实身份；应保留歧义或引入额外跨帧/空间证据。",
+  "scope": "不是现场精度数据；证明当前固定形状匹配原型在一个生成条件下错误接受，不能据此否定两链解耦方向。",
+  "production_modified": false,
+  "device_calls": false,
+  "mouse_used": false
+}

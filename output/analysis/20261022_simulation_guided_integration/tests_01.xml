@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="16"
+	failures="4"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="126"
+	timestamp="2026-10-22T09:15:59"
+	>
+	<testcase name="i2r_rlc_online_correction_run_recorder_tests" classname="i2r_rlc_online_correction_run_recorder_tests" time="0.568937" status="run">
+		<properties/>
+		<system-out>PASS: online ICP result recording; files=C:/Users/admin/AppData/Local/Temp/i2r_icp_records_666dd073-2f20-4e48-8767-b871c284f9fd
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_runtime_tracking_flow_tests" classname="i2r_rlc_runtime_tracking_flow_tests" time="6.41282" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>FAIL: fresh supported geometry establishes a new-version anchor without applying old compensation
+FAIL: fresh supported geometry establishes a new-version anchor without applying old compensation
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_tests" classname="i2r_rlc_online_local_registration_tests" time="120.02" status="fail">
+		<failure message="Timeout"/>
+		<properties/>
+		<system-out>FAIL: valid history must collect despite in-flight solve, cooldown and absent solve worker
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_surface_tests" classname="i2r_rlc_online_local_registration_surface_tests" time="1.43643" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>FAIL: known small surface shift passes PCL, projected train/holdout and safety references
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_safety_tests" classname="i2r_rlc_online_local_registration_safety_tests" time="1.59114" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_stability_tests" classname="i2r_rlc_online_local_registration_stability_tests" time="0.0811071" status="run">
+		<properties/>
+		<system-out>PASS: online local registration stability tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_history_replay_tests" classname="i2r_rlc_online_local_registration_history_replay_tests" time="0.079664" status="run">
+		<properties/>
+		<system-out>PASS: online local registration history replay tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_verification_tests" classname="i2r_rlc_online_local_registration_verification_tests" time="0.0713154" status="run">
+		<properties/>
+		<system-out>PASS: online local registration verification tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_surface_verification_tests" classname="i2r_rlc_online_local_surface_verification_tests" time="0.0785064" status="run">
+		<properties/>
+		<system-out>PASS: online local surface verification tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_local_registration_writeback_safety_tests" classname="i2r_rlc_local_registration_writeback_safety_tests" time="0.216892" status="run">
+		<properties/>
+		<system-out>PASS: local registration writeback safety tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_correction_robot_sim_offline_frame_sync_tests" classname="i2r_rlc_correction_robot_sim_offline_frame_sync_tests" time="58.2292" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>FAIL: missing RobotState should emit an explicit failure
+FAIL: frame 100 RobotSim query should enter the deterministic block
+FAIL: blocked current and latest pending frames should both reach Vision
+FAIL: while frame 100 is current, frames 101..105 must collapse to frame 105
+FAIL: only current and latest-pending frames should issue per-frame queries
+FAIL: a valid observation after one/two failures must clear the counter before Vision
+FAIL: transport failure should produce one explicit synchronization failure
+FAIL: transport failure should consume exactly the current frame query
+FAIL: old-session query should be blocked before stop
+FAIL: restarted session should route its own frame after old query returns
+FAIL: old-session Vision should enter the deterministic synchronization hook
+FAIL: new session should route after the blocked old Vision call returns
+FAIL: active correction must pause ordinary realtime RobotSim queries
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_correction_robot_sim_online_frame_sync_tests" classname="i2r_rlc_correction_robot_sim_online_frame_sync_tests" time="2.02424" status="run">
+		<properties/>
+		<system-out>PASS: online correction RobotSim frame sync tests; frame mismatch=0, max current=1, max pending=1, post-stop query=0, old-session route=0, stale observation reuse=0
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_localization_surface_validation_tests" classname="i2r_rlc_localization_surface_validation_tests" time="6.72627" status="run">
+		<properties/>
+		<system-out>PASS: surface subspace projection and heldout validation
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_seam_continuity_tests" classname="i2r_rlc_online_seam_continuity_tests" time="0.0552125" status="run">
+		<properties/>
+		<system-out>PASS: continuous targets, 400-frame occlusion, glare, bounded drift, recovery, reset
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_simulation_guided_seam_tests" classname="i2r_rlc_simulation_guided_seam_tests" time="0.285086" status="run">
+		<properties/>
+		<system-out>PASS: temporal anchor, valid-looking reflection, tack GapCenter, pose version, motion compensation, drift and budgets
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_seam_refiner_tests" classname="i2r_rlc_online_seam_refiner_tests" time="0.348596" status="run">
+		<properties/>
+		<system-out>right-biased coarse point valid=1 point=[150.5, 109.989] confidence=0.654288
+left-biased coarse point valid=1 point=[149.5, 109.751] confidence=0.654412
+translated physical seam valid=1 point=[167.5, 120.989] confidence=0.654512
+dominant true stripe with weak parallel reflection valid=1 point=[150.5, 109.989] confidence=0.654288
+frame6469 horizontalValid=1 valid=0 x=498.5
+</system-out>
+	</testcase>
+</testsuite>

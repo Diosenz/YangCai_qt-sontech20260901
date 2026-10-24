@@ -1,0 +1,612 @@
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\include\\RuntimeWorkerAdapters.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\RuntimeWorkerAdapters.h"
+index 60778e4..0e1e92d 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\include\\RuntimeWorkerAdapters.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\RuntimeWorkerAdapters.h"
+@@ -338,6 +338,9 @@ public:
+         bool hasVerifiedPose = false;
+         /// @brief false 表示恢复目标仍是初始可信基线，尚无新帧几何验收的修正。
+         bool verifiedByIndependentObservation = false;
++        /// @brief 当前命令已回读的工作位姿，与几何可信位姿分离；用于下一候选外部修改检查。
++        bool hasConfirmedPose = false;
++        localization::RigidTransform confirmedParentFromWorkpiece;
+         bool hasPendingPose = false;
+         bool pendingPoseConfirmed = false;
+         bool rollbackAttempted = false;
+@@ -362,7 +365,13 @@ public:
+         const std::vector<localization::Point3D_mm> &points);
+     /** @brief 仅独立新帧几何验证通过后调用；epoch 必须仍有效且匹配 pending。 */
+     digital_twin::DigitalTwinCommandResult markLocalRegistrationVerified(quint64 epoch);
+-    /** @brief 验证失败时显式恢复可信位姿；停止/取消只撤销 epoch，不自动写设备。 */
++    /**
++     * @brief 正式在线后验失败/超时后只读确认并保留当前位姿，解除pending以继续采样。
++     * @details 不发送SET、不晋升几何可信、不重置初始基线或累计预算；未知写入拒绝结案。
++     * 仅RobotSim worker线程调用，epoch、场景身份及机器人状态须仍有效。
++     */
++    digital_twin::DigitalTwinCommandResult retainLocalRegistrationCorrection(quint64 epoch);
++    /** @brief 受控显式恢复接口；在线纠偏不再调用，停止/取消也不自动写设备。 */
+     digital_twin::DigitalTwinCommandResult rollbackLocalRegistrationCorrection(quint64 epoch);
+     /** @brief 返回归档所需的事务值对象；仅 worker 线程调用。 */
+     LocalRegistrationSafetySnapshot localRegistrationSafetySnapshot() const;
+@@ -455,9 +464,10 @@ private:
+     digital_twin::DigitalTwinCommandResult applyWorkpieceCorrection(
+         const localization::RigidTransform &virtualToRealCorrection,
+         quint64 epoch);
+-    /// @brief 同线程执行验证晋升/显式恢复，共享身份、外部修改和代次门禁。
+-    digital_twin::DigitalTwinCommandResult verifyOrRestoreLocalRegistration(
+-        quint64 epoch, bool restore);
++    enum class LocalRegistrationCompletion { Verify, Retain, Restore };
++    /// @brief 同线程结案；保留只读、几何晋升和旧显式恢复共享严格事务身份检查。
++    digital_twin::DigitalTwinCommandResult completeLocalRegistrationTransaction(
++        quint64 epoch, LocalRegistrationCompletion completion);
+     /// @brief 在写入前检查累计与关键点预算；不访问设备，不把候选晋升为可信位姿。
+     digital_twin::DigitalTwinCommandResult checkLocalRegistrationCandidate(
+         const localization::RigidTransform &current,
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\src\\RuntimeWorkerAdapters.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\RuntimeWorkerAdapters.cpp"
+index 55156a1..2244b48 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\src\\RuntimeWorkerAdapters.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\RuntimeWorkerAdapters.cpp"
+@@ -1909,18 +1909,27 @@ CGlobalLocatePriorWorkerAdapter::localRegistrationSafetySnapshot() const
+ digital_twin::DigitalTwinCommandResult
+ CGlobalLocatePriorWorkerAdapter::markLocalRegistrationVerified(quint64 epoch)
+ {
+-    return verifyOrRestoreLocalRegistration(epoch, false);
++    return completeLocalRegistrationTransaction(epoch, LocalRegistrationCompletion::Verify);
++}
++
++digital_twin::DigitalTwinCommandResult
++CGlobalLocatePriorWorkerAdapter::retainLocalRegistrationCorrection(quint64 epoch)
++{
++    return completeLocalRegistrationTransaction(epoch, LocalRegistrationCompletion::Retain);
+ }
+ 
+ digital_twin::DigitalTwinCommandResult
+ CGlobalLocatePriorWorkerAdapter::rollbackLocalRegistrationCorrection(quint64 epoch)
+ {
+-    return verifyOrRestoreLocalRegistration(epoch, true);
++    return completeLocalRegistrationTransaction(epoch, LocalRegistrationCompletion::Restore);
+ }
+ 
+ digital_twin::DigitalTwinCommandResult
+-CGlobalLocatePriorWorkerAdapter::verifyOrRestoreLocalRegistration(quint64 epoch, bool restore)
++CGlobalLocatePriorWorkerAdapter::completeLocalRegistrationTransaction(
++    quint64 epoch, LocalRegistrationCompletion completion)
+ {
++    const bool restore = completion == LocalRegistrationCompletion::Restore;
++    const bool retain = completion == LocalRegistrationCompletion::Retain;
+     m_localRegistrationWriteAttempted = false;
+     QElapsedTimer timer;
+     timer.start();
+@@ -1955,7 +1964,21 @@ CGlobalLocatePriorWorkerAdapter::verifyOrRestoreLocalRegistration(quint64 epoch,
+             rigidTransformToMatrix(transaction.pendingParentFromWorkpiece))) {
+         return {false, QStringLiteral("工件位姿已被外部修改，拒绝恢复/晋升局部定位事务。")};
+     }
++    if (retain) {
++        if (!eligible()) {
++            return {false, QStringLiteral("保留结案前事务已撤销，保持待确认保护且不修改场景。")};
++        }
++        // 命令确认锚只负责下一次写回身份；后验未通过不能伪装成几何可信位姿。
++        transaction.confirmedParentFromWorkpiece = transaction.pendingParentFromWorkpiece;
++        transaction.hasConfirmedPose = true;
++        transaction.hasPendingPose = false;
++        transaction.pendingPoseConfirmed = false;
++        transaction.message = QStringLiteral("当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。");
++        return {true, transaction.message};
++    }
+     if (!restore) {
++        transaction.confirmedParentFromWorkpiece = transaction.pendingParentFromWorkpiece;
++        transaction.hasConfirmedPose = true;
+         transaction.verifiedParentFromWorkpiece = transaction.pendingParentFromWorkpiece;
+         transaction.verifiedByIndependentObservation = true;
+         transaction.hasPendingPose = false;
+@@ -1982,6 +2005,8 @@ CGlobalLocatePriorWorkerAdapter::verifyOrRestoreLocalRegistration(quint64 epoch,
+     }
+     transaction.hasPendingPose = false;
+     transaction.pendingPoseConfirmed = false;
++    transaction.confirmedParentFromWorkpiece = transaction.verifiedParentFromWorkpiece;
++    transaction.hasConfirmedPose = true;
+     transaction.message = QStringLiteral("已恢复并回读确认上一可信工件位姿，待上层冷却并重建新采样窗口。");
+     return {true, transaction.message};
+ }
+@@ -1994,7 +2019,7 @@ CGlobalLocatePriorWorkerAdapter::checkLocalRegistrationCandidate(
+     auto &transaction = m_localRegistrationSafety;
+     const auto &options = m_localRegistrationSafetyOptions;
+     if (transaction.hasPendingPose) {
+-        return {false, QStringLiteral("上一局部修正尚未几何验证，禁止连续累积写回。")};
++        return {false, QStringLiteral("上一局部修正尚未结束后验事务，禁止连续累积写回。")};
+     }
+     if (!std::isfinite(options.maximumCumulativeTranslationMm)
+         || options.maximumCumulativeTranslationMm <= 0.0
+@@ -2015,7 +2040,7 @@ CGlobalLocatePriorWorkerAdapter::checkLocalRegistrationCandidate(
+         return {false, QStringLiteral("候选位姿不是有限刚体变换，拒绝局部写回。")};
+     }
+     if (!transaction.hasBaseline) {
+-        // 初始现场位姿是会话恢复基线；此处不表示它已经通过新采样几何验收。
++        // 初始现场位姿固定累计预算；命令确认锚不表示已通过新采样几何验收。
+         transaction.hasBaseline = true;
+         transaction.hasVerifiedPose = true;
+         transaction.sceneRevision = m_robotSimSceneRevision;
+@@ -2023,12 +2048,15 @@ CGlobalLocatePriorWorkerAdapter::checkLocalRegistrationCandidate(
+         transaction.parentId = m_robotSimScene.workpieceParentId;
+         transaction.baselineParentFromWorkpiece = current;
+         transaction.verifiedParentFromWorkpiece = current;
++        transaction.confirmedParentFromWorkpiece = current;
++        transaction.hasConfirmedPose = true;
+     }
+     if (transaction.sceneRevision != m_robotSimSceneRevision
+         || transaction.workpieceId != m_robotSimScene.workpieceId
+         || transaction.parentId != m_robotSimScene.workpieceParentId
++        || !transaction.hasConfirmedPose
+         || !localRegistrationPosesMatch(currentMatrix,
+-            rigidTransformToMatrix(transaction.verifiedParentFromWorkpiece))) {
++            rigidTransformToMatrix(transaction.confirmedParentFromWorkpiece))) {
+         return {false, QStringLiteral("场景身份或工件位姿已变更，必须显式建立新会话，拒绝累积写回。")};
+     }
+     const Eigen::Matrix4d baseline = rigidTransformToMatrix(transaction.baselineParentFromWorkpiece);
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\include\\RuntimeCoordinator.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\RuntimeCoordinator.h"
+index cf82684..455ea63 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\include\\RuntimeCoordinator.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\RuntimeCoordinator.h"
+@@ -590,7 +590,7 @@ private:
+         std::optional<COnlineLocalRegistrationVerification> check;
+         std::optional<COnlineLocalSurfaceVerification> surfaceCheck;
+         quint64 workpiecePoseRevision = 0;
+-        bool rollbackRequested = false;
++        bool retainRequested = false;
+     };
+     std::optional<LocalVerification> m_localVerification;
+ 
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\src\\RuntimeLocalRegistration.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\RuntimeLocalRegistration.cpp"
+index d6d03e4..e89e8eb 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\src\\RuntimeLocalRegistration.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\RuntimeLocalRegistration.cpp"
+@@ -108,6 +108,11 @@ bool saveLocalWritebackSnapshot(const QString &path, const QString &phase,
+     object.insert(QStringLiteral("has_pending_pose"), snapshot.hasPendingPose);
+     object.insert(QStringLiteral("pending_pose_confirmed"), snapshot.pendingPoseConfirmed);
+     object.insert(QStringLiteral("rollback_attempted"), snapshot.rollbackAttempted);
++    object.insert(QStringLiteral("auto_rollback_enabled"), false);
++    object.insert(QStringLiteral("has_confirmed_pose"), snapshot.hasConfirmedPose);
++    object.insert(QStringLiteral("current_pose_geometrically_verified"), phase == QStringLiteral("verified") && command.succeeded);
++    object.insert(QStringLiteral("retained_without_geometric_verification"),
++        phase == QStringLiteral("retained") && command.succeeded);
+     object.insert(QStringLiteral("verified_by_independent_observation"), snapshot.verifiedByIndependentObservation);
+     object.insert(QStringLiteral("workpiece_id"), snapshot.workpieceId);
+     object.insert(QStringLiteral("parent_id"), snapshot.parentId);
+@@ -123,6 +128,7 @@ bool saveLocalWritebackSnapshot(const QString &path, const QString &phase,
+     };
+     addMatrix("baseline_parent_from_workpiece", snapshot.baselineParentFromWorkpiece);
+     addMatrix("verified_parent_from_workpiece", snapshot.verifiedParentFromWorkpiece);
++    addMatrix("confirmed_parent_from_workpiece", snapshot.confirmedParentFromWorkpiece);
+     addMatrix("before_parent_from_workpiece", snapshot.beforeParentFromWorkpiece);
+     addMatrix("pending_parent_from_workpiece", snapshot.pendingParentFromWorkpiece);
+     QSaveFile file(path + QStringLiteral(".") + phase + QStringLiteral(".json"));
+@@ -679,7 +685,7 @@ void CRuntimeCoordinator::verifyOnlineLocalRegistration(
+             {QStringLiteral("counterfactual_previous_error_mm"), verification.check->previousErrorMm()}});
+     }
+     if (verification.check->decision() == COnlineLocalRegistrationVerification::Decision::Rollback) {
+-        verification.rollbackRequested = true;
++        verification.retainRequested = true;
+     }
+ }
+ 
+@@ -690,7 +696,7 @@ void CRuntimeCoordinator::submitOnlineLocalSurfaceVerification(
+         || m_localRegistrationWorker == nullptr || m_localRegistrationBusy
+         || m_localRegistrationWritebackBusy) { return; }
+     auto &verification = *m_localVerification;
+-    if (verification.rollbackRequested
++    if (verification.retainRequested
+         || verification.surfaceCheck->decision() != COnlineLocalSurfaceVerification::Decision::Waiting) {
+         return;
+     }
+@@ -815,7 +821,7 @@ void CRuntimeCoordinator::submitOnlineLocalSurfaceVerification(
+                                 {QStringLiteral("message"), result.message}});
+                         }
+                         if (current.surfaceCheck->decision() == COnlineLocalSurfaceVerification::Decision::Rollback) {
+-                            current.rollbackRequested = true;
++                            current.retainRequested = true;
+                         }
+                         coordinator->dispatchPendingVisionFrame();
+                     }, Qt::QueuedConnection);
+@@ -831,7 +837,7 @@ bool CRuntimeCoordinator::finishOnlineLocalRegistrationVerification()
+         ? verification.surfaceCheck->decision() == COnlineLocalSurfaceVerification::Decision::Waiting
+         : (verification.check.has_value()
+             && verification.check->decision() == COnlineLocalRegistrationVerification::Decision::Waiting);
+-    if (!verification.rollbackRequested && waiting) {
++    if (!verification.retainRequested && waiting) {
+         return false;
+     }
+     if (!m_running || m_stopping || !m_correctionSession.active
+@@ -853,19 +859,18 @@ bool CRuntimeCoordinator::finishOnlineLocalRegistrationVerification()
+     const QPointer<CRuntimeCoordinator> coordinator(this);
+     QMetaObject::invokeMethod(m_robotSimWorker,
+         [coordinator, worker = m_robotSimWorker, verification, requestId]() {
+-            const bool rollback = verification.rollbackRequested;
+-            const auto command = rollback
+-                ? worker->rollbackLocalRegistrationCorrection(verification.generation)
++            const bool retained = verification.retainRequested;
++            const auto command = retained
++                ? worker->retainLocalRegistrationCorrection(verification.generation)
+                 : worker->markLocalRegistrationVerified(verification.generation);
+             const auto snapshot = worker->localRegistrationSafetySnapshot();
+             const bool archived = saveLocalWritebackSnapshot(verification.archivePath,
+-                rollback ? QStringLiteral("rollback") : QStringLiteral("verified"),
++                retained ? QStringLiteral("retained") : QStringLiteral("verified"),
+                 snapshot, command, verification.samples, verification.verifiedGoodFrames,
+-                verification.surfaceCheck.has_value(), verification.workpiecePoseRevision
+-                    + (rollback && snapshot.rollbackAttempted ? 1U : 0U));
++                verification.surfaceCheck.has_value(), verification.workpiecePoseRevision);
+             if (!coordinator.isNull()) {
+                 QMetaObject::invokeMethod(coordinator,
+-                    [coordinator, verification, command, snapshot, archived, rollback, requestId]() {
++                    [coordinator, verification, command, snapshot, archived, retained, requestId]() {
+                         if (coordinator.isNull()
+                             || requestId != coordinator->m_localRegistrationRequestId) { return; }
+                         coordinator->m_localRegistrationWritebackBusy = false;
+@@ -876,51 +881,47 @@ bool CRuntimeCoordinator::finishOnlineLocalRegistrationVerification()
+                             return;
+                         }
+                         coordinator->m_localVerification.reset();
+-                        if (rollback && snapshot.rollbackAttempted) {
+-                            // 恢复回读失败也不能携带旧像素锚；未知写入仍保持故障暂停。
+-                            ++coordinator->m_localWorkpiecePoseRevision;
+-                        }
+-                        const bool recovered = rollback && coordinator->m_localRegistrationRecovery.complete(
+-                            {command.succeeded, archived, snapshot.rollbackAttempted,
+-                                snapshot.hasVerifiedPose, snapshot.hasPendingPose, snapshot.pendingPoseConfirmed},
+-                            coordinator->m_localRegistrationClock.elapsed(), QDateTime::currentMSecsSinceEpoch(),
+-                            std::max(verification.sourceFrameId, verification.lastObservedFrameId),
+-                            coordinator->m_localRegistrationOptions.minimumMatchIntervalMs);
+-                        // 只有恢复及归档都确认才允许冷却后重建窗口；未知写入仍锁住。
+-                        if ((rollback && !recovered) || !command.succeeded || !archived) {
++                        // 保留事务只做GET核验，不改变场景，也不推进实际位姿版本或重置KCF锚。
++                        const bool retainedConfirmed = retained
++                            && coordinator->m_localRegistrationRecovery.completeRetained(
++                                {command.succeeded, archived, snapshot.hasConfirmedPose, snapshot.hasPendingPose},
++                                coordinator->m_localRegistrationClock.elapsed(), QDateTime::currentMSecsSinceEpoch(),
++                                std::max(verification.sourceFrameId, verification.lastObservedFrameId),
++                                coordinator->m_localRegistrationOptions.minimumMatchIntervalMs);
++                        // 未知写入或归档失败仍锁住；不得通过保留结案绕过事务保护。
++                        if ((retained && !retainedConfirmed) || !command.succeeded || !archived) {
+                             coordinator->m_localRegistrationFaulted = true;
+                         }
+                         if (!coordinator->m_localRegistrationFaulted) {
+                             if (snapshot.verifiedByIndependentObservation) {
+                                 coordinator->m_lastVerifiedLocalWorkpiecePose = snapshot.verifiedParentFromWorkpiece;
+                             } else {
+-                                // 初始基线不是新帧验证位姿，恢复后仍需独立焊点建立首锚。
++                                // 保留首个工作位姿不等于几何首锚，下一窗口仍须独立焊点验收。
+                                 coordinator->m_lastVerifiedLocalWorkpiecePose.reset();
+                             }
+-                            if (recovered || verification.surfaceCheck.has_value()) {
+-                                // 表面更新未产生材料焊点对应，不能刚体推进历史激光交点。
++                            if (retained || verification.surfaceCheck.has_value()) {
++                                // 未通过的修正不能推进历史几何；当前场景则继续保留用于新采样。
+                                 coordinator->m_localRegistrationStability.clear();
+                             } else if (verification.stabilityProtectionEnabled
+                                 && !coordinator->m_localRegistrationStability.promote(
+                                     verification.correction, verification.verifiedGoodFrames)) {
+-                                // 监测失效不能冒充场景写回故障，也不能继续传递错误坐标。
+                                 coordinator->m_localRegistrationStability.clear();
+                                 emit coordinator->statusMessage(QStringLiteral("历史监测坐标推进失效，已清空待校核观测；原验收继续生效。"));
+                             }
+                         }
+-                        if (recovered) {
++                        if (retainedConfirmed) {
+                             coordinator->m_lastLocalRegistrationAttemptMs = coordinator->m_localRegistrationClock.elapsed();
+                         }
+                         coordinator->resetOnlineLocalRegistration(!coordinator->m_localRegistrationFaulted);
+                         coordinator->m_pendingVisionFrame.reset();
+                         const QString message = QStringLiteral("[在线局部定位] %1：%2；事务归档%3。%4")
+-                            .arg(rollback ? QStringLiteral("后验验证失败，受保护恢复") : QStringLiteral("后验验证"))
++                            .arg(retained ? QStringLiteral("后验未确认，禁止自动回退") : QStringLiteral("后验验证"))
+                             .arg(command.message)
+                             .arg(archived ? QStringLiteral("成功") : QStringLiteral("失败"))
+                             .arg(coordinator->m_localRegistrationFaulted
+-                                ? QStringLiteral("本会话自动更新暂停，纠偏继续。")
+-                                : (recovered
+-                                    ? QStringLiteral("恢复已确认；冷却后仅用恢复完成后的新曝光重新采样。")
++                                ? QStringLiteral("本会话工件位姿自动更新暂停，视觉跟随继续。")
++                                : (retainedConfirmed
++                                    ? QStringLiteral("当前位姿保持不变；冷却后仅用新曝光继续ICP，未晋升几何可信。")
+                                     : QStringLiteral("已通过连续新帧独立检查，重新采样。")));
+                         qInfo().noquote() << message;
+                         emit coordinator->statusMessage(message);
+@@ -1051,7 +1052,7 @@ bool CRuntimeCoordinator::dispatchOnlineLocalRegistrationWriteback()
+                                             && pending.check->decision() == COnlineLocalRegistrationVerification::Decision::Waiting);
+                                     // 已通过的后验可能仍在等待仿真通道晋升，计时器不能改写该终态。
+                                     if (waiting) {
+-                                        pending.rollbackRequested = true;
++                                        pending.retainRequested = true;
+                                         coordinator->dispatchPendingVisionFrame();
+                                     }
+                                 }
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\include\\OnlineLocalRegistrationRecovery.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\OnlineLocalRegistrationRecovery.h"
+index 9db4dfb..198e026 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\UI\\include\\OnlineLocalRegistrationRecovery.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\OnlineLocalRegistrationRecovery.h"
+@@ -1,6 +1,6 @@
+ ﻿/**
+  * @file OnlineLocalRegistrationRecovery.h
+- * @brief 已确认回滚后的冷却及新曝光边界；仅 coordinator 线程持有。
++ * @brief 在线写后事务结案的冷却及新曝光边界；仅 coordinator 线程持有。
+  */
+ #ifndef I2R_RLC_UI_ONLINE_LOCAL_REGISTRATION_RECOVERY_H
+ #define I2R_RLC_UI_ONLINE_LOCAL_REGISTRATION_RECOVERY_H
+@@ -9,7 +9,7 @@
+ 
+ namespace i2r_rlc::ui {
+ 
+-/** @brief 只管理恢复后采样资格，不清除会话累计预算、不访问设备或晋升位姿。 */
++/** @brief 只管理保留/显式恢复后的采样资格，不清累计预算、不访问设备或晋升位姿。 */
+ class COnlineLocalRegistrationRecovery final {
+ public:
+     /** @brief 回滚命令、归档和 worker 事务快照共同证明恢复已确认。 */
+@@ -22,6 +22,14 @@ public:
+         bool pendingPoseConfirmed = false;
+     };
+ 
++    /** @brief 保留当前已确认位姿的结案结果；不要求或伪造恢复尝试标记。 */
++    struct RetainedOutcome {
++        bool commandSucceeded = false;
++        bool archived = false;
++        bool hasConfirmedPose = false;
++        bool hasPendingPose = true;
++    };
++
+     /** @brief 新会话显式清除旧边界；普通清窗和热调不能缩短恢复冷却。 */
+     void reset() { *this = COnlineLocalRegistrationRecovery{}; }
+ 
+@@ -45,6 +53,24 @@ public:
+         return m_confirmed;
+     }
+ 
++    /**
++     * @brief 不发恢复命令的保留结案：仅成功回读且归档后允许冷却并使用新曝光。
++     * @details 当前位姿不晋升几何可信，未知写入、未归档或pending未结束保持禁止采样。
++     */
++    bool completeRetained(const RetainedOutcome &outcome, qint64 nowMs,
++        qint64 captureAfterMs, qint64 frameAfter, int cooldownMs)
++    {
++        m_active = true;
++        m_confirmed = outcome.commandSucceeded && outcome.archived
++            && outcome.hasConfirmedPose && !outcome.hasPendingPose
++            && nowMs >= 0 && captureAfterMs >= 0 && frameAfter >= 0 && cooldownMs >= 0;
++        m_startedAtMs = nowMs;
++        m_cooldownMs = cooldownMs;
++        m_captureAfterMs = captureAfterMs;
++        m_frameAfter = frameAfter;
++        return m_confirmed;
++    }
++
+     /** @brief 冷却后仍须新曝光及递增帧号；参数为调用方已校核的当前会话时间。 */
+     bool allowsSample(qint64 nowMs, qint64 captureTimeMs, qint64 frameId) const
+     {
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\tests\\test_local_registration_writeback_safety.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_local_registration_writeback_safety.cpp"
+index 1032325..d08f017 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\tests\\test_local_registration_writeback_safety.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_local_registration_writeback_safety.cpp"
+@@ -1,6 +1,6 @@
+ ﻿/**
+  * @file test_local_registration_writeback_safety.cpp
+- * @brief 用受控内存 transport 验证累计预算、独立验收与受保护恢复；不访问设备。
++ * @brief 用受控内存transport验证保留位姿后继续修正、累计预算及旧显式恢复；不访问设备。
+  */
+ #include <cmath>
+ #include <cstdio>
+@@ -216,6 +216,101 @@ bool testRestoreLastVerifiedPose()
+     return ok;
+ }
+ 
++/** @brief 后验未通过也保留命令确认锚；无SET、无几何伪晋升且下一代仍可修正。 */
++bool testRetainConfirmedPoseAndContinue()
++{
++    SafetyFixture fixture;
++    bool ok = expect(fixture.applyTranslation(5.0).succeeded, "retain first candidate written");
++    const auto appliedPose = fixture.scene->pose;
++    ok &= expect(fixture.worker.retainLocalRegistrationCorrection(7).succeeded
++        && fixture.scene->writes == 1 && fixture.scene->pose == appliedPose
++        && !fixture.worker.localRegistrationWriteAttempted(),
++        "retain only reads and never sends a rollback SET");
++    auto retained = fixture.worker.localRegistrationSafetySnapshot();
++    ok &= expect(!retained.hasPendingPose && !retained.pendingPoseConfirmed
++        && retained.hasConfirmedPose && !retained.verifiedByIndependentObservation
++        && std::abs(retained.confirmedParentFromWorkpiece.rowMajor[3] - 25.0) < 1e-6
++        && std::abs(retained.verifiedParentFromWorkpiece.rowMajor[3] - 20.0) < 1e-6
++        && std::abs(retained.baselineParentFromWorkpiece.rowMajor[3] - 20.0) < 1e-6,
++        "first retained command is a working anchor, not a geometrically verified anchor");
++    ok &= expect(!fixture.worker.retainLocalRegistrationCorrection(7).succeeded
++        && fixture.scene->writes == 1 && fixture.scene->pose == appliedPose,
++        "repeating retained completion cannot write or promote a pose");
++    fixture.worker.setLocalRegistrationEpoch(8);
++    fixture.refreshDeadline();
++    loc::RigidTransform next;
++    next.rowMajor[3] = 2.0;
++    ok &= expect(fixture.worker.applyLocalRegistrationCorrection(8, next).succeeded
++        && fixture.scene->writes == 2 && std::abs(fixture.scene->pose[0].toDouble() - 27.0) < 1e-6,
++        "next ICP generation continues from retained current pose, not the old verified pose");
++    ok &= expect(fixture.worker.markLocalRegistrationVerified(8).succeeded,
++        "a later independently verified candidate may establish the first geometric anchor");
++    retained = fixture.worker.localRegistrationSafetySnapshot();
++    ok &= expect(retained.verifiedByIndependentObservation
++        && std::abs(retained.confirmedParentFromWorkpiece.rowMajor[3] - 27.0) < 1e-6
++        && std::abs(retained.verifiedParentFromWorkpiece.rowMajor[3] - 27.0) < 1e-6,
++        "verified completion synchronizes current and geometric anchors");
++
++    SafetyFixture established;
++    ok &= expect(established.applyTranslation(3.0).succeeded
++        && established.worker.markLocalRegistrationVerified(7).succeeded
++        && established.applyTranslation(2.0).succeeded
++        && established.worker.retainLocalRegistrationCorrection(7).succeeded,
++        "established geometric anchor can retain a later unverified working pose");
++    const auto state = established.worker.localRegistrationSafetySnapshot();
++    ok &= expect(state.verifiedByIndependentObservation && !state.hasPendingPose
++        && std::abs(state.verifiedParentFromWorkpiece.rowMajor[3] - 23.0) < 1e-6
++        && std::abs(state.confirmedParentFromWorkpiece.rowMajor[3] - 25.0) < 1e-6
++        && established.scene->writes == 2,
++        "retaining preserves the previous geometric anchor and adds no restore write");
++    return ok;
++}
++
++/** @brief 保留结案不能重置累计预算、接受外部修改或解锁未知SET。 */
++bool testRetentionKeepsBudgetsAndRejectsUnknownState()
++{
++    SafetyFixture cumulative;
++    bool ok = expect(cumulative.applyTranslation(16.0).succeeded
++        && cumulative.worker.retainLocalRegistrationCorrection(7).succeeded,
++        "first retained increment within session budget is allowed");
++    ok &= expect(!cumulative.applyTranslation(16.0).succeeded && cumulative.scene->writes == 1,
++        "retained completion does not reset the thirty-millimetre cumulative budget");
++    SafetyFixture external;
++    ok &= expect(external.applyTranslation(5.0).succeeded, "retention external-edit candidate written");
++    external.scene->pose[0] = 99.0;
++    ok &= expect(!external.worker.retainLocalRegistrationCorrection(7).succeeded
++        && external.worker.localRegistrationSafetySnapshot().hasPendingPose && external.scene->writes == 1,
++        "external edit blocks retention without overwriting or clearing pending");
++    SafetyFixture afterRetention;
++    ok &= expect(afterRetention.applyTranslation(5.0).succeeded
++        && afterRetention.worker.retainLocalRegistrationCorrection(7).succeeded,
++        "working-anchor external-edit fixture retained");
++    afterRetention.scene->pose[0] = 99.0;
++    ok &= expect(!afterRetention.applyTranslation(1.0).succeeded && afterRetention.scene->writes == 1,
++        "next candidate still detects external modification of a retained working anchor");
++    SafetyFixture unknown;
++    unknown.scene->failReadback = true;
++    ok &= expect(!unknown.applyTranslation(5.0).succeeded, "unknown retained command fixture");
++    unknown.scene->failReadback = false;
++    ok &= expect(!unknown.worker.retainLocalRegistrationCorrection(7).succeeded
++        && unknown.worker.localRegistrationSafetySnapshot().hasPendingPose
++        && !unknown.applyTranslation(1.0).succeeded && unknown.scene->writes == 1,
++        "unknown original readback cannot be silently retained to unlock another write");
++    SafetyFixture cancelled;
++    ok &= expect(cancelled.applyTranslation(5.0).succeeded, "retention cancellation fixture written");
++    cancelled.scene->beforeParentRead = [&cancelled]() { cancelled.worker.setLocalRegistrationEpoch(0); };
++    ok &= expect(!cancelled.worker.retainLocalRegistrationCorrection(7).succeeded
++        && cancelled.worker.localRegistrationSafetySnapshot().hasPendingPose && cancelled.scene->writes == 1,
++        "cancellation during read-only retention cannot clear the old transaction");
++    SafetyFixture expired;
++    ok &= expect(expired.applyTranslation(5.0).succeeded, "retention expired-state candidate written");
++    expired.worker.setLocalRegistrationStateDeadline(QDateTime::currentMSecsSinceEpoch() - 1);
++    ok &= expect(!expired.worker.retainLocalRegistrationCorrection(7).succeeded
++        && expired.scene->writes == 1 && expired.worker.localRegistrationSafetySnapshot().hasPendingPose,
++        "expired robot state forbids retention and never sends a restore");
++    return ok;
++}
++
+ bool testExternalChangesAndCancellation()
+ {
+     SafetyFixture external;
+@@ -311,6 +406,9 @@ bool testSceneRevisionAloneRejectsPendingTransaction()
+         "old pending snapshot and IDs must survive reconnect unchanged");
+     ok &= expect(!fixture.worker.markLocalRegistrationVerified(7).succeeded,
+         "scene revision alone must prevent old pending pose promotion");
++    ok &= expect(!fixture.worker.retainLocalRegistrationCorrection(7).succeeded
++        && fixture.worker.localRegistrationSafetySnapshot().hasPendingPose,
++        "scene revision alone must prevent retained completion even with matching current pose");
+     ok &= expect(!fixture.worker.rollbackLocalRegistrationCorrection(7).succeeded
+         && fixture.scene->writes == 1 && fixture.scene->pose == pendingPose,
+         "scene revision alone must prevent rollback despite live connection and identical IDs/pose");
+@@ -323,6 +421,8 @@ int main(int argc, char **argv)
+     QCoreApplication application(argc, argv);
+     bool ok = testPendingBlocksAndGeometryPromotion();
+     ok &= testCumulativeAndRotatingKeypointBudgets();
++    ok &= testRetainConfirmedPoseAndContinue();
++    ok &= testRetentionKeepsBudgetsAndRejectsUnknownState();
+     ok &= testRestoreLastVerifiedPose();
+     ok &= testExternalChangesAndCancellation();
+     ok &= testSceneIdentityAndUnknownWrite();
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\tests\\test_online_local_surface_verification.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_local_surface_verification.cpp"
+index 1ef5cb0..9656b06 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\tests\\test_online_local_surface_verification.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_local_surface_verification.cpp"
+@@ -227,10 +227,37 @@ bool testRecoveryRequiresConfirmationCooldownAndNewExposure()
+     return ok;
+ }
+ 
++/** @brief 不回退结案必须保持冷却和新曝光边界，不能伪造恢复尝试解锁。 */
++bool testRetainedPoseSamplingBoundary()
++{
++    using Recovery = i2r_rlc::ui::COnlineLocalRegistrationRecovery;
++    Recovery boundary;
++    const Recovery::RetainedOutcome retained{true, true, true, false};
++    bool ok = expect(boundary.completeRetained(retained, 1000, 50000, 100, 2000),
++        "read-only confirmed retention can end pending without a restore operation");
++    ok &= expect(!boundary.allowsSample(2999, 50001, 101)
++        && !boundary.allowsSample(3000, 50000, 101)
++        && !boundary.allowsSample(3000, 50001, 100),
++        "retained pose still requires cooldown, a new exposure and a higher frame id");
++    ok &= expect(boundary.allowsSample(3000, 50001, 101),
++        "fresh post-retention frame resumes ICP without changing workpiece pose");
++    for (const auto outcome : {Recovery::RetainedOutcome{false, true, true, false},
++             Recovery::RetainedOutcome{true, false, true, false},
++             Recovery::RetainedOutcome{true, true, false, false},
++             Recovery::RetainedOutcome{true, true, true, true}}) {
++        Recovery blocked;
++        ok &= expect(!blocked.completeRetained(outcome, 1000, 50000, 100, 2000)
++            && !blocked.allowsSample(99999, 99999, 99999),
++            "unknown confirmation, archive failure or pending pose cannot resume retained sampling");
++    }
++    return ok;
++}
++
+ } // namespace
+ 
+ int main()
+ {
++    if (!testRetainedPoseSamplingBoundary()) { return 1; }
+     bool ok = testNewFrameStreakAndTerminalState();
+     ok &= testBadStreakAndCoverage();
+     ok &= testFrozenDirectionalBaseline();
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\docs\\online_local_registration.md" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\docs\\online_local_registration.md"
+index ab540e7..be6fa4e 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_no_rollback_20261022\\docs\\online_local_registration.md"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\docs\\online_local_registration.md"
+@@ -2,6 +2,8 @@
+ 
+ ## 行为与边界
+ 
++2026-10-22 最新用户策略：正式在线纠偏禁止自动回退工件位姿。后验失败或超时保留当前已回读位姿，结束事务后清窗并继续下一轮 ICP。以末尾“取消在线自动回退”章节为准；前文自动恢复与恢复计数保留为历史证据。
++
+ 2026-10-22 新增“有界仿真辅助接缝”和“已有可信位姿后的表面辅助更新”。本页末尾同日章节说明当前接线；早期“所有更新都必须存在独立焊点”和“无限期像素续接”的描述只保留为历史版本，不覆盖同日新边界。
+ 
+ 在线纠偏进入 `OnlineRunning` 后，独立的 `online-local-registration` 线程从已经完成主视觉处理的同帧上下文采样。复用当前相机图像、冻结的机器人状态和 RobotSim 三维激光线，不增加逐帧仿真请求，不改变机器人 O/P 指令与轨迹 ICP。初始反向扫描、离线纠偏、普通 IBVS 和全局定位不启用本支路。
+@@ -373,3 +375,34 @@ Vision 保留原图几何观测，同时增加 `CSimulationGuidedSeamEstimator`
+ 最终 MSVC 主程序重建成功。只重跑受到该增量影响的 6 项 KCF、在线投影合同、同帧同步、诊断和融合控制专项，6/6 通过，耗时 3.28 秒；结合首轮其他 4 项的最后结果，选定 10 项全部通过。最终原生归档回放仍为 59/117 份新配对有效，第 12680 次三份全部通过；写前支持性检查在这批 39 份旧候选中有 37 份可通过，其余不会在新策略下先写回。这不意味着其余 24 组原三帧证据不足均已解决：有限范围之外或几何不一致仍可能触发 5 秒超时恢复，需要后续现场记录判别。
+ 
+ 最终主程序为 `out/build/qt-debug/UI/i2r_rlc.exe`。未自动启动相机、机器人或现场仿真闭环，也未重复运行无关离线专项；原有在线/离线共享完整门禁不能据本次在线专项单独宣称全部通过。源码变化清单、SHA256、审查范围及各次原始日志见同目录 `source_changes.json`、`source_changes.diff`、`validation_summary.json`。
++
++
++## 2026-10-22 取消在线自动回退
++
++### 用户确认与现场依据
++
++最新现场会话 `output/online_correction/20261022_164042_961/` 对应局部记录 `20261022_084042_917_session_1`：24 次工件写回、7 次后验晋升、17 次恢复。用户明确要求不再回退，且选择“保留位姿，继续后续 ICP 修正”。本节取代本页前文关于在线后验恶化或五秒超时自动恢复旧工件位姿的当前行为说明。
++
++### 后验结束只保留当前位姿
++
++正式在线纠偏的后验未通过及五秒待确认超时均调用 `retainLocalRegistrationCorrection`，不再调用 `rollbackLocalRegistrationCorrection`。保留结案只 GET 工件/父级位姿，确认当前相对位姿仍等于这次已命令回读的 pending 目标；不发送 SET_POSE，也不将当前位姿晋升为几何可信。后验通过的正常晋升分支继续沿用。
++
++命令确认的当前工作锚 `confirmedParentFromWorkpiece` 与独立几何验证锚 `verifiedParentFromWorkpiece` 分开保存。首次读取初始化工作锚，保留结案只更新工作锚；正常几何晋升同步两者。下一次候选以工作锚核对场景实际位姿，因此保留后能够继续修正，不会因仍与旧几何锚比较而被误判为外部改动。
++
++初始 baseline、累计平移/旋转/关键点位移预算，以及旧几何可信锚均不会因保留而重置或伪晋升。首次尚无独立几何首锚时，下轮仍以真实独立焊点验收建立首锚，不把 retained 位姿填进 `m_lastVerifiedLocalWorkpiecePose` 放行缺焊点表面支路。
++
++### 后续采样与异常边界
++
++保留结案及归档成功后清理旧点云窗口和历史监测、提升任务 generation，经过原 `minimum_match_interval_ms` 冷却后，只接受结案完成之后的新曝光及递增帧号。实际工件位姿没有再次改变，因此 workpiecePoseRevision 不递增，KCF 不因该结案额外清模板、滤波和实测锚。最终业务点显示与在线跟随路径不变。
++
++保留仍要求 pending 已回读确认，epoch/场景修订/工件/父级/参考身份一致、真实场景连接、机器人状态未过期，且两次 GET 后及结案前代次仍有效。原始 SET 结果未知、当前位姿被外部修改、状态失效或归档失败时，工件位姿自动更新保持暂停且不发送恢复命令。停止、切会话及关闭功能也不触发恢复。
++
++旧显式恢复 API 仅保留给既有受控调用/测试，正式在线生产路径无其调用。未修改 RobotSim、Control、检测融合、通用投影或其他功能。
++
++### 归档与验证
++
++新结案文件为 `.retained.json`，明确保存 `auto_rollback_enabled=false`、`retained_without_geometric_verification`、`has_confirmed_pose`、`confirmed_parent_from_workpiece` 及旧 `verified_parent_from_workpiece`；`current_pose_geometrically_verified` 只有晋升命令实际成功才为 true。历史恢复文件不删除、不覆盖。
++
++修改前备份位于 `output/backups/online_no_rollback_20261022/`，构建及直接相关行为验证证据位于 `output/analysis/20261022_online_no_rollback/`。本轮复用已授权的 VS2022 x64 Developer 命令行和现有 qt-debug 构建目录，禁止 Computer Use/鼠标，不自动启动相机、机器人或现场仿真闭环。
++
++本轮最终验证：MSVC 主程序及必要专项目标构建成功；5 项直接相关 CTest 全部通过，耗时 15.37 秒，覆盖保留结案不发送额外 SET、保留后下一代 ICP 可继续、旧几何锚不伪晋升、累计预算和未知写入/外部修改保护，以及冷却新曝光边界。在线生产模块中对 rollback API 的调用为零。尚未自动启动现场闭环；现场效果需用户下一轮运行记录确认。

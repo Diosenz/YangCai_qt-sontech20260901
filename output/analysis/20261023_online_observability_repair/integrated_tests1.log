@@ -1,0 +1,127 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start   8: i2r_rlc_online_correction_run_recorder_tests
+1/7 Test   #8: i2r_rlc_online_correction_run_recorder_tests ....***Failed    0.58 sec
+FAIL: online fusion schema appends columns without moving existing fields
+FAIL: online ICP result recording; files=C:/Users/admin/AppData/Local/Temp/i2r_icp_records_c815ea0c-4e2a-47d7-a5dc-700e80c8d896
+
+    Start  16: i2r_rlc_online_seam_refinement_contract_tests
+2/7 Test  #16: i2r_rlc_online_seam_refinement_contract_tests ...   Passed    5.98 sec
+    Start  80: i2r_rlc_online_seam_continuity_tests
+3/7 Test  #80: i2r_rlc_online_seam_continuity_tests ............   Passed    0.09 sec
+    Start  81: i2r_rlc_online_image_geometry_tests
+4/7 Test  #81: i2r_rlc_online_image_geometry_tests .............   Passed   17.87 sec
+    Start  82: i2r_rlc_simulation_guided_seam_tests
+5/7 Test  #82: i2r_rlc_simulation_guided_seam_tests ............***Failed   15.60 sec
+FAIL: observed image motion can resume after a short missing frame without a stale-anchor jump
+FAIL: observed image motion can resume after a short missing frame without a stale-anchor jump
+FAIL: observed image motion can resume after a short missing frame without a stale-anchor jump
+FAIL: observed image motion can resume after a short missing frame without a stale-anchor jump
+FAIL: observed image motion can resume after a short missing frame without a stale-anchor jump
+FAIL: observed image motion can resume after a short missing frame without a stale-anchor jump
+FAIL: far recovery reseeds Kalman and converges continuously to the independently recovered branch
+
+    Start 106: i2r_rlc_online_seam_candidate_geometry_tests
+6/7 Test #106: i2r_rlc_online_seam_candidate_geometry_tests ....***Failed    0.81 sec
+
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******
+
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******
+******        Transferring Shape, ShapeType = 6                      ******
+** WorkSession : Sending all data
+ Step File Name : C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_candidate_geometry_tests-Wdfguk/seam.step(28 ents)  Write  Done
+
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******
+
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******
+******        Transferring Shape, ShapeType = 6                      ******
+** WorkSession : Sending all data
+ Step File Name : C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_candidate_geometry_tests-QiDqtS/seam.step(28 ents)  Write  Done
+
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******
+
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******
+******        Transferring Shape, ShapeType = 6                      ******
+** WorkSession : Sending all data
+ Step File Name : C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_candidate_geometry_tests-FnaPKw/seam.step(29 ents)  Write  Done
+FAIL: coplanar seam is not a unique laser intersection
+
+    Start 107: i2r_rlc_online_seam_geometry_worker_tests
+7/7 Test #107: i2r_rlc_online_seam_geometry_worker_tests .......***Failed   11.62 sec
+
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******
+
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******
+******        Transferring Shape, ShapeType = 6                      ******
+** WorkSession : Sending all data
+ Step File Name : C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_geometry_worker_tests-OLNnSJ/straight/seam.step(28 ents)  Write  Done
+worker result: 表面窗已有真实焊点否决最终投影候选：frame=8，前=0.25 mm，后=0.353553 mm。; surfaceAccepted=1 before=0.250000 after=0.353553 correctionZ=0.250000 evidence=0
+FAIL: production surface window accepts independently reintersected straight seam
+FAIL: worker compares fixed-plane CAD intersection instead of moving old laser point
+FAIL: all measured frames retain candidate geometry evidence
+
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******
+
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******
+******        Transferring Shape, ShapeType = 6                      ******
+** WorkSession : Sending all data
+ Step File Name : C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_geometry_worker_tests-OLNnSJ/stability/seam.step(28 ents)  Write  Done
+worker result: 表面窗已有真实焊点否决最终投影候选：frame=8，前=0.25 mm，后=0.353553 mm。; surfaceAccepted=1 before=0.250000 after=0.353553 correctionZ=0.250000 evidence=0
+FAIL: production surface window accepts independently reintersected straight seam
+FAIL: worker compares fixed-plane CAD intersection instead of moving old laser point
+FAIL: all measured frames retain candidate geometry evidence
+FAIL: existing stability gain consumes actual candidate intersection
+
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******
+
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******
+******        Transferring Shape, ShapeType = 6                      ******
+** WorkSession : Sending all data
+ Step File Name : C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_geometry_worker_tests-OLNnSJ/identity/seam.step(28 ents)  Write  Done
+worker result: 表面窗已有真实焊点否决最终投影候选：frame=8，前=0.25 mm，后=0.353553 mm。; surfaceAccepted=1 before=0.250000 after=0.353553 correctionZ=0.250000 evidence=0
+FAIL: failed identity is recorded for all measured frames
+
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******
+
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******
+******        Transferring Shape, ShapeType = 6                      ******
+** WorkSession : Sending all data
+ Step File Name : C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_geometry_worker_tests-OLNnSJ/missing/seam.step(28 ents)  Write  Done
+FAIL: verified current seam with missing candidate intersection rejects
+FAIL: missing intersection recorded for all measured frames
+
+*******************************************************************
+******        Statistics on Transfer (Write)                 ******
+
+*******************************************************************
+******        Transfer Mode = 0  I.E.  As Is       ******
+******        Transferring Shape, ShapeType = 6                      ******
+** WorkSession : Sending all data
+ Step File Name : C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_geometry_worker_tests-OLNnSJ/holdout/seam.step(28 ents)  Write  Done
+worker result: 表面窗已有真实焊点否决最终投影候选：frame=8，前=0.25 mm，后=0.353553 mm。; surfaceAccepted=0 before=0.250000 after=0.353553 correctionZ=0.250000 evidence=0
+worker geometry fixtures retained: C:/Users/admin/AppData/Local/Temp/i2r_rlc_online_seam_geometry_worker_tests-OLNnSJ
+
+
+43% tests passed, 4 tests failed out of 7
+
+Total Test time (real) =  52.57 sec
+
+The following tests FAILED:
+	  8 - i2r_rlc_online_correction_run_recorder_tests (Failed)
+	 82 - i2r_rlc_simulation_guided_seam_tests (Failed)
+	106 - i2r_rlc_online_seam_candidate_geometry_tests (Failed)
+	107 - i2r_rlc_online_seam_geometry_worker_tests (Failed)
+Errors while running CTest

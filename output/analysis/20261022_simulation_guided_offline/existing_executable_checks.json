@@ -1,0 +1,16 @@
+[
+  {
+    "name": "i2r_rlc_online_seam_continuity_tests",
+    "exit_code": 0,
+    "binary_sha256": "9c6e20147cecc431d961611f497fbe16cc371f5cc6e48732c9f00cff32c2eea4",
+    "status": "passed",
+    "rebuilt": false
+  },
+  {
+    "name": "i2r_rlc_online_seam_refiner_tests",
+    "exit_code": 0,
+    "binary_sha256": "64a367d6c92fb46b638fc89e2d03f1c1a233e3a67d17b675bfb86130d9f0bfb2",
+    "status": "passed",
+    "rebuilt": false
+  }
+]

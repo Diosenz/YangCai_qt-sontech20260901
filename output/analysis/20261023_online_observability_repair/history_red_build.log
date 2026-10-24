@@ -1,0 +1,5 @@
+[1/4] Building CXX object DigitalTwin\CMakeFiles\i2r_rlc_digital_twin.dir\src\OnlineSeamCandidateGeometry.cpp.obj
+[2/4] Linking CXX static library DigitalTwin\i2r_rlc_digital_twin.lib
+[3/4] Building CXX object tests\CMakeFiles\i2r_rlc_online_local_registration_stability_tests.dir\test_online_local_registration_stability.cpp.obj
+[4/4] Linking CXX executable tests\i2r_rlc_online_local_registration_stability_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_online_local_registration_stability_tests.exe: message: deploying dependencies

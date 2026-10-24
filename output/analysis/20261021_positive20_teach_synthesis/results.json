@@ -1,0 +1,537 @@
+{
+  "session": "20261021_152328_050",
+  "method": "Four source teachings with explicit positive-20mm mappings; deduplicate by XYZ geometry; fit each circle using existing angle-balanced method; rigidly normalize centers/normals; equal source weights; arithmetic mean radius. Preserve current teaching pose/axis/time columns as unvalidated analysis metadata.",
+  "sources": [
+    {
+      "name": "20230608CHUFENGKOU",
+      "W_file": "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_W.txt",
+      "T_file": "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_T.txt",
+      "W_points": 1687,
+      "T_points": 2,
+      "circle": {
+        "center": [
+          -19.49664444291481,
+          -5.7907745397024835,
+          265.94444230496646
+        ],
+        "radius_mm": 140.64765469148105,
+        "normal": [
+          -0.00397776936320461,
+          0.0025436234645973554,
+          0.9999888536031605
+        ]
+      },
+      "weight": 0.25,
+      "geometry_sha256": "39f59e36d81e3cb30056afed0c3507d3b90eafc09a795f08451c6fc1fab913f7",
+      "aliases": [
+        "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_W.txt",
+        "E:\\SontechWorks -20230615\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks_IBVS\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_W.txt",
+        "E:\\SontechWorks20230706\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_W.txt"
+      ],
+      "T_to_W_max_mm": 0.0,
+      "canonical_transform": {
+        "rotation": [
+          [
+            0.9999950538662423,
+            5.67271052400724e-06,
+            0.0031451885271592144
+          ],
+          [
+            -2.629057807495028e-06,
+            0.9999995317550591,
+            -0.0009677203886772619
+          ],
+          [
+            -0.0031451925440382313,
+            0.0009677073333203261,
+            0.9999945856385313
+          ]
+        ],
+        "translation": [
+          23.15249343223281,
+          14.957445981883524,
+          -12.09112541432981
+        ],
+        "normal_alignment_deg": 0.18854359990011552,
+        "axial_rotation_is_identifiable": false,
+        "scale": 1.0
+      }
+    },
+    {
+      "name": "20250606CHUFENGKOU",
+      "W_file": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20250606CHUFENGKOU_W.txt",
+      "T_file": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20250606CHUFENGKOU_T.txt",
+      "W_points": 1663,
+      "T_points": 5,
+      "circle": {
+        "center": [
+          -3.069807861513475,
+          0.3198184130952076,
+          254.5442446008582
+        ],
+        "radius_mm": 141.69201986783509,
+        "normal": [
+          -0.0031802782516911414,
+          1.2605619549521663e-05,
+          0.9999949428228826
+        ]
+      },
+      "weight": 0.25,
+      "geometry_sha256": "7af5ae778fba196e1b2b501cbc4344aa993c77023e392b7a6a80aa0978edda0b",
+      "aliases": [
+        "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20250606CHUFENGKOU_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks_IBVS\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20250606CHUFENGKOU_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20250606CHUFENGKOU_W.txt"
+      ],
+      "T_to_W_max_mm": 0.0,
+      "canonical_transform": {
+        "rotation": [
+          [
+            0.9999972441446475,
+            3.1662876910389584e-06,
+            0.0023476995303776944
+          ],
+          [
+            -6.836469999050496e-06,
+            0.9999987780166725,
+            0.001563303689143481
+          ],
+          [
+            -0.0023476917116587817,
+            -0.0015633154308820477,
+            0.9999960221863338
+          ]
+        ],
+        "translation": [
+          6.964562967161065,
+          8.191596586846748,
+          -0.6423451596525922
+        ],
+        "normal_alignment_deg": 0.16160718843540697,
+        "axial_rotation_is_identifiable": false,
+        "scale": 1.0
+      }
+    },
+    {
+      "name": "20260308CHUFENGKOU",
+      "W_file": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260308CHUFENGKOU_W.txt",
+      "T_file": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260308CHUFENGKOU_T.txt",
+      "W_points": 1355,
+      "T_points": 2,
+      "circle": {
+        "center": [
+          -0.25570525411998535,
+          -8.55045354578577,
+          253.06973120036724
+        ],
+        "radius_mm": 142.08463931235414,
+        "normal": [
+          -0.0032074009165564783,
+          0.002463158387383646,
+          0.9999918226816251
+        ]
+      },
+      "weight": 0.25,
+      "geometry_sha256": "840a0b9281938cdac73c415d5c6eb3a9ffc469aba8723faea84064ac64ccdd38",
+      "aliases": [
+        "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260308CHUFENGKOU_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks_IBVS\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260308CHUFENGKOU_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260308CHUFENGKOU_W.txt"
+      ],
+      "T_to_W_max_mm": 0.0,
+      "canonical_transform": {
+        "rotation": [
+          [
+            0.9999971801039452,
+            4.057361210447148e-06,
+            0.0023748195080052605
+          ],
+          [
+            -1.9503117307989776e-06,
+            0.999999606393692,
+            -0.0008872477993459754
+          ],
+          [
+            -0.002374822173146127,
+            0.0008872406657610615,
+            0.9999967865066602
+          ]
+        ],
+        "translation": [
+          4.147102272536917,
+          17.684350796070262,
+          0.8456549901610799
+        ],
+        "normal_alignment_deg": 0.14525354936729076,
+        "axial_rotation_is_identifiable": false,
+        "scale": 1.0
+      }
+    },
+    {
+      "name": "20260404CHUFENGKOU1",
+      "W_file": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\data\\WorkPiece\\20260404CHUFENGKOU1_W.txt",
+      "T_file": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\data\\WorkPiece\\20260404CHUFENGKOU1_T.txt",
+      "W_points": 1368,
+      "T_points": 5,
+      "circle": {
+        "center": [
+          4.4923579817409,
+          8.909365552413297,
+          253.90759389704337
+        ],
+        "radius_mm": 143.71704466934042,
+        "normal": [
+          -0.0008325817897459309,
+          0.0015759231292623577,
+          0.9999984116356657
+        ]
+      },
+      "weight": 0.25,
+      "geometry_sha256": "3218ff63e425cd656dabf93cd9cf724025105f7c63bb74eb738b719c0a4e2912",
+      "aliases": [
+        "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260610CHUFENGKOUFLIP_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260404CHUFENGKOU_W.txt",
+        "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260404CHUFENGKOU1_W.txt",
+        "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\data\\WorkPiece\\20260404CHUFENGKOU1_W.txt"
+      ],
+      "T_to_W_max_mm": 0.0,
+      "canonical_transform": {
+        "rotation": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "translation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "normal_alignment_deg": 0.0,
+        "axial_rotation_is_identifiable": false,
+        "scale": 1.0
+      }
+    }
+  ],
+  "new_original_circle": {
+    "center": [
+      4.4923579817409,
+      8.909365552413297,
+      253.90759389704337
+    ],
+    "normal": [
+      -0.0008325817897459309,
+      0.0015759231292623577,
+      0.9999984116356657
+    ],
+    "radius_mm": 142.03533963525268
+  },
+  "current_circle": {
+    "center": [
+      -0.5089636594170854,
+      -1.6744511336382502,
+      253.47836713213812
+    ],
+    "normal": [
+      -0.0033784269874421575,
+      0.00013638092458723156,
+      0.9999942837993296
+    ],
+    "radius_mm": 142.03533963525268
+  },
+  "alignment": {
+    "rotation": [
+      [
+        0.9999967593171549,
+        -7.043011050544475e-06,
+        -0.002545840840308527
+      ],
+      [
+        3.378174860963926e-06,
+        0.9999989638559856,
+        -0.0014395400456990032
+      ],
+      [
+        0.002545848341147228,
+        0.0014395267803107457,
+        0.9999957232002908
+      ]
+    ],
+    "translation": [
+      -4.354836011882936,
+      -10.218312481314683,
+      -0.4524029854054561
+    ],
+    "normal_alignment_deg": 0.1675706407131008,
+    "axial_rotation_is_identifiable": false,
+    "scale": 1.0
+  },
+  "metrics": {
+    "TCP": {
+      "n": 5848,
+      "mean_mm": 0.7838067626540576,
+      "max_mm": 2.5685300773690756,
+      "rmse_mm": 0.8950016816148303,
+      "median_mm": 0.7244405048911888,
+      "p95_mm": 1.5985016800661351,
+      "within_2mm_fraction": 0.984781121751026,
+      "within_3mm_fraction": 1.0,
+      "above_3mm_count": 0,
+      "max_time": "15:24:15.253"
+    },
+    "raw_KCF": {
+      "n": 7522,
+      "mean_mm": 0.7677160977847944,
+      "max_mm": 6.470628905304498,
+      "rmse_mm": 0.9005881066409376,
+      "median_mm": 0.7076329796454701,
+      "p95_mm": 1.506433354256952,
+      "within_2mm_fraction": 0.9767349109279447,
+      "within_3mm_fraction": 0.9966764158468493,
+      "above_3mm_count": 25,
+      "max_time": "15:26:41.282"
+    },
+    "final_vision": {
+      "n": 7522,
+      "mean_mm": 0.7664823324988005,
+      "max_mm": 6.3020562116061125,
+      "rmse_mm": 0.8959318097180451,
+      "median_mm": 0.7041839624067497,
+      "p95_mm": 1.5140572083922168,
+      "within_2mm_fraction": 0.9770007976601968,
+      "within_3mm_fraction": 0.9969423025791013,
+      "above_3mm_count": 23,
+      "max_time": "15:26:41.282"
+    }
+  },
+  "previous_reference_radius_mm": 143.71704466934042,
+  "new_reference_radius_mm": 142.03533963525268,
+  "source_radius_range_mm": [
+    140.64765469148105,
+    143.71704466934042
+  ],
+  "coordinate_frame": "Positioner last-link/material frame. Undo each sample Ry(S1)Rz(S2). Vision parent-TCP coordinates restored by +[0,0,231] mm. Original W is already in this last-link frame.",
+  "reference_status": "Composite historical teaching reference; current pose estimated from raw KCF; not independently measured truth for this specimen",
+  "generated_files": {
+    "W": "20261021CHUFENGKOU20_SYNTH_ANALYSIS_W.txt",
+    "T": "20261021CHUFENGKOU20_SYNTH_ANALYSIS_T.txt",
+    "runtime_configuration_changed": false
+  },
+  "interpretation": "Same TCP/KCF measurements. Error changes arise only from changed reference geometry; they are not an improvement caused by a new control algorithm.",
+  "selection_decisions": [
+    {
+      "name": "20230608CHUFENGKOU_W.txt",
+      "path": "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230608CHUFENGKOU_W.txt",
+      "included": true,
+      "reason": "明确正20mm映射；按几何去重后纳入",
+      "radius_mm": 140.64765469148105,
+      "coverage_deg": 359.74148003355566
+    },
+    {
+      "name": "20230529CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20230529CHUFENGKOUFLIP_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 140.09049264153043,
+      "coverage_deg": 359.7613554730918
+    },
+    {
+      "name": "20211127chufengkou_W.txt",
+      "path": "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20211127chufengkou_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 155.4512251040977,
+      "coverage_deg": 119.7511084344745
+    },
+    {
+      "name": "20211127chufengkouoffline_W.txt",
+      "path": "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20211127chufengkouoffline_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 159.63000035218712,
+      "coverage_deg": 134.14012339543683
+    },
+    {
+      "name": "20211127chufengkouoffline1_W.txt",
+      "path": "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20211127chufengkouoffline1_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 159.63596559590778,
+      "coverage_deg": 53.25221141533183
+    },
+    {
+      "name": "20211118chufengkou_W.txt",
+      "path": "E:\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20211118chufengkou_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 157.5082466303548,
+      "coverage_deg": 116.93564680923976
+    },
+    {
+      "name": "20231028CHUFENGKOUFLIPOFF_W.txt",
+      "path": "E:\\SontechWorks -20230615\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20231028CHUFENGKOUFLIPOFF_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 138.02479728964013,
+      "coverage_deg": 359.721817911415
+    },
+    {
+      "name": "20260610CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260610CHUFENGKOUFLIP_W.txt",
+      "included": true,
+      "reason": "明确正20mm映射；按几何去重后纳入",
+      "radius_mm": 143.71704466934042,
+      "coverage_deg": 359.671236737589
+    },
+    {
+      "name": "20260405CHUFENGKOUTRUEVALUE_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260405CHUFENGKOUTRUEVALUE_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 143.4912279737853,
+      "coverage_deg": 359.6720998882132
+    },
+    {
+      "name": "20260309CHUFENGKOU_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260309CHUFENGKOU_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 141.9645297866943,
+      "coverage_deg": 359.6685812849071
+    },
+    {
+      "name": "20260308CHUFENGKOU_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260308CHUFENGKOU_W.txt",
+      "included": true,
+      "reason": "明确正20mm映射；按几何去重后纳入",
+      "radius_mm": 142.08463931235414,
+      "coverage_deg": 359.6577402044418
+    },
+    {
+      "name": "20251125CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20251125CHUFENGKOUFLIP_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 133.30555167279957,
+      "coverage_deg": 359.4771672000451
+    },
+    {
+      "name": "20250606CHUFENGKOU_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20250606CHUFENGKOU_W.txt",
+      "included": true,
+      "reason": "明确正20mm映射；按几何去重后纳入",
+      "radius_mm": 141.69201986783509,
+      "coverage_deg": 359.7259956914804
+    },
+    {
+      "name": "20250325CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20250325CHUFENGKOUFLIP_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 133.88752767629003,
+      "coverage_deg": 359.74093855904994
+    },
+    {
+      "name": "20250324CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20250324CHUFENGKOUFLIP_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 133.72773011204413,
+      "coverage_deg": 359.7246440302628
+    },
+    {
+      "name": "20240523CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20240523CHUFENGKOUFLIP_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 145.30099691679183,
+      "coverage_deg": 359.70569018747324
+    },
+    {
+      "name": "20240124ChuFengKouTrueValue_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20240124ChuFengKouTrueValue_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 136.0128674352319,
+      "coverage_deg": 359.73581225250746
+    },
+    {
+      "name": "20240123ChuFengKouTrueValue_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20240123ChuFengKouTrueValue_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 134.39040517484094,
+      "coverage_deg": 359.68956482682205
+    },
+    {
+      "name": "20231028CHUFENGKOUFLIPOFFP3P5_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20231028CHUFENGKOUFLIPOFFP3P5_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 138.35615723123374,
+      "coverage_deg": 171.08287382532944
+    },
+    {
+      "name": "20231028CHUFENGKOUFLIPOFFP2P4_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20231028CHUFENGKOUFLIPOFFP2P4_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 137.93236728360318,
+      "coverage_deg": 193.4498983964515
+    },
+    {
+      "name": "20260610CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260610CHUFENGKOUFLIP_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": NaN,
+      "coverage_deg": NaN
+    },
+    {
+      "name": "20260328CHUFENGKOUTRUEVALUE_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260328CHUFENGKOUTRUEVALUE_W.txt",
+      "included": false,
+      "reason": "无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合",
+      "radius_mm": 143.06918303241002,
+      "coverage_deg": 359.6699196404608
+    },
+    {
+      "name": "20260327CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260327CHUFENGKOUFLIP_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 133.0097721617773,
+      "coverage_deg": 359.63797706982865
+    },
+    {
+      "name": "20260327CHUFENGKOUFLIPTRUEVALUE_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260327CHUFENGKOUFLIPTRUEVALUE_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 131.43507986289683,
+      "coverage_deg": 359.61167102960087
+    },
+    {
+      "name": "20260319CHUFENGKOUFLIP_W.txt",
+      "path": "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260319CHUFENGKOUFLIP_W.txt",
+      "included": false,
+      "reason": "反面/FLIP；排除",
+      "radius_mm": 133.49930660864683,
+      "coverage_deg": 359.6199319677022
+    }
+  ]
+}

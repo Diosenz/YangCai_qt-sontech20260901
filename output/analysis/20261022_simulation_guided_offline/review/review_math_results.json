@@ -1,0 +1,65 @@
+{
+  "evidence_kind": "analytic_synthetic_counterexamples_not_field_replay",
+  "units": "geometry examples mm; Jacobian Rz column uses radians",
+  "laser_intersection_is_not_material_point": {
+    "nominal_seam_equation": "z=0.5*x+10; laser_plane x=0",
+    "workpiece_translation_x_z": [
+      4.0,
+      1.0
+    ],
+    "old_intersection_x_z": [
+      0.0,
+      10.0
+    ],
+    "new_intersection_recomputed_x_z": [
+      0.0,
+      9.0
+    ],
+    "rigidly_transformed_old_intersection_x_z": [
+      4.0,
+      11.0
+    ],
+    "inverse_transformed_new_intersection_x_z": [
+      -4.0,
+      8.0
+    ],
+    "true_old_scene_vs_new_intersection_distance": 1.0,
+    "inverse_transform_counterfactual_distance": 4.123105625617661,
+    "conclusion": "变换旧扫描交点或逆变换新交点，不等价于固定激光平面与另一个位姿模型重新求交。"
+  },
+  "surface_observability": {
+    "allowed_dofs": [
+      "Tx",
+      "Ty",
+      "Tz",
+      "Rz"
+    ],
+    "flat_plane_rank": 1,
+    "v_surfaces_extruded_along_seam_rank": 3,
+    "v_surfaces_null_direction": [
+      0,
+      1,
+      0,
+      0
+    ],
+    "conclusion": "二维覆盖足够或双侧母材可见，仍不证明四自由度可观测；边界/采样最近邻约束不能直接当真实形状约束。"
+  },
+  "model_self_validation": {
+    "reported_model_consistency_error": 0.0,
+    "known_synthetic_physical_error": 5.0,
+    "conclusion": "仅模型推导的接缝目标不能当作模型位姿正确的独立验收证据。"
+  },
+  "global_and_local_compensation": {
+    "original_simulation": 0.0,
+    "true_seam": 5.0,
+    "bias_before_pose_update": 5.0,
+    "simulation_after_pose_update": 5.0,
+    "target_if_bias_kept": 10.0,
+    "target_after_rebase": 5.0,
+    "conclusion": "补偿必须绑定工件位姿版本；位姿晋升后重估局部残差，不能重复补偿已被全局位姿吸收的偏差。"
+  },
+  "assertions_passed": 8,
+  "production_changes": false,
+  "device_calls": false,
+  "mouse_used": false
+}

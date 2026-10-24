@@ -1,0 +1,102 @@
+[
+  {
+    "path": "Vision/include/feature/SimulationGuidedSeamEstimator.h",
+    "backup": ".codex_backups\\estimator_recovery_20261023_010539\\Vision\\include\\feature\\SimulationGuidedSeamEstimator.h",
+    "before_sha256": "e02fed888f42adba5fa1cbedf49f1b8b500d62d5385bb76c2f4ee1220286dc8e",
+    "after_sha256": "053156d7cfb2453669d8f15d0c2cfe18f21f159a0bfe3ac48f65cef749b93621",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 147,
+    "bare_lf": 0
+  },
+  {
+    "path": "Vision/src/feature/SimulationGuidedSeamEstimator.cpp",
+    "backup": ".codex_backups\\estimator_recovery_20261023_010539\\Vision\\src\\feature\\SimulationGuidedSeamEstimator.cpp",
+    "before_sha256": "79d97e5194132824a56b701c6d1fc8dff98308855852adfbdf920ed98e15975e",
+    "after_sha256": "66c46df5f4d084142cd6894ef21b1ce96c69b795647c1188dff12f5169cfe7fc",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 813,
+    "bare_lf": 0
+  },
+  {
+    "path": "tests/test_simulation_guided_seam.cpp",
+    "backup": ".codex_backups\\estimator_recovery_20261023_010539\\tests\\test_simulation_guided_seam.cpp",
+    "before_sha256": "45c47fea991957da5c006b7e1f94bf5806476b17e67eb6123012bf40eefd1040",
+    "after_sha256": "09049b3830a77c5242da8528228ac80d644a7dfbe62bdb0184b3ed7df1e37b55",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 516,
+    "bare_lf": 0
+  },
+  {
+    "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+    "backup": ".codex_backups\\detector_recovery_20261023_010345\\LegacyOnlineKcfDetector.h",
+    "before_sha256": "0bab468be463db869a368bc17454f907dcf2198acc15c17742f881e5270d40d8",
+    "after_sha256": "e3ccc24f8395f529a231b71a9b177858619d6e30d3c7d493c137b7500ffcc6db",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 141,
+    "bare_lf": 0
+  },
+  {
+    "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+    "backup": ".codex_backups\\detector_recovery_20261023_010345\\LegacyOnlineKcfDetector.cpp",
+    "before_sha256": "7f2d7c2c40b4c5af16c14f2e4ab484046f7a5a700b5672f3b4f0e7627aa324de",
+    "after_sha256": "d0640750ed3af5ca4853c0925326d01a02256fc48961206ecf6527d86ec9654f",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 702,
+    "bare_lf": 0
+  },
+  {
+    "path": "Vision/include/track/OnlineSeamContinuity.h",
+    "backup": ".codex_backups\\detector_recovery_20261023_010345\\OnlineSeamContinuity.h",
+    "before_sha256": "08b98c4aa17e4cbe81e209d289b4c8bcd4e1b3ba2761742b0fde11717e70d839",
+    "after_sha256": "ccd298904adea82b3c9b3f25455f27b5fe72ba988de0bff2651846d38709d61d",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 76,
+    "bare_lf": 0
+  },
+  {
+    "path": "Vision/src/track/OnlineSeamContinuity.cpp",
+    "backup": ".codex_backups\\detector_recovery_20261023_010345\\OnlineSeamContinuity.cpp",
+    "before_sha256": "ce74c1518be616278c9c4089f41dfcd8527c4bae0a9bbf3a872d6ddacc6c9f6e",
+    "after_sha256": "94b98b65997bb869aa66ce0dcde428cbc58872c31c02289afb714de76cfabb64",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 183,
+    "bare_lf": 0
+  },
+  {
+    "path": "tests/test_online_seam_continuity.cpp",
+    "backup": ".codex_backups\\detector_recovery_20261023_010345\\test_online_seam_continuity.cpp",
+    "before_sha256": "436fea27c89ef5cc97cd4f08c2f9c44cbc908a98fb751f9131991988a16999bb",
+    "after_sha256": "98ce453074ab4f47ec01e70dbabc032f050b7d1144252e1476e32baa421ed751",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 142,
+    "bare_lf": 0
+  },
+  {
+    "path": "tests/test_online_image_geometry.cpp",
+    "backup": "output\\backups\\raw_reacquisition_repair_20261022\\main_baseline\\tests\\test_online_image_geometry.cpp",
+    "before_sha256": "dc26d49419891f60904e9d05752be3f77048e9b9bc7486fe24910ca18e77f1e3",
+    "after_sha256": "458bfa2d398b03d7be8a285723b112a8295cf503d3914d9507058ca63ad32107",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 220,
+    "bare_lf": 0
+  },
+  {
+    "path": "docs/online_local_registration.md",
+    "backup": "output\\backups\\raw_reacquisition_repair_20261022\\main_baseline\\docs\\online_local_registration.md",
+    "before_sha256": "1ddebacec6dde2f9ed7cc68e9ebfd984267f0115cab84b969f87f56e89106073",
+    "after_sha256": "d68399b631345022d44105630753eccb66c68863ac79800a4dc1d7e567d00ca4",
+    "changed": true,
+    "utf8_bom": true,
+    "crlf": 482,
+    "bare_lf": 0
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "prefix": "20261021_185548_548",
+    "directory": "20261021_185548_stability_auto_kalman_composite_teach",
+    "label": "18:55 稳定保护",
+    "archive": "20261021_105548_492_session_1"
+  },
+  {
+    "prefix": "20261021_201400_950",
+    "directory": "20261021_201400_stability10_auto_kalman_composite_teach",
+    "label": "20:14 稳定保护1.0",
+    "archive": "20261021_121400_904_session_1"
+  }
+]

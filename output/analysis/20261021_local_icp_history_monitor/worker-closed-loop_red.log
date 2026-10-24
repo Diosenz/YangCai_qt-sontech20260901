@@ -1,0 +1,5 @@
+FAIL: closed loop should send every O teach point in index order
+FAIL: closed loop should send a normal P and a final P
+FAIL: segment finish should send P with Online_endflag=1
+FAIL: offline==5 should enter OnlineRunning
+FAIL: final P acknowledgement should complete the worker closed loop

@@ -1,0 +1,15 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 35: i2r_rlc_localization_surface_validation_tests
+    Start 19: i2r_rlc_online_local_registration_surface_tests
+1/5 Test #35: i2r_rlc_localization_surface_validation_tests ..........   Passed    7.14 sec
+    Start 28: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+2/5 Test #19: i2r_rlc_online_local_registration_surface_tests ........   Passed    7.90 sec
+    Start 25: i2r_rlc_local_registration_writeback_safety_tests
+3/5 Test #25: i2r_rlc_local_registration_writeback_safety_tests ......   Passed    0.20 sec
+    Start 24: i2r_rlc_online_local_surface_verification_tests
+4/5 Test #24: i2r_rlc_online_local_surface_verification_tests ........   Passed    0.05 sec
+5/5 Test #28: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...   Passed    2.32 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   9.50 sec

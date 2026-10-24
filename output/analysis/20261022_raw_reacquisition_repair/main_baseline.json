@@ -1,0 +1,10 @@
+[
+  {
+    "path": "tests/test_online_image_geometry.cpp",
+    "sha256": "dc26d49419891f60904e9d05752be3f77048e9b9bc7486fe24910ca18e77f1e3"
+  },
+  {
+    "path": "docs/online_local_registration.md",
+    "sha256": "1ddebacec6dde2f9ed7cc68e9ebfd984267f0115cab84b969f87f56e89106073"
+  }
+]

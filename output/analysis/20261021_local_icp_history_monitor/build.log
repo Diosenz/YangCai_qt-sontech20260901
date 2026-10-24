@@ -1,0 +1,252 @@
+[0/1] Re-running CMake...
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+CMake Warning (dev) at C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    H:/YangCai_Code/YangCai_qt-sontech20260901/vcpkg_installed/x64-windows
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  vcpkg_installed/x64-windows/share/pcl/Modules/FindFLANN.cmake:45 (find_package)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:261 (find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:306 (find_flann)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:578 (find_external_library)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  Localization/CMakeLists.txt:30 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Found Qhull version 8.0.2
+-- looking for PCL_COMMON
+-- looking for PCL_IO_PLY
+-- looking for PCL_IO
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_FILTERS
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_2D
+-- looking for PCL_FEATURES
+-- looking for PCL_REGISTRATION
+-- looking for PCL_GEOMETRY
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_SURFACE
+-- looking for PCL_KEYPOINTS
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+CMake Warning (dev) at C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    H:/YangCai_Code/YangCai_qt-sontech20260901/vcpkg_installed/x64-windows
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  vcpkg_installed/x64-windows/share/pcl/Modules/FindFLANN.cmake:45 (find_package)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:261 (find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:306 (find_flann)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:578 (find_external_library)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  Vision/CMakeLists.txt:5 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Found Qhull version 8.0.2
+-- looking for PCL_COMMON
+-- looking for PCL_IO_PLY
+-- looking for PCL_IO
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_FILTERS
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_2D
+-- looking for PCL_FEATURES
+-- looking for PCL_REGISTRATION
+-- looking for PCL_GEOMETRY
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_SURFACE
+-- looking for PCL_KEYPOINTS
+-- Vision OpenCV enabled: 3.4.5
+-- Vision OpenCV_DIR: E:/Libs/OPENCV3/opencv/build/x64/vc15/lib
+-- IBVS OpenCV enabled: 3.4.5
+-- IBVS OpenCV_DIR: E:/Libs/OPENCV3/opencv/build/x64/vc15/lib
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+CMake Warning (dev) at C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    H:/YangCai_Code/YangCai_qt-sontech20260901/vcpkg_installed/x64-windows
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  vcpkg_installed/x64-windows/share/pcl/Modules/FindFLANN.cmake:45 (find_package)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:261 (find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:306 (find_flann)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:578 (find_external_library)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  tests/CMakeLists.txt:2 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Found Qhull version 8.0.2
+-- looking for PCL_COMMON
+-- looking for PCL_IO_PLY
+-- looking for PCL_IO
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_FILTERS
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_2D
+-- looking for PCL_FEATURES
+-- looking for PCL_REGISTRATION
+-- looking for PCL_GEOMETRY
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_SURFACE
+-- looking for PCL_KEYPOINTS
+-- Configuring done (8.8s)
+-- Generating done (3.1s)
+-- Build files have been written to: H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+[1/30] Automatic MOC for target i2r_rlc_ui
+[2/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\ConfigRepository.cpp.obj
+[3/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\i2r_rlc_ui_autogen\mocs_compilation.cpp.obj
+[4/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\MainWidget.cpp.obj
+[5/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\TrackingDiagnosticImageWriter.cpp.obj
+[6/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\OnlineCorrectionRunRecorder.cpp.obj
+[7/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\RuntimeCoordinator.cpp.obj
+[8/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\RuntimeLocalRegistration.cpp.obj
+[9/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\OnlineLocalRegistrationWorker.cpp.obj
+[10/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\RuntimeWorkerAdapters.cpp.obj
+[11/30] Building CXX object UI\CMakeFiles\i2r_rlc_ui.dir\src\UiController.cpp.obj
+[12/30] Linking CXX static library UI\i2r_rlc_ui.lib
+[13/30] Building CXX object tests\CMakeFiles\i2r_rlc_online_correction_run_recorder_tests.dir\test_online_correction_run_recorder.cpp.obj
+[14/30] Building CXX object UI\CMakeFiles\i2r_rlc.dir\src\main.cpp.obj
+[15/30] Building CXX object tests\CMakeFiles\i2r_rlc_online_local_registration_tests.dir\test_online_local_registration.cpp.obj
+[16/30] Building CXX object tests\CMakeFiles\i2r_rlc_online_local_registration_stability_tests.dir\test_online_local_registration_stability.cpp.obj
+[17/30] Building CXX object tests\CMakeFiles\i2r_rlc_online_local_registration_safety_tests.dir\test_online_local_registration_safety.cpp.obj
+[18/30] Building CXX object tests\CMakeFiles\i2r_rlc_online_local_registration_history_replay_tests.dir\test_online_local_registration_history_replay.cpp.obj
+[19/30] Building CXX object tests\CMakeFiles\i2r_rlc_local_registration_writeback_safety_tests.dir\test_local_registration_writeback_safety.cpp.obj
+[20/30] Building CXX object tests\CMakeFiles\i2r_rlc_main_widget_panel_tests.dir\test_main_widget_panels.cpp.obj
+H:\YangCai_Code\YangCai_qt-sontech20260901\tests\test_main_widget_panels.cpp(1066) : warning C6262: Function uses '16556' bytes of stack.  Consider moving some data to heap.
+[21/30] Linking CXX executable tests\i2r_rlc_online_correction_run_recorder_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_online_correction_run_recorder_tests.exe: message: deploying dependencies
+[22/30] Linking CXX executable tests\i2r_rlc_online_local_registration_tests.exe
+FAILED: tests/i2r_rlc_online_local_registration_tests.exe 
+C:\Windows\system32\cmd.exe /C "cd . && D:\cmake\bin\cmake.exe -E vs_link_exe --msvc-ver=1944 --intdir=tests\CMakeFiles\i2r_rlc_online_local_registration_tests.dir --rc=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\rc.exe --mt=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\mt.exe --manifests  -- D:\vs2022\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe /nologo @CMakeFiles\i2r_rlc_online_local_registration_tests.rsp  /out:tests\i2r_rlc_online_local_registration_tests.exe /implib:tests\i2r_rlc_online_local_registration_tests.lib /pdb:tests\i2r_rlc_online_local_registration_tests.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console && C:\Windows\system32\cmd.exe /C "cd /D H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests && C:\vcpkg\vcpkg.exe z-applocal --target-binary=H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_online_local_registration_tests.exe --installed-bin-dir=H:/YangCai_Code/YangCai_qt-sontech20260901/vcpkg_installed/x64-windows/debug/bin""
+LINK Pass 1: command "D:\vs2022\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe /nologo @CMakeFiles\i2r_rlc_online_local_registration_tests.rsp /out:tests\i2r_rlc_online_local_registration_tests.exe /implib:tests\i2r_rlc_online_local_registration_tests.lib /pdb:tests\i2r_rlc_online_local_registration_tests.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console /MANIFEST /MANIFESTFILE:tests\CMakeFiles\i2r_rlc_online_local_registration_tests.dir/intermediate.manifest tests\CMakeFiles\i2r_rlc_online_local_registration_tests.dir/manifest.res" failed (exit code 1120) with the following output:
+   Creating library tests\i2r_rlc_online_local_registration_tests.lib and object tests\i2r_rlc_online_local_registration_tests.exp
+
+test_online_local_registration.cpp.obj : error LNK2019: unresolved external symbol "public: void __cdecl i2r_rlc::ui::CRuntimeCoordinator::submitOnlineLocalRegistration(struct i2r_rlc::ui::CRuntimeCoordinator::FrozenVisionFrameContext const &,struct i2r_rlc::ui::RuntimeTrackingResult const &)" (?submitOnlineLocalRegistration@CRuntimeCoordinator@ui@i2r_rlc@@QEAAXAEBUFrozenVisionFrameContext@123@AEBURuntimeTrackingResult@23@@Z) referenced in function "bool __cdecl `anonymous namespace'::testHistoryCollectionIndependentOfSolve(void)" (?testHistoryCollectionIndependentOfSolve@?A0x96303e42@@YA_NXZ)
+
+
+tests\i2r_rlc_online_local_registration_tests.exe : fatal error LNK1120: 1 unresolved externals
+
+
+[23/30] Linking CXX executable UI\i2r_rlc.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI/i2r_rlc.exe: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libzmq-mt-gd-4_3_5.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\libzmq-mt-gd-4_3_5.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\libzmq-mt-gd-4_3_5.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDESTEP.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKDESTEP.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKDESTEP.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDE.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKDE.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKDE.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKernel.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKernel.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKernel.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKXCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKXCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKVCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKVCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKVCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKLCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKLCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKLCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCDF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKCDF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKCDF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBO.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKBO.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKBO.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKPrim.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKPrim.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKPrim.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKTopAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKTopAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKTopAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKGeomAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKGeomAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBRep.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKBRep.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKBRep.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKGeomBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKGeomBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKG3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKG3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKG2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKG2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMath.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKMath.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKMath.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKShHealing.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKShHealing.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKShHealing.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKV3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKV3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKV3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKService.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKService.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKService.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\freetyped.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\freetyped.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\freetyped.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\zd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\zd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\zd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\bz2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\bz2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\bz2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libpng16d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\libpng16d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\libpng16d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlidec.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\brotlidec.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\brotlidec.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlicommon.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\brotlicommon.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\brotlicommon.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMesh.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKMesh.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKMesh.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKHLR.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKHLR.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKHLR.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXSBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKXSBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKXSBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_registrationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_registrationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_registrationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_filtersd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_filtersd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_filtersd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_sample_consensusd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_sample_consensusd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_sample_consensusd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_commond.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_commond.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_commond.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_searchd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_searchd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_searchd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_octreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_octreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_octreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_kdtreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_kdtreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_kdtreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\lz4d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\lz4d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\lz4d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_segmentationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_segmentationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_segmentationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_mld.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_mld.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_mld.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_featuresd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_featuresd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_featuresd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\fmtd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\fmtd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\fmtd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\tinysplinecxx.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\tinysplinecxx.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\tinysplinecxx.dll: message: deploying dependencies
+ninja: build stopped: subcommand failed.

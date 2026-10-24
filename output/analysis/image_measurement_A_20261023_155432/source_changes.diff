@@ -1,0 +1,1384 @@
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/Vision/include/track/LegacyOnlineKcfDetector.h b/Vision/include/track/LegacyOnlineKcfDetector.h
+index 3c73b0d..ec32a81 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/Vision/include/track/LegacyOnlineKcfDetector.h
++++ b/Vision/include/track/LegacyOnlineKcfDetector.h
+@@ -30,6 +30,8 @@ namespace i2r_rlc::vision {
+  */
+ struct LegacyOnlineKcfOptions {
+     KcfFusionOptions fusion;
++    /// @brief 在线纠偏显式启用；仿真仅提示搜索，输出必须由同帧原图验收。
++    bool enableImageMeasurementOutput = false;
+     /// @brief 在线纠偏显式启用原图精定位；离线/legacy 回放保持既有行为。
+     bool enableSeamRefinement = false;
+     OnlineSeamRefinementOptions seamRefinement;
+@@ -51,6 +53,11 @@ struct LegacyOnlineKcfOptions {
+  * @brief 检测器阶段快照，随本帧结果按值传递，不拥有跟踪器状态。
+  */
+ struct CLegacyOnlineKcfDiagnostic {
++    bool imageMeasurementOutputEnabled = false;
++    bool imageObservationAccepted = false;
++    bool imageSearchExpanded = false;
++    /// @brief 同帧 CAD 点实际存在且有限；没有参考时禁止以默认零坐标记录偏差。
++    bool simulatedPointAvailable = false;
+     bool onlineObservationFusionEnabled = false;
+     bool attempted = false;
+     bool templateReinitialized = false;
+@@ -110,6 +117,9 @@ public:
+ 
+     void reset();
+ 
++    /** @brief 缺图/门禁断开连续重捕获与待训练帧；保留此前原图模板供后续搜索。 */
++    void notifyImageObservationGap();
++
+     LegacyOnlineKcfResult process(
+         const cv::Mat &gray8,
+         const digital_twin::DigitalTwinVisionLaserObservation &observation,
+@@ -117,6 +127,13 @@ public:
+         const LegacyOnlineKcfOptions &options);
+ 
+ private:
++    /** @brief 原图测量策略；不使用 CAD 模板、坐标融合或失测补点。 */
++    LegacyOnlineKcfResult processImageMeasurement(
++        const cv::Mat &gray8,
++        const digital_twin::DigitalTwinVisionLaserObservation &observation,
++        const WeldProjectionContext &projectionContext,
++        const LegacyOnlineKcfOptions &options);
++
+     std::unique_ptr<CKcfTracker> m_tracker;
+     COnlineSeamContinuity m_continuity;
+     CSimulationGuidedSeamEstimator m_guidedEstimator;
+@@ -134,6 +151,13 @@ private:
+     cv::Point2d m_lastImageSearchPoint{-1.0, -1.0};
+     /// @brief 新原图支系已确认而粗 KCF 尚未同位验收；期间保留检测但不融合旧粗点。
+     bool m_coarseRecoveryPending = false;
++    bool m_imageMeasurementActive = false;
++    /// @brief 仅由独立原图精定位建立的局部身份模板；退化 KCF 不刷新此模板。
++    cv::Mat m_imageIdentityPatch;
++    /// @brief 远处原图身份重捕获候选；失测中断确认，不产生业务补点。
++    cv::Point2d m_imageReacquisitionPoint{-1.0, -1.0};
++    int m_imageReacquisitionFrames = 0;
++    qint64 m_imageLastObservationFrameId = -1;
+ };
+ 
+ } // namespace i2r_rlc::vision
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/Vision/src/track/LegacyOnlineKcfDetector.cpp b/Vision/src/track/LegacyOnlineKcfDetector.cpp
+index 8755b42..4586baf 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/Vision/src/track/LegacyOnlineKcfDetector.cpp
++++ b/Vision/src/track/LegacyOnlineKcfDetector.cpp
+@@ -196,6 +196,141 @@ double coarseObservationQuality(const cv::Mat &gray8, const cv::Point2d &coarse,
+     return std::clamp(responseQuality * supported / columns * ambiguityPenalty, 0.0, 1.0);
+ }
+ 
++bool insideImage(const cv::Mat &gray8, const cv::Point2d &point)
++{
++    return std::isfinite(point.x) && std::isfinite(point.y)
++        && point.x >= 0.0 && point.x < gray8.cols
++        && point.y >= 0.0 && point.y < gray8.rows;
++}
++
++/** @brief 固定原图支撑范围用于身份比较，不从反光增强图或 CAD 学习模板。 */
++cv::Mat imageIdentityPatch(const cv::Mat &gray8, const cv::Point2d &point)
++{
++    constexpr int patchSize = 81;
++    if (!insideImage(gray8, point) || point.x < patchSize / 2
++        || point.y < patchSize / 2 || point.x + patchSize / 2 >= gray8.cols
++        || point.y + patchSize / 2 >= gray8.rows) {
++        return {};
++    }
++    cv::Mat patch;
++    cv::getRectSubPix(gray8, {patchSize, patchSize}, point, patch);
++    return patch;
++}
++
++/**
++ * @brief KCF 响应以外的原图身份校核：相关形状和可见窄条纹必须同时保留。
++ * @details 身份参照只能来自独立几何；缺少参照、空白、宽饱和及大范围竞争反光均不接纳。
++ */
++double imageIdentityQuality(const cv::Mat &gray8, const cv::Point2d &point,
++    const cv::Mat &identity)
++{
++    const auto patch = imageIdentityPatch(gray8, point);
++    if (patch.empty() || identity.empty() || patch.size() != identity.size()) {
++        return 0.0;
++    }
++    double minimum = 0.0, maximum = 0.0;
++    double anchorMinimum = 0.0, anchorMaximum = 0.0;
++    cv::minMaxLoc(patch, &minimum, &maximum);
++    cv::minMaxLoc(identity, &anchorMinimum, &anchorMaximum);
++    if (maximum - minimum < 40.0 || anchorMaximum - anchorMinimum < 40.0) {
++        return 0.0;
++    }
++    cv::Mat currentMask, anchorMask;
++    cv::threshold(patch, currentMask, minimum + 0.4 * (maximum - minimum), 255,
++        cv::THRESH_BINARY);
++    cv::threshold(identity, anchorMask,
++        anchorMinimum + 0.4 * (anchorMaximum - anchorMinimum), 255, cv::THRESH_BINARY);
++    const int support = cv::countNonZero(anchorMask);
++    const int currentSupport = cv::countNonZero(currentMask);
++    if (support < 32 || currentSupport < support * 0.5
++        || currentSupport > support * 2.0) {
++        return 0.0;
++    }
++    cv::Mat shared;
++    cv::bitwise_and(anchorMask, currentMask, shared);
++    const double overlap = static_cast<double>(cv::countNonZero(shared)) / support;
++    if (overlap < 0.6) {
++        return 0.0;
++    }
++    cv::Mat response;
++    cv::matchTemplate(patch, identity, response, cv::TM_CCOEFF_NORMED);
++    const double correlation = response.at<float>(0, 0);
++    return std::isfinite(correlation) && correlation >= 0.7
++        ? std::clamp(correlation * overlap, 0.0, 1.0) : 0.0;
++}
++
++struct ImageSearchResult {
++    OnlineSeamRefinementResult geometry;
++    bool ambiguous = false;
++};
++
++/**
++ * @brief 搜索中心仅产生提案；每个输出必须由既有原图双侧几何独立定位。
++ * @details 保留原 refiner 的相机截面语义，不根据 CAD 方向改变几何判据。
++ * 多个分离的合法接缝候选不能以 CAD 距离或亮度决定身份。
++ */
++ImageSearchResult searchImageGeometry(const cv::Mat &gray8,
++    const std::vector<cv::Point2d> &hints, bool expanded,
++    const OnlineSeamRefinementOptions &options)
++{
++    ImageSearchResult result;
++    result.geometry.status = OnlineSeamRefinementStatus::InsufficientSupport;
++    std::vector<cv::Point2d> proposals = hints;
++    if (expanded) {
++        std::vector<cv::Point2f> corners;
++        cv::goodFeaturesToTrack(gray8, corners, 32, 0.02, 24.0, cv::noArray(), 9);
++        for (const auto &corner : corners) {
++            proposals.push_back(corner);
++        }
++        // 对比度差异只影响提案，不改变最终测量原图及几何门禁。
++        // 二值条纹提案避免远端饱和反光独占角点预算，弱但清晰的真实折点仍可被搜索。
++        cv::Mat proposalImage;
++        cv::GaussianBlur(gray8, proposalImage, {3, 3}, 0.8);
++        cv::threshold(proposalImage, proposalImage, 0.0, 255.0,
++            cv::THRESH_BINARY | cv::THRESH_OTSU);
++        cv::goodFeaturesToTrack(proposalImage, corners, 32, 0.02, 24.0, cv::noArray(), 9);
++        for (const auto &corner : corners) {
++            proposals.push_back(corner);
++        }
++        proposals.push_back({0.5 * gray8.cols, 0.5 * gray8.rows});
++    }
++    std::vector<cv::Point2d> searched;
++    for (const auto &proposal : proposals) {
++        if (!insideImage(gray8, proposal)) {
++            continue;
++        }
++        if (std::any_of(searched.begin(), searched.end(), [&proposal](const auto &point) {
++            return cv::norm(point - proposal) < 12.0;
++        })) {
++            continue;
++        }
++        searched.push_back(proposal);
++        const auto candidate = COnlineSeamRefiner::refine(gray8, proposal, options);
++        if (!candidate.valid) {
++            // 失测也保留原图拒绝证据；不得将有歧义的图像统一写成非法输入。
++            if (!result.geometry.valid
++                && ((candidate.status == OnlineSeamRefinementStatus::AmbiguousStripe
++                        && candidate.ambiguousColumnRatio > result.geometry.ambiguousColumnRatio)
++                    || (result.geometry.status != OnlineSeamRefinementStatus::AmbiguousStripe
++                        && candidate.supportRatio > result.geometry.supportRatio))) {
++                result.geometry = candidate;
++            }
++            continue;
++        }
++        if (result.geometry.valid && cv::norm(candidate.point - result.geometry.point)
++            > std::max(3.0, options.maxPositionUncertaintyPixel)) {
++            result.ambiguous = true;
++            result.geometry.valid = false;
++            result.geometry.status = OnlineSeamRefinementStatus::AmbiguousStripe;
++            return result;
++        }
++        if (!result.geometry.valid || candidate.confidence > result.geometry.confidence) {
++            result.geometry = candidate;
++        }
++    }
++    return result;
++}
++
+ } // namespace
+ 
+ CLegacyOnlineKcfDetector::CLegacyOnlineKcfDetector()
+@@ -218,6 +353,234 @@ void CLegacyOnlineKcfDetector::reset()
+     m_hasImageSearchPoint = false;
+     m_lastImageSearchPoint = {-1.0, -1.0};
+     m_coarseRecoveryPending = false;
++    m_imageMeasurementActive = false;
++    m_imageIdentityPatch.release();
++    m_imageReacquisitionPoint = {-1.0, -1.0};
++    m_imageReacquisitionFrames = 0;
++    m_imageLastObservationFrameId = -1;
++}
++
++void CLegacyOnlineKcfDetector::notifyImageObservationGap()
++{
++    m_imageReacquisitionPoint = {-1.0, -1.0};
++    m_imageReacquisitionFrames = 0;
++    if (m_tracker) {
++        m_tracker->commitOnlineObservationTraining(false);
++    }
++}
++
++LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processImageMeasurement(
++    const cv::Mat &gray8,
++    const digital_twin::DigitalTwinVisionLaserObservation &observation,
++    const WeldProjectionContext &projectionContext,
++    const LegacyOnlineKcfOptions &options)
++{
++    LegacyOnlineKcfResult result;
++    result.diagnostic.imageMeasurementOutputEnabled = true;
++    result.diagnostic.seamRefinementEnabled = true;
++    result.diagnostic.imageSize = gray8.size();
++    if (gray8.empty() || gray8.type() != CV_8UC1 || !projectionContext.valid) {
++        notifyImageObservationGap();
++        result.message = "原图或投影上下文无效，不生成测量点。";
++        return result;
++    }
++    if ((m_initialized && m_templateImageSize != gray8.size())
++        || observation.seamIndex != m_continuitySeamIndex) {
++        reset();
++        m_imageMeasurementActive = true;
++        m_continuitySeamIndex = observation.seamIndex;
++    }
++    const bool freshImageFrame = observation.frameId >= 0
++        && (m_imageLastObservationFrameId < 0
++            || observation.frameId > m_imageLastObservationFrameId);
++    if (!freshImageFrame) {
++        notifyImageObservationGap();
++    }
++    m_imageLastObservationFrameId = std::max(m_imageLastObservationFrameId,
++        observation.frameId);
++    result.processedImage = gray8.clone();
++    result.diagnostic.attempted = true;
++    result.diagnostic.simulatedPoint = {observation.weldPointImage_px.x_px,
++        observation.weldPointImage_px.y_px};
++    result.diagnostic.simulatedPointAvailable = observation.valid
++        && observation.hasWeldPointImage_px
++        && std::isfinite(result.diagnostic.simulatedPoint.x)
++        && std::isfinite(result.diagnostic.simulatedPoint.y);
++    cv::Point2d coarse(-1.0, -1.0);
++    bool coarseUsable = false;
++    if (m_initialized && m_tracker) {
++        try {
++            result.trackedRoi = m_tracker->update(gray8);
++            ++m_framesSinceInitialize;
++            result.diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
++            coarse = weldPointFromRoi(result.diagnostic.tracker.beforeFusionRoi,
++                m_templateWeldAnchor);
++            const auto &tracking = result.diagnostic.tracker;
++            coarseUsable = tracking.completed && tracking.hasResponse
++                && !tracking.correlationJumpRejected && insideImage(gray8, coarse)
++                && std::isfinite(tracking.responsePeak) && tracking.responsePeak >= 0.45;
++        } catch (const std::exception &) {
++            m_tracker->commitOnlineObservationTraining(false);
++        }
++    }
++    result.diagnostic.beforeFusionPoint = coarse;
++    result.diagnostic.responsePoint = coarse;
++    std::vector<cv::Point2d> hints;
++    if (coarseUsable) { hints.push_back(coarse); }
++    if (m_hasImageSearchPoint) { hints.push_back(m_lastImageSearchPoint); }
++    const auto started = std::chrono::steady_clock::now();
++    auto search = searchImageGeometry(gray8, hints, false, options.seamRefinement);
++    if (!search.geometry.valid && !search.ambiguous) {
++        result.diagnostic.imageSearchExpanded = true;
++        // 仿真仅是可退出的搜索提案；无效、越界、错误方向均不阻断原图搜索。
++        if (result.diagnostic.simulatedPointAvailable) {
++            hints.push_back(result.diagnostic.simulatedPoint);
++        }
++        search = searchImageGeometry(gray8, hints, true, options.seamRefinement);
++    }
++    result.diagnostic.refinementAttempted = true;
++    result.diagnostic.refinementElapsedMs = std::chrono::duration<double, std::milli>(
++        std::chrono::steady_clock::now() - started).count();
++    result.diagnostic.rawRefinement = search.geometry;
++    result.diagnostic.refinement = search.geometry;
++    const double coarseIdentityQuality = coarseUsable
++        ? imageIdentityQuality(gray8, coarse, m_imageIdentityPatch) : 0.0;
++    // 局部尺度仅决定是否需要重新确认，不限制总行程。
++    // 远候选必须匹配既有独立原图身份，并由连续新图像确认，不能重建模板后自证。
++    const double associationRadius = static_cast<double>(std::min(
++        options.seamRefinement.searchHalfWidthPixel,
++        options.seamRefinement.searchHalfHeightPixel));
++    if (search.geometry.valid && m_hasImageSearchPoint
++        && cv::norm(search.geometry.point - m_lastImageSearchPoint) > associationRadius) {
++        const double identity = imageIdentityQuality(gray8,
++            search.geometry.point, m_imageIdentityPatch);
++        // 旧目标仍有当前图像身份支撑时，远处相似折点不能通过累计帧数取代它。
++        // 只有旧分支也不可验收时，才允许远候选开始独立重捕获确认。
++        if (identity > 0.0 && freshImageFrame && coarseIdentityQuality <= 0.0) {
++            m_imageReacquisitionFrames = m_imageReacquisitionFrames > 0
++                    && cv::norm(search.geometry.point - m_imageReacquisitionPoint)
++                        <= associationRadius
++                ? m_imageReacquisitionFrames + 1 : 1;
++            m_imageReacquisitionPoint = search.geometry.point;
++        } else {
++            m_imageReacquisitionFrames = 0;
++        }
++        if (m_imageReacquisitionFrames < 3) {
++            result.diagnostic.refinement.valid = false;
++            result.diagnostic.refinement.status = OnlineSeamRefinementStatus::UnstablePosition;
++        }
++    } else {
++        m_imageReacquisitionFrames = 0;
++    }
++    const bool geometryAccepted = result.diagnostic.refinement.valid;
++    if (geometryAccepted) {
++        m_imageReacquisitionFrames = 0;
++        result.weldPointPixel = search.geometry.point;
++        result.diagnostic.continuity.source = OnlineSeamPointSource::Geometry;
++    } else if (!search.ambiguous && coarseUsable) {
++        result.diagnostic.coarseObservationQuality = coarseIdentityQuality;
++        if (result.diagnostic.coarseObservationQuality > 0.0) {
++            result.weldPointPixel = coarse;
++            result.diagnostic.coarseObservationUsed = true;
++            result.diagnostic.continuity.source = OnlineSeamPointSource::CorrectedKcf;
++        }
++    }
++    result.diagnostic.imageObservationAccepted = geometryAccepted
++        || result.diagnostic.coarseObservationUsed;
++    if (!result.diagnostic.imageObservationAccepted) {
++        if (m_tracker) {
++            m_tracker->commitOnlineObservationTraining(false);
++            if (m_hasImageSearchPoint) {
++                m_tracker->m_roi.x = static_cast<float>(m_lastImageSearchPoint.x
++                    - m_tracker->m_roi.width * m_templateWeldAnchor.x);
++                m_tracker->m_roi.y = static_cast<float>(m_lastImageSearchPoint.y
++                    - m_tracker->m_roi.height * m_templateWeldAnchor.y);
++            }
++        }
++        result.message = search.ambiguous
++            ? "原图存在多个合法接缝候选，身份未确认，不生成点。"
++            : "同帧原图未通过接缝或 KCF 身份验收，不生成点。";
++        return result;
++    }
++    result.diagnostic.finalPoint = result.weldPointPixel;
++    result.diagnostic.coarseFinalPoint = result.weldPointPixel;
++    result.diagnostic.continuity.valid = true;
++    result.diagnostic.continuity.point = result.weldPointPixel;
++    result.diagnostic.continuity.observationWeightX = 1.0;
++    result.diagnostic.continuity.observationWeightY = 1.0;
++    const auto projection = CWeldImageToSpaceProjector::projectCvPoint(
++        result.weldPointPixel, projectionContext, WeldProjectionTargetFrame::PositionerTcp);
++    if (!projection.valid || !projection.spacePoint.valid) {
++        if (m_tracker) { m_tracker->commitOnlineObservationTraining(false); }
++        result.message = "原图测量已验收，但空间投影失败：" + projection.message;
++        return result;
++    }
++    result.stationPoint = projection.spacePoint;
++    result.valid = true;
++    // 初始化和重捕获模板都只能来自当前已接纳的真实接缝；CAD 写回不改变此状态。
++    if (geometryAccepted) {
++        const bool aligned = m_initialized && coarseUsable
++            && cv::norm(coarse - result.weldPointPixel) <= 3.0;
++        if (!aligned) {
++            m_tracker = std::make_unique<CKcfTracker>(
++                true, true, false, false, KcfFeatureMode::Standard, 2);
++            KcfFusionOptions imageFusion;
++            imageFusion.mode = KcfFusionMode::KcfOnly;
++            m_tracker->setFusionOptions(imageFusion);
++            m_tracker->setOnlineObservationMode(true);
++            m_tracker->init(centeredRoi(result.weldPointPixel,
++                kRoiWidthPixel, kRoiHeightPixel, gray8.size()), gray8);
++            m_templateWeldAnchor = {(result.weldPointPixel.x - m_tracker->m_roi.x)
++                    / m_tracker->m_roi.width,
++                (result.weldPointPixel.y - m_tracker->m_roi.y) / m_tracker->m_roi.height};
++            m_templateImageSize = gray8.size();
++            m_initialized = true;
++            m_framesSinceInitialize = 0;
++            result.diagnostic.templateReinitialized = true;
++        } else {
++            m_tracker->commitOnlineObservationTraining(true);
++        }
++        m_imageIdentityPatch = imageIdentityPatch(gray8, result.weldPointPixel);
++    } else {
++        // 退化 KCF 可续测，不能训练自身或更新独立几何身份参照。
++        m_tracker->commitOnlineObservationTraining(false);
++    }
++    m_lastImageSearchPoint = result.weldPointPixel;
++    m_hasImageSearchPoint = true;
++    result.trackedRoi = clampRoi(cv::Rect(m_tracker->m_roi), gray8.size());
++    result.diagnostic.templateAnchor = m_templateWeldAnchor;
++    result.diagnostic.framesSinceInitialize = m_framesSinceInitialize;
++    result.diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
++    result.message = geometryAccepted
++        ? "原图接缝精定位测量；仿真仅辅助搜索。"
++        : "当前原图 KCF 身份及质量验收通过，非独立精定位。";
++    if (options.enableGapDetection) {
++        DpStripeDetectionOptions centerlineOptions;
++        centerlineOptions.roi = centeredRoi(result.weldPointPixel,
++            kGapRoiSizePixel, kGapRoiSizePixel, gray8.size());
++        centerlineOptions.seamXPixel = static_cast<int>(std::lround(result.weldPointPixel.x))
++            - centerlineOptions.roi.x;
++        const auto centerline = CDpStripeCenterlineDetector::detectCenterline(
++            gray8, centerlineOptions);
++        WeldPointCloud cloud;
++        cloud.frameId = "positioner_tcp";
++        if (centerline.valid) {
++            std::vector<WeldImagePoint> points;
++            for (const auto &point : centerline.points) {
++                points.push_back({point.xPixel, point.yPixel, point.valid});
++            }
++            cloud.points = CWeldImageToSpaceProjector::projectImagePoints(points,
++                projectionContext, WeldProjectionTargetFrame::PositionerTcp);
++            cloud.valid = std::any_of(cloud.points.begin(), cloud.points.end(),
++                [](const auto &point) { return point.valid; });
++        }
++        const auto gap = CPointCloudGapWidthDetector::detect(
++            cloud, result.stationPoint, options.gapWidthOptions);
++        result.gapValid = gap.valid;
++        result.gapWidthMm = gap.valid ? gap.gapWidthMm : 0.0;
++        result.gapConfidence = gap.valid ? gap.confidence : 0.0;
++    }
++    return result;
+ }
+ 
+ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
+@@ -226,6 +589,16 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
+     const WeldProjectionContext &projectionContext,
+     const LegacyOnlineKcfOptions &options)
+ {
++    if (options.enableImageMeasurementOutput) {
++        if (!m_imageMeasurementActive) {
++            reset();
++            m_imageMeasurementActive = true;
++        }
++        return processImageMeasurement(gray8, observation, projectionContext, options);
++    }
++    if (m_imageMeasurementActive) {
++        reset();
++    }
+     LegacyOnlineKcfResult result;
+     result.diagnostic.onlineObservationFusionEnabled = options.enableOnlineObservationFusion;
+     result.diagnostic.imageSize = gray8.size();
+@@ -352,6 +725,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
+         simulatedWeldPoint.py - m_tracker->m_roi.height * m_templateWeldAnchor.y;
+ 
+     result.diagnostic.attempted = true;
++    result.diagnostic.simulatedPointAvailable = true;
+     result.diagnostic.gaborSucceeded = gaborSucceeded;
+     result.diagnostic.enhancementRoi = currentRoi;
+     result.diagnostic.templateAnchor = m_templateWeldAnchor;
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/UI/include/RuntimeWorkerAdapters.h b/UI/include/RuntimeWorkerAdapters.h
+index 0e1e92d..50bd123 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/UI/include/RuntimeWorkerAdapters.h
++++ b/UI/include/RuntimeWorkerAdapters.h
+@@ -271,12 +271,6 @@ private:
+         m_latestDigitalTwinObservation;
+     bool m_requireSynchronizedObservation = false;
+     RuntimeVisionCorrelation m_activeCorrelation;
+-    /// @brief Vision 线程独占的上一业务目标，仅用于位姿版本切换的估计过渡。
+-    vision::WeldSpacePoint m_lastBusinessPointInParent;
+-    quint64 m_lastBusinessPointPoseRevision = 0;
+-    quint64 m_lastBusinessPointSessionId = 0;
+-    int m_lastBusinessPointSeamIndex = -1;
+-    QSize m_lastBusinessPointImageSize;
+     vision::CLegacyOnlineKcfDetector m_detector;
+     bool m_trackingActive = false;
+     int m_currentLocalizationSegmentIndex = -1;
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/UI/src/RuntimeWorkerAdapters.cpp b/UI/src/RuntimeWorkerAdapters.cpp
+index fa4bd1e..0387971 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/UI/src/RuntimeWorkerAdapters.cpp
++++ b/UI/src/RuntimeWorkerAdapters.cpp
+@@ -1196,11 +1196,6 @@ void CVisionTrackingWorkerAdapter::configure(
+     m_options = options;
+     m_options.method = RuntimeTrackingMethod::Kcf;
+     m_projectionContext = projectionContext;
+-    m_lastBusinessPointInParent = {};
+-    m_lastBusinessPointPoseRevision = 0;
+-    m_lastBusinessPointSessionId = 0;
+-    m_lastBusinessPointSeamIndex = -1;
+-    m_lastBusinessPointImageSize = {};
+     m_detector.reset();
+     emit statusChanged(QStringLiteral("vision tracking configured"));
+ }
+@@ -1243,11 +1238,6 @@ void CVisionTrackingWorkerAdapter::stopTracking()
+ {
+     m_trackingActive = false;
+     m_currentLocalizationSegmentIndex = -1;
+-    m_lastBusinessPointInParent = {};
+-    m_lastBusinessPointPoseRevision = 0;
+-    m_lastBusinessPointSessionId = 0;
+-    m_lastBusinessPointSeamIndex = -1;
+-    m_lastBusinessPointImageSize = {};
+     m_detector.reset();
+     m_latestDigitalTwinObservation.reset();
+     m_requireSynchronizedObservation = false;
+@@ -1269,7 +1259,12 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
+     const control::TrackingTriggerDecision decision =
+         control::CTrackingTriggerPolicy::evaluate(triggerInput);
+     if (!decision.shouldStartTracking) {
++        if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
++            m_detector.notifyImageObservationGap();
++        }
+         RuntimeTrackingResult result;
++        result.imageMeasurementOutputEnabled =
++            m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
+         result.frameId = frame.frameId;
+         result.posflag = m_robotState.posflag;
+         result.traflag = m_robotState.traflag;
+@@ -1284,6 +1279,11 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
+ 
+     RuntimeTrackingResult result;
+     if (m_options.detType != 2) {
++        if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
++            m_detector.notifyImageObservationGap();
++        }
++        result.imageMeasurementOutputEnabled =
++            m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
+         result.frameId = frame.frameId;
+         result.triggerAccepted = true;
+         result.valid = false;
+@@ -1381,6 +1381,8 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+     RuntimeTrackingResult result;
+     result.frameId = frame.frameId;
+     result.posflag = m_robotState.posflag;
++    result.imageMeasurementOutputEnabled =
++        m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
+     const bool diagnosticsEnabled = m_options.visionDiagnostics.enabled
+         && m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
+     if (diagnosticsEnabled) {
+@@ -1394,12 +1396,14 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+     const QImage image = frame.image.isNull() ? frame.previewImage : frame.image;
+     const cv::Mat gray8 = qImageToGray8(image);
+     if (gray8.empty()) {
++        if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
+         result.message = QStringLiteral("invalid frame image");
+         return result;
+     }
+ 
+     digital_twin::DigitalTwinVisionLaserObservation observation;
+     if (!makeObservation(frame.frameId, &observation)) {
++        if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
+         result.message = QStringLiteral("simulated observation unavailable");
+         return result;
+     }
+@@ -1421,6 +1425,7 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+             m_options.positionerCalibration,
+             m_robotState);
+         if (!contextResult.valid) {
++            if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
+             result.message = QStringLiteral("projection context rejected: %1")
+                                  .arg(QString::fromStdString(contextResult.message));
+             return result;
+@@ -1434,25 +1439,10 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+         detectorOptions.fusion = m_options.fusion;
+         detectorOptions.enableSeamRefinement = true;
+         detectorOptions.enableSimulationGuidance = true;
+-        // 新融合仅作用于正式在线跟随，初始反向扫描沿用原检测策略。
+-        detectorOptions.enableOnlineObservationFusion = m_activeCorrelation.onlineControlWindowActive;
++        // 反向初扫与正式跟随使用同一原图测量边界；CAD 只辅助搜索。
++        detectorOptions.enableImageMeasurementOutput = true;
++        detectorOptions.enableOnlineObservationFusion = false;
+         detectorOptions.referenceRevision = m_activeCorrelation.workpiecePoseRevision;
+-        if (m_lastBusinessPointInParent.valid
+-            && m_lastBusinessPointSessionId == m_activeCorrelation.sessionId
+-            && m_lastBusinessPointSeamIndex == observation.seamIndex
+-            && m_lastBusinessPointImageSize == image.size()
+-            && m_lastBusinessPointPoseRevision != detectorOptions.referenceRevision) {
+-            // 工件写回/回滚只改变模型参考；把旧业务点按当前曝光位姿重投影，
+-            // 作为单次过渡估计。绝不将该点写入 independentWeldPoint。
+-            const auto transition = vision::CWeldImageToSpaceProjector::projectSpacePointToImage(
+-                m_lastBusinessPointInParent, projectionContext,
+-                vision::WeldProjectionTargetFrame::PositionerTcp);
+-            if (transition.valid && transition.xPixel >= 0.0 && transition.xPixel < gray8.cols
+-                && transition.yPixel >= 0.0 && transition.yPixel < gray8.rows) {
+-                detectorOptions.hasReferenceTransitionPoint = true;
+-                detectorOptions.referenceTransitionPoint = {transition.xPixel, transition.yPixel};
+-            }
+-        }
+         // 用户明确选择实际接缝间隙中部；只对在线纠偏启用，不影响离线扫描。
+         detectorOptions.seamRefinement.heightPolicy = vision::OnlineSeamHeightPolicy::GapCenter;
+     }
+@@ -1471,7 +1461,8 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+         const bool anomaly = COnlineVisionImageSampling::isAnomaly(
+             raw.beforeFusionPoint.x, raw.beforeFusionPoint.y,
+             raw.simulatedPoint.x, raw.simulatedPoint.y,
+-            raw.attempted && raw.tracker.completed && raw.tracker.hasResponse,
++            raw.simulatedPointAvailable && raw.attempted
++                && raw.tracker.completed && raw.tracker.hasResponse,
+             raw.tracker.correlationJumpRejected || raw.tracker.fusionJumpRejected);
+         const qint64 sampleTimeMs = m_diagnosticImageSamplingClock.elapsed();
+         const int bucket = !detected.processedImage.empty()
+@@ -1490,9 +1481,18 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+     }
+     result.pointSource = detected.diagnostic.continuity.source;
+     result.degradedFrames = detected.diagnostic.continuity.degradedFrames;
+-    result.sample.estimated = result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
+-        || result.pointSource == vision::OnlineSeamPointSource::SimulationPrediction
+-        || result.pointSource == vision::OnlineSeamPointSource::GuidedEstimate;
++    result.imageObservationAccepted = detected.diagnostic.imageObservationAccepted;
++    if (result.imageMeasurementOutputEnabled) {
++        // 初扫允许已验收 KCF 进入起点缓存；正式跟随保留其 estimated 标记，
++        // 沿用 Control 异常 ICP 的隔离门，不能因图像可用而冒充独立几何。
++        result.sample.estimated = result.imageObservationAccepted
++            && result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
++            && m_activeCorrelation.onlineControlWindowActive;
++    } else {
++        result.sample.estimated = result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
++            || result.pointSource == vision::OnlineSeamPointSource::SimulationPrediction
++            || result.pointSource == vision::OnlineSeamPointSource::GuidedEstimate;
++    }
+     result.imageXPixel = detected.weldPointPixel.x;
+     result.imageYPixel = detected.weldPointPixel.y;
+     result.sample.point = control::OnlineCorrectionPoint{
+@@ -1508,19 +1508,6 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+         result.sample.gapWidthMm = static_cast<float>(detected.gapWidthMm);
+     }
+     result.valid = detected.valid;
+-    if (detected.valid
+-        && m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
+-        const auto parentPoint = vision::CWeldImageToSpaceProjector::projectCvPoint(
+-            detected.weldPointPixel, projectionContext,
+-            vision::WeldProjectionTargetFrame::PositionerTcp);
+-        if (parentPoint.valid && parentPoint.spacePoint.valid) {
+-            m_lastBusinessPointInParent = parentPoint.spacePoint;
+-            m_lastBusinessPointPoseRevision = m_activeCorrelation.workpiecePoseRevision;
+-            m_lastBusinessPointSessionId = m_activeCorrelation.sessionId;
+-            m_lastBusinessPointSeamIndex = observation.seamIndex;
+-            m_lastBusinessPointImageSize = image.size();
+-        }
+-    }
+     // 独立验收使用同帧原图精定位观测，禁止读粗 KCF 或融合后的仿真先验。
+     // 归档关闭仍须执行几何校核与投影；非在线旧路径保持原观测。
+     const auto &rawDiagnostic = detected.diagnostic;
+@@ -1530,11 +1517,14 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+     if (detected.valid
+         && (!detectorOptions.enableSeamRefinement || rawDiagnostic.refinement.valid)
+         && rawDiagnostic.attempted
+-        // 正式在线的当前原图精定位已独立通过几何/时序校核；
+-        // 不再因错误 CAD 触发的融合跳变剥夺原图的独立验收资格。
+-        && (detectorOptions.enableOnlineObservationFusion
+-            || (rawTracker.hasResponse && rawTracker.completed
+-                && !rawTracker.correlationJumpRejected && !rawTracker.fusionJumpRejected))
++        // 原图测量模式只授予已验收几何独立资格，KCF 业务点不能自证 ICP。
++        // 初扫同样不能因错误 CAD 的旧融合跳变否定已验收的原图几何。
++        && (detectorOptions.enableImageMeasurementOutput
++            ? rawDiagnostic.imageObservationAccepted
++                && result.pointSource == vision::OnlineSeamPointSource::Geometry
++            : (detectorOptions.enableOnlineObservationFusion
++                || (rawTracker.hasResponse && rawTracker.completed
++                    && !rawTracker.correlationJumpRejected && !rawTracker.fusionJumpRejected)))
+         && std::isfinite(rawPixel.x) && std::isfinite(rawPixel.y)
+         && rawPixel.x >= 0.0 && rawPixel.x < gray8.cols
+         && rawPixel.y >= 0.0 && rawPixel.y < gray8.rows) {
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/UI/src/OnlineCorrectionRunRecorder.cpp b/UI/src/OnlineCorrectionRunRecorder.cpp
+index ed52680..1726092 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/UI/src/OnlineCorrectionRunRecorder.cpp
++++ b/UI/src/OnlineCorrectionRunRecorder.cpp
+@@ -290,7 +290,8 @@ bool COnlineCorrectionRunRecorder::beginSession(
+         "guided_reacquisition_blocked_previous_branch\tguided_reacquisition_frames\t"
+         "guided_image_continuity_active\tguided_image_observation_quality\tguided_model_translation_suppressed\t"
+         "kcf_online_observation_mode\tkcf_training_deferred\tkcf_training_committed\t"
+-        "geometry_has_branch_directions\tgeometry_left_slope\tgeometry_right_slope\tkcf_real_search_fallback_used\n"))) {
++        "geometry_has_branch_directions\tgeometry_left_slope\tgeometry_right_slope\tkcf_real_search_fallback_used\t"
++        "image_measurement_output_enabled\timage_observation_accepted\timage_search_expanded\n"))) {
+             if (errorMessage != nullptr) *errorMessage = m_lastError;
+             return false;
+         }
+@@ -489,10 +490,11 @@ bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
+         fields << (valid ? numberText(point.x) : QString())
+                << (valid ? numberText(point.y) : QString());
+     };
+-    addImagePoint(algorithm.simulatedPoint, algorithm.attempted);
++    addImagePoint(algorithm.simulatedPoint, algorithm.simulatedPointAvailable);
+     addImagePoint(algorithm.responsePoint, tracker.completed);
+     addImagePoint(algorithm.beforeFusionPoint, tracker.completed);
+-    addImagePoint(algorithm.finalPoint, result.valid);
++    addImagePoint(hasContext ? algorithm.finalPoint
++        : cv::Point2d(result.imageXPixel, result.imageYPixel), result.valid);
+     fields << (tracker.hasResponse ? numberText(tracker.responsePeak, 12) : QString());
+     for (const double value : {tracker.normalizedPeak, tracker.observationNoise,
+                               tracker.gainX, tracker.gainY, 1.0 - tracker.gainX, 1.0 - tracker.gainY}) {
+@@ -611,7 +613,11 @@ bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
+                ? numberText(algorithm.refinement.leftSlope) : QString())
+            << (algorithm.refinement.valid && algorithm.refinement.hasBranchDirections
+                ? numberText(algorithm.refinement.rightSlope) : QString())
+-           << boolText(algorithm.realSearchFallbackUsed);
++           << boolText(algorithm.realSearchFallbackUsed)
++           // 测量身份是运行链值对象的一部分，不能因可选诊断关闭而丢失。
++           << boolText(result.imageMeasurementOutputEnabled)
++           << boolText(result.imageObservationAccepted)
++           << boolText(algorithm.imageSearchExpanded);
+     const bool written = appendFields(QString::fromLatin1(kVisionDiagnosticFileName), fields);
+     if (m_imageWriter && !m_imageErrorReported && !m_imageWriter->lastError().isEmpty()) {
+         m_imageErrorReported = true;
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/UI/src/UiController.cpp b/UI/src/UiController.cpp
+index 16b0394..f561dcc 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/UI/src/UiController.cpp
++++ b/UI/src/UiController.cpp
+@@ -4276,9 +4276,13 @@ bool UiController::presentCorrectionFrame(const RuntimeTrackingResult& result)
+     presentation.virtualWeldPointVisible = observation.hasWeldPointImage_px;
+     presentation.detectedWeldPoint = QPointF(result.imageXPixel, result.imageYPixel);
+     presentation.detectedWeldPointVisible = result.triggerAccepted && result.valid;
+-    QString pointLabel = QStringLiteral("绿色：精定位/融合点");
++    QString pointLabel = result.imageMeasurementOutputEnabled
++        ? QStringLiteral("绿色：原图精定位测量点")
++        : QStringLiteral("绿色：精定位/融合点");
+     if (result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf) {
+-        pointLabel = QStringLiteral("绿色：KCF辅助估计（精定位受干扰）");
++        pointLabel = result.imageMeasurementOutputEnabled && result.imageObservationAccepted
++            ? QStringLiteral("绿色：已验收原图 KCF（非独立精定位）")
++            : QStringLiteral("绿色：KCF辅助估计（精定位受干扰）");
+     } else if (result.pointSource == vision::OnlineSeamPointSource::SimulationPrediction) {
+         pointLabel = result.correlation.purpose == CorrectionPurpose::OnlineCorrection
+                 && result.correlation.onlineControlWindowActive
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/UI/include/RuntimeTrackingTypes.h b/UI/include/RuntimeTrackingTypes.h
+index 0229357..550504d 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/UI/include/RuntimeTrackingTypes.h
++++ b/UI/include/RuntimeTrackingTypes.h
+@@ -325,6 +325,10 @@ struct RuntimeTrackingResult {
+     /// @brief 焊缝图像点 X，单位 pixel。
+     vision::OnlineSeamPointSource pointSource = vision::OnlineSeamPointSource::Unavailable;
+     int degradedFrames = 0;
++    /// @brief true 表示最终输出仅允许当前图像验收的测量，关闭诊断仍保留来源身份。
++    bool imageMeasurementOutputEnabled = false;
++    /// @brief 当前帧原图几何或图像质量验收 KCF 已通过；不代表独立几何资格。
++    bool imageObservationAccepted = false;
+     double imageXPixel = 0.0;
+     /// @brief 焊缝图像点 Y，单位 pixel。
+     double imageYPixel = 0.0;
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/tests/test_runtime_tracking_flow.cpp b/tests/test_runtime_tracking_flow.cpp
+index 7ec83b6..81d9105 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/tests/test_runtime_tracking_flow.cpp
++++ b/tests/test_runtime_tracking_flow.cpp
+@@ -1222,7 +1222,8 @@ bool testVisionImageSamplingSessionAndMonotonicClock(QCoreApplication &app)
+     qint64 frameId = 0;
+     bool ok = true;
+     const auto submit = [&](quint64 sessionId, bool onlineWindow, double simulatedX, qint64 cameraMs) {
+-        auto frame = makeFrame();
++        // 采样时钟测试先由可验收原图建立 KCF，不能再借 CAD 模板制造目标。
++        auto frame = makeOnlineSeamFrame();
+         frame.frameId = ++frameId;
+         frame.timestamp = QDateTime::fromMSecsSinceEpoch(cameraMs);
+         digital_twin::DigitalTwinVisionLaserObservation observation;
+@@ -1252,7 +1253,8 @@ bool testVisionImageSamplingSessionAndMonotonicClock(QCoreApplication &app)
+         const auto &raw = result.diagnostic->algorithm;
+         return ui::COnlineVisionImageSampling::isAnomaly(raw.beforeFusionPoint.x,
+             raw.beforeFusionPoint.y, raw.simulatedPoint.x, raw.simulatedPoint.y,
+-            raw.attempted && raw.tracker.completed && raw.tracker.hasResponse,
++            raw.simulatedPointAvailable && raw.attempted
++                && raw.tracker.completed && raw.tracker.hasResponse,
+             raw.tracker.correlationJumpRejected || raw.tracker.fusionJumpRejected);
+     };
+     for (int index = 0; index < 3; ++index) {
+@@ -1335,7 +1337,7 @@ bool testOnlineTrainingRequiresConsistentRawRoi()
+     return ok;
+ }
+ 
+-/** @brief 正式在线的独立投影必须使用同帧精定位，不受归档与业务融合影响。 */
++/** @brief 实际 worker 两阶段均以当前图像定点，错误 CAD 与缺图不能新增测量。 */
+ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+ {
+     using namespace i2r_rlc;
+@@ -1358,33 +1360,67 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+         std::vector<ui::RuntimeTrackingResult> results;
+         QObject::connect(&worker, &ui::CVisionTrackingWorkerAdapter::trackingResultReady,
+             &app, [&](const ui::RuntimeTrackingResult &result) { results.push_back(result); });
++        ui::COnlineCorrectionWorkerAdapter initialControl;
++        ui::RuntimeOnlineCorrectionConfiguration initialConfiguration;
++        makeOnlineConfigurationFiles(&initialConfiguration);
++        std::optional<control::OnlineCorrectionUpdate> initialUpdate;
++        QObject::connect(&initialControl, &ui::COnlineCorrectionWorkerAdapter::onlineCorrectionUpdated,
++            &app, [&](const control::OnlineCorrectionUpdate &update) { initialUpdate = update; });
++        const auto initialConnection = QObject::connect(&worker,
++            &ui::CVisionTrackingWorkerAdapter::trackingResultReady,
++            &initialControl, &ui::COnlineCorrectionWorkerAdapter::appendTrackingResult);
++        initialControl.configure(initialConfiguration);
++        initialControl.startInitialDetection();
+         worker.configure(options, makeProjectionContext());
+         worker.startTracking();
+         qint64 frameId = 0;
+         quint64 poseRevision = 1;
+-        bool onlineWindow = true;
++        bool onlineWindow = false;
+         double simulatedX = 180.0;
+-        bool tackVisible = false;
++        double imageShiftX = 0.0;
++        bool hasCadImageHint = true;
++        bool hideCenter = false;
++        bool symmetricCrossSection = false;
++        bool emptyImage = false;
+         const auto submit = [&](bool blank) {
+             auto frame = makeOnlineSeamFrame();
+             frame.frameId = ++frameId;
+-            if (tackVisible) {
++            frame.timestamp = QDateTime::fromMSecsSinceEpoch(1700000000000LL + frameId * 100);
++            if (imageShiftX != 0.0) {
++                QImage shifted(frame.image.size(), QImage::Format_Grayscale8);
++                shifted.fill(15);
++                for (int y = 0; y < shifted.height(); ++y) {
++                    for (int x = 0; x < shifted.width(); ++x) {
++                        const int sourceX = x - static_cast<int>(imageShiftX);
++                        if (sourceX >= 0 && sourceX < frame.image.width()) {
++                            shifted.scanLine(y)[x] = frame.image.constScanLine(y)[sourceX];
++                        }
++                    }
++                }
++                frame.image = shifted;
++            }
++            if (symmetricCrossSection) {
+                 for (int y = 0; y < frame.image.height(); ++y) {
+-                    auto *row = frame.image.scanLine(y);
+                     for (int x = 0; x < frame.image.width(); ++x) {
+-                        const double dx = x - 160.0;
+-                        const double stripeY = 120.0 + (dx < 0.0 ? 0.28 : -0.32) * dx
+-                            - (std::abs(dx) <= 28.0 ? 22.0 : 0.0);
++                        const double stripeY = 120.0 - 0.45 * std::abs(x - 160.0 - imageShiftX);
+                         const double dy = y - stripeY;
+-                        row[x] = static_cast<uchar>(15.0 + 220.0 * std::exp(-dy * dy / 2.88));
++                        frame.image.scanLine(y)[x] = static_cast<uchar>(
++                            14.0 + 210.0 * std::exp(-dy * dy / 3.38));
+                     }
+                 }
+-                frame.previewImage = frame.image;
+             }
+-            if (blank) {
+-                frame.image.fill(0);
+-                frame.previewImage = frame.image;
++            if (hideCenter) {
++                const int centerX = 160 + static_cast<int>(imageShiftX);
++                for (int y = 0; y < frame.image.height(); ++y) {
++                    for (int x = std::max(0, centerX - 8);
++                         x < std::min(frame.image.width(), centerX + 9); ++x) {
++                        frame.image.scanLine(y)[x] = 14;
++                    }
++                }
+             }
++            if (blank) { frame.image.fill(0); }
++            frame.previewImage = frame.image;
++            if (emptyImage) { frame.image = {}; frame.previewImage = {}; }
+             digital_twin::DigitalTwinVisionLaserObservation observation;
+             observation.valid = true;
+             observation.frameId = frame.frameId;
+@@ -1393,6 +1429,10 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+             const double modelShift = simulatedX - 180.0;
+             observation.laserLineImagePoints_px = {
+                 {30.0 + modelShift, 78.0}, {simulatedX, 120.0}, {300.0 + modelShift, 81.6}};
++            if (!hasCadImageHint) {
++                observation.hasWeldPointImage_px = false;
++                observation.laserLineImagePoints_px.clear();
++            }
+             ui::RuntimeVisionCorrelation correlation;
+             correlation.sessionId = diagnostics ? 710 : 711;
+             correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
+@@ -1403,193 +1443,136 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+                 frame, makeReadyRobotState(), -1, observation, correlation);
+             return results.empty() ? ui::RuntimeTrackingResult{} : results.back();
+         };
+-        const auto first = submit(false);
+-        if (!first.valid) {
+-            std::cerr << "refinement integration: " << first.message.toStdString() << '\n';
+-        }
+-        ok &= expectTrue(first.valid && first.sample.point.valid
+-                && first.independentWeldPointInParent_mm.valid && !first.sample.estimated,
+-            "online geometry must project with diagnostics both enabled and disabled");
+-        ok &= expectTrue(first.diagnostic.has_value() == diagnostics,
+-            "geometry execution must not force diagnostic payload on");
+-        if (first.valid) {
+-            ok &= expectTrue(std::abs(first.imageXPixel - 180.0) < 1e-6,
+-                "manual full simulation weight preserves final business fusion");
+-            ok &= expectTrue(std::abs(first.independentWeldPointInParent_mm.xMm) < 1.5
+-                    && std::abs(first.independentWeldPointInParent_mm.yMm) < 1.5,
+-                "ICP independent projection uses known real seam, not fused prior at X180");
+-            ok &= expectTrue(std::abs(first.sample.point.xMm - 20.0) < 1e-6,
+-                "business projection corresponds to final displayed pixel");
+-            if (first.diagnostic.has_value()) {
+-                const auto &algorithm = first.diagnostic->algorithm;
+-                ok &= expectTrue(algorithm.onlineObservationFusionEnabled
+-                        && algorithm.rawRefinement.valid && algorithm.refinement.valid
+-                        && std::abs(algorithm.rawRefinement.point.x
+-                            - algorithm.refinement.point.x) < 1.0e-9
+-                        && std::abs(algorithm.refinement.point.x - 160.0) <= 1.5
+-                        && std::abs(algorithm.finalPoint.x - first.imageXPixel) < 1e-9,
+-                    "diagnostics distinguish original geometry and final fused output");
++        const auto expectMeasured = [&](const ui::RuntimeTrackingResult &result,
++                                        double expectedX, const char *message) {
++            ok &= expectTrue(result.valid && result.sample.point.valid
++                    && result.imageMeasurementOutputEnabled && result.imageObservationAccepted
++                    && !result.sample.estimated
++                    && std::abs(result.imageXPixel - expectedX) <= 1.5
++                    && std::abs(result.sample.point.xMm - (expectedX - 160.0)) <= 1.5,
++                message);
++            ok &= expectTrue(result.diagnostic.has_value() == diagnostics,
++                "measurement provenance must survive disabled diagnostic payload");
++            if (result.diagnostic.has_value()) {
++                const auto &algorithm = result.diagnostic->algorithm;
++                ok &= expectTrue(algorithm.imageMeasurementOutputEnabled
++                        && algorithm.imageObservationAccepted
++                        && std::abs(algorithm.finalPoint.x - result.imageXPixel) < 1e-9,
++                    "diagnostic identity and displayed measurement must agree");
+             }
+-        }
+-        const auto predicted = submit(true);
+-        ok &= expectTrue(predicted.valid && predicted.sample.point.valid
+-                && predicted.detectedRobotBasePoint.valid
+-                && predicted.detectedStationBasePoint.valid
+-                && !predicted.independentWeldPointInParent_mm.valid
+-                && predicted.sample.estimated
+-                && predicted.pointSource == vision::OnlineSeamPointSource::SimulationPrediction
+-                && std::hypot(predicted.imageXPixel - first.imageXPixel,
+-                    predicted.imageYPixel - first.imageYPixel) <= 2.000001,
+-            "blank frame keeps a bounded image-history estimate without inventing independent geometry");
+-        if (predicted.diagnostic.has_value()) {
+-            const auto &algorithm = predicted.diagnostic->algorithm;
+-            ok &= expectTrue(algorithm.onlineObservationFusionEnabled
+-                    && algorithm.attempted && algorithm.tracker.completed
+-                    && !algorithm.coarseObservationUsed
+-                    && std::abs(algorithm.continuity.observationWeightX) < 1.0e-12
+-                    && std::abs(algorithm.continuity.observationWeightY) < 1.0e-12,
+-                "online blank-frame prediction still runs KCF without fabricating an observation weight");
+-        }
+-        const auto recovered = submit(false);
+-        ok &= expectTrue(recovered.valid && recovered.independentWeldPointInParent_mm.valid,
+-            "coarse tracking survives invalid geometry and can recover on a new supported frame");
+-        vision::KcfFusionOptions realOnly;
+-        realOnly.mode = vision::KcfFusionMode::KcfOnly;
+-        worker.updateOnlineFusionOptions(realOnly);
+-        const auto unfused = submit(false);
+-        ok &= expectTrue(unfused.valid && std::abs(unfused.imageXPixel - 160.0) <= 1.5,
+-            "real-only mode outputs geometry instead of the biased simulated prior");
+-        // 此标定把像素(x,y)投影为(x-160,y-120,1000) mm；独立点可作
+-        // 未融合几何观测，非端点权重可识别权重方向反转和重复融合。
+-        vision::KcfFusionOptions manual;
+-        manual.mode = vision::KcfFusionMode::ManualWeight;
+-        manual.simulationWeight = 0.1;
+-        worker.updateOnlineFusionOptions(manual);
+-        const auto mixed = submit(false);
+-        ok &= expectTrue(mixed.valid && mixed.independentWeldPointInParent_mm.valid,
+-            "non-endpoint manual fusion retains a valid independent observation");
+-        if (mixed.valid && mixed.independentWeldPointInParent_mm.valid) {
+-            const auto &independent = mixed.independentWeldPointInParent_mm;
+-            const double expectedX = 2.0 + 0.9 * independent.xMm;
+-            const double expectedY = 0.9 * independent.yMm;
+-            ok &= expectTrue(std::abs(mixed.imageXPixel - 160.0 - expectedX) < 1e-6
+-                    && std::abs(mixed.imageYPixel - 120.0 - expectedY) < 1e-6
+-                    && std::abs(mixed.sample.point.xMm - expectedX) < 1e-6
+-                    && std::abs(mixed.sample.point.yMm - expectedY) < 1e-6
+-                    && std::abs(mixed.sample.point.zMm - independent.zMm) < 1e-6,
+-                "manual 10 percent prior and 90 percent geometry fuse once before projection");
+-        }
+-
+-        // 切换模式重置二维Kalman：首帧只种子，第二帧首次更新。
+-        // A/H/B均为单位矩阵、P初值为零、Q=.03I，因此K=.03/(.03+R)。
+-        vision::KcfFusionOptions automatic;
+-        automatic.mode = vision::KcfFusionMode::AutomaticKalman;
+-        worker.updateOnlineFusionOptions(automatic);
+-        const auto seeded = submit(false);
+-        const auto automaticSecond = submit(false);
+-        ok &= expectTrue(seeded.valid && automaticSecond.valid
+-                && automaticSecond.independentWeldPointInParent_mm.valid,
+-            "automatic seeded and second frames preserve valid geometry");
+-        if (diagnostics && seeded.diagnostic.has_value()
+-            && automaticSecond.diagnostic.has_value() && automaticSecond.valid) {
+-            const auto &seedTracker = seeded.diagnostic->algorithm.tracker;
+-            const auto &tracker = automaticSecond.diagnostic->algorithm.tracker;
+-            const auto &independent = automaticSecond.independentWeldPointInParent_mm;
+-            const double expectedGain = 0.03 / (0.03 + tracker.observationNoise);
+-            const double expectedX = 20.0 + expectedGain * (independent.xMm - 20.0);
+-            const double expectedY = expectedGain * independent.yMm;
+-            ok &= expectTrue(seedTracker.kalmanSeeded && !seedTracker.fusionApplied
+-                    && !tracker.kalmanSeeded && tracker.fusionApplied
+-                    && std::isfinite(expectedGain) && expectedGain > 0.0
+-                    && expectedGain < 1.0
+-                    && std::abs(tracker.gainX - expectedGain) < 1e-9
+-                    && std::abs(tracker.gainY - expectedGain) < 1e-9,
+-                "automatic second-frame gain follows initial covariance and observation noise");
+-            ok &= expectTrue(std::abs(automaticSecond.imageXPixel - 160.0 - expectedX) < 1e-6
+-                    && std::abs(automaticSecond.imageYPixel - 120.0 - expectedY) < 1e-6
+-                    && std::abs(automaticSecond.sample.point.xMm - expectedX) < 1e-6
+-                    && std::abs(automaticSecond.sample.point.yMm - expectedY) < 1e-6
+-                    && std::abs(automaticSecond.sample.point.zMm - independent.zMm) < 1e-6,
+-                "automatic second frame fuses raw geometry once and projects that displayed point");
++        };
++        const auto expectMissing = [&](const ui::RuntimeTrackingResult &result,
++                                       const char *message) {
++            ok &= expectTrue(!result.valid && !result.sample.point.valid
++                    && !result.detectedRobotBasePoint.valid
++                    && !result.detectedStationBasePoint.valid
++                    && !result.independentWeldPointInParent_mm.valid
++                    && result.imageMeasurementOutputEnabled && !result.imageObservationAccepted,
++                message);
++        };
++        expectMissing(submit(true), "initial reverse scan cannot create an initial point from CAD alone");
++        const auto first = submit(false);
++        expectMeasured(first, 160.0, "reverse scan must use original-image geometry despite full CAD weight");
++        ok &= expectTrue(first.independentWeldPointInParent_mm.valid,
++            "accepted reverse-scan geometry remains independently projected");
++        imageShiftX = 3.0;
++        const auto lastInitial = submit(false);
++        expectMeasured(lastInitial, 163.0, "later reverse-scan image supplies a fresh measured starting sample");
++        expectMissing(submit(true), "reverse-scan blank tail cannot append a newer simulated starting point");
++        ok &= expectTrue(initialUpdate.has_value()
++                && initialUpdate->state.initialDetectionSamples.size() == 2
++                && std::abs(initialUpdate->state.initialDetectionSamples.back().point.xMm - 3.0) <= 1.5,
++            "real control input retains last accepted reverse-scan image point and appends nothing for blank tail");
++        QObject::disconnect(initialConnection);
++        initialControl.reset();
++        // 实际反扫完成会停 Vision，STARTCOR 再 configure/start；不假设模板跨阶段保留。
++        worker.stopTracking();
++        worker.configure(options, makeProjectionContext());
++        worker.startTracking();
++        onlineWindow = true;
++        simulatedX = 250.0;
++        const auto firstOnline = submit(false);
++        expectMeasured(firstOnline, 163.0, "online entry retains image measurement while CAD remains misaligned");
++        ok &= expectTrue(firstOnline.independentWeldPointInParent_mm.valid,
++            "clear online geometry retains independent ICP identity");
++        for (const auto mode : {vision::KcfFusionMode::KcfOnly,
++                               vision::KcfFusionMode::ManualWeight,
++                               vision::KcfFusionMode::AutomaticKalman}) {
++            vision::KcfFusionOptions fusion;
++            fusion.mode = mode;
++            fusion.simulationWeight = 0.1;
++            worker.updateOnlineFusionOptions(fusion);
++            expectMeasured(submit(false), 163.0,
++                "legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD");
+         }
+         ++poseRevision;
+-        const auto afterPoseChange = submit(true);
+-        ok &= expectTrue(afterPoseChange.valid && afterPoseChange.sample.estimated
+-                && !afterPoseChange.independentWeldPointInParent_mm.valid
+-                && afterPoseChange.correlation.workpiecePoseRevision == poseRevision
+-                && std::hypot(afterPoseChange.imageXPixel - automaticSecond.imageXPixel,
+-                    afterPoseChange.imageYPixel - automaticSecond.imageYPixel) <= 2.000001,
+-            "CAD pose revision preserves bounded real-image continuity without inventing independent geometry");
+-        if (afterPoseChange.diagnostic.has_value()) {
+-            ok &= expectTrue(afterPoseChange.diagnostic->algorithm.guided.attempted
+-                    && afterPoseChange.diagnostic->algorithm.guided.hasTrustedAnchor
+-                    && !afterPoseChange.diagnostic->algorithm.templateReinitialized,
+-                "formal online CAD revision preserves real guidance and KCF template history");
+-        }
+-        const auto newPoseGeometry = submit(false);
+-        if (!newPoseGeometry.valid || !newPoseGeometry.independentWeldPointInParent_mm.valid) {
+-            std::cerr << "pose recovery: valid=" << newPoseGeometry.valid
+-                << " independent=" << newPoseGeometry.independentWeldPointInParent_mm.valid
+-                << " message=" << newPoseGeometry.message.toStdString() << '\n';
+-            if (newPoseGeometry.diagnostic.has_value()) {
+-                const auto &raw = newPoseGeometry.diagnostic->algorithm;
+-                std::cerr << "geometry=" << raw.refinement.valid
+-                    << " status=" << static_cast<int>(raw.refinement.status)
+-                    << " hasResponse=" << raw.tracker.hasResponse
+-                    << " completed=" << raw.tracker.completed
+-                    << " correlationRejected=" << raw.tracker.correlationJumpRejected
+-                    << " fusionRejected=" << raw.tracker.fusionJumpRejected
+-                    << " beforeFusion=" << raw.beforeFusionPoint
+-                    << " peak=" << raw.tracker.responsePeak << '\n';
+-            }
+-        }
+-        ok &= expectTrue(newPoseGeometry.valid
+-                && newPoseGeometry.independentWeldPointInParent_mm.valid
+-                && newPoseGeometry.correlation.workpiecePoseRevision == poseRevision,
+-            "fresh supported geometry remains independently usable after a CAD-only pose revision");
+-        // 事故链：真实条纹不动、预焊点遮中心、CAD平滑漂移及反复版本切换。
+-        // 图像两肩仍可见时，控制业务点不能把模型位移当作真实激光运动。
+-        tackVisible = true;
+-        for (int frame = 0; frame < 36; ++frame) {
+-            simulatedX = 180.0 + frame * 2.0;
+-            if (frame % 12 == 0) { ++poseRevision; }
+-            const auto assisted = submit(false);
+-            ok &= expectTrue(assisted.valid && assisted.sample.estimated
+-                    && !assisted.independentWeldPointInParent_mm.valid
+-                    && std::hypot(assisted.imageXPixel - 160.0,
+-                        assisted.imageYPixel - 120.0) < 6.0,
+-                "visible real shoulders cross a tack without following smooth CAD drift or inventing raw seam points");
+-            if (assisted.diagnostic.has_value()) {
+-                const auto &algorithm = assisted.diagnostic->algorithm;
+-                ok &= expectTrue(algorithm.guided.hasRawShoulderSupport
+-                        && algorithm.guided.imageObservationQuality > 0.0
+-                        && algorithm.tracker.onlineObservationMode
+-                        && !algorithm.tracker.trainingCommitted,
+-                    "tack branch uses actual shoulder evidence and never trains its rejected central KCF patch");
+-            }
+-        }
+-        tackVisible = false;
+         simulatedX = 290.0;
+-        ++poseRevision;
+-        const auto inaccurateModel = submit(false);
+-        ok &= expectTrue(inaccurateModel.valid
+-                && inaccurateModel.independentWeldPointInParent_mm.valid
+-                && std::abs(inaccurateModel.independentWeldPointInParent_mm.xMm) < 1.5,
+-            "far simulated prior and new CAD version cannot reject clear independent original-image geometry");
+-        simulatedX = 180.0;
++        expectMissing(submit(true), "CAD update on a missing frame cannot project a transition estimate");
++        expectMeasured(submit(false), 163.0,
++            "new CAD revision cannot displace a fresh accepted image measurement");
+         worker.stopTracking();
+         worker.startTracking();
+-        const auto restartedWithoutAnchor = submit(true);
+-        ok &= expectTrue(restartedWithoutAnchor.valid && restartedWithoutAnchor.sample.estimated
+-                && !restartedWithoutAnchor.independentWeldPointInParent_mm.valid
+-                && std::abs(restartedWithoutAnchor.imageXPixel - 180.0) < 1.0e-6,
+-            "restart clears old transition seed and a valid current simulation supplies a marked target");
++        expectMissing(submit(true), "restart without a current image cannot seed business output from simulation");
++        expectMeasured(submit(false), 163.0,
++            "restart with distant CAD must recover from actual image evidence");
++        // 同帧运输仍成功，仅仿真图像提示缺失；不能由此剥夺原图检测资格。
++        worker.stopTracking();
++        worker.startTracking();
++        hasCadImageHint = false;
++        const auto noHint = submit(false);
++        expectMeasured(noHint, 163.0,
++            "same-frame transport without CAD image hints still allows original-image recovery");
++        const auto secondNoHint = submit(false);
++        expectMeasured(secondNoHint, 163.0, "missing CAD image hint cannot contaminate the next image measurement");
++        if (secondNoHint.diagnostic.has_value()) {
++            ok &= expectTrue(!secondNoHint.diagnostic->algorithm.simulatedPointAvailable
++                    && secondNoHint.diagnostic->imageSampleBucket != 4,
++                "missing CAD hint cannot manufacture a CAD deviation anomaly against default coordinates");
++        }
++        worker.stopTracking();
++        worker.startTracking();
++        hasCadImageHint = true;
++        imageShiftX = 0.0;
++        simulatedX = 180.0;
+         onlineWindow = false;
+-        const auto initialStage = submit(false);
+-        ok &= expectTrue(initialStage.valid
+-                && (!initialStage.diagnostic.has_value()
+-                    || !initialStage.diagnostic->algorithm.onlineObservationFusionEnabled),
+-            "initial reverse-scan stage keeps the new online-only observation policy disabled");
++        symmetricCrossSection = true;
++        expectMeasured(submit(false), 160.0, "clear image initializes raw KCF identity for stage admission test");
++        hideCenter = true;
++        const auto initialKcf = submit(false);
++        ok &= expectTrue(initialKcf.valid && initialKcf.imageObservationAccepted
++                && initialKcf.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
++                && !initialKcf.sample.estimated && !initialKcf.independentWeldPointInParent_mm.valid,
++            "image-quality accepted KCF is admissible during initial scan without claiming independent geometry");
++        hideCenter = false;
++        worker.stopTracking();
++        worker.configure(options, makeProjectionContext());
++        worker.startTracking();
++        onlineWindow = true;
++        expectMeasured(submit(false), 160.0,
++            "formal online KCF fallback starts from its own freshly accepted raw-image identity");
++        hideCenter = true;
++        const auto onlineKcf = submit(false);
++        ok &= expectTrue(onlineKcf.valid && onlineKcf.imageObservationAccepted
++                && onlineKcf.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
++                && onlineKcf.sample.estimated && !onlineKcf.independentWeldPointInParent_mm.valid,
++            "same image-quality KCF in formal online remains excluded from Control and local independent ICP");
++        hideCenter = false;
++        expectMeasured(submit(false), 160.0, "original geometry recovers after a quality-KCF interval");
++        imageShiftX = 100.0;
++        expectMissing(submit(false), "far raw image needs consecutive independent identity confirmations");
++        emptyImage = true;
++        expectMissing(submit(false), "invalid image input interrupts pending image identity confirmations");
++        emptyImage = false;
++        expectMissing(submit(false), "first far image after invalid input cannot inherit prior confirmation");
++        expectMissing(submit(false), "second far image after invalid input is still unconfirmed");
++        expectMeasured(submit(false), 260.0,
++            "third consecutive independent far image can recover after the input gap");
++        worker.stopTracking();
++        options.sensorCalibration.focalLengthM = 0.0;
++        worker.configure(options, makeProjectionContext());
++        worker.startTracking();
++        expectMissing(submit(false),
++            "invalid same-exposure projection context cannot publish any 3D measurement");
+         worker.stopTracking();
+     }
+     return ok;
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/tests/test_online_correction_run_recorder.cpp b/tests/test_online_correction_run_recorder.cpp
+index f77c9d2..360001b 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/tests/test_online_correction_run_recorder.cpp
++++ b/tests/test_online_correction_run_recorder.cpp
+@@ -166,6 +166,66 @@ bool testImageWriterBucketReservation(const QString &root)
+         "startup byte rejection must leave the reserved online byte budget available");
+     return ok;
+ }
++/** @brief 已验收 KCF 的测量身份不依赖可选诊断，且不能变成独立焊点。 */
++bool testImageMeasurementProvenance(const QString &root)
++{
++    using namespace i2r_rlc;
++    ui::COnlineCorrectionRunRecorder recorder;
++    ui::RuntimeOnlineCorrectionConfiguration configuration;
++    configuration.visionDiagnostics.enabled = true;
++    configuration.visionDiagnostics.imagesEnabled = false;
++    QString error;
++    if (!expect(recorder.beginSession(root, configuration, &error), "begin image measurement provenance session")) {
++        return false;
++    }
++    ui::RuntimeTrackingResult result;
++    result.correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
++    result.valid = true;
++    result.sample.point = {1.0, 2.0, 3.0, true};
++    result.imageXPixel = 101.5;
++    result.imageYPixel = 202.25;
++    result.pointSource = vision::OnlineSeamPointSource::CorrectedKcf;
++    result.imageMeasurementOutputEnabled = true;
++    result.imageObservationAccepted = true;
++    bool ok = recorder.recordTrackingResult(result, control::OnlineCorrectionPhase::InitialDetectionRunning);
++    result.sample.estimated = true;
++    result.correlation.onlineControlWindowActive = true;
++    ok &= recorder.recordTrackingResult(result, control::OnlineCorrectionPhase::OnlineRunning);
++    result.diagnostic.emplace();
++    result.diagnostic->algorithm.attempted = true;
++    result.diagnostic->algorithm.imageMeasurementOutputEnabled = true;
++    result.diagnostic->algorithm.imageObservationAccepted = true;
++    result.diagnostic->algorithm.simulatedPointAvailable = false;
++    result.diagnostic->algorithm.simulatedPoint = {999.0, 888.0};
++    result.diagnostic->algorithm.finalPoint = {101.5, 202.25};
++    ok &= recorder.recordTrackingResult(result, control::OnlineCorrectionPhase::OnlineRunning);
++    const auto rows = readRows(recorder.sessionDirectory(), "vision_diagnostics.tsv");
++    ok &= expect(rows.size() == 4, "KCF stages and a missing CAD hint retain numeric provenance");
++    if (rows.size() == 4) {
++        const auto header = rows[0].split('\t');
++        for (int index = 1; index < rows.size(); ++index) {
++            const auto row = rows[index].split('\t');
++            const auto value = [&header, &row](const char *name) {
++                const int column = header.indexOf(name);
++                return column >= 0 && column < row.size() ? row[column] : QByteArray("MISSING");
++            };
++            ok &= expect(row.size() == header.size()
++                    && value("image_measurement_output_enabled") == "1"
++                    && value("image_observation_accepted") == "1"
++                    && value("estimated") == (index == 1 ? "0" : "1")
++                    && value("point_source") == "2"
++                    && value("final_x_px") == "101.500000"
++                    && value("final_y_px") == "202.250000"
++                    && value("sim_x_px").isEmpty() && value("sim_y_px").isEmpty()
++                    && value("geometry_valid") == "0"
++                    && value("geometry_x_px").isEmpty(),
++                "KCF stage identity preserves initial admission and formal ICP exclusion without geometry");
++        }
++    }
++    ok &= expect(recorder.finishSession("completed", "measurement provenance"),
++        "finish image measurement provenance session");
++    return ok;
++}
+ } // namespace
+ 
+ int main(int argc, char **argv)
+@@ -182,6 +242,7 @@ int main(int argc, char **argv)
+     if (!expect(recorder.beginSession(root, configuration, &error), "begin session")) {
+         return 1;
+     }
++    if (!testImageMeasurementProvenance(root)) { return 1; }
+     control::OnlineCorrectionUpdate update;
+     update.onlineIcpUpdated = true;
+     update.phase = control::OnlineCorrectionPhase::OnlineRunning;
+@@ -279,6 +340,7 @@ int main(int argc, char **argv)
+     diagnostic.algorithm.attempted = true;
+     diagnostic.algorithm.templateReinitialized = true;
+     diagnostic.algorithm.gaborSucceeded = true;
++    diagnostic.algorithm.simulatedPointAvailable = true;
+     diagnostic.algorithm.simulatedPoint = {100, 200};
+     diagnostic.algorithm.responsePoint = {101, 210};
+     diagnostic.algorithm.beforeFusionPoint = {101, 210};
+@@ -423,7 +485,9 @@ int main(int argc, char **argv)
+                 == header.indexOf("workpiece_pose_revision") + 1
+             && header.indexOf("guided_image_continuity_active")
+                 == header.indexOf("guided_reacquisition_frames") + 1
+-            && header.last() == "kcf_real_search_fallback_used",
++            && header.indexOf("image_measurement_output_enabled")
++                == header.indexOf("kcf_real_search_fallback_used") + 1
++            && header.last() == "image_search_expanded",
+             "online fusion schema appends columns without moving existing fields");
+         ok &= expect(value("estimated") == "1" && value("point_source") == "4"
+             && value("geometry_valid") == "0" && value("geometry_x_px").isEmpty()
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 028cae3..a4bf203 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -894,6 +894,12 @@ if(I2R_RLC_ENABLE_OPENCV)
+         test_online_seam_continuity.cpp)
+     target_link_libraries(i2r_rlc_online_seam_continuity_tests PRIVATE i2r_rlc_vision)
+ 
++    i2r_rlc_add_test(i2r_rlc_online_image_measurement_tests
++        test_online_image_measurement.cpp)
++    target_link_libraries(i2r_rlc_online_image_measurement_tests PRIVATE i2r_rlc_vision)
++    target_compile_definitions(i2r_rlc_online_image_measurement_tests PRIVATE
++        I2R_RLC_PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
++
+     i2r_rlc_add_test(i2r_rlc_online_image_geometry_tests
+         test_online_image_geometry.cpp)
+     target_link_libraries(i2r_rlc_online_image_geometry_tests PRIVATE i2r_rlc_vision)
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/docs/online_local_registration.md b/docs/online_local_registration.md
+index a87d4c6..02e3f2b 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/docs/online_local_registration.md
++++ b/docs/online_local_registration.md
+@@ -1,7 +1,9 @@
+-﻿# 在线纠偏的工件局部定位
++# 在线纠偏的工件局部定位
+ 
+ ## 行为与边界
+ 
++2026-10-23 方案 A 将在线纠偏的反向初扫及正式跟随改为“当前原图决定测量输出”。本页末尾“方案 A：原图测量边界”取代这两个入口先前关于仿真种子、肩部预测补点和坐标融合的说明；离线和其他未启用入口继续原有实现。工件位姿更新的事务、后验及保留策略不变。
++
+ 2026-10-22 最新用户策略：正式在线纠偏禁止自动回退工件位姿。后验失败或超时保留当前已回读位姿，结束事务后清窗并继续下一轮 ICP。以末尾“取消在线自动回退”章节为准；前文自动恢复与恢复计数保留为历史证据。
+ 
+ 2026-10-22 新增“有界仿真辅助接缝”和“已有可信位姿后的表面辅助更新”。本页末尾同日章节（包括反光/预焊点后的图像几何续接修复）说明当前接线；早期“所有更新都必须存在独立焊点”和“无限期像素续接”的描述只保留为历史版本，不覆盖同日新边界。
+@@ -480,3 +482,35 @@ vision_diagnostics.tsv 升级 schema=7，旧列位置保留，尾部追加图像
+ 沿用此前用户明确授权的VS2022 x64 Developer命令行和现有out/build/qt-debug。收到本轮禁止Computer Use要求后未再使用，未操作鼠标。最终MSVC主程序构建成功，11项相关CTest全部通过，33.46秒，覆盖在线控制、记录器、runtime跟踪、融合、写回保留、表面后验、在线帧同步、连续器、图像几何、仿真辅助、原图精定位。独立agent复核实际diff未发现新增确定性阻断，不据此声称全量离线门禁或现场通过。
+ 
+ 精确修改、SHA256及RED/GREEN原始日志位于output/analysis/20261022_raw_reacquisition_repair/。源文件备份位于.codex_backups/estimator_recovery_20261023_010539/、.codex_backups/detector_recovery_20261023_010345/、output/backups/raw_reacquisition_repair_20261022/main_baseline/。工作流依据已有Notion快照及历史对话；本次公开页面未获取可用正文，不声称已核对Notion最新版本。未删除原始文件或归档。
++
++## 2026-10-23 方案 A：原图测量边界
++
++### 坐标来源与入口
++
++用户在回撤方案二后选择方案 A：反向初扫保留最后一个可信原图点；允许通过图像质量验收的 KCF；完全失测不新增点。`LegacyOnlineKcfOptions::enableImageMeasurementOutput` 默认关闭，仅在线纠偏的反向初扫、正式跟随显式启用。该分支不使用仿真绘制模板、仿真方向增强、仿真坐标融合、肩部历史预测或旧三维点重投影补点。旧入口仍保留原代码。
++
++已有图像目标优先提供局部搜索位置；局部失败时扩大原图候选搜索，CAD 像素仅作可选提案。没有 CAD 像素、折线或参考越界不阻断原图搜索；同帧观测传输有效性、曝光绑定的机器人状态、标定和空间投影门禁仍须成立。候选最终在原图通过既有 refiner 的支撑、残差、歧义等几何检查，不放宽原验收阈值。多个分离的合法几何候选不按亮度或距 CAD 最近选择身份。旧融合模式、权重及工件位姿版本不能混入该分支的最终像素。
++
++### 原图身份与 KCF
++
++KCF 使用已验收原图目标建立模板，以 KcfOnly 模式搜索，训练延迟提交。几何未通过时，只有当前 KCF 响应、由独立原图建立的局部模板相关性、可见条纹掩膜重叠同时通过才可续测；KCF 续测不刷新独立身份模板、不训练自身、不伪造精定位结果。空白、饱和、质量不符时不输出测量点。
++
++超出局部尺度的候选须匹配此前独立原图身份，并经过三份递增且已知帧号的当前图像确认。缺图、门禁失败、重复或逆序帧打断确认；旧目标仍有通过验收的 KCF 身份支撑时清除远候选计数，不能用相似反光连续出现取代仍可见的旧目标。局部尺度仅决定是否重确认，不限制累计行程，不使用圆心、半径、路径类型或固定运动方向。
++
++当前原图几何测量可生成独立焊点。已验收 KCF 在反扫时允许成为最后可信起点，在正式跟随时保留 `estimated=true`，沿用既有 Control 门禁排除轨迹 ICP；两个阶段均不将 KCF 填入 `independentWeldPointInParent_mm`。诊断关闭不丢失测量来源身份，绿色点和三维业务点使用同一最终像素。记录器保留既有列位置，尾部追加图像测量开关、验收身份和扩大搜索标记；没有 CAD 像素时不记录默认零坐标偏差。
++
++### 生命周期与未决事项
++
++反扫结束的 `stopTracking` 和正式启动前的 `configure` 仍重置检测器；没有把初扫模板跨视角直接带入正式阶段。正式阶段必须重新由当前原图建立目标。初扫末段失测时仍取最后一个已接纳的可信点，没有增加年龄阈值、末帧平均、启动阻断或自动 Hold/停止。此前运行的初扫起点来自 1171 帧，比末帧 1560 早 12.835 秒；1171～1560 末段原图未保存，须先补充该段图像证据再决定陈旧起点处理。
++
++失测帧不向下游新增点，不代表撤销先前已排队的跟随指令或自动停止设备。工件局部配准的表面采样、写回事务、后验及保留策略未改变；这次切断错误焊点的仿真坐标依赖，不代表全部配准门槛或现场精度问题已经解决。
++
++### 验证证据与现场限制
++
++备份为 `.codex_backups/image_measurement_A_20261023_155432/`，计划、Notion 正文及提供方日期、各次真实 RED/GREEN 日志位于 `output/analysis/image_measurement_A_20261023_155432/`。按职责独占修改、主 agent 统一构建、独立 agent 只读实际差异审查；不修改 RobotSim、oldproject 或 Control 生产文件，不删除文件，不使用 Computer Use/鼠标。使用已授权的 VS2022 Developer 环境及既有 qt-debug 构建目录。
++
++两张现场原图以原字节复制到 `tests/fixtures/online_image_measurement/`，来源与 SHA256 见 `provenance.json`，它们没有物理真值标注。1120 帧可在偏离 CAD 的情况下恢复原图折点；2148 帧的原 refiner 在可见折点附近仍因竞争列比例 0.326531 超过原 0.2 门而拒绝，冷启动和 1120→2148 稀疏预热均不产点。此前“2148 必须成功精定位”的测试前提被实际 refiner 证据推翻，改为检查歧义拒绝且不制造 CAD 点，没有降低生产阈值。两张稀疏原图不能替代完整连续帧闭环，也不能证明起点精度已通过现场验证。
++
++原 refiner 的相机截面语义保持；直线、斜线、曲线路径运动的测试不等于支持任意激光截面。扩大搜索在本机 Debug 的现场测试约需 334～531 ms，属于冷启动/重捕获成本，不能据此宣称达到相机帧率。现场预焊点后的身份保持、反光、重捕获延迟和工件更新时机仍需连续图像及运行记录复测。
++
++最终 MSVC 主程序构建成功，选定 12 项不同 CTest 的最后结果均通过：原图测量、运行链、精定位投影合同、标定合同、记录器、在线控制、融合旧入口、写回安全、在线同帧同步、图像几何、原图精定位、KCF。证据分别见 `green_tests2.log`（3/3）、`final_tests.log`（9 项中 7 项通过）和 `regression_fix_tests.log`（其余 2 项通过）。完整回归曾暴露两个旧测试前提：空白图必须产出仿真点与新要求冲突；采样时钟测试用无折点原图依赖旧仿真模板启动。前者改为同步成功但不产点，后者换为可验收折点图像并保留全部时钟/配额断言，原失败日志保留。最终程序为 `out/build/qt-debug/UI/i2r_rlc.exe`，未自动启动程序或设备，不宣称现场闭环或共享离线完整门禁通过。
+diff --git a/.codex_backups/image_measurement_A_20261023_155432/tests/test_correction_robot_sim_frame_sync.cpp b/tests/test_correction_robot_sim_frame_sync.cpp
+index 729ec37..0dbe595 100644
+--- a/.codex_backups/image_measurement_A_20261023_155432/tests/test_correction_robot_sim_frame_sync.cpp
++++ b/tests/test_correction_robot_sim_frame_sync.cpp
+@@ -892,10 +892,12 @@ bool testOnlineNoTargetIsSynchronizationSuccess()
+         fixture.trackingResults.begin(),
+         fixture.trackingResults.end(),
+         [](const ui::RuntimeTrackingResult &result) {
+-            return result.frameId == 800 && result.valid
+-                && result.sample.point.valid && result.sample.estimated
++            return result.frameId == 800 && !result.valid
++                && result.imageMeasurementOutputEnabled && !result.imageObservationAccepted
++                && !result.sample.point.valid
+                 && !result.independentWeldPointInParent_mm.valid
+-                && result.pointSource == i2r_rlc::vision::OnlineSeamPointSource::SimulationPrediction;
++                && !result.detectedRobotBasePoint.valid && !result.detectedStationBasePoint.valid
++                && result.pointSource == i2r_rlc::vision::OnlineSeamPointSource::Unavailable;
+         });
+     fixture.stop();
+     return expectTrue(
+@@ -903,7 +905,7 @@ bool testOnlineNoTargetIsSynchronizationSuccess()
+                "online no-target must consume a synchronized frame without counting a failure")
+         && expectTrue(
+                noTargetResult,
+-               "online obscured frame keeps a synchronized estimated target without inventing an independent measurement");
++               "online blank frame succeeds in synchronization but cannot manufacture a CAD or historical measurement");
+ }
+ 
+ bool testOnlineInternalPauseKeepsSession()

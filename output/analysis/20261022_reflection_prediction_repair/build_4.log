@@ -1,0 +1,4 @@
+[1/3] Building CXX object Vision\CMakeFiles\i2r_rlc_vision.dir\src\feature\SimulationGuidedSeamEstimator.cpp.obj
+[2/3] Linking CXX static library Vision\i2r_rlc_vision.lib
+[3/3] Linking CXX executable tests\i2r_rlc_online_image_geometry_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_online_image_geometry_tests.exe: message: deploying dependencies

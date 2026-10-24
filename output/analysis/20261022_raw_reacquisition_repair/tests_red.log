@@ -1,0 +1,20 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 82: i2r_rlc_simulation_guided_seam_tests
+1/1 Test #82: i2r_rlc_simulation_guided_seam_tests ...***Failed    4.52 sec
+FAIL: one translated stripe is never counted as an independently surviving historical branch
+FAIL: one translated stripe is never counted as an independently surviving historical branch
+FAIL: one translated stripe is never counted as an independently surviving historical branch
+FAIL: three visible shallow-stripe raw frames recover without a slope or displacement special case
+FAIL: one translated stripe is never counted as an independently surviving historical branch
+FAIL: one translated stripe is never counted as an independently surviving historical branch
+FAIL: one translated stripe is never counted as an independently surviving historical branch
+FAIL: three visible shallow-stripe raw frames recover without a slope or displacement special case
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   4.53 sec
+
+The following tests FAILED:
+	 82 - i2r_rlc_simulation_guided_seam_tests (Failed)
+Errors while running CTest

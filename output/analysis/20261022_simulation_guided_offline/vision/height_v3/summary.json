@@ -1,0 +1,55 @@
+{
+  "experiment": "fixed branch GapCenter semantics and pose-version invalidation",
+  "synthetic_case_count": 5,
+  "synthetic_pass_count": 5,
+  "real_frame": {
+    "frame_id": 7891,
+    "input_prior": "exact-frame RobotSim raw_virtual_parent_mm, validated calibrated inverse projection",
+    "v1_point": [
+      463.64823168685814,
+      596.3188810680979
+    ],
+    "original_geometry_point": [
+      463.5,
+      600.197225
+    ],
+    "v3": {
+      "measured": true,
+      "point": [
+        463.64823168685814,
+        600.7298997494653
+      ],
+      "reason": "image_branch_gap_center",
+      "branches": [
+        {
+          "side": -1,
+          "point_count": 16,
+          "slope": 0.2661764705882274,
+          "endpoint_y": 604.1710734342962,
+          "fit_rms_px": 0.42193967369197644
+        },
+        {
+          "side": 1,
+          "point_count": 16,
+          "slope": -0.31911764705883394,
+          "endpoint_y": 597.2887260646344,
+          "fit_rms_px": 0.48818767485706777
+        }
+      ]
+    },
+    "independent_ground_truth_available": false,
+    "production_eligible": false,
+    "seam_x_source": "experimental prior-profile alignment, not independently validated",
+    "v3_minus_original_geometry_px": [
+      0.14823168685813926,
+      0.5326747494652864
+    ]
+  },
+  "limitations": [
+    "seam X is provided for synthetic unit cases; not complete candidate-detection validation",
+    "model-selected image branch remains prior-dependent",
+    "history example uses scalar image-height residual only; production needs material coordinates and fresh simulation",
+    "stale residual invalidation proves no double compensation; it does not provide continuity after pose updates",
+    "sole model-like reflection counterexample from experiment_v2 remains unresolved"
+  ]
+}

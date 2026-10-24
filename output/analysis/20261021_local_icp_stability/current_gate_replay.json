@@ -1,0 +1,4353 @@
+[
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 2779,
+    "frame_count": 8,
+    "before_surface": 4.8199435568694655,
+    "after_surface": 2.588663236652533,
+    "before_mean": 6.540290784541691,
+    "after_mean": 1.4206884524038748,
+    "gain": 5.119602332137816,
+    "required_gain": 0.32701453922708457,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_2779_4353c5ed-0e59-4ce9-9d79-96faa333f408.json",
+    "maximum_before": 7.100134933978501,
+    "maximum_after": 2.6090803883972926,
+    "per_frame": [
+      {
+        "frame": 2714,
+        "before": 4.333949653195673,
+        "after": 2.6090803883972926
+      },
+      {
+        "frame": 2722,
+        "before": 6.489319147892425,
+        "after": 0.9258439624064313
+      },
+      {
+        "frame": 2731,
+        "before": 6.888874874181496,
+        "after": 1.1412963316513696
+      },
+      {
+        "frame": 2741,
+        "before": 6.959730230971545,
+        "after": 1.365765011922997
+      },
+      {
+        "frame": 2750,
+        "before": 6.785424152623757,
+        "after": 1.281091934717798
+      },
+      {
+        "frame": 2759,
+        "before": 7.100134933978501,
+        "after": 1.4779953012131857
+      },
+      {
+        "frame": 2768,
+        "before": 6.992292386807293,
+        "after": 1.4205702025443376
+      },
+      {
+        "frame": 2779,
+        "before": 6.772600896682835,
+        "after": 1.1438644863775858
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 2947,
+    "frame_count": 8,
+    "before_surface": 1.5851015579001742,
+    "after_surface": 1.2299773689648934,
+    "before_mean": 1.6032805349495556,
+    "after_mean": 0.7614858706494272,
+    "gain": 0.8417946643001284,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_2947_430d8fe4-a3ca-465a-bb8d-485ded0d09a5.json",
+    "maximum_before": 1.7187050388310448,
+    "maximum_after": 0.8803036203545214,
+    "per_frame": [
+      {
+        "frame": 2876,
+        "before": 1.5197872270485075,
+        "after": 0.6266829630295427
+      },
+      {
+        "frame": 2888,
+        "before": 1.7172427576429035,
+        "after": 0.863808269323163
+      },
+      {
+        "frame": 2899,
+        "before": 1.6633018681819904,
+        "after": 0.7613902995039364
+      },
+      {
+        "frame": 2909,
+        "before": 1.7187050388310448,
+        "after": 0.778573563099617
+      },
+      {
+        "frame": 2919,
+        "before": 1.6577186244171687,
+        "after": 0.8803036203545214
+      },
+      {
+        "frame": 2929,
+        "before": 1.6420663506162552,
+        "after": 0.8410432539627898
+      },
+      {
+        "frame": 2938,
+        "before": 1.5463289227566654,
+        "after": 0.8453587909717145
+      },
+      {
+        "frame": 2947,
+        "before": 1.3610934901019083,
+        "after": 0.49472620495013303
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 4560,
+    "frame_count": 8,
+    "before_surface": 2.1570241651425657,
+    "after_surface": 1.7110971742622216,
+    "before_mean": 2.3893063717459335,
+    "after_mean": 1.4506655595614821,
+    "gain": 0.9386408121844514,
+    "required_gain": 0.11946531858729668,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_4560_674f0ba4-128b-4ac6-8b71-813677b2195f.json",
+    "maximum_before": 2.5357807169357844,
+    "maximum_after": 1.6348698298871527,
+    "per_frame": [
+      {
+        "frame": 4498,
+        "before": 2.484329149853874,
+        "after": 1.486860252131162
+      },
+      {
+        "frame": 4506,
+        "before": 2.2806507887794885,
+        "after": 1.2277881425539559
+      },
+      {
+        "frame": 4516,
+        "before": 2.324398112494718,
+        "after": 1.4413432988863002
+      },
+      {
+        "frame": 4525,
+        "before": 2.381038654678731,
+        "after": 1.4659179321350002
+      },
+      {
+        "frame": 4533,
+        "before": 2.330427718981103,
+        "after": 1.3940215441623605
+      },
+      {
+        "frame": 4543,
+        "before": 2.386614435439093,
+        "after": 1.4467071760253936
+      },
+      {
+        "frame": 4552,
+        "before": 2.5357807169357844,
+        "after": 1.6348698298871527
+      },
+      {
+        "frame": 4560,
+        "before": 2.391211396804677,
+        "after": 1.5078163007105316
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 4749,
+    "frame_count": 8,
+    "before_surface": 1.573691204017062,
+    "after_surface": 1.485799937786536,
+    "before_mean": 1.4280429841611748,
+    "after_mean": 0.9978311601247083,
+    "gain": 0.4302118240364665,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_4749_d6d80b88-872f-4c88-aa40-4fc7cd15a110.json",
+    "maximum_before": 1.6225670814378708,
+    "maximum_after": 1.2666670533767217,
+    "per_frame": [
+      {
+        "frame": 4684,
+        "before": 1.339637552366709,
+        "after": 0.8059555974207966
+      },
+      {
+        "frame": 4695,
+        "before": 1.2322335584737836,
+        "after": 0.6940302871563275
+      },
+      {
+        "frame": 4704,
+        "before": 1.5081457902383386,
+        "after": 0.9860403896926078
+      },
+      {
+        "frame": 4712,
+        "before": 1.3604100505852483,
+        "after": 0.9168385774689038
+      },
+      {
+        "frame": 4720,
+        "before": 1.5010018207587543,
+        "after": 1.1740196084082148
+      },
+      {
+        "frame": 4732,
+        "before": 1.3798866577638054,
+        "after": 1.0278471308549435
+      },
+      {
+        "frame": 4740,
+        "before": 1.6225670814378708,
+        "after": 1.2666670533767217
+      },
+      {
+        "frame": 4749,
+        "before": 1.4804613616648883,
+        "after": 1.111250636619151
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 5991,
+    "frame_count": 8,
+    "before_surface": 1.1030692151819972,
+    "after_surface": 1.0153851828786893,
+    "before_mean": 2.3925452987751874,
+    "after_mean": 2.436989105595314,
+    "gain": -0.0444438068201265,
+    "required_gain": 0.11962726493875937,
+    "stable": false,
+    "worsened_frames": 8,
+    "exceeded_frames": 0,
+    "current_gate_accept": false,
+    "reasons": [
+      "current_worsened",
+      "gain_insufficient"
+    ],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_5991_aadfdf52-a8ba-4d8e-8510-0ee4e463b49a.json",
+    "maximum_before": 2.539332114050729,
+    "maximum_after": 2.5921936594370605,
+    "per_frame": [
+      {
+        "frame": 5918,
+        "before": 2.3724841540949053,
+        "after": 2.415480849675516
+      },
+      {
+        "frame": 5930,
+        "before": 2.539332114050729,
+        "after": 2.5921936594370605
+      },
+      {
+        "frame": 5941,
+        "before": 2.5054290171442455,
+        "after": 2.5263912245134392
+      },
+      {
+        "frame": 5950,
+        "before": 2.520328804588686,
+        "after": 2.5779437253749298
+      },
+      {
+        "frame": 5961,
+        "before": 2.2751306298595573,
+        "after": 2.349400608573039
+      },
+      {
+        "frame": 5971,
+        "before": 2.4175326695611923,
+        "after": 2.463683592200117
+      },
+      {
+        "frame": 5980,
+        "before": 2.222944649284581,
+        "after": 2.2793735229257193
+      },
+      {
+        "frame": 5991,
+        "before": 2.2871803516176046,
+        "after": 2.2914456620626895
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 6457,
+    "frame_count": 8,
+    "before_surface": 1.3805529107909151,
+    "after_surface": 1.1579074999688201,
+    "before_mean": 2.028428734647627,
+    "after_mean": 1.2639177535708543,
+    "gain": 0.7645109810767727,
+    "required_gain": 0.10142143673238135,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_6457_de15f072-8884-4a1f-b552-25d5caab5431.json",
+    "maximum_before": 2.2130629458567124,
+    "maximum_after": 1.4223528612831582,
+    "per_frame": [
+      {
+        "frame": 6393,
+        "before": 1.945323756572191,
+        "after": 1.2023583560255555
+      },
+      {
+        "frame": 6401,
+        "before": 1.8094400452826809,
+        "after": 1.0414802157923755
+      },
+      {
+        "frame": 6413,
+        "before": 1.905096425488548,
+        "after": 1.1353718940659143
+      },
+      {
+        "frame": 6421,
+        "before": 1.8891033690688552,
+        "after": 1.1259034464965678
+      },
+      {
+        "frame": 6429,
+        "before": 2.154448880303051,
+        "after": 1.4056005403795762
+      },
+      {
+        "frame": 6439,
+        "before": 2.155456181764468,
+        "after": 1.4223528612831582
+      },
+      {
+        "frame": 6447,
+        "before": 2.2130629458567124,
+        "after": 1.420049387717647
+      },
+      {
+        "frame": 6457,
+        "before": 2.1554982728445085,
+        "after": 1.3582253268060394
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 6769,
+    "frame_count": 8,
+    "before_surface": 1.1730621324926656,
+    "after_surface": 1.0771750386738326,
+    "before_mean": 1.8131119486910805,
+    "after_mean": 1.4618731895986787,
+    "gain": 0.35123875909240176,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_6769_d4261696-b847-4be0-95bd-9c4d8f076e9e.json",
+    "maximum_before": 1.990055775034298,
+    "maximum_after": 1.6088405978959432,
+    "per_frame": [
+      {
+        "frame": 6704,
+        "before": 1.8869584498035648,
+        "after": 1.576694499339487
+      },
+      {
+        "frame": 6715,
+        "before": 1.8042815069265479,
+        "after": 1.4717562827789938
+      },
+      {
+        "frame": 6726,
+        "before": 1.990055775034298,
+        "after": 1.6088405978959432
+      },
+      {
+        "frame": 6735,
+        "before": 1.785304046734836,
+        "after": 1.4071057883321163
+      },
+      {
+        "frame": 6743,
+        "before": 1.7619371628608416,
+        "after": 1.411232887781624
+      },
+      {
+        "frame": 6754,
+        "before": 1.6485473199674197,
+        "after": 1.3268045165269422
+      },
+      {
+        "frame": 6762,
+        "before": 1.8459736727148481,
+        "after": 1.4786910036441074
+      },
+      {
+        "frame": 6769,
+        "before": 1.7818376554862878,
+        "after": 1.4138599404902166
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 6924,
+    "frame_count": 8,
+    "before_surface": 1.2372828894071008,
+    "after_surface": 1.165081519969913,
+    "before_mean": 1.5773376014607696,
+    "after_mean": 1.2786506017396178,
+    "gain": 0.29868699972115187,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_6924_3cb09407-a9d6-4345-aa16-6248180d044d.json",
+    "maximum_before": 1.709329446309151,
+    "maximum_after": 1.4109877495172478,
+    "per_frame": [
+      {
+        "frame": 6861,
+        "before": 1.2752360632384063,
+        "after": 0.9904314613069473
+      },
+      {
+        "frame": 6869,
+        "before": 1.4663957659430573,
+        "after": 1.1986704516002213
+      },
+      {
+        "frame": 6880,
+        "before": 1.616120647565203,
+        "after": 1.3354937015590709
+      },
+      {
+        "frame": 6888,
+        "before": 1.6956402394293608,
+        "after": 1.4109877495172478
+      },
+      {
+        "frame": 6898,
+        "before": 1.709329446309151,
+        "after": 1.3899440286484985
+      },
+      {
+        "frame": 6907,
+        "before": 1.7011490563693126,
+        "after": 1.3822308283126588
+      },
+      {
+        "frame": 6915,
+        "before": 1.6154186932560533,
+        "after": 1.2968311991307224
+      },
+      {
+        "frame": 6924,
+        "before": 1.539410899575613,
+        "after": 1.2246153938415754
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 7707,
+    "frame_count": 8,
+    "before_surface": 1.864984395386446,
+    "after_surface": 1.7513926541309195,
+    "before_mean": 1.8922318919616372,
+    "after_mean": 1.8614200575394955,
+    "gain": 0.03081183442214175,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": false,
+    "reasons": [
+      "gain_insufficient"
+    ],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_7707_e7a81233-8f88-4e54-b478-2eab5b42065d.json",
+    "maximum_before": 2.019759925966363,
+    "maximum_after": 1.9716903787134858,
+    "per_frame": [
+      {
+        "frame": 7640,
+        "before": 1.8972323228488313,
+        "after": 1.8862496133848219
+      },
+      {
+        "frame": 7649,
+        "before": 1.990785682129768,
+        "after": 1.9296162469525784
+      },
+      {
+        "frame": 7657,
+        "before": 1.8676401886685117,
+        "after": 1.8539140512557764
+      },
+      {
+        "frame": 7666,
+        "before": 2.019759925966363,
+        "after": 1.9716903787134858
+      },
+      {
+        "frame": 7678,
+        "before": 1.7907683699758736,
+        "after": 1.7855399268800844
+      },
+      {
+        "frame": 7688,
+        "before": 1.7490564364533583,
+        "after": 1.695480694826954
+      },
+      {
+        "frame": 7697,
+        "before": 1.9304380898879099,
+        "after": 1.8768646603868517
+      },
+      {
+        "frame": 7707,
+        "before": 1.8921741197624826,
+        "after": 1.892004887915411
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 8169,
+    "frame_count": 8,
+    "before_surface": 2.1748572724730306,
+    "after_surface": 1.9617988231744186,
+    "before_mean": 2.3609879010184223,
+    "after_mean": 2.0786621686167375,
+    "gain": 0.2823257324016848,
+    "required_gain": 0.11804939505092112,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_8169_8e3472db-47c5-4f80-b54b-bd8febf15af7.json",
+    "maximum_before": 2.5187661434361055,
+    "maximum_after": 2.184257941881004,
+    "per_frame": [
+      {
+        "frame": 8101,
+        "before": 2.3381120489830707,
+        "after": 2.1542632182772903
+      },
+      {
+        "frame": 8110,
+        "before": 2.464179576392618,
+        "after": 2.184257941881004
+      },
+      {
+        "frame": 8119,
+        "before": 2.113312616263707,
+        "after": 1.8976528248836504
+      },
+      {
+        "frame": 8130,
+        "before": 2.4188870865022682,
+        "after": 2.0960205510388406
+      },
+      {
+        "frame": 8139,
+        "before": 2.2720420991747052,
+        "after": 1.9792569354067484
+      },
+      {
+        "frame": 8148,
+        "before": 2.3506132136893205,
+        "after": 2.0903163468722936
+      },
+      {
+        "frame": 8160,
+        "before": 2.5187661434361055,
+        "after": 2.1806838679916214
+      },
+      {
+        "frame": 8169,
+        "before": 2.411990423705583,
+        "after": 2.0468456625824505
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 8330,
+    "frame_count": 8,
+    "before_surface": 1.6602841935193842,
+    "after_surface": 1.3359830438091274,
+    "before_mean": 2.1917375687624436,
+    "after_mean": 1.5037010203199246,
+    "gain": 0.688036548442519,
+    "required_gain": 0.10958687843812219,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_8330_797e2f52-0f67-4f19-a656-1c61a5981863.json",
+    "maximum_before": 2.4793084163559445,
+    "maximum_after": 1.782148350373664,
+    "per_frame": [
+      {
+        "frame": 8263,
+        "before": 2.017064146926393,
+        "after": 1.3658897913817654
+      },
+      {
+        "frame": 8272,
+        "before": 2.148051286732501,
+        "after": 1.4923540997149656
+      },
+      {
+        "frame": 8283,
+        "before": 2.13509058879009,
+        "after": 1.4611622456926279
+      },
+      {
+        "frame": 8293,
+        "before": 2.344147774822615,
+        "after": 1.6232766923202464
+      },
+      {
+        "frame": 8302,
+        "before": 2.4793084163559445,
+        "after": 1.782148350373664
+      },
+      {
+        "frame": 8311,
+        "before": 2.2785648476872695,
+        "after": 1.5848002410154456
+      },
+      {
+        "frame": 8320,
+        "before": 2.120653852516348,
+        "after": 1.4000269557847158
+      },
+      {
+        "frame": 8330,
+        "before": 2.011019636268387,
+        "after": 1.3199497862759657
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 8667,
+    "frame_count": 8,
+    "before_surface": 1.7904759907921017,
+    "after_surface": 1.7002805610543874,
+    "before_mean": 2.085063342165939,
+    "after_mean": 1.7020625997375671,
+    "gain": 0.3830007424283719,
+    "required_gain": 0.10425316710829696,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_8667_485439c5-f2b4-442f-b597-28bb1417f5ba.json",
+    "maximum_before": 2.2437639446815103,
+    "maximum_after": 1.821114149219681,
+    "per_frame": [
+      {
+        "frame": 8600,
+        "before": 2.164898392717583,
+        "after": 1.7582490601652982
+      },
+      {
+        "frame": 8608,
+        "before": 2.2437639446815103,
+        "after": 1.821114149219681
+      },
+      {
+        "frame": 8619,
+        "before": 2.12328992456576,
+        "after": 1.7262265031968844
+      },
+      {
+        "frame": 8629,
+        "before": 1.9279732129060658,
+        "after": 1.5431503445017818
+      },
+      {
+        "frame": 8637,
+        "before": 2.0226063055559402,
+        "after": 1.6775209992223086
+      },
+      {
+        "frame": 8648,
+        "before": 1.960874377525363,
+        "after": 1.6026401609785963
+      },
+      {
+        "frame": 8656,
+        "before": 2.121774403706441,
+        "after": 1.753354144815076
+      },
+      {
+        "frame": 8667,
+        "before": 2.1153261756688497,
+        "after": 1.7342454358009114
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 8983,
+    "frame_count": 8,
+    "before_surface": 1.8999330864468273,
+    "after_surface": 1.7437936343041052,
+    "before_mean": 2.280915158364695,
+    "after_mean": 1.9082850122017825,
+    "gain": 0.37263014616291246,
+    "required_gain": 0.11404575791823475,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_8983_0433f9dc-a519-452b-b1df-e37372009013.json",
+    "maximum_before": 2.4341480553126664,
+    "maximum_after": 2.0935206824590207,
+    "per_frame": [
+      {
+        "frame": 8913,
+        "before": 2.190844295877326,
+        "after": 1.8215521072755072
+      },
+      {
+        "frame": 8922,
+        "before": 2.1984110698829387,
+        "after": 1.846614697125689
+      },
+      {
+        "frame": 8931,
+        "before": 2.3230300994279833,
+        "after": 1.9432005031725375
+      },
+      {
+        "frame": 8944,
+        "before": 2.3820876002743283,
+        "after": 1.9920430110032628
+      },
+      {
+        "frame": 8954,
+        "before": 2.4341480553126664,
+        "after": 2.0935206824590207
+      },
+      {
+        "frame": 8963,
+        "before": 2.3580450099414407,
+        "after": 1.970683513368215
+      },
+      {
+        "frame": 8971,
+        "before": 2.1614074921221498,
+        "after": 1.7853172892716709
+      },
+      {
+        "frame": 8983,
+        "before": 2.199347644078727,
+        "after": 1.8133482939383565
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 9772,
+    "frame_count": 8,
+    "before_surface": 1.5823858736082257,
+    "after_surface": 1.216208305555772,
+    "before_mean": 4.167560739392695,
+    "after_mean": 2.6223078601352157,
+    "gain": 1.545252879257479,
+    "required_gain": 0.20837803696963475,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_9772_68b8a79c-0634-4dd0-b469-4d0024ee66b7.json",
+    "maximum_before": 4.359263379181816,
+    "maximum_after": 2.8137410908666602,
+    "per_frame": [
+      {
+        "frame": 9706,
+        "before": 3.9470412573926694,
+        "after": 2.4034302915043915
+      },
+      {
+        "frame": 9715,
+        "before": 3.970227581428181,
+        "after": 2.4265859443155824
+      },
+      {
+        "frame": 9725,
+        "before": 3.996911301089105,
+        "after": 2.453119653012206
+      },
+      {
+        "frame": 9735,
+        "before": 4.205297384301587,
+        "after": 2.6593591330060518
+      },
+      {
+        "frame": 9745,
+        "before": 4.359263379181816,
+        "after": 2.8137410908666602
+      },
+      {
+        "frame": 9755,
+        "before": 4.298564630425688,
+        "after": 2.750874209407918
+      },
+      {
+        "frame": 9763,
+        "before": 4.2055159166154334,
+        "after": 2.6583550506413944
+      },
+      {
+        "frame": 9772,
+        "before": 4.357664464707079,
+        "after": 2.8129975083275207
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 9930,
+    "frame_count": 8,
+    "before_surface": 1.5365231798123558,
+    "after_surface": 1.4374065937089289,
+    "before_mean": 2.7951846930129345,
+    "after_mean": 2.0944279702381037,
+    "gain": 0.7007567227748308,
+    "required_gain": 0.13975923465064674,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_9930_e68b8169-9aca-4516-bfee-5632b0c6147f.json",
+    "maximum_before": 3.0195745774626075,
+    "maximum_after": 2.2854219310245223,
+    "per_frame": [
+      {
+        "frame": 9865,
+        "before": 2.7388656760147745,
+        "after": 2.0483157779175
+      },
+      {
+        "frame": 9874,
+        "before": 2.779589129929811,
+        "after": 2.1076578761905855
+      },
+      {
+        "frame": 9884,
+        "before": 2.7539777627550603,
+        "after": 2.0555931337026685
+      },
+      {
+        "frame": 9893,
+        "before": 2.729436035631213,
+        "after": 2.0235505383598222
+      },
+      {
+        "frame": 9903,
+        "before": 2.7545688557852057,
+        "after": 2.0523859395652297
+      },
+      {
+        "frame": 9913,
+        "before": 2.845352583495637,
+        "after": 2.1362828693590363
+      },
+      {
+        "frame": 9920,
+        "before": 2.7401129230291663,
+        "after": 2.0462156957854636
+      },
+      {
+        "frame": 9930,
+        "before": 3.0195745774626075,
+        "after": 2.2854219310245223
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 10084,
+    "frame_count": 8,
+    "before_surface": 2.0565707864664806,
+    "after_surface": 1.6392465828076006,
+    "before_mean": 2.435848714922701,
+    "after_mean": 2.0866087801311792,
+    "gain": 0.3492399347915218,
+    "required_gain": 0.12179243574613506,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_10084_3e497435-7c88-4ade-baea-1f4590382790.json",
+    "maximum_before": 2.62633430325353,
+    "maximum_after": 2.249616647944884,
+    "per_frame": [
+      {
+        "frame": 10019,
+        "before": 2.4303648520783656,
+        "after": 2.192269696445009
+      },
+      {
+        "frame": 10028,
+        "before": 2.62633430325353,
+        "after": 2.1981312343374286
+      },
+      {
+        "frame": 10037,
+        "before": 2.3076741146091613,
+        "after": 2.070262332725101
+      },
+      {
+        "frame": 10047,
+        "before": 2.580323968982365,
+        "after": 2.249616647944884
+      },
+      {
+        "frame": 10057,
+        "before": 2.263389525696976,
+        "after": 1.8705633913225443
+      },
+      {
+        "frame": 10064,
+        "before": 2.4406355570917153,
+        "after": 2.0076582093326416
+      },
+      {
+        "frame": 10073,
+        "before": 2.453614558760906,
+        "after": 2.10087366304825
+      },
+      {
+        "frame": 10084,
+        "before": 2.384452838908591,
+        "after": 2.003495065893577
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 10552,
+    "frame_count": 8,
+    "before_surface": 2.047865388386899,
+    "after_surface": 1.3137961431066352,
+    "before_mean": 3.1324938280688954,
+    "after_mean": 1.4031349416268273,
+    "gain": 1.7293588864420681,
+    "required_gain": 0.1566246914034448,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_10552_27e998f7-3637-4b17-a18c-bf78761341d6.json",
+    "maximum_before": 3.2480252511603624,
+    "maximum_after": 1.6230505835014462,
+    "per_frame": [
+      {
+        "frame": 10483,
+        "before": 3.2480252511603624,
+        "after": 1.6230505835014462
+      },
+      {
+        "frame": 10494,
+        "before": 3.1475633777010312,
+        "after": 1.4255677521056853
+      },
+      {
+        "frame": 10504,
+        "before": 3.0730528389693856,
+        "after": 1.3817058832541127
+      },
+      {
+        "frame": 10511,
+        "before": 3.2122182333659937,
+        "after": 1.549566169928378
+      },
+      {
+        "frame": 10520,
+        "before": 3.098104564580103,
+        "after": 1.3764969372368931
+      },
+      {
+        "frame": 10532,
+        "before": 3.122526185403745,
+        "after": 1.3419947539424981
+      },
+      {
+        "frame": 10541,
+        "before": 3.1048492489723643,
+        "after": 1.2707610061522328
+      },
+      {
+        "frame": 10552,
+        "before": 3.053610924398179,
+        "after": 1.255936446893372
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 10713,
+    "frame_count": 8,
+    "before_surface": 1.3874382107720153,
+    "after_surface": 1.3137481565835407,
+    "before_mean": 1.790543621828258,
+    "after_mean": 1.4507531905254594,
+    "gain": 0.3397904313027986,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_10713_d1a40d6d-392b-458a-a6f1-97123c879aac.json",
+    "maximum_before": 2.053211560063944,
+    "maximum_after": 1.6998698117169828,
+    "per_frame": [
+      {
+        "frame": 10648,
+        "before": 1.7941419775002712,
+        "after": 1.5539869217966233
+      },
+      {
+        "frame": 10658,
+        "before": 1.729483570986599,
+        "after": 1.440554466325949
+      },
+      {
+        "frame": 10668,
+        "before": 1.7469845365953107,
+        "after": 1.4383528713695815
+      },
+      {
+        "frame": 10677,
+        "before": 1.689102833698572,
+        "after": 1.2977586727232409
+      },
+      {
+        "frame": 10685,
+        "before": 1.9636648267192027,
+        "after": 1.5740399953995914
+      },
+      {
+        "frame": 10696,
+        "before": 1.7043501661503775,
+        "after": 1.354845910820709
+      },
+      {
+        "frame": 10705,
+        "before": 1.6434095029117868,
+        "after": 1.2466168740509969
+      },
+      {
+        "frame": 10713,
+        "before": 2.053211560063944,
+        "after": 1.6998698117169828
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 11185,
+    "frame_count": 8,
+    "before_surface": 2.851152132933727,
+    "after_surface": 2.394848380444658,
+    "before_mean": 1.6265257194966165,
+    "after_mean": 1.4192449594844883,
+    "gain": 0.20728076001212825,
+    "required_gain": 0.1,
+    "stable": false,
+    "worsened_frames": 1,
+    "exceeded_frames": 0,
+    "current_gate_accept": false,
+    "reasons": [
+      "current_worsened"
+    ],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_11185_a8efff59-72d2-4e02-9bd0-4d5e2122130e.json",
+    "maximum_before": 1.7361817202763123,
+    "maximum_after": 1.5454742546008946,
+    "per_frame": [
+      {
+        "frame": 11122,
+        "before": 1.625882115400797,
+        "after": 1.4790215040578594
+      },
+      {
+        "frame": 11132,
+        "before": 1.466783148661553,
+        "after": 1.5454742546008946
+      },
+      {
+        "frame": 11141,
+        "before": 1.7361817202763123,
+        "after": 1.2352487370184673
+      },
+      {
+        "frame": 11148,
+        "before": 1.6150404320476772,
+        "after": 1.3427367744330243
+      },
+      {
+        "frame": 11157,
+        "before": 1.607734255647947,
+        "after": 1.4893400665760665
+      },
+      {
+        "frame": 11166,
+        "before": 1.7200701992402843,
+        "after": 1.3186158274788358
+      },
+      {
+        "frame": 11175,
+        "before": 1.7161504865740116,
+        "after": 1.4325543001995618
+      },
+      {
+        "frame": 11185,
+        "before": 1.524363398124349,
+        "after": 1.5109682115111966
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 11846,
+    "frame_count": 8,
+    "before_surface": 3.302771715977037,
+    "after_surface": 2.635215416521681,
+    "before_mean": 3.3278443662006265,
+    "after_mean": 2.042875139325237,
+    "gain": 1.2849692268753894,
+    "required_gain": 0.16639221831003134,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_11846_ea8be938-e6fe-4770-b337-0c1b9c6f5240.json",
+    "maximum_before": 3.544433856376579,
+    "maximum_after": 2.2894831015624555,
+    "per_frame": [
+      {
+        "frame": 11782,
+        "before": 3.3843086589116425,
+        "after": 2.2894831015624555
+      },
+      {
+        "frame": 11790,
+        "before": 3.287864724118249,
+        "after": 1.9678173352507462
+      },
+      {
+        "frame": 11800,
+        "before": 3.296902647033777,
+        "after": 1.921570419256054
+      },
+      {
+        "frame": 11808,
+        "before": 3.544433856376579,
+        "after": 2.1176143560749376
+      },
+      {
+        "frame": 11818,
+        "before": 3.3024917886463925,
+        "after": 1.8104958929491304
+      },
+      {
+        "frame": 11827,
+        "before": 3.457183185037266,
+        "after": 2.1130688901871824
+      },
+      {
+        "frame": 11838,
+        "before": 3.1009608136398783,
+        "after": 2.026194146175003
+      },
+      {
+        "frame": 11846,
+        "before": 3.2486092558412274,
+        "after": 2.0967569731463893
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 12370,
+    "frame_count": 8,
+    "before_surface": 2.2726161972092913,
+    "after_surface": 1.9507773403641469,
+    "before_mean": 2.0890664961635537,
+    "after_mean": 1.5381054917029515,
+    "gain": 0.5509610044606021,
+    "required_gain": 0.10445332480817769,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_12370_8d1f7357-f2b0-48a6-91f5-bff6e4f7a36c.json",
+    "maximum_before": 2.3054741793100275,
+    "maximum_after": 1.7180043809377006,
+    "per_frame": [
+      {
+        "frame": 12306,
+        "before": 2.0208120989656666,
+        "after": 1.525063450940911
+      },
+      {
+        "frame": 12315,
+        "before": 2.0574529282152034,
+        "after": 1.611988655098801
+      },
+      {
+        "frame": 12323,
+        "before": 1.9402585194568718,
+        "after": 1.4526999689943674
+      },
+      {
+        "frame": 12334,
+        "before": 2.030002137634871,
+        "after": 1.466590553814189
+      },
+      {
+        "frame": 12343,
+        "before": 2.3054741793100275,
+        "after": 1.7180043809377006
+      },
+      {
+        "frame": 12352,
+        "before": 2.14047238661291,
+        "after": 1.5861502128312122
+      },
+      {
+        "frame": 12362,
+        "before": 2.032430295068427,
+        "after": 1.4089906073991842
+      },
+      {
+        "frame": 12370,
+        "before": 2.185629424044453,
+        "after": 1.5353561036072474
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 13010,
+    "frame_count": 8,
+    "before_surface": 1.1206967287900809,
+    "after_surface": 1.040645598712859,
+    "before_mean": 1.7926769252878887,
+    "after_mean": 1.418595632188471,
+    "gain": 0.37408129309941773,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_13010_5070e407-f933-48b3-9f6a-2952f7a19c0c.json",
+    "maximum_before": 1.8591892203994023,
+    "maximum_after": 1.5001973335086818,
+    "per_frame": [
+      {
+        "frame": 12946,
+        "before": 1.8136416253938632,
+        "after": 1.4248398907110422
+      },
+      {
+        "frame": 12955,
+        "before": 1.792848268908218,
+        "after": 1.4155205409439036
+      },
+      {
+        "frame": 12964,
+        "before": 1.6692170855535493,
+        "after": 1.2976148192412746
+      },
+      {
+        "frame": 12974,
+        "before": 1.8494180075480753,
+        "after": 1.4958285198885883
+      },
+      {
+        "frame": 12984,
+        "before": 1.8591892203994023,
+        "after": 1.5001973335086818
+      },
+      {
+        "frame": 12994,
+        "before": 1.8379759958060355,
+        "after": 1.455338745258757
+      },
+      {
+        "frame": 13002,
+        "before": 1.753386134433602,
+        "after": 1.3767289184663472
+      },
+      {
+        "frame": 13010,
+        "before": 1.765739064260365,
+        "after": 1.3826962894891726
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 13459,
+    "frame_count": 8,
+    "before_surface": 0.8694222719483874,
+    "after_surface": 0.7812090235562154,
+    "before_mean": 1.980116560309056,
+    "after_mean": 1.6356729502225755,
+    "gain": 0.3444436100864805,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_13459_cb7b6ede-17dc-415f-8413-ec724b4accb7.json",
+    "maximum_before": 2.1681133540567723,
+    "maximum_after": 1.8361349705765793,
+    "per_frame": [
+      {
+        "frame": 13392,
+        "before": 2.1681133540567723,
+        "after": 1.8361349705765793
+      },
+      {
+        "frame": 13403,
+        "before": 1.9669568342844936,
+        "after": 1.6182878341455904
+      },
+      {
+        "frame": 13412,
+        "before": 1.8687252031556731,
+        "after": 1.539890656216124
+      },
+      {
+        "frame": 13421,
+        "before": 1.7737883120460862,
+        "after": 1.4321171986748802
+      },
+      {
+        "frame": 13431,
+        "before": 1.9712887393904548,
+        "after": 1.6366456154792814
+      },
+      {
+        "frame": 13441,
+        "before": 1.9866780946771547,
+        "after": 1.6295171223825853
+      },
+      {
+        "frame": 13449,
+        "before": 2.1265986686974534,
+        "after": 1.7622161002158934
+      },
+      {
+        "frame": 13459,
+        "before": 1.9787832761643604,
+        "after": 1.6305741040896697
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 13757,
+    "frame_count": 8,
+    "before_surface": 0.9529206178851131,
+    "after_surface": 0.7832005574260859,
+    "before_mean": 2.669834271444395,
+    "after_mean": 2.0117926787605405,
+    "gain": 0.6580415926838543,
+    "required_gain": 0.13349171357221976,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_13757_9ed33e75-d3d3-45b2-a50f-0619fb28fa49.json",
+    "maximum_before": 2.868377421330708,
+    "maximum_after": 2.1974476619918413,
+    "per_frame": [
+      {
+        "frame": 13693,
+        "before": 2.749074616773209,
+        "after": 2.0970571128448507
+      },
+      {
+        "frame": 13700,
+        "before": 2.64981302142586,
+        "after": 1.9986502742879881
+      },
+      {
+        "frame": 13711,
+        "before": 2.505515373391624,
+        "after": 1.8787218904842728
+      },
+      {
+        "frame": 13719,
+        "before": 2.4253976811345117,
+        "after": 1.7637853522827571
+      },
+      {
+        "frame": 13729,
+        "before": 2.635173568959814,
+        "after": 1.967830218699863
+      },
+      {
+        "frame": 13738,
+        "before": 2.6863518475067716,
+        "after": 2.026059193333925
+      },
+      {
+        "frame": 13748,
+        "before": 2.8389706410326605,
+        "after": 2.164789726158825
+      },
+      {
+        "frame": 13757,
+        "before": 2.868377421330708,
+        "after": 2.1974476619918413
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 13913,
+    "frame_count": 8,
+    "before_surface": 0.9723903273196737,
+    "after_surface": 0.8823309153213229,
+    "before_mean": 2.109116205275136,
+    "after_mean": 1.7803869729664679,
+    "gain": 0.32872923230866835,
+    "required_gain": 0.10545581026375682,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_13913_aa2c5ec9-02c3-492e-a7a4-e457dbbb9b1e.json",
+    "maximum_before": 2.508174195409558,
+    "maximum_after": 2.1408014379127804,
+    "per_frame": [
+      {
+        "frame": 13850,
+        "before": 1.9932720637690513,
+        "after": 1.6938221846137858
+      },
+      {
+        "frame": 13858,
+        "before": 1.9331375612580521,
+        "after": 1.5929672075759116
+      },
+      {
+        "frame": 13868,
+        "before": 2.508174195409558,
+        "after": 2.1408014379127804
+      },
+      {
+        "frame": 13877,
+        "before": 2.2871912455625893,
+        "after": 1.9646741104917445
+      },
+      {
+        "frame": 13886,
+        "before": 2.0189175187137813,
+        "after": 1.6898528463517335
+      },
+      {
+        "frame": 13893,
+        "before": 1.9706673937344032,
+        "after": 1.6830302916324569
+      },
+      {
+        "frame": 13903,
+        "before": 2.034328041443069,
+        "after": 1.7079021577373532
+      },
+      {
+        "frame": 13913,
+        "before": 2.1272416223105837,
+        "after": 1.7700455474159769
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 14232,
+    "frame_count": 8,
+    "before_surface": 1.580258668503153,
+    "after_surface": 1.415055686403567,
+    "before_mean": 1.9372391515626028,
+    "after_mean": 1.6797647502682498,
+    "gain": 0.25747440129435306,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_14232_296efcb5-f677-4203-82ad-94c730d2d4e2.json",
+    "maximum_before": 2.2675402951724326,
+    "maximum_after": 1.9212627883532387,
+    "per_frame": [
+      {
+        "frame": 14166,
+        "before": 1.8921522562337474,
+        "after": 1.7198786972998032
+      },
+      {
+        "frame": 14176,
+        "before": 1.8079020702576685,
+        "after": 1.514513883706822
+      },
+      {
+        "frame": 14184,
+        "before": 1.7208648252255034,
+        "after": 1.5484694785605593
+      },
+      {
+        "frame": 14195,
+        "before": 1.9285099138631985,
+        "after": 1.6737725574696627
+      },
+      {
+        "frame": 14205,
+        "before": 1.8274012123913996,
+        "after": 1.5743810484010892
+      },
+      {
+        "frame": 14214,
+        "before": 1.9025689066762945,
+        "after": 1.6622681721601875
+      },
+      {
+        "frame": 14224,
+        "before": 2.1509737326805785,
+        "after": 1.8235713761946348
+      },
+      {
+        "frame": 14232,
+        "before": 2.2675402951724326,
+        "after": 1.9212627883532387
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 14390,
+    "frame_count": 8,
+    "before_surface": 1.2682122166598169,
+    "after_surface": 1.0977367276085033,
+    "before_mean": 2.3473355674886935,
+    "after_mean": 1.5773975136629967,
+    "gain": 0.7699380538256968,
+    "required_gain": 0.11736677837443468,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_14390_467c4584-9d7b-4869-84d7-ed0ed1d91320.json",
+    "maximum_before": 2.56151578524052,
+    "maximum_after": 1.7531791803291463,
+    "per_frame": [
+      {
+        "frame": 14326,
+        "before": 2.148225784529366,
+        "after": 1.4208360608343582
+      },
+      {
+        "frame": 14337,
+        "before": 2.4403144065057196,
+        "after": 1.6670911211555055
+      },
+      {
+        "frame": 14347,
+        "before": 2.423242680892395,
+        "after": 1.6926632647852777
+      },
+      {
+        "frame": 14355,
+        "before": 2.4122585899026388,
+        "after": 1.6039960994688918
+      },
+      {
+        "frame": 14366,
+        "before": 2.426691485428036,
+        "after": 1.6307310644382398
+      },
+      {
+        "frame": 14373,
+        "before": 2.56151578524052,
+        "after": 1.7531791803291463
+      },
+      {
+        "frame": 14384,
+        "before": 2.260250893085126,
+        "after": 1.4927217110021418
+      },
+      {
+        "frame": 14390,
+        "before": 2.1061849143257483,
+        "after": 1.3579616072904133
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 14724,
+    "frame_count": 8,
+    "before_surface": 1.7416572884426424,
+    "after_surface": 1.5947635005129466,
+    "before_mean": 2.277266920795759,
+    "after_mean": 1.2798939740026485,
+    "gain": 0.9973729467931107,
+    "required_gain": 0.11386334603978797,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_14724_0cca5bd6-5335-461f-a226-56e9c636d62b.json",
+    "maximum_before": 2.532175073861927,
+    "maximum_after": 1.4806311627517794,
+    "per_frame": [
+      {
+        "frame": 14654,
+        "before": 2.2322475770277226,
+        "after": 1.3426161496163571
+      },
+      {
+        "frame": 14664,
+        "before": 2.381424307507004,
+        "after": 1.427753912591477
+      },
+      {
+        "frame": 14675,
+        "before": 2.532175073861927,
+        "after": 1.4806311627517794
+      },
+      {
+        "frame": 14685,
+        "before": 2.0591736649794354,
+        "after": 1.0234831104152917
+      },
+      {
+        "frame": 14695,
+        "before": 2.2452998053467725,
+        "after": 1.2425139886470253
+      },
+      {
+        "frame": 14704,
+        "before": 2.144612629836735,
+        "after": 1.146956569291175
+      },
+      {
+        "frame": 14715,
+        "before": 2.174168101420508,
+        "after": 1.185493485122226
+      },
+      {
+        "frame": 14724,
+        "before": 2.4490342063859694,
+        "after": 1.3897034135858564
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 15350,
+    "frame_count": 8,
+    "before_surface": 3.0671510930784276,
+    "after_surface": 2.352570420035502,
+    "before_mean": 2.823243021633445,
+    "after_mean": 2.2783385750004626,
+    "gain": 0.5449044466329824,
+    "required_gain": 0.14116215108167227,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_15350_2c13e16a-40d4-4991-a79a-ee30e6608d81.json",
+    "maximum_before": 3.0954184971841094,
+    "maximum_after": 2.386046999937885,
+    "per_frame": [
+      {
+        "frame": 15286,
+        "before": 2.7939119262745535,
+        "after": 2.3573077197120478
+      },
+      {
+        "frame": 15295,
+        "before": 2.740643368697844,
+        "after": 2.338989330247226
+      },
+      {
+        "frame": 15303,
+        "before": 2.6018548300732425,
+        "after": 2.0898306739760852
+      },
+      {
+        "frame": 15313,
+        "before": 2.5470134903072665,
+        "after": 2.255371911591936
+      },
+      {
+        "frame": 15321,
+        "before": 2.8555105646630565,
+        "after": 2.173740023532538
+      },
+      {
+        "frame": 15331,
+        "before": 3.0954184971841094,
+        "after": 2.3816309829103135
+      },
+      {
+        "frame": 15339,
+        "before": 2.997041989814422,
+        "after": 2.386046999937885
+      },
+      {
+        "frame": 15350,
+        "before": 2.9545495060530658,
+        "after": 2.24379095809567
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 15675,
+    "frame_count": 8,
+    "before_surface": 2.1870321683794898,
+    "after_surface": 1.9489696228038764,
+    "before_mean": 2.1812318290277464,
+    "after_mean": 1.483451009832316,
+    "gain": 0.6977808191954304,
+    "required_gain": 0.10906159145138733,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_15675_5ba12529-1416-45a2-9fd1-1ada1d2fc2cd.json",
+    "maximum_before": 2.3568319623333878,
+    "maximum_after": 1.6715085808695718,
+    "per_frame": [
+      {
+        "frame": 15605,
+        "before": 2.3568319623333878,
+        "after": 1.6715085808695718
+      },
+      {
+        "frame": 15615,
+        "before": 2.3567293257420623,
+        "after": 1.6707737037449906
+      },
+      {
+        "frame": 15627,
+        "before": 2.081296975445448,
+        "after": 1.3867639047587923
+      },
+      {
+        "frame": 15636,
+        "before": 1.9831374595304543,
+        "after": 1.3219907835925324
+      },
+      {
+        "frame": 15646,
+        "before": 2.3298937299602374,
+        "after": 1.6281289164276243
+      },
+      {
+        "frame": 15655,
+        "before": 2.2674161994877036,
+        "after": 1.548319254722303
+      },
+      {
+        "frame": 15664,
+        "before": 2.0287616408120184,
+        "after": 1.3321408689360716
+      },
+      {
+        "frame": 15675,
+        "before": 2.045787338910659,
+        "after": 1.3079820656066419
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 16005,
+    "frame_count": 8,
+    "before_surface": 2.9971578469293045,
+    "after_surface": 2.5743219381791547,
+    "before_mean": 2.479974740458839,
+    "after_mean": 1.776889397111867,
+    "gain": 0.7030853433469719,
+    "required_gain": 0.12399873702294195,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_16005_9f74da95-687c-4437-87ee-4e0c262a3c75.json",
+    "maximum_before": 2.922419572077148,
+    "maximum_after": 2.048783787731304,
+    "per_frame": [
+      {
+        "frame": 15938,
+        "before": 2.022911274464679,
+        "after": 1.652712685403271
+      },
+      {
+        "frame": 15947,
+        "before": 1.9337140881873345,
+        "after": 1.7000097894418529
+      },
+      {
+        "frame": 15955,
+        "before": 2.4266084449061007,
+        "after": 1.7816826405485653
+      },
+      {
+        "frame": 15965,
+        "before": 2.521360375531437,
+        "after": 1.7495684643128202
+      },
+      {
+        "frame": 15976,
+        "before": 2.922419572077148,
+        "after": 2.048783787731304
+      },
+      {
+        "frame": 15986,
+        "before": 2.718238192714002,
+        "after": 1.7833038987806225
+      },
+      {
+        "frame": 15995,
+        "before": 2.5669876496536292,
+        "after": 1.6896901488746663
+      },
+      {
+        "frame": 16005,
+        "before": 2.7275583261363807,
+        "after": 1.809363761801835
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 16176,
+    "frame_count": 8,
+    "before_surface": 2.2407386455621943,
+    "after_surface": 2.047761866069656,
+    "before_mean": 1.0700979387540672,
+    "after_mean": 0.9028829687272915,
+    "gain": 0.16721497002677577,
+    "required_gain": 0.1,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_16176_49efb6b3-d09f-41bb-8bd0-46ce917fd44a.json",
+    "maximum_before": 1.270904908279286,
+    "maximum_after": 1.057193425859965,
+    "per_frame": [
+      {
+        "frame": 16110,
+        "before": 1.270904908279286,
+        "after": 1.0369405473474473
+      },
+      {
+        "frame": 16119,
+        "before": 0.9045000051426384,
+        "after": 0.856500551528507
+      },
+      {
+        "frame": 16129,
+        "before": 1.196232550269445,
+        "after": 1.057193425859965
+      },
+      {
+        "frame": 16138,
+        "before": 1.0767011427513058,
+        "after": 0.9037639951065143
+      },
+      {
+        "frame": 16146,
+        "before": 0.9938087733648125,
+        "after": 0.8711624953969349
+      },
+      {
+        "frame": 16158,
+        "before": 1.1265967743423082,
+        "after": 0.9048029294191196
+      },
+      {
+        "frame": 16167,
+        "before": 0.9979391574052369,
+        "after": 0.804425698937415
+      },
+      {
+        "frame": 16176,
+        "before": 0.994100198477505,
+        "after": 0.7882741062224284
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 16681,
+    "frame_count": 8,
+    "before_surface": 2.6224638082321006,
+    "after_surface": 1.9863942354166844,
+    "before_mean": 2.468970892405569,
+    "after_mean": 0.8386932235358152,
+    "gain": 1.6302776688697538,
+    "required_gain": 0.12344854462027846,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_16681_2d37ead9-cf2b-43f7-94f8-e58ccc87ad80.json",
+    "maximum_before": 2.5879129825434006,
+    "maximum_after": 0.8928902382203454,
+    "per_frame": [
+      {
+        "frame": 16617,
+        "before": 2.3707881733947507,
+        "after": 0.877049127119363
+      },
+      {
+        "frame": 16625,
+        "before": 2.2745728262324856,
+        "after": 0.8301965214658465
+      },
+      {
+        "frame": 16634,
+        "before": 2.3627760839662963,
+        "after": 0.8682847975263944
+      },
+      {
+        "frame": 16642,
+        "before": 2.551272487636139,
+        "after": 0.785669899784169
+      },
+      {
+        "frame": 16651,
+        "before": 2.4742005774576357,
+        "after": 0.8892742502547302
+      },
+      {
+        "frame": 16662,
+        "before": 2.5879129825434006,
+        "after": 0.8928902382203454
+      },
+      {
+        "frame": 16673,
+        "before": 2.545100017235158,
+        "after": 0.7998351525036358
+      },
+      {
+        "frame": 16681,
+        "before": 2.5851439907786884,
+        "after": 0.7663458014120373
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 16999,
+    "frame_count": 8,
+    "before_surface": 1.4235614835751487,
+    "after_surface": 1.3370589733596003,
+    "before_mean": 0.9902529733570381,
+    "after_mean": 0.7850614179203845,
+    "gain": 0.20519155543665357,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_16999_8e13ad16-d3bd-4fc3-ae87-da781874eed6.json",
+    "maximum_before": 1.1922872708134407,
+    "maximum_after": 0.9335502471782354,
+    "per_frame": [
+      {
+        "frame": 16935,
+        "before": 1.0172155701449785,
+        "after": 0.7893514365562032
+      },
+      {
+        "frame": 16944,
+        "before": 0.9795815115082523,
+        "after": 0.8090094293847389
+      },
+      {
+        "frame": 16952,
+        "before": 1.1922872708134407,
+        "after": 0.9335502471782354
+      },
+      {
+        "frame": 16961,
+        "before": 0.9165164773536643,
+        "after": 0.7192766535057191
+      },
+      {
+        "frame": 16972,
+        "before": 1.1605729900114339,
+        "after": 0.8445439345449413
+      },
+      {
+        "frame": 16982,
+        "before": 0.8170601223820021,
+        "after": 0.598692635412394
+      },
+      {
+        "frame": 16989,
+        "before": 1.0517136956130162,
+        "after": 0.8210490235635226
+      },
+      {
+        "frame": 16999,
+        "before": 0.7870761490295165,
+        "after": 0.765017983217322
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 17926,
+    "frame_count": 8,
+    "before_surface": 2.0562693455178978,
+    "after_surface": 1.7305145196972644,
+    "before_mean": 2.8649870657436165,
+    "after_mean": 1.8086976187078359,
+    "gain": 1.0562894470357806,
+    "required_gain": 0.14324935328718083,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_17926_f43fd20a-6091-4fd8-b4e9-0d8f0c772c8f.json",
+    "maximum_before": 3.1192449061965606,
+    "maximum_after": 2.0002715654415417,
+    "per_frame": [
+      {
+        "frame": 17861,
+        "before": 2.7441880283799933,
+        "after": 1.674782988334008
+      },
+      {
+        "frame": 17870,
+        "before": 3.1192449061965606,
+        "after": 2.0002715654415417
+      },
+      {
+        "frame": 17878,
+        "before": 2.9107722974858055,
+        "after": 1.9278416935548761
+      },
+      {
+        "frame": 17889,
+        "before": 2.7268333490027112,
+        "after": 1.7823560245311603
+      },
+      {
+        "frame": 17900,
+        "before": 2.8781478182256253,
+        "after": 1.7948426478628658
+      },
+      {
+        "frame": 17909,
+        "before": 2.7607023133559476,
+        "after": 1.6419526491782281
+      },
+      {
+        "frame": 17917,
+        "before": 2.8644074970671958,
+        "after": 1.7652726036847635
+      },
+      {
+        "frame": 17926,
+        "before": 2.915600316235094,
+        "after": 1.882260777075244
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 18091,
+    "frame_count": 8,
+    "before_surface": 1.7492050548722786,
+    "after_surface": 1.3733821117154486,
+    "before_mean": 2.3841682984925665,
+    "after_mean": 1.116053686542166,
+    "gain": 1.2681146119504005,
+    "required_gain": 0.11920841492462833,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_18091_7bc5d558-b49b-461f-81f7-b11f7ff5f50a.json",
+    "maximum_before": 2.807141712839148,
+    "maximum_after": 1.3531629951902162,
+    "per_frame": [
+      {
+        "frame": 18024,
+        "before": 2.0121579677652512,
+        "after": 0.8593826858983596
+      },
+      {
+        "frame": 18035,
+        "before": 2.3349556396995457,
+        "after": 1.0972027862219658
+      },
+      {
+        "frame": 18043,
+        "before": 2.121742952529321,
+        "after": 1.0931742905919724
+      },
+      {
+        "frame": 18053,
+        "before": 2.1779812996319436,
+        "after": 1.0474350726832933
+      },
+      {
+        "frame": 18062,
+        "before": 2.264453076458163,
+        "after": 1.0318371074329313
+      },
+      {
+        "frame": 18073,
+        "before": 2.5808112661614437,
+        "after": 1.0954950791588278
+      },
+      {
+        "frame": 18081,
+        "before": 2.807141712839148,
+        "after": 1.3507394751597614
+      },
+      {
+        "frame": 18091,
+        "before": 2.7741024728557178,
+        "after": 1.3531629951902162
+      }
+    ]
+  },
+  {
+    "session": "20261021_072328_003_session_1",
+    "frame": 18252,
+    "frame_count": 8,
+    "before_surface": 1.954383946178521,
+    "after_surface": 1.8157268906212995,
+    "before_mean": 1.610666168907525,
+    "after_mean": 0.9391789516875749,
+    "gain": 0.6714872172199501,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_072328_003_session_1\\local_icp_1_18252_365f2a69-7ff2-44c0-a92e-12b1becd294e.json",
+    "maximum_before": 1.853863556891595,
+    "maximum_after": 1.135092768285456,
+    "per_frame": [
+      {
+        "frame": 18184,
+        "before": 1.1848607375643139,
+        "after": 0.668058492460425
+      },
+      {
+        "frame": 18194,
+        "before": 1.6788247103260654,
+        "after": 1.031423526157698
+      },
+      {
+        "frame": 18202,
+        "before": 1.6530365150077808,
+        "after": 0.9536936020715924
+      },
+      {
+        "frame": 18215,
+        "before": 1.5160906924240285,
+        "after": 0.760695902167811
+      },
+      {
+        "frame": 18224,
+        "before": 1.6794230821680813,
+        "after": 0.9942964893429669
+      },
+      {
+        "frame": 18233,
+        "before": 1.6298177312297026,
+        "after": 0.949224232043354
+      },
+      {
+        "frame": 18242,
+        "before": 1.853863556891595,
+        "after": 1.135092768285456
+      },
+      {
+        "frame": 18252,
+        "before": 1.6894123256486326,
+        "after": 1.0209466009712964
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 7968,
+    "frame_count": 8,
+    "before_surface": 4.820897024299282,
+    "after_surface": 2.3815184648448513,
+    "before_mean": 6.531625187485936,
+    "after_mean": 1.29124475137743,
+    "gain": 5.240380436108506,
+    "required_gain": 0.32658125937429683,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_7968_68d2d4e1-d16a-4f98-9fbe-074f9c1d7015.json",
+    "maximum_before": 7.000166742904609,
+    "maximum_after": 2.0568307197213964,
+    "per_frame": [
+      {
+        "frame": 7886,
+        "before": 4.6917343316624835,
+        "after": 2.0568307197213964
+      },
+      {
+        "frame": 7896,
+        "before": 7.000166742904609,
+        "after": 1.3969787756428462
+      },
+      {
+        "frame": 7908,
+        "before": 6.938872564071558,
+        "after": 1.294038245165147
+      },
+      {
+        "frame": 7922,
+        "before": 6.846571801185516,
+        "after": 1.2008750370081887
+      },
+      {
+        "frame": 7933,
+        "before": 6.849568830716146,
+        "after": 1.1493589496759302
+      },
+      {
+        "frame": 7945,
+        "before": 6.587575750437201,
+        "after": 1.0038659035799284
+      },
+      {
+        "frame": 7957,
+        "before": 6.772259166515486,
+        "after": 1.2061250755042607
+      },
+      {
+        "frame": 7968,
+        "before": 6.566252312394487,
+        "after": 1.021885304721741
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 8162,
+    "frame_count": 8,
+    "before_surface": 1.5187834691680568,
+    "after_surface": 1.2143947808624187,
+    "before_mean": 1.3546152109692546,
+    "after_mean": 0.43442051432327533,
+    "gain": 0.9201946966459793,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_8162_c8a1a2e4-ffc7-470c-a673-abc76eea8485.json",
+    "maximum_before": 1.5149390689778315,
+    "maximum_after": 0.5724229911719175,
+    "per_frame": [
+      {
+        "frame": 8088,
+        "before": 1.2213687747081121,
+        "after": 0.3098448454870498
+      },
+      {
+        "frame": 8097,
+        "before": 1.273131669340892,
+        "after": 0.34831201319250826
+      },
+      {
+        "frame": 8108,
+        "before": 1.263624456980671,
+        "after": 0.3474308918749535
+      },
+      {
+        "frame": 8121,
+        "before": 1.3697019569165207,
+        "after": 0.5262895653507572
+      },
+      {
+        "frame": 8132,
+        "before": 1.4085350420107774,
+        "after": 0.4560469512065953
+      },
+      {
+        "frame": 8140,
+        "before": 1.5149390689778315,
+        "after": 0.5724229911719175
+      },
+      {
+        "frame": 8151,
+        "before": 1.4646377874553902,
+        "after": 0.5134040915154225
+      },
+      {
+        "frame": 8162,
+        "before": 1.3209829313638421,
+        "after": 0.40161276478699853
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 9690,
+    "frame_count": 8,
+    "before_surface": 2.158371591350524,
+    "after_surface": 1.8438237737500192,
+    "before_mean": 1.642351707253662,
+    "after_mean": 1.398862183334668,
+    "gain": 0.24348952391899403,
+    "required_gain": 0.1,
+    "stable": false,
+    "worsened_frames": 1,
+    "exceeded_frames": 0,
+    "current_gate_accept": false,
+    "reasons": [
+      "current_worsened"
+    ],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_9690_02734966-be4c-40fa-9c76-8dad924c732d.json",
+    "maximum_before": 1.8272518958506065,
+    "maximum_after": 1.550241575773976,
+    "per_frame": [
+      {
+        "frame": 9619,
+        "before": 1.7961069969140924,
+        "after": 1.3505111550311626
+      },
+      {
+        "frame": 9626,
+        "before": 1.8094006572848753,
+        "after": 1.3858639550932792
+      },
+      {
+        "frame": 9637,
+        "before": 1.8272518958506065,
+        "after": 1.3537129380791046
+      },
+      {
+        "frame": 9649,
+        "before": 1.5247907454788003,
+        "after": 1.2673571745241219
+      },
+      {
+        "frame": 9659,
+        "before": 1.5038765846892084,
+        "after": 1.3658199780803142
+      },
+      {
+        "frame": 9667,
+        "before": 1.7083523118685564,
+        "after": 1.550241575773976
+      },
+      {
+        "frame": 9679,
+        "before": 1.4844147353337274,
+        "after": 1.3767200689872277
+      },
+      {
+        "frame": 9690,
+        "before": 1.484619730609429,
+        "after": 1.540670621108158
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 9874,
+    "frame_count": 8,
+    "before_surface": 1.5920384495742375,
+    "after_surface": 1.4651021625163398,
+    "before_mean": 1.3851123553912152,
+    "after_mean": 0.7551772750756142,
+    "gain": 0.6299350803156011,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_9874_17fb0223-e3df-4a35-ac48-537768c10420.json",
+    "maximum_before": 1.5546860865058993,
+    "maximum_after": 0.9492887484112599,
+    "per_frame": [
+      {
+        "frame": 9804,
+        "before": 1.3500716959636814,
+        "after": 0.7240982242754764
+      },
+      {
+        "frame": 9815,
+        "before": 1.3252485957248448,
+        "after": 0.6336220159094882
+      },
+      {
+        "frame": 9824,
+        "before": 1.3543062194654842,
+        "after": 0.8185891143482831
+      },
+      {
+        "frame": 9833,
+        "before": 1.2189258005046006,
+        "after": 0.5752293781172113
+      },
+      {
+        "frame": 9844,
+        "before": 1.5546860865058993,
+        "after": 0.9492887484112599
+      },
+      {
+        "frame": 9854,
+        "before": 1.4542364303259334,
+        "after": 0.847244719465372
+      },
+      {
+        "frame": 9864,
+        "before": 1.46199328008534,
+        "after": 0.7815245149366764
+      },
+      {
+        "frame": 9874,
+        "before": 1.3614307345539387,
+        "after": 0.7118214851411458
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 11188,
+    "frame_count": 8,
+    "before_surface": 1.1243949011679222,
+    "after_surface": 0.9753976797310048,
+    "before_mean": 1.6915485339643963,
+    "after_mean": 1.7438230065474642,
+    "gain": -0.052274472583067944,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 8,
+    "exceeded_frames": 0,
+    "current_gate_accept": false,
+    "reasons": [
+      "current_worsened",
+      "gain_insufficient"
+    ],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_11188_d1befaed-c0eb-4837-b957-6e42bcfe4fe8.json",
+    "maximum_before": 1.9567744307566357,
+    "maximum_after": 2.0471956630842407,
+    "per_frame": [
+      {
+        "frame": 11113,
+        "before": 1.6912762129042118,
+        "after": 1.7180984191104574
+      },
+      {
+        "frame": 11123,
+        "before": 1.8507950360900867,
+        "after": 1.8847715821456124
+      },
+      {
+        "frame": 11134,
+        "before": 1.6231387966620596,
+        "after": 1.6582454648832679
+      },
+      {
+        "frame": 11146,
+        "before": 1.5082935317648782,
+        "after": 1.5657419528842782
+      },
+      {
+        "frame": 11156,
+        "before": 1.9567744307566357,
+        "after": 2.0471956630842407
+      },
+      {
+        "frame": 11166,
+        "before": 1.7349410786357942,
+        "after": 1.825233037046882
+      },
+      {
+        "frame": 11179,
+        "before": 1.7724935788269127,
+        "after": 1.8079777870012412
+      },
+      {
+        "frame": 11188,
+        "before": 1.3946756060745915,
+        "after": 1.4433201462237337
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 11684,
+    "frame_count": 8,
+    "before_surface": 1.4107952795205436,
+    "after_surface": 1.1144641868060672,
+    "before_mean": 2.673830027936459,
+    "after_mean": 1.684205998036099,
+    "gain": 0.98962402990036,
+    "required_gain": 0.13369150139682295,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_11684_bf96b2e0-c241-4a51-8dbb-4d82ed6c704d.json",
+    "maximum_before": 2.8805338474954856,
+    "maximum_after": 1.8567805112398617,
+    "per_frame": [
+      {
+        "frame": 11613,
+        "before": 2.1397137614018065,
+        "after": 1.3307482026625048
+      },
+      {
+        "frame": 11623,
+        "before": 2.8805338474954856,
+        "after": 1.8567805112398617
+      },
+      {
+        "frame": 11631,
+        "before": 2.6778475119820784,
+        "after": 1.6799758510318157
+      },
+      {
+        "frame": 11642,
+        "before": 2.8114145028283084,
+        "after": 1.7887471298899182
+      },
+      {
+        "frame": 11652,
+        "before": 2.7803374945622066,
+        "after": 1.7172649083416132
+      },
+      {
+        "frame": 11663,
+        "before": 2.654779350224008,
+        "after": 1.6283982062833255
+      },
+      {
+        "frame": 11674,
+        "before": 2.74608912102923,
+        "after": 1.780000768726146
+      },
+      {
+        "frame": 11684,
+        "before": 2.6999246339685494,
+        "after": 1.6917324061136065
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 12009,
+    "frame_count": 8,
+    "before_surface": 1.2068034880195997,
+    "after_surface": 1.0900928166883208,
+    "before_mean": 1.622988387073077,
+    "after_mean": 1.0930304938363937,
+    "gain": 0.5299578932366833,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_12009_e0d579f2-8652-4a7d-abb1-a97913c6da57.json",
+    "maximum_before": 1.7724456939520996,
+    "maximum_after": 1.192605615976725,
+    "per_frame": [
+      {
+        "frame": 11940,
+        "before": 1.4087599205861028,
+        "after": 0.9559954319819965
+      },
+      {
+        "frame": 11950,
+        "before": 1.5025028761294112,
+        "after": 1.0109783832003314
+      },
+      {
+        "frame": 11960,
+        "before": 1.682091834343217,
+        "after": 1.1881651168263623
+      },
+      {
+        "frame": 11969,
+        "before": 1.664067979881805,
+        "after": 1.1551615045241608
+      },
+      {
+        "frame": 11980,
+        "before": 1.5583392634990616,
+        "after": 0.9983986035382734
+      },
+      {
+        "frame": 11991,
+        "before": 1.643607588983309,
+        "after": 1.0549296802797066
+      },
+      {
+        "frame": 11998,
+        "before": 1.7520919392096101,
+        "after": 1.1880096143635939
+      },
+      {
+        "frame": 12009,
+        "before": 1.7724456939520996,
+        "after": 1.192605615976725
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 12979,
+    "frame_count": 8,
+    "before_surface": 1.4432563130684153,
+    "after_surface": 1.3196530119808896,
+    "before_mean": 1.9477124554991683,
+    "after_mean": 1.5112050930715757,
+    "gain": 0.4365073624275926,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_12979_32dd7554-61fe-4feb-a6db-577d6a4c2348.json",
+    "maximum_before": 2.0868855520907323,
+    "maximum_after": 1.632907213737313,
+    "per_frame": [
+      {
+        "frame": 12915,
+        "before": 1.9058579971559066,
+        "after": 1.451240060245594
+      },
+      {
+        "frame": 12924,
+        "before": 1.9065010460107412,
+        "after": 1.4644046688096877
+      },
+      {
+        "frame": 12933,
+        "before": 2.0406918118227706,
+        "after": 1.5921492885033937
+      },
+      {
+        "frame": 12942,
+        "before": 2.077479404875495,
+        "after": 1.632907213737313
+      },
+      {
+        "frame": 12953,
+        "before": 1.8849913696696545,
+        "after": 1.4213134357866024
+      },
+      {
+        "frame": 12961,
+        "before": 1.7412234321803288,
+        "after": 1.374742616871513
+      },
+      {
+        "frame": 12969,
+        "before": 2.0868855520907323,
+        "after": 1.5849241810274188
+      },
+      {
+        "frame": 12979,
+        "before": 1.9380690301877175,
+        "after": 1.5679592795910837
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 13311,
+    "frame_count": 8,
+    "before_surface": 2.1643592126379056,
+    "after_surface": 1.8893714119228107,
+    "before_mean": 2.111035688892974,
+    "after_mean": 1.25600390639434,
+    "gain": 0.855031782498634,
+    "required_gain": 0.1055517844446487,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_13311_2a8e04d5-3900-4c28-8795-80504b887f4f.json",
+    "maximum_before": 2.546179459619865,
+    "maximum_after": 1.4721317462234218,
+    "per_frame": [
+      {
+        "frame": 13242,
+        "before": 2.0635521692137586,
+        "after": 1.2768228625069187
+      },
+      {
+        "frame": 13252,
+        "before": 1.991834661364664,
+        "after": 1.1700493999732877
+      },
+      {
+        "frame": 13262,
+        "before": 2.0484918395425034,
+        "after": 1.4721317462234218
+      },
+      {
+        "frame": 13272,
+        "before": 1.9350917567722035,
+        "after": 1.2474328277655249
+      },
+      {
+        "frame": 13282,
+        "before": 1.7810908016320517,
+        "after": 1.017559972428174
+      },
+      {
+        "frame": 13293,
+        "before": 2.0968072679204375,
+        "after": 1.1159480716993195
+      },
+      {
+        "frame": 13303,
+        "before": 2.4252375550783096,
+        "after": 1.2863602390423075
+      },
+      {
+        "frame": 13311,
+        "before": 2.546179459619865,
+        "after": 1.4617261315157655
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 13481,
+    "frame_count": 8,
+    "before_surface": 1.8338739977360357,
+    "after_surface": 1.6940405346036915,
+    "before_mean": 1.4435640622511825,
+    "after_mean": 1.1637319206050358,
+    "gain": 0.27983214164614667,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_13481_e797aa31-1c3a-4d5c-88fa-41e889f9f64b.json",
+    "maximum_before": 1.6262344635243826,
+    "maximum_after": 1.3070728346559766,
+    "per_frame": [
+      {
+        "frame": 13412,
+        "before": 1.4105348996992055,
+        "after": 1.1821057334443674
+      },
+      {
+        "frame": 13421,
+        "before": 1.4709168202949843,
+        "after": 1.2651319663947784
+      },
+      {
+        "frame": 13430,
+        "before": 1.3297018242582617,
+        "after": 1.0895425665067184
+      },
+      {
+        "frame": 13441,
+        "before": 1.5413043771795563,
+        "after": 1.2412639948854245
+      },
+      {
+        "frame": 13453,
+        "before": 1.4737360298077236,
+        "after": 1.1468719417216962
+      },
+      {
+        "frame": 13460,
+        "before": 1.3947884728508329,
+        "after": 1.0779328920898152
+      },
+      {
+        "frame": 13470,
+        "before": 1.6262344635243826,
+        "after": 1.3070728346559766
+      },
+      {
+        "frame": 13481,
+        "before": 1.301295610394513,
+        "after": 0.9999334351415092
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 13816,
+    "frame_count": 8,
+    "before_surface": 1.6338910739712773,
+    "after_surface": 1.5430337616567489,
+    "before_mean": 1.8267970320711462,
+    "after_mean": 1.363572634087178,
+    "gain": 0.4632243979839681,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_13816_3b50dd2a-abfd-460d-9acd-f3d60248794a.json",
+    "maximum_before": 1.9825154999511314,
+    "maximum_after": 1.5247504691424867,
+    "per_frame": [
+      {
+        "frame": 13746,
+        "before": 1.6647667852571935,
+        "after": 1.2140608908116781
+      },
+      {
+        "frame": 13756,
+        "before": 1.9677967612891694,
+        "after": 1.5247504691424867
+      },
+      {
+        "frame": 13766,
+        "before": 1.8163039398124414,
+        "after": 1.3709671076182925
+      },
+      {
+        "frame": 13776,
+        "before": 1.6771836946986685,
+        "after": 1.2256663175613947
+      },
+      {
+        "frame": 13785,
+        "before": 1.843948156718949,
+        "after": 1.3836439010850379
+      },
+      {
+        "frame": 13796,
+        "before": 1.9825154999511314,
+        "after": 1.5121225365395767
+      },
+      {
+        "frame": 13805,
+        "before": 1.820665849681018,
+        "after": 1.3270202148713675
+      },
+      {
+        "frame": 13816,
+        "before": 1.8411955691605988,
+        "after": 1.3503496350675914
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 14922,
+    "frame_count": 8,
+    "before_surface": 1.9912430675532513,
+    "after_surface": 1.5917008489208986,
+    "before_mean": 4.153128857548546,
+    "after_mean": 1.9065334566886931,
+    "gain": 2.2465954008598525,
+    "required_gain": 0.2076564428774273,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_14922_20e985be-fb92-4fbc-994b-0f888b82c41b.json",
+    "maximum_before": 4.26057309131703,
+    "maximum_after": 2.0101711596342917,
+    "per_frame": [
+      {
+        "frame": 14858,
+        "before": 4.26057309131703,
+        "after": 1.9946521083587183
+      },
+      {
+        "frame": 14867,
+        "before": 4.225205925703178,
+        "after": 2.0101711596342917
+      },
+      {
+        "frame": 14877,
+        "before": 4.08039502226102,
+        "after": 1.8369982943929246
+      },
+      {
+        "frame": 14886,
+        "before": 4.182042917499558,
+        "after": 1.9347942548697263
+      },
+      {
+        "frame": 14896,
+        "before": 4.006424352938052,
+        "after": 1.777546360766472
+      },
+      {
+        "frame": 14905,
+        "before": 4.121673980538356,
+        "after": 1.8806320807308712
+      },
+      {
+        "frame": 14913,
+        "before": 4.199440726613997,
+        "after": 1.9515542765378695
+      },
+      {
+        "frame": 14922,
+        "before": 4.1492748435171745,
+        "after": 1.8659191182186718
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 15088,
+    "frame_count": 8,
+    "before_surface": 1.7064233290470443,
+    "after_surface": 1.5720910396100574,
+    "before_mean": 2.5974549063405807,
+    "after_mean": 2.054101462870489,
+    "gain": 0.543353443470092,
+    "required_gain": 0.12987274531702905,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_15088_8ec0f003-7e9e-4e00-afbc-740f962d659b.json",
+    "maximum_before": 2.6909313313594643,
+    "maximum_after": 2.1237043813696315,
+    "per_frame": [
+      {
+        "frame": 15020,
+        "before": 2.5723686164039417,
+        "after": 2.071847545822229
+      },
+      {
+        "frame": 15029,
+        "before": 2.5387010521614624,
+        "after": 2.050714080733697
+      },
+      {
+        "frame": 15038,
+        "before": 2.6716494282700003,
+        "after": 2.1237043813696315
+      },
+      {
+        "frame": 15049,
+        "before": 2.4756398474592602,
+        "after": 1.9598671621694055
+      },
+      {
+        "frame": 15060,
+        "before": 2.5720877243038593,
+        "after": 2.0054752242472986
+      },
+      {
+        "frame": 15070,
+        "before": 2.617216269860641,
+        "after": 2.0571163830229513
+      },
+      {
+        "frame": 15077,
+        "before": 2.6909313313594643,
+        "after": 2.104480467362348
+      },
+      {
+        "frame": 15088,
+        "before": 2.6410449809060177,
+        "after": 2.0596064582363476
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 15242,
+    "frame_count": 8,
+    "before_surface": 2.0766880114451265,
+    "after_surface": 1.6817983384588828,
+    "before_mean": 2.2962260511816304,
+    "after_mean": 2.2409323152019427,
+    "gain": 0.055293735979687675,
+    "required_gain": 0.11481130255908152,
+    "stable": false,
+    "worsened_frames": 4,
+    "exceeded_frames": 0,
+    "current_gate_accept": false,
+    "reasons": [
+      "current_worsened",
+      "gain_insufficient"
+    ],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_15242_a4f13733-d5ef-4258-a076-886b5595421a.json",
+    "maximum_before": 2.5204851081219775,
+    "maximum_after": 2.3993756488883995,
+    "per_frame": [
+      {
+        "frame": 15175,
+        "before": 2.3940398273502144,
+        "after": 2.385144191933004
+      },
+      {
+        "frame": 15186,
+        "before": 2.226297270795948,
+        "after": 2.2546313851793083
+      },
+      {
+        "frame": 15193,
+        "before": 2.108166343939343,
+        "after": 2.1742853782288236
+      },
+      {
+        "frame": 15205,
+        "before": 1.9428593702742363,
+        "after": 2.028853567038272
+      },
+      {
+        "frame": 15214,
+        "before": 2.3402205471098414,
+        "after": 2.3993756488883995
+      },
+      {
+        "frame": 15223,
+        "before": 2.5204851081219775,
+        "after": 2.3142809259443484
+      },
+      {
+        "frame": 15232,
+        "before": 2.3909919083786293,
+        "after": 2.135170737945976
+      },
+      {
+        "frame": 15242,
+        "before": 2.446748033482852,
+        "after": 2.235716686457411
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 15718,
+    "frame_count": 8,
+    "before_surface": 2.2401224612673487,
+    "after_surface": 1.7443444568771025,
+    "before_mean": 3.130586712531815,
+    "after_mean": 1.6946780040205534,
+    "gain": 1.4359087085112616,
+    "required_gain": 0.15652933562659077,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_15718_078aad90-6289-4fd3-a8ac-0f1f5d547b58.json",
+    "maximum_before": 3.3116324947654667,
+    "maximum_after": 1.9064393113921434,
+    "per_frame": [
+      {
+        "frame": 15650,
+        "before": 3.1498123502828466,
+        "after": 1.8409260709542317
+      },
+      {
+        "frame": 15658,
+        "before": 3.3116324947654667,
+        "after": 1.9064393113921434
+      },
+      {
+        "frame": 15669,
+        "before": 3.1548450604162435,
+        "after": 1.7951932686450538
+      },
+      {
+        "frame": 15679,
+        "before": 3.069294777727244,
+        "after": 1.6514850434279347
+      },
+      {
+        "frame": 15687,
+        "before": 3.065178018649915,
+        "after": 1.5881487553207148
+      },
+      {
+        "frame": 15697,
+        "before": 3.048473864157281,
+        "after": 1.5323744936095567
+      },
+      {
+        "frame": 15707,
+        "before": 3.2933976754177983,
+        "after": 1.8125215791304035
+      },
+      {
+        "frame": 15718,
+        "before": 2.952059458837723,
+        "after": 1.4303355096843893
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 15876,
+    "frame_count": 8,
+    "before_surface": 1.3591544931168567,
+    "after_surface": 1.130401852905228,
+    "before_mean": 1.9470017085877063,
+    "after_mean": 1.1374167286018992,
+    "gain": 0.809584979985807,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_15876_8eb8133c-a095-4cf2-bc5b-77fd9b238e72.json",
+    "maximum_before": 2.141318848937583,
+    "maximum_after": 1.327326685200156,
+    "per_frame": [
+      {
+        "frame": 15809,
+        "before": 2.0272455744204105,
+        "after": 1.2343207722092693
+      },
+      {
+        "frame": 15820,
+        "before": 2.0086438810349514,
+        "after": 1.2217571348998748
+      },
+      {
+        "frame": 15830,
+        "before": 1.889780327050398,
+        "after": 1.0782800413757807
+      },
+      {
+        "frame": 15840,
+        "before": 2.1307907288603585,
+        "after": 1.3106206373727927
+      },
+      {
+        "frame": 15848,
+        "before": 1.9290086028519597,
+        "after": 1.1078572124310342
+      },
+      {
+        "frame": 15857,
+        "before": 1.6867507712163727,
+        "after": 0.8643344989049799
+      },
+      {
+        "frame": 15868,
+        "before": 1.762474934329616,
+        "after": 0.9548368464213055
+      },
+      {
+        "frame": 15876,
+        "before": 2.141318848937583,
+        "after": 1.327326685200156
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 16516,
+    "frame_count": 8,
+    "before_surface": 4.0175402116571854,
+    "after_surface": 3.29503371049869,
+    "before_mean": 3.5095233050396377,
+    "after_mean": 2.6200188762279075,
+    "gain": 0.8895044288117302,
+    "required_gain": 0.1754761652519819,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_16516_e00981cc-8298-4d51-9d32-ac5fba9c13c9.json",
+    "maximum_before": 3.6939270542544067,
+    "maximum_after": 2.9428812737884016,
+    "per_frame": [
+      {
+        "frame": 16448,
+        "before": 3.4508337275450534,
+        "after": 2.9428812737884016
+      },
+      {
+        "frame": 16455,
+        "before": 3.5151674432063067,
+        "after": 2.745599573608145
+      },
+      {
+        "frame": 16466,
+        "before": 3.6939270542544067,
+        "after": 2.6094130852673136
+      },
+      {
+        "frame": 16477,
+        "before": 3.3351561799512712,
+        "after": 2.7401067727142054
+      },
+      {
+        "frame": 16486,
+        "before": 3.4799064085973064,
+        "after": 2.420791530224766
+      },
+      {
+        "frame": 16496,
+        "before": 3.422321752746229,
+        "after": 2.5440145970185015
+      },
+      {
+        "frame": 16507,
+        "before": 3.5300047748339587,
+        "after": 2.5554752917244126
+      },
+      {
+        "frame": 16516,
+        "before": 3.6488690991825683,
+        "after": 2.401868885477515
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 16838,
+    "frame_count": 8,
+    "before_surface": 3.0377424628305403,
+    "after_surface": 2.6518963623629626,
+    "before_mean": 2.0557078747640345,
+    "after_mean": 2.021658428887439,
+    "gain": 0.03404944587659564,
+    "required_gain": 0.10278539373820172,
+    "stable": false,
+    "worsened_frames": 3,
+    "exceeded_frames": 0,
+    "current_gate_accept": false,
+    "reasons": [
+      "current_worsened",
+      "gain_insufficient"
+    ],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_16838_57671347-a16f-4a86-9b9c-58c06dad263a.json",
+    "maximum_before": 2.158015633512193,
+    "maximum_after": 2.135246739432705,
+    "per_frame": [
+      {
+        "frame": 16771,
+        "before": 2.050009860436286,
+        "after": 2.115258056237111
+      },
+      {
+        "frame": 16780,
+        "before": 2.1505009536883715,
+        "after": 2.135246739432705
+      },
+      {
+        "frame": 16789,
+        "before": 1.9399856448075712,
+        "after": 2.031611268148659
+      },
+      {
+        "frame": 16799,
+        "before": 2.158015633512193,
+        "after": 2.074285520293326
+      },
+      {
+        "frame": 16810,
+        "before": 1.8864167075770848,
+        "after": 1.9195258320139716
+      },
+      {
+        "frame": 16817,
+        "before": 2.0465985556216544,
+        "after": 1.9898996202783716
+      },
+      {
+        "frame": 16829,
+        "before": 2.1194999090596194,
+        "after": 1.8891423915493903
+      },
+      {
+        "frame": 16838,
+        "before": 2.094635733409494,
+        "after": 2.0182980031459765
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 17017,
+    "frame_count": 8,
+    "before_surface": 2.2496710209068165,
+    "after_surface": 2.129570434993279,
+    "before_mean": 1.5312903603303942,
+    "after_mean": 1.218815936653443,
+    "gain": 0.3124744236769512,
+    "required_gain": 0.1,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_17017_97e33e43-8963-4914-94bd-8c1332b8b607.json",
+    "maximum_before": 1.7229794201501063,
+    "maximum_after": 1.4107506933706973,
+    "per_frame": [
+      {
+        "frame": 16948,
+        "before": 1.480304774528255,
+        "after": 1.151720366234296
+      },
+      {
+        "frame": 16957,
+        "before": 1.5562211092638267,
+        "after": 1.2668912707608766
+      },
+      {
+        "frame": 16968,
+        "before": 1.7229794201501063,
+        "after": 1.3981971605057526
+      },
+      {
+        "frame": 16979,
+        "before": 1.6379143808593826,
+        "after": 1.4107506933706973
+      },
+      {
+        "frame": 16989,
+        "before": 1.3526148938763956,
+        "after": 1.0854454703494143
+      },
+      {
+        "frame": 16998,
+        "before": 1.63058370536782,
+        "after": 1.3419614016404804
+      },
+      {
+        "frame": 17006,
+        "before": 1.4351726999765415,
+        "after": 1.0437794424487539
+      },
+      {
+        "frame": 17017,
+        "before": 1.4345318986208269,
+        "after": 1.0517816879172737
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 18111,
+    "frame_count": 8,
+    "before_surface": 1.2429127244600746,
+    "after_surface": 1.1761498470854026,
+    "before_mean": 1.3605336245191664,
+    "after_mean": 1.028347927735372,
+    "gain": 0.3321856967837944,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_18111_814382d3-bf61-4bc1-81c2-e2b6ca120198.json",
+    "maximum_before": 1.537788340686696,
+    "maximum_after": 1.2467333538053251,
+    "per_frame": [
+      {
+        "frame": 18051,
+        "before": 1.275584890651854,
+        "after": 0.8589728136353963
+      },
+      {
+        "frame": 18058,
+        "before": 1.2917802955972209,
+        "after": 0.9815561050722594
+      },
+      {
+        "frame": 18066,
+        "before": 1.438221875996767,
+        "after": 1.0556348347627609
+      },
+      {
+        "frame": 18075,
+        "before": 1.2635806208956801,
+        "after": 0.9048096245792459
+      },
+      {
+        "frame": 18086,
+        "before": 1.2750799770844983,
+        "after": 0.969750833849832
+      },
+      {
+        "frame": 18093,
+        "before": 1.3703246806613671,
+        "after": 1.0604842636438951
+      },
+      {
+        "frame": 18100,
+        "before": 1.4319083145792473,
+        "after": 1.1488415925342608
+      },
+      {
+        "frame": 18111,
+        "before": 1.537788340686696,
+        "after": 1.2467333538053251
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 18568,
+    "frame_count": 8,
+    "before_surface": 1.0153853770468848,
+    "after_surface": 0.9196872898491796,
+    "before_mean": 2.489902907010235,
+    "after_mean": 2.027755618070076,
+    "gain": 0.4621472889401592,
+    "required_gain": 0.12449514535051176,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_18568_020a5f5a-b49b-4dd0-9b35-673b93d47c12.json",
+    "maximum_before": 2.7745798711576604,
+    "maximum_after": 2.295889236388868,
+    "per_frame": [
+      {
+        "frame": 18502,
+        "before": 2.528378588439455,
+        "after": 2.0643721811248117
+      },
+      {
+        "frame": 18510,
+        "before": 2.6194655794296913,
+        "after": 2.1712491625545356
+      },
+      {
+        "frame": 18521,
+        "before": 2.4941860650527117,
+        "after": 2.0270944351704436
+      },
+      {
+        "frame": 18531,
+        "before": 2.264642204277353,
+        "after": 1.7935367647931386
+      },
+      {
+        "frame": 18541,
+        "before": 2.3356883913791715,
+        "after": 1.8814537462897223
+      },
+      {
+        "frame": 18550,
+        "before": 2.444161800598093,
+        "after": 1.9825203347950926
+      },
+      {
+        "frame": 18558,
+        "before": 2.458120755747745,
+        "after": 2.0059290834439962
+      },
+      {
+        "frame": 18568,
+        "before": 2.7745798711576604,
+        "after": 2.295889236388868
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 18875,
+    "frame_count": 8,
+    "before_surface": 1.0360536127151945,
+    "after_surface": 0.8507624373643909,
+    "before_mean": 2.873822237938894,
+    "after_mean": 2.080605038205816,
+    "gain": 0.7932171997330779,
+    "required_gain": 0.1436911118969447,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_18875_7fc21388-1d1c-4b14-9335-5692aa9621fa.json",
+    "maximum_before": 3.1193177441438107,
+    "maximum_after": 2.3130876883724762,
+    "per_frame": [
+      {
+        "frame": 18811,
+        "before": 3.1193177441438107,
+        "after": 2.3130876883724762
+      },
+      {
+        "frame": 18818,
+        "before": 2.988244529622558,
+        "after": 2.218593703316621
+      },
+      {
+        "frame": 18826,
+        "before": 2.9337979243691534,
+        "after": 2.130320354297079
+      },
+      {
+        "frame": 18836,
+        "before": 3.036639689992206,
+        "after": 2.239433232571724
+      },
+      {
+        "frame": 18846,
+        "before": 2.924295752268851,
+        "after": 2.132946643654661
+      },
+      {
+        "frame": 18854,
+        "before": 2.7375691265702136,
+        "after": 1.928249757527125
+      },
+      {
+        "frame": 18865,
+        "before": 2.624985538896525,
+        "after": 1.8483151026852955
+      },
+      {
+        "frame": 18875,
+        "before": 2.6257275976478325,
+        "after": 1.8338938232215458
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 19194,
+    "frame_count": 8,
+    "before_surface": 1.3337763386372545,
+    "after_surface": 1.1465780403822314,
+    "before_mean": 2.1848831938651174,
+    "after_mean": 1.4418657369191712,
+    "gain": 0.7430174569459462,
+    "required_gain": 0.10924415969325588,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_19194_4ce72900-839f-467d-8d2a-bc08b964b20b.json",
+    "maximum_before": 2.3168650895963174,
+    "maximum_after": 1.5939060714724715,
+    "per_frame": [
+      {
+        "frame": 19129,
+        "before": 2.200468769190978,
+        "after": 1.5014851888862955
+      },
+      {
+        "frame": 19137,
+        "before": 1.987455614843927,
+        "after": 1.250204160019877
+      },
+      {
+        "frame": 19147,
+        "before": 2.276352161750334,
+        "after": 1.507630397219385
+      },
+      {
+        "frame": 19157,
+        "before": 2.2051376584294937,
+        "after": 1.4888360484117293
+      },
+      {
+        "frame": 19165,
+        "before": 2.024188244056697,
+        "after": 1.2887314118477495
+      },
+      {
+        "frame": 19175,
+        "before": 2.3168650895963174,
+        "after": 1.5939060714724715
+      },
+      {
+        "frame": 19184,
+        "before": 2.2730018443493236,
+        "after": 1.5274942768151056
+      },
+      {
+        "frame": 19194,
+        "before": 2.1955961687038674,
+        "after": 1.3766383406807563
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 19510,
+    "frame_count": 8,
+    "before_surface": 1.3907240410025643,
+    "after_surface": 1.2309849994984685,
+    "before_mean": 2.34543555011858,
+    "after_mean": 1.564581998800803,
+    "gain": 0.7808535513177772,
+    "required_gain": 0.11727177750592901,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_19510_338bd7f9-86e3-4c5e-aaaa-fc78d23d86e3.json",
+    "maximum_before": 2.597621723415677,
+    "maximum_after": 1.830629897231847,
+    "per_frame": [
+      {
+        "frame": 19446,
+        "before": 2.597621723415677,
+        "after": 1.830629897231847
+      },
+      {
+        "frame": 19456,
+        "before": 2.3616231874208866,
+        "after": 1.572312577331956
+      },
+      {
+        "frame": 19465,
+        "before": 2.1776313841564323,
+        "after": 1.4497521978274144
+      },
+      {
+        "frame": 19473,
+        "before": 2.308977952114437,
+        "after": 1.551674433881908
+      },
+      {
+        "frame": 19482,
+        "before": 2.3050270701360698,
+        "after": 1.4561068304977245
+      },
+      {
+        "frame": 19492,
+        "before": 2.383497792861321,
+        "after": 1.605231006077826
+      },
+      {
+        "frame": 19502,
+        "before": 2.423377480982328,
+        "after": 1.5950909076965312
+      },
+      {
+        "frame": 19510,
+        "before": 2.205727809861489,
+        "after": 1.4558581398612156
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 19836,
+    "frame_count": 8,
+    "before_surface": 1.8702498957251044,
+    "after_surface": 1.7201329475319285,
+    "before_mean": 2.432073987222593,
+    "after_mean": 1.6005993140486086,
+    "gain": 0.8314746731739844,
+    "required_gain": 0.12160369936112965,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_19836_06ecefe1-5566-4a1f-a59f-f8193d54e718.json",
+    "maximum_before": 2.5643086909307007,
+    "maximum_after": 1.7310705491072185,
+    "per_frame": [
+      {
+        "frame": 19764,
+        "before": 2.3115528902462508,
+        "after": 1.521692078114523
+      },
+      {
+        "frame": 19774,
+        "before": 2.4489008852289884,
+        "after": 1.6220554027022904
+      },
+      {
+        "frame": 19784,
+        "before": 2.5643086909307007,
+        "after": 1.7310705491072185
+      },
+      {
+        "frame": 19794,
+        "before": 2.4621441399288018,
+        "after": 1.684649999099965
+      },
+      {
+        "frame": 19805,
+        "before": 2.41874523888227,
+        "after": 1.5525635157462323
+      },
+      {
+        "frame": 19816,
+        "before": 2.4356331046013056,
+        "after": 1.4713093709903022
+      },
+      {
+        "frame": 19827,
+        "before": 2.3652357693195856,
+        "after": 1.5729916324836237
+      },
+      {
+        "frame": 19836,
+        "before": 2.450071178642841,
+        "after": 1.648461964144713
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 20467,
+    "frame_count": 8,
+    "before_surface": 3.191789126607922,
+    "after_surface": 2.318666279013234,
+    "before_mean": 3.5689960158191276,
+    "after_mean": 2.3733808232949003,
+    "gain": 1.1956151925242273,
+    "required_gain": 0.1784498007909564,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_20467_660a8e2f-86f8-4193-a00b-b5517a3517c9.json",
+    "maximum_before": 4.029159369749719,
+    "maximum_after": 2.496796888685489,
+    "per_frame": [
+      {
+        "frame": 20400,
+        "before": 3.4912603297182376,
+        "after": 2.2647858604573896
+      },
+      {
+        "frame": 20412,
+        "before": 3.3294900189485115,
+        "after": 2.3430217992901383
+      },
+      {
+        "frame": 20422,
+        "before": 3.513121113970462,
+        "after": 2.436164841878217
+      },
+      {
+        "frame": 20429,
+        "before": 3.4210922586134394,
+        "after": 2.4362453304087315
+      },
+      {
+        "frame": 20438,
+        "before": 3.48780131111966,
+        "after": 2.2521403128755773
+      },
+      {
+        "frame": 20450,
+        "before": 3.306325947851393,
+        "after": 2.3352047033962426
+      },
+      {
+        "frame": 20459,
+        "before": 3.9737177765815974,
+        "after": 2.496796888685489
+      },
+      {
+        "frame": 20467,
+        "before": 4.029159369749719,
+        "after": 2.4226868493674165
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 20778,
+    "frame_count": 8,
+    "before_surface": 2.5134400428564607,
+    "after_surface": 2.3399467184464418,
+    "before_mean": 2.3299123818393817,
+    "after_mean": 1.9110626645885178,
+    "gain": 0.41884971725086384,
+    "required_gain": 0.1164956190919691,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_20778_3070b258-eae6-4aaa-a346-f44add89b5cd.json",
+    "maximum_before": 2.4894310113331533,
+    "maximum_after": 2.062462892084946,
+    "per_frame": [
+      {
+        "frame": 20711,
+        "before": 2.4245931428331,
+        "after": 2.062462892084946
+      },
+      {
+        "frame": 20720,
+        "before": 2.305538805029221,
+        "after": 2.0062802554103984
+      },
+      {
+        "frame": 20730,
+        "before": 2.230784408697963,
+        "after": 1.8697597900986624
+      },
+      {
+        "frame": 20737,
+        "before": 2.4184410245174206,
+        "after": 1.981375014111337
+      },
+      {
+        "frame": 20749,
+        "before": 2.232644936797268,
+        "after": 1.8451459208105054
+      },
+      {
+        "frame": 20760,
+        "before": 2.17704114828494,
+        "after": 1.6822834565821307
+      },
+      {
+        "frame": 20768,
+        "before": 2.3608245772219894,
+        "after": 1.9314262383434158
+      },
+      {
+        "frame": 20778,
+        "before": 2.4894310113331533,
+        "after": 1.9097677492667469
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 21110,
+    "frame_count": 8,
+    "before_surface": 3.031009038614261,
+    "after_surface": 2.4944815788361923,
+    "before_mean": 2.5904858000017628,
+    "after_mean": 1.718572866082835,
+    "gain": 0.8719129339189278,
+    "required_gain": 0.12952429000008814,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_21110_aeaffec4-c70a-44e2-85f6-e8f9d24f52dc.json",
+    "maximum_before": 3.136780273849092,
+    "maximum_after": 1.9254558132187152,
+    "per_frame": [
+      {
+        "frame": 21040,
+        "before": 2.1281615292002245,
+        "after": 1.9111935750768207
+      },
+      {
+        "frame": 21050,
+        "before": 2.2665615130940946,
+        "after": 1.9254558132187152
+      },
+      {
+        "frame": 21061,
+        "before": 2.2289270041667515,
+        "after": 1.6889938763081416
+      },
+      {
+        "frame": 21072,
+        "before": 2.547720321780897,
+        "after": 1.6555635518149616
+      },
+      {
+        "frame": 21081,
+        "before": 2.860472757733995,
+        "after": 1.6957790812047315
+      },
+      {
+        "frame": 21091,
+        "before": 2.5545326815861933,
+        "after": 1.734772771755421
+      },
+      {
+        "frame": 21102,
+        "before": 3.136780273849092,
+        "after": 1.514997738988118
+      },
+      {
+        "frame": 21110,
+        "before": 3.0007303186028547,
+        "after": 1.6218265202957705
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 21613,
+    "frame_count": 8,
+    "before_surface": 2.87929993113069,
+    "after_surface": 2.504273591970611,
+    "before_mean": 2.1289149954312236,
+    "after_mean": 1.5707631166937812,
+    "gain": 0.5581518787374424,
+    "required_gain": 0.10644574977156118,
+    "stable": false,
+    "worsened_frames": 1,
+    "exceeded_frames": 0,
+    "current_gate_accept": false,
+    "reasons": [
+      "current_worsened"
+    ],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_21613_aed4bef8-e982-46b0-82b9-76cd483aae0e.json",
+    "maximum_before": 2.697235475491591,
+    "maximum_after": 1.7182162718311327,
+    "per_frame": [
+      {
+        "frame": 21550,
+        "before": 1.6453804087388653,
+        "after": 1.7122254624307676
+      },
+      {
+        "frame": 21558,
+        "before": 1.7827360743365555,
+        "after": 1.585969296363481
+      },
+      {
+        "frame": 21569,
+        "before": 1.856811375201604,
+        "after": 1.6365337341701374
+      },
+      {
+        "frame": 21578,
+        "before": 1.977452890926018,
+        "after": 1.7182162718311327
+      },
+      {
+        "frame": 21588,
+        "before": 2.2126343840998315,
+        "after": 1.4196654422102128
+      },
+      {
+        "frame": 21597,
+        "before": 2.554955423753198,
+        "after": 1.4909943212705308
+      },
+      {
+        "frame": 21605,
+        "before": 2.697235475491591,
+        "after": 1.515534534384029
+      },
+      {
+        "frame": 21613,
+        "before": 2.3041139309021244,
+        "after": 1.486965870889958
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 22103,
+    "frame_count": 8,
+    "before_surface": 1.7019068470361414,
+    "after_surface": 1.4230796019185818,
+    "before_mean": 1.8571446080535385,
+    "after_mean": 1.0281709024580112,
+    "gain": 0.8289737055955273,
+    "required_gain": 0.2,
+    "stable": true,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_22103_70038006-bf7b-446e-aaf0-ef012692ede5.json",
+    "maximum_before": 2.13699314321595,
+    "maximum_after": 1.3751374087449626,
+    "per_frame": [
+      {
+        "frame": 22036,
+        "before": 1.8504464453126737,
+        "after": 0.9834432993428098
+      },
+      {
+        "frame": 22045,
+        "before": 1.8152385433871605,
+        "after": 0.9815181167571008
+      },
+      {
+        "frame": 22056,
+        "before": 1.8438832088461803,
+        "after": 0.9929181217909591
+      },
+      {
+        "frame": 22065,
+        "before": 1.7356962466331185,
+        "after": 0.8720677931544766
+      },
+      {
+        "frame": 22073,
+        "before": 1.6480506588263655,
+        "after": 0.7821791400346374
+      },
+      {
+        "frame": 22083,
+        "before": 2.0082822114363235,
+        "after": 1.173974491812868
+      },
+      {
+        "frame": 22094,
+        "before": 1.8185664067705363,
+        "after": 1.0641288480262756
+      },
+      {
+        "frame": 22103,
+        "before": 2.13699314321595,
+        "after": 1.3751374087449626
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 22886,
+    "frame_count": 8,
+    "before_surface": 1.9953813854345592,
+    "after_surface": 1.669290141849106,
+    "before_mean": 3.3242324429724803,
+    "after_mean": 1.7914022508286376,
+    "gain": 1.5328301921438428,
+    "required_gain": 0.16621162214862403,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_22886_cfb87394-684c-4287-916e-256e27b4809f.json",
+    "maximum_before": 3.4718716037127884,
+    "maximum_after": 2.0633402710914845,
+    "per_frame": [
+      {
+        "frame": 22821,
+        "before": 3.4718716037127884,
+        "after": 2.0633402710914845
+      },
+      {
+        "frame": 22831,
+        "before": 3.4352908966617943,
+        "after": 1.987249911848423
+      },
+      {
+        "frame": 22840,
+        "before": 3.2805933957433244,
+        "after": 1.8271212218424182
+      },
+      {
+        "frame": 22848,
+        "before": 3.1661402105107213,
+        "after": 1.6822367021707556
+      },
+      {
+        "frame": 22858,
+        "before": 3.262075978069023,
+        "after": 1.7760631493412768
+      },
+      {
+        "frame": 22868,
+        "before": 3.2272637897138656,
+        "after": 1.5994209949145353
+      },
+      {
+        "frame": 22879,
+        "before": 3.2993805015269837,
+        "after": 1.638060408934241
+      },
+      {
+        "frame": 22886,
+        "before": 3.4512431678413424,
+        "after": 1.7577253464859652
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 23050,
+    "frame_count": 8,
+    "before_surface": 2.27586215739134,
+    "after_surface": 1.9467330307984603,
+    "before_mean": 2.3413158778946457,
+    "after_mean": 1.2914523781156597,
+    "gain": 1.049863499778986,
+    "required_gain": 0.11706579389473229,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_23050_2bab27bc-7725-4e76-959b-dc60e1a1d68e.json",
+    "maximum_before": 2.5967926151333067,
+    "maximum_after": 1.4885879652341198,
+    "per_frame": [
+      {
+        "frame": 22983,
+        "before": 1.9665021199940345,
+        "after": 1.3061304978417878
+      },
+      {
+        "frame": 22993,
+        "before": 2.1385129438175166,
+        "after": 1.0990108607416327
+      },
+      {
+        "frame": 23003,
+        "before": 2.2201159116699896,
+        "after": 1.2225187473597001
+      },
+      {
+        "frame": 23011,
+        "before": 2.5338439034273588,
+        "after": 1.3573150267708347
+      },
+      {
+        "frame": 23022,
+        "before": 2.4678922111340778,
+        "after": 1.2376687081616802
+      },
+      {
+        "frame": 23031,
+        "before": 2.5967926151333067,
+        "after": 1.4885879652341198
+      },
+      {
+        "frame": 23041,
+        "before": 2.3452834589668194,
+        "after": 1.1997743309643492
+      },
+      {
+        "frame": 23050,
+        "before": 2.461583859014061,
+        "after": 1.4206128878511723
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 23205,
+    "frame_count": 8,
+    "before_surface": 1.801273609315185,
+    "after_surface": 1.635279988280542,
+    "before_mean": 2.37782085569354,
+    "after_mean": 1.9153137726724365,
+    "gain": 0.4625070830211033,
+    "required_gain": 0.11889104278467699,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_23205_4f2599b5-972f-4c4c-b773-13b30b0d487b.json",
+    "maximum_before": 2.4652726984074533,
+    "maximum_after": 1.9807815817619032,
+    "per_frame": [
+      {
+        "frame": 23136,
+        "before": 2.3955986312897273,
+        "after": 1.952678343384066
+      },
+      {
+        "frame": 23145,
+        "before": 2.3555949235477653,
+        "after": 1.9148786942878175
+      },
+      {
+        "frame": 23155,
+        "before": 2.42264390687052,
+        "after": 1.9807815817619032
+      },
+      {
+        "frame": 23166,
+        "before": 2.26928307789158,
+        "after": 1.8208843122420004
+      },
+      {
+        "frame": 23174,
+        "before": 2.387077901766903,
+        "after": 1.914140054682002
+      },
+      {
+        "frame": 23184,
+        "before": 2.3591245733921116,
+        "after": 1.8940011603016036
+      },
+      {
+        "frame": 23193,
+        "before": 2.3679711323822588,
+        "after": 1.8812648799186817
+      },
+      {
+        "frame": 23205,
+        "before": 2.4652726984074533,
+        "after": 1.963881154801418
+      }
+    ]
+  },
+  {
+    "session": "20261021_083204_186_session_3",
+    "frame": 23367,
+    "frame_count": 8,
+    "before_surface": 2.35933392979497,
+    "after_surface": 2.128138957840437,
+    "before_mean": 2.27546424084682,
+    "after_mean": 1.7195551643632048,
+    "gain": 0.5559090764836154,
+    "required_gain": 0.11377321204234102,
+    "stable": false,
+    "worsened_frames": 0,
+    "exceeded_frames": 0,
+    "current_gate_accept": true,
+    "reasons": [],
+    "source": "output\\online_local_registration\\20261021_083204_186_session_3\\local_icp_3_23367_6127bbd8-0c2a-495d-8268-6c749c449fed.json",
+    "maximum_before": 2.5422564022071077,
+    "maximum_after": 1.9887488079646736,
+    "per_frame": [
+      {
+        "frame": 23295,
+        "before": 1.7822676850705002,
+        "after": 1.757315363756107
+      },
+      {
+        "frame": 23306,
+        "before": 2.13037187808789,
+        "after": 1.4903308410292668
+      },
+      {
+        "frame": 23315,
+        "before": 2.516883228597861,
+        "after": 1.9887488079646736
+      },
+      {
+        "frame": 23326,
+        "before": 2.4771752038984274,
+        "after": 1.6156515807703016
+      },
+      {
+        "frame": 23337,
+        "before": 2.301643209629074,
+        "after": 1.752307725032024
+      },
+      {
+        "frame": 23347,
+        "before": 2.19621771567449,
+        "after": 1.5750974643726154
+      },
+      {
+        "frame": 23357,
+        "before": 2.2568986036092125,
+        "after": 1.8377233990360275
+      },
+      {
+        "frame": 23367,
+        "before": 2.5422564022071077,
+        "after": 1.7392661329446222
+      }
+    ]
+  }
+]

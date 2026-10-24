@@ -1,0 +1,5046 @@
+[
+  {
+    "frame_id": 10606,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "10537",
+      "10546",
+      "10556",
+      "10566",
+      "10578",
+      "10588"
+    ],
+    "holdout_frame_ids": [
+      "10597",
+      "10606"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7839668639063506,
+        0.6076582015915749,
+        0.24779030971595886,
+        0.1391719623363741
+      ],
+      "relative": [
+        1.0,
+        0.7751069969510385,
+        0.3160724274509118,
+        0.17752276115715906
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.17999580216298222,
+        0.8767984952536305,
+        0.010913047264467443,
+        0.44576542634448246
+      ],
+      "yaw_length_scale_mm": 23.51465845192664,
+      "normal_count": 237
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 179,
+      "iterations": 16
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.2391261237700366,
+      "mean_virtual_to_real_mm": 1.4122321235534476,
+      "symmetric_mean_mm": 1.8256791236617422,
+      "p90_real_to_virtual_mm": 3.571755361618352,
+      "real_coverage_3mm": 0.8875,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.8044647637443534,
+      "mean_virtual_to_real_mm": 0.6281296390097173,
+      "symmetric_mean_mm": 1.2162972013770355,
+      "p90_real_to_virtual_mm": 4.036894210944142,
+      "real_coverage_3mm": 0.87375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": 0.6093819222847068,
+    "prototype_theta_mm_rad": [
+      0.4846471094228405,
+      5.696112339384231,
+      -0.4903709730358867,
+      -0.033438493839006524
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.244777436323866,
+      "mean_virtual_to_real_mm": 1.3176280135241683,
+      "symmetric_mean_mm": 1.7812027249240172,
+      "p90_real_to_virtual_mm": 3.0774730125088148,
+      "real_coverage_3mm": 0.8857142857142857,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.0354724124103463,
+      "mean_virtual_to_real_mm": 0.7774646613612428,
+      "symmetric_mean_mm": 1.4064685368857945,
+      "p90_real_to_virtual_mm": 3.5003554241871493,
+      "real_coverage_3mm": 0.8714285714285714,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.9336156036805794,
+      "mean_virtual_to_real_mm": 0.7905551215564526,
+      "symmetric_mean_mm": 1.362085362618516,
+      "p90_real_to_virtual_mm": 3.151815991061682,
+      "real_coverage_3mm": 0.8959183673469387,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 0.37473418803822267
+  },
+  {
+    "frame_id": 10761,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "10696",
+      "10705",
+      "10713",
+      "10723",
+      "10734",
+      "10742"
+    ],
+    "holdout_frame_ids": [
+      "10751",
+      "10761"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7391563926355186,
+        0.6809220109914639,
+        0.177071903394036,
+        0.04484881269562113
+      ],
+      "relative": [
+        1.0,
+        0.921215074070569,
+        0.23955945610193888,
+        0.06067567451552339
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.3825420674465868,
+        0.9233603698036302,
+        8.190516609137e-05,
+        0.032667834353344805
+      ],
+      "yaw_length_scale_mm": 23.860715402219974,
+      "normal_count": 249
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 188,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.368759092891085,
+      "mean_virtual_to_real_mm": 0.8703225687915949,
+      "symmetric_mean_mm": 1.11954083084134,
+      "p90_real_to_virtual_mm": 1.8202780047986946,
+      "real_coverage_3mm": 0.9625,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.6716717667224652,
+      "mean_virtual_to_real_mm": 1.0950506563740934,
+      "symmetric_mean_mm": 1.3833612115482792,
+      "p90_real_to_virtual_mm": 2.8694195021134,
+      "real_coverage_3mm": 0.9125,
+      "virtual_coverage_3mm": 0.9651162790697675
+    },
+    "training_symmetric_gain_mm": -0.26382038070693925,
+    "prototype_theta_mm_rad": [
+      -1.0213079803763572,
+      8.255701685348416,
+      -0.7124733627329446,
+      -0.05975173445939633
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.471722758428772,
+      "mean_virtual_to_real_mm": 0.8812969055696147,
+      "symmetric_mean_mm": 1.1765098319991933,
+      "p90_real_to_virtual_mm": 2.0294311228760566,
+      "real_coverage_3mm": 0.9546351084812623,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.3215598086461595,
+      "mean_virtual_to_real_mm": 1.680471636746523,
+      "symmetric_mean_mm": 2.001015722696341,
+      "p90_real_to_virtual_mm": 3.4438777953299913,
+      "real_coverage_3mm": 0.8007889546351085,
+      "virtual_coverage_3mm": 0.8953488372093024
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.3127263854624758,
+      "mean_virtual_to_real_mm": 0.5717014394287259,
+      "symmetric_mean_mm": 0.9422139124456008,
+      "p90_real_to_virtual_mm": 1.803506667509284,
+      "real_coverage_3mm": 0.9506903353057199,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.8245058906971479
+  },
+  {
+    "frame_id": 10917,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "10847",
+      "10859",
+      "10869",
+      "10879",
+      "10887",
+      "10898"
+    ],
+    "holdout_frame_ids": [
+      "10908",
+      "10917"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7386391145721286,
+        0.6796261753531281,
+        0.20916067160644838,
+        0.031567410115882294
+      ],
+      "relative": [
+        1.0,
+        0.9201058567644567,
+        0.28317031616665583,
+        0.04273725760403082
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.42842356758424704,
+        0.8983405475157358,
+        0.00214276806705703,
+        0.09712319997057972
+      ],
+      "yaw_length_scale_mm": 23.451281763465843,
+      "normal_count": 241
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 178,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.016567572558894,
+      "mean_virtual_to_real_mm": 0.8465307672606519,
+      "symmetric_mean_mm": 1.4315491699097729,
+      "p90_real_to_virtual_mm": 5.211066435288393,
+      "real_coverage_3mm": 0.85875,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.135644810340167,
+      "mean_virtual_to_real_mm": 0.9405763629238898,
+      "symmetric_mean_mm": 1.5381105866320284,
+      "p90_real_to_virtual_mm": 5.354503215967135,
+      "real_coverage_3mm": 0.85125,
+      "virtual_coverage_3mm": 0.9961240310077519
+    },
+    "training_symmetric_gain_mm": -0.1065614167222555,
+    "prototype_theta_mm_rad": [
+      4.6411897346001885,
+      -9.070611218762243,
+      -0.1744458144441749,
+      0.06028065585793507
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.1200012161533572,
+      "mean_virtual_to_real_mm": 0.8777350013086658,
+      "symmetric_mean_mm": 1.4988681087310116,
+      "p90_real_to_virtual_mm": 5.2156785469827005,
+      "real_coverage_3mm": 0.8117408906882592,
+      "virtual_coverage_3mm": 0.9883720930232558
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.521413480951754,
+      "mean_virtual_to_real_mm": 1.3518291479254327,
+      "symmetric_mean_mm": 1.9366213144385933,
+      "p90_real_to_virtual_mm": 5.417958698765954,
+      "real_coverage_3mm": 0.8036437246963563,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 2.166593058433355,
+      "mean_virtual_to_real_mm": 1.1745422711993483,
+      "symmetric_mean_mm": 1.6705676648163514,
+      "p90_real_to_virtual_mm": 4.476134051912572,
+      "real_coverage_3mm": 0.8238866396761133,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.4377532057075817
+  },
+  {
+    "frame_id": 11387,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "11318",
+      "11329",
+      "11337",
+      "11345",
+      "11355",
+      "11366"
+    ],
+    "holdout_frame_ids": [
+      "11376",
+      "11387"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7377958811058857,
+        0.6802100883878887,
+        0.186975899285134,
+        0.034497733319492414
+      ],
+      "relative": [
+        1.0,
+        0.921948882891998,
+        0.2534249703385101,
+        0.04675782855792526
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.5864267894834371,
+        0.8078442726811472,
+        0.0021104908160841686,
+        0.059049110924146775
+      ],
+      "yaw_length_scale_mm": 23.740595861881623,
+      "normal_count": 240
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 196,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.9826726821002512,
+      "mean_virtual_to_real_mm": 1.3354293529631958,
+      "symmetric_mean_mm": 1.6590510175317235,
+      "p90_real_to_virtual_mm": 3.455286503098613,
+      "real_coverage_3mm": 0.785,
+      "virtual_coverage_3mm": 0.8914728682170543
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.0869584256096827,
+      "mean_virtual_to_real_mm": 1.2355195978844322,
+      "symmetric_mean_mm": 1.6612390117470575,
+      "p90_real_to_virtual_mm": 3.8938271809128002,
+      "real_coverage_3mm": 0.82125,
+      "virtual_coverage_3mm": 0.8953488372093024
+    },
+    "training_symmetric_gain_mm": -0.0021879942153339993,
+    "prototype_theta_mm_rad": [
+      9.129664632077386,
+      -8.048202698934928,
+      -0.2349860023863236,
+      0.08217358958098375
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.2136792679346815,
+      "mean_virtual_to_real_mm": 1.409820447098092,
+      "symmetric_mean_mm": 1.8117498575163866,
+      "p90_real_to_virtual_mm": 3.5779916633298696,
+      "real_coverage_3mm": 0.7841140529531568,
+      "virtual_coverage_3mm": 0.8372093023255814
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.7896305120314904,
+      "mean_virtual_to_real_mm": 1.8763775210191276,
+      "symmetric_mean_mm": 2.333004016525309,
+      "p90_real_to_virtual_mm": 4.3830361933249185,
+      "real_coverage_3mm": 0.6782077393075356,
+      "virtual_coverage_3mm": 0.7441860465116279
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.6939742770883037,
+      "mean_virtual_to_real_mm": 0.6418719318148901,
+      "symmetric_mean_mm": 1.167923104451597,
+      "p90_real_to_virtual_mm": 2.3133559144378295,
+      "real_coverage_3mm": 0.9205702647657841,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.5212541590089224
+  },
+  {
+    "frame_id": 11560,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "11486",
+      "11494",
+      "11509",
+      "11518",
+      "11527",
+      "11537"
+    ],
+    "holdout_frame_ids": [
+      "11549",
+      "11560"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7333100098202758,
+        0.6879259833719675,
+        0.23118195196824426,
+        0.032789269379691455
+      ],
+      "relative": [
+        1.0,
+        0.9381107228313558,
+        0.31525814303953625,
+        0.04471406218459728
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.6627159230643553,
+        0.735148368594252,
+        -0.0020016787156393635,
+        0.1426901354421128
+      ],
+      "yaw_length_scale_mm": 23.660877340350858,
+      "normal_count": 245
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 169,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.8518722557031333,
+      "mean_virtual_to_real_mm": 1.0893429278491762,
+      "symmetric_mean_mm": 1.4706075917761547,
+      "p90_real_to_virtual_mm": 3.0611941701888727,
+      "real_coverage_3mm": 0.89375,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.72882421629859,
+      "mean_virtual_to_real_mm": 0.8779285522764176,
+      "symmetric_mean_mm": 1.303376384287504,
+      "p90_real_to_virtual_mm": 3.0302082895389675,
+      "real_coverage_3mm": 0.89625,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "training_symmetric_gain_mm": 0.16723120748865083,
+    "prototype_theta_mm_rad": [
+      -2.115165153112579,
+      5.441429895923562,
+      -0.1647339441517917,
+      -0.02727821398152587
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.116344078007509,
+      "mean_virtual_to_real_mm": 1.2959556762831217,
+      "symmetric_mean_mm": 1.7061498771453154,
+      "p90_real_to_virtual_mm": 4.0189909999322975,
+      "real_coverage_3mm": 0.8583690987124464,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.0530899646443403,
+      "mean_virtual_to_real_mm": 1.2416374407323625,
+      "symmetric_mean_mm": 1.6473637026883514,
+      "p90_real_to_virtual_mm": 3.9018027522238192,
+      "real_coverage_3mm": 0.8605150214592274,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.6039649430885434,
+      "mean_virtual_to_real_mm": 0.7237975826892087,
+      "symmetric_mean_mm": 1.163881262888876,
+      "p90_real_to_virtual_mm": 3.430561380996421,
+      "real_coverage_3mm": 0.8798283261802575,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 0.05878617445696399
+  },
+  {
+    "frame_id": 11997,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "11924",
+      "11934",
+      "11945",
+      "11955",
+      "11966",
+      "11977"
+    ],
+    "holdout_frame_ids": [
+      "11988",
+      "11997"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7382950512525048,
+        0.6855387069448202,
+        0.22774847050079758,
+        0.052384458339578194
+      ],
+      "relative": [
+        1.0,
+        0.9285430070021675,
+        0.308478934152987,
+        0.0709532838540755
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.7854675142682024,
+        0.6017926287908159,
+        0.004610036514442908,
+        0.14444778823404103
+      ],
+      "yaw_length_scale_mm": 23.73539336533341,
+      "normal_count": 248
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 187,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.9062922682562022,
+      "mean_virtual_to_real_mm": 2.0181397101784544,
+      "symmetric_mean_mm": 2.462215989217328,
+      "p90_real_to_virtual_mm": 5.21188953595273,
+      "real_coverage_3mm": 0.51875,
+      "virtual_coverage_3mm": 0.627906976744186
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.9599500167376056,
+      "mean_virtual_to_real_mm": 0.8402830512549491,
+      "symmetric_mean_mm": 1.4001165339962773,
+      "p90_real_to_virtual_mm": 4.028756721680024,
+      "real_coverage_3mm": 0.875,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "training_symmetric_gain_mm": 1.0620994552210508,
+    "prototype_theta_mm_rad": [
+      -3.8129804506579354,
+      9.212119260437118,
+      -0.2645654902634501,
+      -0.053108129252536225
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 3.0268341770164455,
+      "mean_virtual_to_real_mm": 2.081337206338999,
+      "symmetric_mean_mm": 2.5540856916777224,
+      "p90_real_to_virtual_mm": 5.294099100960055,
+      "real_coverage_3mm": 0.5235294117647059,
+      "virtual_coverage_3mm": 0.627906976744186
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.1778387450974828,
+      "mean_virtual_to_real_mm": 1.1657900070315408,
+      "symmetric_mean_mm": 1.6718143760645119,
+      "p90_real_to_virtual_mm": 4.130296007861054,
+      "real_coverage_3mm": 0.8745098039215686,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.898950189234752,
+      "mean_virtual_to_real_mm": 0.8642512678642613,
+      "symmetric_mean_mm": 1.3816007285495067,
+      "p90_real_to_virtual_mm": 3.6619102488244755,
+      "real_coverage_3mm": 0.8901960784313725,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 0.8822713156132105
+  },
+  {
+    "frame_id": 12162,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "12092",
+      "12101",
+      "12110",
+      "12120",
+      "12130",
+      "12140"
+    ],
+    "holdout_frame_ids": [
+      "12151",
+      "12162"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.746577867256004,
+        0.6717103426375972,
+        0.20624217382004395,
+        0.027987490464976002
+      ],
+      "relative": [
+        1.0,
+        0.8997190676257559,
+        0.2762500508862833,
+        0.03748770448800219
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.8247458656498098,
+        -0.565478432943826,
+        0.0008597273841719558,
+        0.005259262093268602
+      ],
+      "yaw_length_scale_mm": 23.09671830465427,
+      "normal_count": 241
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 129,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.6498793487629582,
+      "mean_virtual_to_real_mm": 1.033359102843485,
+      "symmetric_mean_mm": 1.3416192258032216,
+      "p90_real_to_virtual_mm": 2.5908001230764905,
+      "real_coverage_3mm": 0.915,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 7.582089352474263,
+      "mean_virtual_to_real_mm": 7.1041309302748825,
+      "symmetric_mean_mm": 7.343110141374573,
+      "p90_real_to_virtual_mm": 11.373074108599681,
+      "real_coverage_3mm": 0.0,
+      "virtual_coverage_3mm": 0.0
+    },
+    "training_symmetric_gain_mm": -6.001490915571351,
+    "prototype_theta_mm_rad": [
+      -6.64360092685828,
+      8.25198823750918,
+      -0.7511865860492041,
+      -0.11881920646331788
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.6384905572733786,
+      "mean_virtual_to_real_mm": 1.0222751059553294,
+      "symmetric_mean_mm": 1.330382831614354,
+      "p90_real_to_virtual_mm": 2.3846272851029595,
+      "real_coverage_3mm": 0.9320388349514563,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 8.592772134320684,
+      "mean_virtual_to_real_mm": 8.375283851911192,
+      "symmetric_mean_mm": 8.484027993115937,
+      "p90_real_to_virtual_mm": 12.297170699761326,
+      "real_coverage_3mm": 0.0,
+      "virtual_coverage_3mm": 0.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.4288967763267337,
+      "mean_virtual_to_real_mm": 0.7916527939393692,
+      "symmetric_mean_mm": 1.1102747851330514,
+      "p90_real_to_virtual_mm": 2.060992161969996,
+      "real_coverage_3mm": 0.9339805825242719,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -7.153645161501583
+  },
+  {
+    "frame_id": 12319,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "12253",
+      "12262",
+      "12270",
+      "12280",
+      "12290",
+      "12300"
+    ],
+    "holdout_frame_ids": [
+      "12309",
+      "12319"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7498472481720189,
+        0.6691957104287484,
+        0.22982630217131528,
+        0.04349722198991048
+      ],
+      "relative": [
+        1.0,
+        0.8924427102454757,
+        0.3064974936316522,
+        0.058008110446425204
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.83314117099579,
+        0.5208188009702108,
+        -0.0024699494839767466,
+        0.1860576929268505
+      ],
+      "yaw_length_scale_mm": 22.628581767814236,
+      "normal_count": 241
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 185,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.5923450970723838,
+      "mean_virtual_to_real_mm": 0.7773863815381145,
+      "symmetric_mean_mm": 1.184865739305249,
+      "p90_real_to_virtual_mm": 2.7997096358780573,
+      "real_coverage_3mm": 0.905,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.1186096223311552,
+      "mean_virtual_to_real_mm": 1.334605527705793,
+      "symmetric_mean_mm": 1.7266075750184742,
+      "p90_real_to_virtual_mm": 4.061762064513671,
+      "real_coverage_3mm": 0.8125,
+      "virtual_coverage_3mm": 0.9186046511627907
+    },
+    "training_symmetric_gain_mm": -0.5417418357132251,
+    "prototype_theta_mm_rad": [
+      -2.643357667828547,
+      2.203226577503068,
+      -0.5885513626744697,
+      -0.03826554384540508
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.94510353957822,
+      "mean_virtual_to_real_mm": 0.8203849467353603,
+      "symmetric_mean_mm": 1.38274424315679,
+      "p90_real_to_virtual_mm": 4.6388656971861,
+      "real_coverage_3mm": 0.8527131782945736,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.3026210196168213,
+      "mean_virtual_to_real_mm": 2.296453572572694,
+      "symmetric_mean_mm": 2.7995372960947575,
+      "p90_real_to_virtual_mm": 6.142652793668734,
+      "real_coverage_3mm": 0.6027131782945736,
+      "virtual_coverage_3mm": 0.7906976744186046
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.894183726823882,
+      "mean_virtual_to_real_mm": 0.8865832886370554,
+      "symmetric_mean_mm": 1.3903835077304687,
+      "p90_real_to_virtual_mm": 4.103421592593277,
+      "real_coverage_3mm": 0.875968992248062,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.4167930529379675
+  },
+  {
+    "frame_id": 12474,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "12407",
+      "12415",
+      "12426",
+      "12437",
+      "12445",
+      "12454"
+    ],
+    "holdout_frame_ids": [
+      "12465",
+      "12474"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7482194583054163,
+        0.6854965623943089,
+        0.26685014653568845,
+        0.02627014720050118
+      ],
+      "relative": [
+        1.0,
+        0.9161704561210376,
+        0.35664689493648893,
+        0.035110216539941876
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.8886952888024254,
+        0.3869997033938847,
+        -0.002670528849990285,
+        0.24585520435630592
+      ],
+      "yaw_length_scale_mm": 23.138865332079288,
+      "normal_count": 243
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 169,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.2504849539379896,
+      "mean_virtual_to_real_mm": 1.2966926191298829,
+      "symmetric_mean_mm": 1.7735887865339364,
+      "p90_real_to_virtual_mm": 4.2213027006077315,
+      "real_coverage_3mm": 0.8,
+      "virtual_coverage_3mm": 0.9186046511627907
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.315724846054256,
+      "mean_virtual_to_real_mm": 1.2339594174607946,
+      "symmetric_mean_mm": 1.7748421317575254,
+      "p90_real_to_virtual_mm": 4.155989971582929,
+      "real_coverage_3mm": 0.83875,
+      "virtual_coverage_3mm": 0.9844961240310077
+    },
+    "training_symmetric_gain_mm": -0.0012533452235889975,
+    "prototype_theta_mm_rad": [
+      -11.524481280605118,
+      10.03507537689807,
+      -0.6698223971205561,
+      -0.0902722932543082
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.271683498324275,
+      "mean_virtual_to_real_mm": 1.394424307547854,
+      "symmetric_mean_mm": 1.8330539029360646,
+      "p90_real_to_virtual_mm": 4.293203706709993,
+      "real_coverage_3mm": 0.7054108216432866,
+      "virtual_coverage_3mm": 0.8255813953488372
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.749536715136846,
+      "mean_virtual_to_real_mm": 1.897409909033771,
+      "symmetric_mean_mm": 2.3234733120853086,
+      "p90_real_to_virtual_mm": 4.483671203756638,
+      "real_coverage_3mm": 0.7735470941883767,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 2.0482897768128847,
+      "mean_virtual_to_real_mm": 1.1250946562386477,
+      "symmetric_mean_mm": 1.5866922165257662,
+      "p90_real_to_virtual_mm": 3.7466602674469587,
+      "real_coverage_3mm": 0.8717434869739479,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.490419409149244
+  },
+  {
+    "frame_id": 13053,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "12982",
+      "12993",
+      "13002",
+      "13010",
+      "13023",
+      "13032"
+    ],
+    "holdout_frame_ids": [
+      "13043",
+      "13053"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.8063875181250515,
+        0.5940265012819015,
+        0.3027833978895319,
+        0.0804569226633288
+      ],
+      "relative": [
+        1.0,
+        0.7366514088202716,
+        0.3754812557038828,
+        0.09977451393394689
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.9629112642346692,
+        -0.17458612871419432,
+        -0.0028569410310627444,
+        -0.2057022575435843
+      ],
+      "yaw_length_scale_mm": 24.055472736393025,
+      "normal_count": 235
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 152,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 3.4759540397931503,
+      "mean_virtual_to_real_mm": 2.4191004452329903,
+      "symmetric_mean_mm": 2.94752724251307,
+      "p90_real_to_virtual_mm": 7.702759970910828,
+      "real_coverage_3mm": 0.65375,
+      "virtual_coverage_3mm": 0.7598425196850394
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 5.887604769565315,
+      "mean_virtual_to_real_mm": 4.727260846784068,
+      "symmetric_mean_mm": 5.307432808174692,
+      "p90_real_to_virtual_mm": 10.296524674788927,
+      "real_coverage_3mm": 0.28625,
+      "virtual_coverage_3mm": 0.4094488188976378
+    },
+    "training_symmetric_gain_mm": -2.359905565661622,
+    "prototype_theta_mm_rad": [
+      -14.222087958779941,
+      12.78696159681682,
+      -1.5083693296105236,
+      -0.14813782979130696
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 3.9022471937738836,
+      "mean_virtual_to_real_mm": 2.4095766328738604,
+      "symmetric_mean_mm": 3.155911913323872,
+      "p90_real_to_virtual_mm": 8.337462454224301,
+      "real_coverage_3mm": 0.5948103792415169,
+      "virtual_coverage_3mm": 0.7674418604651163
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 6.863022917715243,
+      "mean_virtual_to_real_mm": 5.949489362675893,
+      "symmetric_mean_mm": 6.406256140195568,
+      "p90_real_to_virtual_mm": 11.409243433874499,
+      "real_coverage_3mm": 0.22554890219560877,
+      "virtual_coverage_3mm": 0.3023255813953488
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 3.563465507440749,
+      "mean_virtual_to_real_mm": 2.0987142977704103,
+      "symmetric_mean_mm": 2.8310899026055796,
+      "p90_real_to_virtual_mm": 6.672603792674622,
+      "real_coverage_3mm": 0.6167664670658682,
+      "virtual_coverage_3mm": 0.8255813953488372
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -3.2503442268716958
+  },
+  {
+    "frame_id": 13269,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "13199",
+      "13209",
+      "13219",
+      "13229",
+      "13238",
+      "13248"
+    ],
+    "holdout_frame_ids": [
+      "13259",
+      "13269"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7376584716669984,
+        0.6850140760469177,
+        0.2610386893563276,
+        0.03631606129029284
+      ],
+      "relative": [
+        1.0,
+        0.928633103743644,
+        0.3538747257472947,
+        0.04923153828657854
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.972300643505144,
+        -0.10979629536667437,
+        -0.0021330191369452424,
+        -0.20632906337353007
+      ],
+      "yaw_length_scale_mm": 24.718120460084936,
+      "normal_count": 246
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 155,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 3.964577024505428,
+      "mean_virtual_to_real_mm": 2.652002809186602,
+      "symmetric_mean_mm": 3.3082899168460154,
+      "p90_real_to_virtual_mm": 9.190272378203536,
+      "real_coverage_3mm": 0.66375,
+      "virtual_coverage_3mm": 0.7945736434108527
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 3.6165475363741653,
+      "mean_virtual_to_real_mm": 2.1750217959092,
+      "symmetric_mean_mm": 2.8957846661416826,
+      "p90_real_to_virtual_mm": 7.122215834550699,
+      "real_coverage_3mm": 0.58875,
+      "virtual_coverage_3mm": 0.7403100775193798
+    },
+    "training_symmetric_gain_mm": 0.41250525070433275,
+    "prototype_theta_mm_rad": [
+      -17.031498116174614,
+      11.669498570298456,
+      -1.2911913853325332,
+      -0.13302302852266162
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 3.8817046053844915,
+      "mean_virtual_to_real_mm": 2.5688686215408043,
+      "symmetric_mean_mm": 3.225286613462648,
+      "p90_real_to_virtual_mm": 9.180003882934011,
+      "real_coverage_3mm": 0.66600790513834,
+      "virtual_coverage_3mm": 0.7441860465116279
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 4.2790042713021625,
+      "mean_virtual_to_real_mm": 3.1448018018987987,
+      "symmetric_mean_mm": 3.7119030366004804,
+      "p90_real_to_virtual_mm": 7.652869588758541,
+      "real_coverage_3mm": 0.4723320158102767,
+      "virtual_coverage_3mm": 0.6162790697674418
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 3.177325941058875,
+      "mean_virtual_to_real_mm": 1.799031995781159,
+      "symmetric_mean_mm": 2.488178968420017,
+      "p90_real_to_virtual_mm": 6.40340710793316,
+      "real_coverage_3mm": 0.658102766798419,
+      "virtual_coverage_3mm": 0.8488372093023255
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.4866164231378325
+  },
+  {
+    "frame_id": 13820,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "13755",
+      "13763",
+      "13773",
+      "13783",
+      "13792",
+      "13801"
+    ],
+    "holdout_frame_ids": [
+      "13810",
+      "13820"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7671423123302877,
+        0.6540618859010725,
+        0.2143498598993506,
+        0.01993482339068093
+      ],
+      "relative": [
+        1.0,
+        0.852595242614477,
+        0.2794134236296222,
+        0.02598582175727798
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.9826170216407413,
+        0.10181746530645372,
+        6.53423393593422e-05,
+        -0.15523204653301143
+      ],
+      "yaw_length_scale_mm": 24.903972888286447,
+      "normal_count": 247
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 176,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.4228972204463726,
+      "mean_virtual_to_real_mm": 1.5997263227063006,
+      "symmetric_mean_mm": 2.0113117715763367,
+      "p90_real_to_virtual_mm": 3.6606364696417613,
+      "real_coverage_3mm": 0.825,
+      "virtual_coverage_3mm": 0.9496124031007752
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.4557883595997554,
+      "mean_virtual_to_real_mm": 1.5877700976272475,
+      "symmetric_mean_mm": 2.0217792286135015,
+      "p90_real_to_virtual_mm": 4.451068452383551,
+      "real_coverage_3mm": 0.76625,
+      "virtual_coverage_3mm": 0.8449612403100775
+    },
+    "training_symmetric_gain_mm": -0.010467457037164785,
+    "prototype_theta_mm_rad": [
+      -18.064423532575,
+      1.4391540253349708,
+      -1.2495185449001516,
+      -0.11637901525987515
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.226686898650013,
+      "mean_virtual_to_real_mm": 1.561748047785302,
+      "symmetric_mean_mm": 1.8942174732176575,
+      "p90_real_to_virtual_mm": 3.4185861275111207,
+      "real_coverage_3mm": 0.8523908523908524,
+      "virtual_coverage_3mm": 0.9186046511627907
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.0579293785962403,
+      "mean_virtual_to_real_mm": 2.5020666451983744,
+      "symmetric_mean_mm": 2.779998011897307,
+      "p90_real_to_virtual_mm": 5.056046236490329,
+      "real_coverage_3mm": 0.6444906444906445,
+      "virtual_coverage_3mm": 0.686046511627907
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.9075760354065048,
+      "mean_virtual_to_real_mm": 1.1697982674736542,
+      "symmetric_mean_mm": 1.5386871514400795,
+      "p90_real_to_virtual_mm": 3.007711408008073,
+      "real_coverage_3mm": 0.8981288981288982,
+      "virtual_coverage_3mm": 0.9767441860465116
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.8857805386796496
+  },
+  {
+    "frame_id": 14009,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "13937",
+      "13948",
+      "13958",
+      "13969",
+      "13980",
+      "13990"
+    ],
+    "holdout_frame_ids": [
+      "13999",
+      "14009"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7720343327509779,
+        0.6471255700617262,
+        0.18361316381536594,
+        0.042235643280169384
+      ],
+      "relative": [
+        1.0,
+        0.8382082798777015,
+        0.2378303088686484,
+        0.05470694953380088
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.963551103410732,
+        0.132007417731291,
+        -0.004159481451692759,
+        -0.23264997634629295
+      ],
+      "yaw_length_scale_mm": 25.111420147274263,
+      "normal_count": 254
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 190,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.866522873281999,
+      "mean_virtual_to_real_mm": 1.3556533673114843,
+      "symmetric_mean_mm": 1.6110881202967415,
+      "p90_real_to_virtual_mm": 2.8061589841846764,
+      "real_coverage_3mm": 0.925,
+      "virtual_coverage_3mm": 0.9961240310077519
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.1062203849971732,
+      "mean_virtual_to_real_mm": 1.5833296966745423,
+      "symmetric_mean_mm": 1.8447750408358576,
+      "p90_real_to_virtual_mm": 3.92387337198854,
+      "real_coverage_3mm": 0.78,
+      "virtual_coverage_3mm": 0.8410852713178295
+    },
+    "training_symmetric_gain_mm": -0.2336869205391161,
+    "prototype_theta_mm_rad": [
+      -19.597163962832315,
+      -0.6860027697445533,
+      -1.2830461036204297,
+      -0.12269588140198907
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.8039449878328964,
+      "mean_virtual_to_real_mm": 1.3382163598004673,
+      "symmetric_mean_mm": 1.5710806738166818,
+      "p90_real_to_virtual_mm": 2.7428197872609896,
+      "real_coverage_3mm": 0.9415204678362573,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.8003110545661722,
+      "mean_virtual_to_real_mm": 2.4712619274025944,
+      "symmetric_mean_mm": 2.6357864909843833,
+      "p90_real_to_virtual_mm": 4.382572483199825,
+      "real_coverage_3mm": 0.5380116959064327,
+      "virtual_coverage_3mm": 0.5813953488372093
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.3855649377817607,
+      "mean_virtual_to_real_mm": 0.7909277381031081,
+      "symmetric_mean_mm": 1.0882463379424343,
+      "p90_real_to_virtual_mm": 2.353858659005779,
+      "real_coverage_3mm": 0.9454191033138402,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.0647058171677015
+  },
+  {
+    "frame_id": 14186,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "14115",
+      "14127",
+      "14137",
+      "14146",
+      "14157",
+      "14167"
+    ],
+    "holdout_frame_ids": [
+      "14177",
+      "14186"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7753283947680338,
+        0.592299737552417,
+        0.3330735688131531,
+        0.1614192359715916
+      ],
+      "relative": [
+        1.0,
+        0.7639340201510663,
+        0.42959031432455597,
+        0.2081946657195313
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.7645918975461972,
+        0.3658723877216157,
+        -0.0018478237497610642,
+        0.5305970332153954
+      ],
+      "yaw_length_scale_mm": 24.76586113914302,
+      "normal_count": 242
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 186,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.5997103821317291,
+      "mean_virtual_to_real_mm": 1.3144390085799489,
+      "symmetric_mean_mm": 1.4570746953558391,
+      "p90_real_to_virtual_mm": 2.4098425791935587,
+      "real_coverage_3mm": 0.92875,
+      "virtual_coverage_3mm": 0.9186046511627907
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.544258094431953,
+      "mean_virtual_to_real_mm": 2.4532501539487703,
+      "symmetric_mean_mm": 2.498754124190362,
+      "p90_real_to_virtual_mm": 5.625538908668568,
+      "real_coverage_3mm": 0.68625,
+      "virtual_coverage_3mm": 0.689922480620155
+    },
+    "training_symmetric_gain_mm": -1.0416794288345228,
+    "prototype_theta_mm_rad": [
+      -19.758309504347444,
+      -2.4105976572789274,
+      -0.2600944648241751,
+      -0.13323221531858354
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.4691932536458754,
+      "mean_virtual_to_real_mm": 1.153473943889636,
+      "symmetric_mean_mm": 1.3113335987677557,
+      "p90_real_to_virtual_mm": 2.049899678165103,
+      "real_coverage_3mm": 0.9425531914893617,
+      "virtual_coverage_3mm": 0.9302325581395349
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.1694842727154207,
+      "mean_virtual_to_real_mm": 3.0263057739708095,
+      "symmetric_mean_mm": 3.0978950233431153,
+      "p90_real_to_virtual_mm": 6.379269248195388,
+      "real_coverage_3mm": 0.6680851063829787,
+      "virtual_coverage_3mm": 0.6627906976744186
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.473825506894906,
+      "mean_virtual_to_real_mm": 1.1814621159147962,
+      "symmetric_mean_mm": 1.327643811404851,
+      "p90_real_to_virtual_mm": 2.1006823174559943,
+      "real_coverage_3mm": 0.9425531914893617,
+      "virtual_coverage_3mm": 0.9302325581395349
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.7865614245753596
+  },
+  {
+    "frame_id": 14346,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "14277",
+      "14288",
+      "14298",
+      "14308",
+      "14317",
+      "14326"
+    ],
+    "holdout_frame_ids": [
+      "14336",
+      "14346"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7619713702610558,
+        0.6183532084532974,
+        0.2340224174844267,
+        0.19707804670849613
+      ],
+      "relative": [
+        1.0,
+        0.8115176404087808,
+        0.30712757279089015,
+        0.2586423248959814
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.5120979522860665,
+        0.03730526817355406,
+        0.044789182180615505,
+        0.8569468673088833
+      ],
+      "yaw_length_scale_mm": 24.862485519461362,
+      "normal_count": 252
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 148,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.525152504649144,
+      "mean_virtual_to_real_mm": 1.0795990493962428,
+      "symmetric_mean_mm": 1.3023757770226934,
+      "p90_real_to_virtual_mm": 2.839289975679795,
+      "real_coverage_3mm": 0.91375,
+      "virtual_coverage_3mm": 0.9224806201550387
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 6.625089600628135,
+      "mean_virtual_to_real_mm": 6.412838821987808,
+      "symmetric_mean_mm": 6.5189642113079715,
+      "p90_real_to_virtual_mm": 12.068864341306949,
+      "real_coverage_3mm": 0.065,
+      "virtual_coverage_3mm": 0.08914728682170543
+    },
+    "training_symmetric_gain_mm": -5.216588434285278,
+    "prototype_theta_mm_rad": [
+      -20.0,
+      -6.743477464580902,
+      -0.10756115665575605,
+      -0.1733749962006686
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.6923471013093165,
+      "mean_virtual_to_real_mm": 1.12550576793419,
+      "symmetric_mean_mm": 1.4089264346217534,
+      "p90_real_to_virtual_mm": 2.899316616412693,
+      "real_coverage_3mm": 0.9023354564755839,
+      "virtual_coverage_3mm": 0.9069767441860465
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 7.539521647572391,
+      "mean_virtual_to_real_mm": 7.48085434071172,
+      "symmetric_mean_mm": 7.510187994142056,
+      "p90_real_to_virtual_mm": 13.469201624411967,
+      "real_coverage_3mm": 0.040339702760084924,
+      "virtual_coverage_3mm": 0.05813953488372093
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.8332302969184266,
+      "mean_virtual_to_real_mm": 1.2839925495551656,
+      "symmetric_mean_mm": 1.5586114232367962,
+      "p90_real_to_virtual_mm": 2.9859339673285707,
+      "real_coverage_3mm": 0.9002123142250531,
+      "virtual_coverage_3mm": 0.9069767441860465
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -6.101261559520303
+  },
+  {
+    "frame_id": 14508,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "14439",
+      "14448",
+      "14457",
+      "14465",
+      "14476",
+      "14487"
+    ],
+    "holdout_frame_ids": [
+      "14498",
+      "14508"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7723678960588809,
+        0.6433130706523456,
+        0.19706666515196375,
+        0.013253553838891756
+      ],
+      "relative": [
+        1.0,
+        0.8329101635825928,
+        0.25514611127355885,
+        0.017159638439815966
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.9295457123456284,
+        -0.35936480338750604,
+        -0.00017644862521501437,
+        0.08247227177663845
+      ],
+      "yaw_length_scale_mm": 25.1455347676399,
+      "normal_count": 243
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 186,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.1963524924222362,
+      "mean_virtual_to_real_mm": 0.5526102973180796,
+      "symmetric_mean_mm": 0.874481394870158,
+      "p90_real_to_virtual_mm": 1.6474692359917078,
+      "real_coverage_3mm": 0.9625,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.5146151452212324,
+      "mean_virtual_to_real_mm": 1.9730345765544064,
+      "symmetric_mean_mm": 2.2438248608878193,
+      "p90_real_to_virtual_mm": 3.9341253978084154,
+      "real_coverage_3mm": 0.69125,
+      "virtual_coverage_3mm": 0.810077519379845
+    },
+    "training_symmetric_gain_mm": -1.3693434660176613,
+    "prototype_theta_mm_rad": [
+      -6.986375385301593,
+      -2.51882571388426,
+      -0.2757503372274123,
+      -0.024794192590056503
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.0762441700267644,
+      "mean_virtual_to_real_mm": 0.4131637615118936,
+      "symmetric_mean_mm": 0.7447039657693291,
+      "p90_real_to_virtual_mm": 1.5090687360526882,
+      "real_coverage_3mm": 0.970703125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.349208721460014,
+      "mean_virtual_to_real_mm": 3.082715472383289,
+      "symmetric_mean_mm": 3.2159620969216514,
+      "p90_real_to_virtual_mm": 4.134545789457254,
+      "real_coverage_3mm": 0.373046875,
+      "virtual_coverage_3mm": 0.43023255813953487
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.0763470487505271,
+      "mean_virtual_to_real_mm": 0.41333105149693167,
+      "symmetric_mean_mm": 0.7448390501237294,
+      "p90_real_to_virtual_mm": 1.5083544669338962,
+      "real_coverage_3mm": 0.970703125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -2.4712581311523225
+  },
+  {
+    "frame_id": 14663,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "14592",
+      "14602",
+      "14612",
+      "14623",
+      "14634",
+      "14645"
+    ],
+    "holdout_frame_ids": [
+      "14654",
+      "14663"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7725631317807596,
+        0.6430341366728519,
+        0.19927675355986046,
+        0.025955729517148893
+      ],
+      "relative": [
+        1.0,
+        0.832338627382667,
+        0.257942354951015,
+        0.03359690418739098
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.8984196761041725,
+        0.36571714606333156,
+        -0.004657112504140415,
+        -0.24304601615185786
+      ],
+      "yaw_length_scale_mm": 25.101348214224767,
+      "normal_count": 245
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 202,
+      "iterations": 16
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.0579633471690673,
+      "mean_virtual_to_real_mm": 0.49107939782301235,
+      "symmetric_mean_mm": 0.7745213724960398,
+      "p90_real_to_virtual_mm": 1.4744328322969944,
+      "real_coverage_3mm": 0.9725,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.0811401565899534,
+      "mean_virtual_to_real_mm": 0.5006039937666097,
+      "symmetric_mean_mm": 0.7908720751782816,
+      "p90_real_to_virtual_mm": 1.650319991426761,
+      "real_coverage_3mm": 0.96875,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": -0.016350702682241813,
+    "prototype_theta_mm_rad": [
+      -4.682473706599189,
+      -1.6541232984803838,
+      -0.30616528489739997,
+      -0.03215980255989546
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.0802358691554323,
+      "mean_virtual_to_real_mm": 0.417854627230024,
+      "symmetric_mean_mm": 0.7490452481927281,
+      "p90_real_to_virtual_mm": 1.4813333875230772,
+      "real_coverage_3mm": 0.9726027397260274,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.2610218459057092,
+      "mean_virtual_to_real_mm": 0.6578918585783593,
+      "symmetric_mean_mm": 0.9594568522420343,
+      "p90_real_to_virtual_mm": 1.686727912763414,
+      "real_coverage_3mm": 0.9706457925636007,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.0458158127537625,
+      "mean_virtual_to_real_mm": 0.34233156036893314,
+      "symmetric_mean_mm": 0.6940736865613478,
+      "p90_real_to_virtual_mm": 1.4845917990326636,
+      "real_coverage_3mm": 0.9706457925636007,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.21041160404930614
+  },
+  {
+    "frame_id": 14824,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "14754",
+      "14763",
+      "14776",
+      "14786",
+      "14795",
+      "14806"
+    ],
+    "holdout_frame_ids": [
+      "14816",
+      "14824"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7692084180562143,
+        0.645880789183515,
+        0.20210169406366135,
+        0.03010887682206953
+      ],
+      "relative": [
+        1.0,
+        0.8396694238157877,
+        0.26273983658989497,
+        0.03914267721894478
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.8752320148720675,
+        0.477839729940346,
+        0.004704610473364457,
+        -0.07493983769539914
+      ],
+      "yaw_length_scale_mm": 25.457880976905248,
+      "normal_count": 246
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 189,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.1042954195078407,
+      "mean_virtual_to_real_mm": 0.6035584142747573,
+      "symmetric_mean_mm": 0.8539269168912991,
+      "p90_real_to_virtual_mm": 1.5596804397711803,
+      "real_coverage_3mm": 0.9725,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.3002761350869816,
+      "mean_virtual_to_real_mm": 0.8126215936237249,
+      "symmetric_mean_mm": 1.0564488643553531,
+      "p90_real_to_virtual_mm": 2.149100516440214,
+      "real_coverage_3mm": 0.97125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": -0.20252194746405405,
+    "prototype_theta_mm_rad": [
+      -4.322860412046076,
+      -1.7012573029938516,
+      -0.3196567136342083,
+      -0.019367581862123593
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.0773889892476913,
+      "mean_virtual_to_real_mm": 0.5703336384920723,
+      "symmetric_mean_mm": 0.8238613138698818,
+      "p90_real_to_virtual_mm": 1.5600722910563585,
+      "real_coverage_3mm": 0.9768339768339769,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.6993414863532017,
+      "mean_virtual_to_real_mm": 1.2965929091193502,
+      "symmetric_mean_mm": 1.4979671977362758,
+      "p90_real_to_virtual_mm": 2.415845073173448,
+      "real_coverage_3mm": 0.974903474903475,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 0.9432002035874844,
+      "mean_virtual_to_real_mm": 0.34705027980815545,
+      "symmetric_mean_mm": 0.6451252416978199,
+      "p90_real_to_virtual_mm": 1.4058460638658716,
+      "real_coverage_3mm": 0.9787644787644788,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.674105883866394
+  },
+  {
+    "frame_id": 14983,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "14915",
+      "14924",
+      "14933",
+      "14943",
+      "14952",
+      "14962"
+    ],
+    "holdout_frame_ids": [
+      "14972",
+      "14983"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7716119156245324,
+        0.6413516856851118,
+        0.16465551832278386,
+        0.01104865052675923
+      ],
+      "relative": [
+        1.0,
+        0.8311842685399827,
+        0.21339162212070545,
+        0.014318921601692219
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.8686085147693491,
+        -0.489212394103434,
+        0.0013190731992974714,
+        0.07866855516448004
+      ],
+      "yaw_length_scale_mm": 25.196923237184148,
+      "normal_count": 244
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 189,
+      "iterations": 5
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 0.9550985162635769,
+      "mean_virtual_to_real_mm": 0.44627170150328144,
+      "symmetric_mean_mm": 0.7006851088834292,
+      "p90_real_to_virtual_mm": 1.5449463233125709,
+      "real_coverage_3mm": 0.98375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 0.9247416251378614,
+      "mean_virtual_to_real_mm": 0.3990818465772289,
+      "symmetric_mean_mm": 0.6619117358575451,
+      "p90_real_to_virtual_mm": 1.5133182082374235,
+      "real_coverage_3mm": 0.98375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": 0.03877337302588402,
+    "prototype_theta_mm_rad": [
+      0.044720868994671086,
+      0.2501697615726646,
+      -0.09022310945507554,
+      0.000717616547074327
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.0139445236168632,
+      "mean_virtual_to_real_mm": 0.3771176188860856,
+      "symmetric_mean_mm": 0.6955310712514744,
+      "p90_real_to_virtual_mm": 1.6382500244469704,
+      "real_coverage_3mm": 0.9787234042553191,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 0.9770304552027175,
+      "mean_virtual_to_real_mm": 0.32772597449795426,
+      "symmetric_mean_mm": 0.6523782148503359,
+      "p90_real_to_virtual_mm": 1.5719540407322101,
+      "real_coverage_3mm": 0.9787234042553191,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 0.9742005527191065,
+      "mean_virtual_to_real_mm": 0.32791776258278954,
+      "symmetric_mean_mm": 0.651059157650948,
+      "p90_real_to_virtual_mm": 1.5647302235741058,
+      "real_coverage_3mm": 0.9806576402321083,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 0.04315285640113853
+  },
+  {
+    "frame_id": 15143,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "15072",
+      "15082",
+      "15094",
+      "15103",
+      "15114",
+      "15125"
+    ],
+    "holdout_frame_ids": [
+      "15135",
+      "15143"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7649873302972134,
+        0.6526534601433381,
+        0.2061744411113037,
+        0.024246433458189883
+      ],
+      "relative": [
+        1.0,
+        0.8531559076798941,
+        0.2695135369512599,
+        0.03169520918571245
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.799327701734382,
+        -0.5929996544323657,
+        -0.0007919088018834564,
+        0.09708763033247161
+      ],
+      "yaw_length_scale_mm": 25.451013819576207,
+      "normal_count": 246
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 179,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.1229793773733947,
+      "mean_virtual_to_real_mm": 0.6342805070178043,
+      "symmetric_mean_mm": 0.8786299421955994,
+      "p90_real_to_virtual_mm": 1.7328027829467436,
+      "real_coverage_3mm": 0.97,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.168803777006506,
+      "mean_virtual_to_real_mm": 0.6797595291274,
+      "symmetric_mean_mm": 0.9242816530669531,
+      "p90_real_to_virtual_mm": 2.0987147322300976,
+      "real_coverage_3mm": 0.97375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": -0.04565171087135367,
+    "prototype_theta_mm_rad": [
+      -6.054946372032037,
+      -2.9653264567563236,
+      -0.11314031581851378,
+      -0.03467010063507743
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.182060675923287,
+      "mean_virtual_to_real_mm": 0.6240308847878415,
+      "symmetric_mean_mm": 0.9030457803555643,
+      "p90_real_to_virtual_mm": 1.76899080154283,
+      "real_coverage_3mm": 0.9709302325581395,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.540848525387075,
+      "mean_virtual_to_real_mm": 1.0755092479939194,
+      "symmetric_mean_mm": 1.3081788866904973,
+      "p90_real_to_virtual_mm": 2.3247917959799773,
+      "real_coverage_3mm": 0.9689922480620154,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 0.9764201811717828,
+      "mean_virtual_to_real_mm": 0.4029195004511964,
+      "symmetric_mean_mm": 0.6896698408114896,
+      "p90_real_to_virtual_mm": 1.4015693518560213,
+      "real_coverage_3mm": 0.9748062015503876,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.40513310633493305
+  },
+  {
+    "frame_id": 15304,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "15231",
+      "15242",
+      "15254",
+      "15264",
+      "15274",
+      "15285"
+    ],
+    "holdout_frame_ids": [
+      "15295",
+      "15304"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7651200696400754,
+        0.6490760314229889,
+        0.17531348357935705,
+        0.03524284942069342
+      ],
+      "relative": [
+        1.0,
+        0.8483322516011434,
+        0.22913198925996975,
+        0.04606185462795691
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.7929366623693704,
+        -0.6076026848063546,
+        0.0028399861899576773,
+        0.04541322896551475
+      ],
+      "yaw_length_scale_mm": 25.129883166869153,
+      "normal_count": 244
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 189,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.0295670772490135,
+      "mean_virtual_to_real_mm": 0.5359258058215738,
+      "symmetric_mean_mm": 0.7827464415352936,
+      "p90_real_to_virtual_mm": 1.5352208861324579,
+      "real_coverage_3mm": 0.98375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.0329403682297578,
+      "mean_virtual_to_real_mm": 0.5254738319363245,
+      "symmetric_mean_mm": 0.7792071000830412,
+      "p90_real_to_virtual_mm": 1.616024577632127,
+      "real_coverage_3mm": 0.98375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": 0.0035393414522524314,
+    "prototype_theta_mm_rad": [
+      -4.004902242102694,
+      -2.378972890571109,
+      -0.2021585899584063,
+      -0.024514925552384256
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.0626564088990085,
+      "mean_virtual_to_real_mm": 0.4788954256301652,
+      "symmetric_mean_mm": 0.7707759172645868,
+      "p90_real_to_virtual_mm": 1.603902193933897,
+      "real_coverage_3mm": 0.9767441860465116,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.2495437250091255,
+      "mean_virtual_to_real_mm": 0.7339175363794084,
+      "symmetric_mean_mm": 0.9917306306942669,
+      "p90_real_to_virtual_mm": 1.7897865426939013,
+      "real_coverage_3mm": 0.9786821705426356,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 0.9423084956795782,
+      "mean_virtual_to_real_mm": 0.30096422780068016,
+      "symmetric_mean_mm": 0.6216363617401292,
+      "p90_real_to_virtual_mm": 1.527657812666313,
+      "real_coverage_3mm": 0.9806201550387597,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.2209547134296801
+  },
+  {
+    "frame_id": 15483,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "15412",
+      "15422",
+      "15432",
+      "15443",
+      "15452",
+      "15462"
+    ],
+    "holdout_frame_ids": [
+      "15473",
+      "15483"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7959372057812777,
+        0.5789598824062839,
+        0.3079622786289203,
+        0.1359101721936132
+      ],
+      "relative": [
+        1.0,
+        0.7273939177626296,
+        0.38691780757582506,
+        0.17075489273077293
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.5780717352776231,
+        0.7021627406906437,
+        -0.026404371143497293,
+        0.41485342428795025
+      ],
+      "yaw_length_scale_mm": 23.81072966741057,
+      "normal_count": 250
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 186,
+      "iterations": 12
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.3449496994403551,
+      "mean_virtual_to_real_mm": 1.458152439845822,
+      "symmetric_mean_mm": 1.4015510696430886,
+      "p90_real_to_virtual_mm": 2.9459703040532603,
+      "real_coverage_3mm": 0.9,
+      "virtual_coverage_3mm": 0.8449612403100775
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.4471937778773434,
+      "mean_virtual_to_real_mm": 1.6058250078144805,
+      "symmetric_mean_mm": 1.526509392845912,
+      "p90_real_to_virtual_mm": 3.0186692419530656,
+      "real_coverage_3mm": 0.8975,
+      "virtual_coverage_3mm": 0.8643410852713178
+    },
+    "training_symmetric_gain_mm": -0.1249583232028233,
+    "prototype_theta_mm_rad": [
+      -4.132695548744833,
+      -3.3305356816444993,
+      -0.08747066014584759,
+      -0.027920737180522532
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.4765006258605,
+      "mean_virtual_to_real_mm": 1.1179778716805715,
+      "symmetric_mean_mm": 1.2972392487705358,
+      "p90_real_to_virtual_mm": 3.041854697549776,
+      "real_coverage_3mm": 0.890495867768595,
+      "virtual_coverage_3mm": 0.8837209302325582
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.7624817433969928,
+      "mean_virtual_to_real_mm": 1.4965093416981723,
+      "symmetric_mean_mm": 1.6294955425475826,
+      "p90_real_to_virtual_mm": 3.062756773207998,
+      "real_coverage_3mm": 0.8946280991735537,
+      "virtual_coverage_3mm": 0.8953488372093024
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.356687858709316,
+      "mean_virtual_to_real_mm": 1.012291742975959,
+      "symmetric_mean_mm": 1.1844898008426377,
+      "p90_real_to_virtual_mm": 2.452971707107926,
+      "real_coverage_3mm": 0.9276859504132231,
+      "virtual_coverage_3mm": 0.9069767441860465
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.3322562937770468
+  },
+  {
+    "frame_id": 15646,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "15574",
+      "15585",
+      "15594",
+      "15604",
+      "15614",
+      "15625"
+    ],
+    "holdout_frame_ids": [
+      "15635",
+      "15646"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7289248541272217,
+        0.6602011710668747,
+        0.2035091999832691,
+        0.18713120180503776
+      ],
+      "relative": [
+        1.0,
+        0.9057191112756975,
+        0.2791909191063884,
+        0.2567222131958984
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.2780310953127594,
+        0.08209124808338597,
+        -0.04015053002254695,
+        -0.9562152853652819
+      ],
+      "yaw_length_scale_mm": 24.729000698147495,
+      "normal_count": 245
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 155,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.7250933897921903,
+      "mean_virtual_to_real_mm": 1.2596374804230002,
+      "symmetric_mean_mm": 1.4923654351075952,
+      "p90_real_to_virtual_mm": 3.143195164211913,
+      "real_coverage_3mm": 0.8875,
+      "virtual_coverage_3mm": 0.9186046511627907
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 5.442431148430278,
+      "mean_virtual_to_real_mm": 5.176231459895628,
+      "symmetric_mean_mm": 5.309331304162953,
+      "p90_real_to_virtual_mm": 10.516323820907145,
+      "real_coverage_3mm": 0.17375,
+      "virtual_coverage_3mm": 0.29457364341085274
+    },
+    "training_symmetric_gain_mm": -3.8169658690553576,
+    "prototype_theta_mm_rad": [
+      -20.0,
+      -20.0,
+      0.026188771768022746,
+      -0.20000000000000004
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.301402632457963,
+      "mean_virtual_to_real_mm": 1.5354221397873486,
+      "symmetric_mean_mm": 1.9184123861226556,
+      "p90_real_to_virtual_mm": 5.688297971946612,
+      "real_coverage_3mm": 0.8354978354978355,
+      "virtual_coverage_3mm": 0.8837209302325582
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 6.187978919520452,
+      "mean_virtual_to_real_mm": 5.842601787122658,
+      "symmetric_mean_mm": 6.015290353321555,
+      "p90_real_to_virtual_mm": 12.001318893919956,
+      "real_coverage_3mm": 0.18398268398268397,
+      "virtual_coverage_3mm": 0.26744186046511625
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 2.259063334526068,
+      "mean_virtual_to_real_mm": 1.5334326641166984,
+      "symmetric_mean_mm": 1.8962479993213832,
+      "p90_real_to_virtual_mm": 5.180363914658414,
+      "real_coverage_3mm": 0.8463203463203464,
+      "virtual_coverage_3mm": 0.8837209302325582
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -4.0968779671989
+  },
+  {
+    "frame_id": 15819,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "15744",
+      "15756",
+      "15764",
+      "15776",
+      "15786",
+      "15797"
+    ],
+    "holdout_frame_ids": [
+      "15807",
+      "15819"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7557780143840442,
+        0.6558551885959801,
+        0.174567548047548,
+        0.020046257035046824
+      ],
+      "relative": [
+        1.0,
+        0.8677881284102968,
+        0.23097727735546766,
+        0.026524001298694082
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.6689383136799626,
+        -0.74035280379459,
+        -0.005050593795270467,
+        -0.06613433228521844
+      ],
+      "yaw_length_scale_mm": 24.9596011768045,
+      "normal_count": 247
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 180,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.814900105493894,
+      "mean_virtual_to_real_mm": 1.0731919892839321,
+      "symmetric_mean_mm": 1.444046047388913,
+      "p90_real_to_virtual_mm": 3.258716536723805,
+      "real_coverage_3mm": 0.88375,
+      "virtual_coverage_3mm": 0.9961240310077519
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 4.356975003738276,
+      "mean_virtual_to_real_mm": 3.8669943473461337,
+      "symmetric_mean_mm": 4.111984675542205,
+      "p90_real_to_virtual_mm": 7.240486629709488,
+      "real_coverage_3mm": 0.31625,
+      "virtual_coverage_3mm": 0.3798449612403101
+    },
+    "training_symmetric_gain_mm": -2.667938628153292,
+    "prototype_theta_mm_rad": [
+      -5.914663195075047,
+      -3.9873066103599686,
+      -0.013694965456497097,
+      -0.07733541771773164
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.830793002231541,
+      "mean_virtual_to_real_mm": 1.092693759114894,
+      "symmetric_mean_mm": 1.4617433806732176,
+      "p90_real_to_virtual_mm": 3.457838331136754,
+      "real_coverage_3mm": 0.8461538461538461,
+      "virtual_coverage_3mm": 0.9651162790697675
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 5.543757980059102,
+      "mean_virtual_to_real_mm": 5.135778128342853,
+      "symmetric_mean_mm": 5.339768054200977,
+      "p90_real_to_virtual_mm": 8.076735742269683,
+      "real_coverage_3mm": 0.1301775147928994,
+      "virtual_coverage_3mm": 0.16279069767441862
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.4258887479353508,
+      "mean_virtual_to_real_mm": 0.639848255467735,
+      "symmetric_mean_mm": 1.0328685017015429,
+      "p90_real_to_virtual_mm": 2.6732536570223946,
+      "real_coverage_3mm": 0.9211045364891519,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -3.8780246735277597
+  },
+  {
+    "frame_id": 16383,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "16314",
+      "16324",
+      "16332",
+      "16342",
+      "16352",
+      "16362"
+    ],
+    "holdout_frame_ids": [
+      "16374",
+      "16383"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7435179648923034,
+        0.672516862794219,
+        0.17435024807888452,
+        0.039999948340651334
+      ],
+      "relative": [
+        1.0,
+        0.9045065412664659,
+        0.2344936589449304,
+        0.05379822711673849
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.48317844327523085,
+        0.8751301806421437,
+        -0.005796788123700922,
+        -0.02553734776407507
+      ],
+      "yaw_length_scale_mm": 24.40407347303999,
+      "normal_count": 248
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 168,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.724415144902669,
+      "mean_virtual_to_real_mm": 1.381029737898251,
+      "symmetric_mean_mm": 2.05272244140046,
+      "p90_real_to_virtual_mm": 5.946277380965415,
+      "real_coverage_3mm": 0.7325,
+      "virtual_coverage_3mm": 0.9534883720930233
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.5681991096062156,
+      "mean_virtual_to_real_mm": 0.8619042928515522,
+      "symmetric_mean_mm": 1.715051701228884,
+      "p90_real_to_virtual_mm": 6.769691411768049,
+      "real_coverage_3mm": 0.76875,
+      "virtual_coverage_3mm": 0.9922480620155039
+    },
+    "training_symmetric_gain_mm": 0.33767074017157594,
+    "prototype_theta_mm_rad": [
+      -4.696031723613695,
+      -4.689203591326282,
+      -0.6840827690316734,
+      -0.04727321843029847
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.800964046399987,
+      "mean_virtual_to_real_mm": 1.3371528947983728,
+      "symmetric_mean_mm": 2.06905847059918,
+      "p90_real_to_virtual_mm": 5.969428067139749,
+      "real_coverage_3mm": 0.7309236947791165,
+      "virtual_coverage_3mm": 0.9534883720930233
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.002505888193255,
+      "mean_virtual_to_real_mm": 1.2647374480178168,
+      "symmetric_mean_mm": 2.133621668105536,
+      "p90_real_to_virtual_mm": 6.998450481996379,
+      "real_coverage_3mm": 0.7409638554216867,
+      "virtual_coverage_3mm": 0.9883720930232558
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 2.5369815089695114,
+      "mean_virtual_to_real_mm": 1.022491765583221,
+      "symmetric_mean_mm": 1.779736637276366,
+      "p90_real_to_virtual_mm": 5.0492281238449195,
+      "real_coverage_3mm": 0.8112449799196787,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.06456319750635586
+  },
+  {
+    "frame_id": 16702,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "16634",
+      "16644",
+      "16654",
+      "16663",
+      "16673",
+      "16685"
+    ],
+    "holdout_frame_ids": [
+      "16693",
+      "16702"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7408535683887522,
+        0.6078374207253339,
+        0.32574810846859303,
+        0.1721553546589728
+      ],
+      "relative": [
+        1.0,
+        0.8204555483849407,
+        0.4396929735751255,
+        0.23237433415267938
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.09360912725256713,
+        -0.5488057509261192,
+        0.005496452776507142,
+        -0.8306740444074959
+      ],
+      "yaw_length_scale_mm": 24.064604978902793,
+      "normal_count": 245
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 115,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 3.5933382869462047,
+      "mean_virtual_to_real_mm": 3.043178884807689,
+      "symmetric_mean_mm": 3.318258585876947,
+      "p90_real_to_virtual_mm": 6.788035214249282,
+      "real_coverage_3mm": 0.46875,
+      "virtual_coverage_3mm": 0.5930232558139535
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 7.849682492211039,
+      "mean_virtual_to_real_mm": 7.5195649641248945,
+      "symmetric_mean_mm": 7.684623728167967,
+      "p90_real_to_virtual_mm": 11.95799837941465,
+      "real_coverage_3mm": 0.08375,
+      "virtual_coverage_3mm": 0.08139534883720931
+    },
+    "training_symmetric_gain_mm": -4.36636514229102,
+    "prototype_theta_mm_rad": [
+      -6.858924932079535,
+      -8.13303922389084,
+      -0.8036608568278586,
+      -0.1152760595442734
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 3.779431045155128,
+      "mean_virtual_to_real_mm": 3.8439524000189653,
+      "symmetric_mean_mm": 3.811691722587047,
+      "p90_real_to_virtual_mm": 7.364145915391813,
+      "real_coverage_3mm": 0.43149284253578735,
+      "virtual_coverage_3mm": 0.6046511627906976
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 8.93844315676024,
+      "mean_virtual_to_real_mm": 9.46781283033226,
+      "symmetric_mean_mm": 9.20312799354625,
+      "p90_real_to_virtual_mm": 12.273426390529133,
+      "real_coverage_3mm": 0.0,
+      "virtual_coverage_3mm": 0.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 3.004194073149716,
+      "mean_virtual_to_real_mm": 2.9317492469500155,
+      "symmetric_mean_mm": 2.967971660049866,
+      "p90_real_to_virtual_mm": 6.039058003964233,
+      "real_coverage_3mm": 0.7239263803680982,
+      "virtual_coverage_3mm": 0.8488372093023255
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -5.391436270959203
+  },
+  {
+    "frame_id": 18701,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "18629",
+      "18637",
+      "18649",
+      "18660",
+      "18669",
+      "18680"
+    ],
+    "holdout_frame_ids": [
+      "18690",
+      "18701"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7414196917720092,
+        0.6789315633712443,
+        0.25569276039591005,
+        0.045755886763713095
+      ],
+      "relative": [
+        1.0,
+        0.9157182779278267,
+        0.34486912504953676,
+        0.061713881181595716
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.4635355275725949,
+        0.861830066169514,
+        -0.0005861351457513335,
+        -0.20587231035240813
+      ],
+      "yaw_length_scale_mm": 24.75254434684678,
+      "normal_count": 238
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 138,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 5.165969946627996,
+      "mean_virtual_to_real_mm": 3.4357860982658326,
+      "symmetric_mean_mm": 4.3008780224469145,
+      "p90_real_to_virtual_mm": 7.8377274943775594,
+      "real_coverage_3mm": 0.355,
+      "virtual_coverage_3mm": 0.6071428571428571
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 3.759506959543113,
+      "mean_virtual_to_real_mm": 1.2016140214100621,
+      "symmetric_mean_mm": 2.4805604904765874,
+      "p90_real_to_virtual_mm": 9.875799784851303,
+      "real_coverage_3mm": 0.67875,
+      "virtual_coverage_3mm": 0.9166666666666666
+    },
+    "training_symmetric_gain_mm": 1.820317531970327,
+    "prototype_theta_mm_rad": [
+      -8.760895790738095,
+      1.522220423934264,
+      -1.951824565328276,
+      0.02995751980580514
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 4.710567017006674,
+      "mean_virtual_to_real_mm": 3.038535050406559,
+      "symmetric_mean_mm": 3.8745510337066165,
+      "p90_real_to_virtual_mm": 7.38433061225423,
+      "real_coverage_3mm": 0.42,
+      "virtual_coverage_3mm": 0.6904761904761905
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.3709595315864207,
+      "mean_virtual_to_real_mm": 1.320367365779995,
+      "symmetric_mean_mm": 2.345663448683208,
+      "p90_real_to_virtual_mm": 7.756999284266191,
+      "real_coverage_3mm": 0.69,
+      "virtual_coverage_3mm": 0.9047619047619048
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 3.2748357013702516,
+      "mean_virtual_to_real_mm": 1.4188613549075233,
+      "symmetric_mean_mm": 2.3468485281388873,
+      "p90_real_to_virtual_mm": 6.188902538643589,
+      "real_coverage_3mm": 0.744,
+      "virtual_coverage_3mm": 0.9761904761904762
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 1.5288875850234085
+  },
+  {
+    "frame_id": 19018,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "18949",
+      "18960",
+      "18970",
+      "18978",
+      "18989",
+      "19001"
+    ],
+    "holdout_frame_ids": [
+      "19010",
+      "19018"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7426115880006081,
+        0.673923817331799,
+        0.23252758832661166,
+        0.041373322551141886
+      ],
+      "relative": [
+        1.0,
+        0.9075051187206186,
+        0.3131214110901017,
+        0.05571327356005116
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.5613348392202292,
+        0.8194833926476965,
+        -0.002916335221799852,
+        -0.11550611430177612
+      ],
+      "yaw_length_scale_mm": 24.464717520314526,
+      "normal_count": 237
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 153,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 5.039447577275488,
+      "mean_virtual_to_real_mm": 3.3057157498995253,
+      "symmetric_mean_mm": 4.172581663587507,
+      "p90_real_to_virtual_mm": 8.857444947543947,
+      "real_coverage_3mm": 0.46375,
+      "virtual_coverage_3mm": 0.6984126984126984
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 3.5301373883769043,
+      "mean_virtual_to_real_mm": 1.2814783763403477,
+      "symmetric_mean_mm": 2.405807882358626,
+      "p90_real_to_virtual_mm": 9.479426416363177,
+      "real_coverage_3mm": 0.73125,
+      "virtual_coverage_3mm": 0.9484126984126984
+    },
+    "training_symmetric_gain_mm": 1.7667737812288808,
+    "prototype_theta_mm_rad": [
+      -10.780104999213814,
+      1.3069341356959772,
+      -1.929889611433038,
+      0.04204771421148125
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 4.769424804702297,
+      "mean_virtual_to_real_mm": 3.261894093637211,
+      "symmetric_mean_mm": 4.015659449169754,
+      "p90_real_to_virtual_mm": 8.605642459282016,
+      "real_coverage_3mm": 0.4669421487603306,
+      "virtual_coverage_3mm": 0.7023809523809523
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.2197909354054506,
+      "mean_virtual_to_real_mm": 1.476436570386134,
+      "symmetric_mean_mm": 2.3481137528957925,
+      "p90_real_to_virtual_mm": 8.118772657873631,
+      "real_coverage_3mm": 0.7334710743801653,
+      "virtual_coverage_3mm": 0.9523809523809523
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 2.938644206975448,
+      "mean_virtual_to_real_mm": 1.3513501611451793,
+      "symmetric_mean_mm": 2.1449971840603137,
+      "p90_real_to_virtual_mm": 6.811553799958487,
+      "real_coverage_3mm": 0.743801652892562,
+      "virtual_coverage_3mm": 0.9285714285714286
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 1.6675456962739617
+  },
+  {
+    "frame_id": 19292,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "19223",
+      "19234",
+      "19244",
+      "19253",
+      "19263",
+      "19273"
+    ],
+    "holdout_frame_ids": [
+      "19283",
+      "19292"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7959637535303679,
+        0.5831078382079838,
+        0.2759155368226082,
+        0.15611666331145235
+      ],
+      "relative": [
+        1.0,
+        0.7325808940692384,
+        0.34664334349250164,
+        0.19613539262186533
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.7236038633818835,
+        -0.6287295536919634,
+        0.014759343464861548,
+        -0.2843919109145049
+      ],
+      "yaw_length_scale_mm": 24.145168463035088,
+      "normal_count": 230
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 84,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 6.872003450926614,
+      "mean_virtual_to_real_mm": 5.707249373534048,
+      "symmetric_mean_mm": 6.289626412230331,
+      "p90_real_to_virtual_mm": 11.766022849116569,
+      "real_coverage_3mm": 0.30875,
+      "virtual_coverage_3mm": 0.4349593495934959
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 7.216195045918237,
+      "mean_virtual_to_real_mm": 7.330168726125961,
+      "symmetric_mean_mm": 7.273181886022099,
+      "p90_real_to_virtual_mm": 11.788027834267934,
+      "real_coverage_3mm": 0.19125,
+      "virtual_coverage_3mm": 0.2886178861788618
+    },
+    "training_symmetric_gain_mm": -0.9835554737917684,
+    "prototype_theta_mm_rad": [
+      11.857040577764234,
+      -17.970432328336422,
+      -1.9799910642909386,
+      -0.16377426857130906
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 7.296149754699329,
+      "mean_virtual_to_real_mm": 6.019964900612373,
+      "symmetric_mean_mm": 6.65805732765585,
+      "p90_real_to_virtual_mm": 12.175466252145942,
+      "real_coverage_3mm": 0.27205882352941174,
+      "virtual_coverage_3mm": 0.4146341463414634
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 7.772656516990576,
+      "mean_virtual_to_real_mm": 7.949772289797414,
+      "symmetric_mean_mm": 7.861214403393995,
+      "p90_real_to_virtual_mm": 11.830246794676773,
+      "real_coverage_3mm": 0.14460784313725492,
+      "virtual_coverage_3mm": 0.2682926829268293
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 3.0255643134178998,
+      "mean_virtual_to_real_mm": 2.9590470742958406,
+      "symmetric_mean_mm": 2.99230569385687,
+      "p90_real_to_virtual_mm": 6.722467489195033,
+      "real_coverage_3mm": 0.7205882352941176,
+      "virtual_coverage_3mm": 0.7804878048780488
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.2031570757381447
+  },
+  {
+    "frame_id": 19848,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "19779",
+      "19789",
+      "19799",
+      "19809",
+      "19818",
+      "19830"
+    ],
+    "holdout_frame_ids": [
+      "19839",
+      "19848"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7529397710077508,
+        0.6585642176387424,
+        0.22082637813902603,
+        0.04226845981123587
+      ],
+      "relative": [
+        1.0,
+        0.8746572342131773,
+        0.29328558092165496,
+        0.05613790297551005
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.8035144572817076,
+        -0.5941266324198032,
+        -0.001199987365939405,
+        0.0371028518999423
+      ],
+      "yaw_length_scale_mm": 23.834942510533818,
+      "normal_count": 221
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 98,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 3.88389751452043,
+      "mean_virtual_to_real_mm": 4.809945627889641,
+      "symmetric_mean_mm": 4.346921571205035,
+      "p90_real_to_virtual_mm": 10.703590900044972,
+      "real_coverage_3mm": 0.64625,
+      "virtual_coverage_3mm": 0.6042553191489362
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 3.232542565639832,
+      "mean_virtual_to_real_mm": 4.058563358095972,
+      "symmetric_mean_mm": 3.645552961867902,
+      "p90_real_to_virtual_mm": 10.920548845705168,
+      "real_coverage_3mm": 0.64875,
+      "virtual_coverage_3mm": 0.6127659574468085
+    },
+    "training_symmetric_gain_mm": 0.7013686093371332,
+    "prototype_theta_mm_rad": [
+      -4.089383786737009,
+      1.278030324851715,
+      -1.8309961954052443,
+      0.019133919537937957
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 3.719440763162802,
+      "mean_virtual_to_real_mm": 5.031845979334042,
+      "symmetric_mean_mm": 4.375643371248422,
+      "p90_real_to_virtual_mm": 8.92570713862668,
+      "real_coverage_3mm": 0.7017543859649122,
+      "virtual_coverage_3mm": 0.6153846153846154
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.1616670106145235,
+      "mean_virtual_to_real_mm": 4.292945525896143,
+      "symmetric_mean_mm": 3.727306268255333,
+      "p90_real_to_virtual_mm": 9.304832358774389,
+      "real_coverage_3mm": 0.6578947368421053,
+      "virtual_coverage_3mm": 0.6153846153846154
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 3.149814076087427,
+      "mean_virtual_to_real_mm": 3.61627839213052,
+      "symmetric_mean_mm": 3.3830462341089733,
+      "p90_real_to_virtual_mm": 6.548760180317896,
+      "real_coverage_3mm": 0.7339181286549707,
+      "virtual_coverage_3mm": 0.6410256410256411
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 0.6483371029930893
+  },
+  {
+    "frame_id": 4467,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "4395",
+      "4405",
+      "4415",
+      "4425",
+      "4436",
+      "4447"
+    ],
+    "holdout_frame_ids": [
+      "4457",
+      "4467"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7402159641329336,
+        0.6717922216369907,
+        0.11100544351314637,
+        0.027351707346444796
+      ],
+      "relative": [
+        1.0,
+        0.9075624604015501,
+        0.14996359021137132,
+        0.036950982783090544
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.7230842962124516,
+        0.686323375958679,
+        -0.0008218023845320784,
+        0.07815784557206125
+      ],
+      "yaw_length_scale_mm": 23.159155039855264,
+      "normal_count": 249
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 176,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 4.878609503599112,
+      "mean_virtual_to_real_mm": 3.955479230733977,
+      "symmetric_mean_mm": 4.417044367166544,
+      "p90_real_to_virtual_mm": 6.777764692663097,
+      "real_coverage_3mm": 0.12,
+      "virtual_coverage_3mm": 0.3178294573643411
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 4.440282908936052,
+      "mean_virtual_to_real_mm": 3.874385060458334,
+      "symmetric_mean_mm": 4.157333984697193,
+      "p90_real_to_virtual_mm": 7.474137132222002,
+      "real_coverage_3mm": 0.35375,
+      "virtual_coverage_3mm": 0.4069767441860465
+    },
+    "training_symmetric_gain_mm": 0.2597103824693514,
+    "prototype_theta_mm_rad": [
+      -0.7496693691574116,
+      -6.570323151796401,
+      -4.005286585545321,
+      -0.061731995700684245
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 4.823785941572006,
+      "mean_virtual_to_real_mm": 3.948251286493656,
+      "symmetric_mean_mm": 4.386018614032831,
+      "p90_real_to_virtual_mm": 6.803755656129574,
+      "real_coverage_3mm": 0.1375968992248062,
+      "virtual_coverage_3mm": 0.3023255813953488
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 6.072655329443102,
+      "mean_virtual_to_real_mm": 5.6745668386678405,
+      "symmetric_mean_mm": 5.873611084055471,
+      "p90_real_to_virtual_mm": 7.616297937905972,
+      "real_coverage_3mm": 0.0,
+      "virtual_coverage_3mm": 0.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 2.1386491629468445,
+      "mean_virtual_to_real_mm": 1.1629811588449244,
+      "symmetric_mean_mm": 1.6508151608958843,
+      "p90_real_to_virtual_mm": 5.408402609657142,
+      "real_coverage_3mm": 0.8565891472868217,
+      "virtual_coverage_3mm": 0.9534883720930233
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.4875924700226406
+  },
+  {
+    "frame_id": 4654,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "4585",
+      "4596",
+      "4607",
+      "4616",
+      "4627",
+      "4637"
+    ],
+    "holdout_frame_ids": [
+      "4645",
+      "4654"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.750989239023606,
+        0.6668086299465916,
+        0.1429247232964447,
+        0.043627003749059805
+      ],
+      "relative": [
+        1.0,
+        0.8879070368751737,
+        0.19031527466660825,
+        0.0580927148913361
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.829722695264116,
+        -0.5428683174477383,
+        0.0009993798399038911,
+        -0.12982002971440085
+      ],
+      "yaw_length_scale_mm": 21.875336911473102,
+      "normal_count": 251
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 209,
+      "iterations": 10
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.649883116371097,
+      "mean_virtual_to_real_mm": 0.8341892179417509,
+      "symmetric_mean_mm": 1.242036167156424,
+      "p90_real_to_virtual_mm": 2.358725739410702,
+      "real_coverage_3mm": 0.91125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.5114584218214844,
+      "mean_virtual_to_real_mm": 0.5209786072667709,
+      "symmetric_mean_mm": 1.0162185145441276,
+      "p90_real_to_virtual_mm": 2.560912922673249,
+      "real_coverage_3mm": 0.91125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": 0.22581765261229636,
+    "prototype_theta_mm_rad": [
+      3.1247377720834777,
+      -3.159410513596238,
+      -0.6261814077176265,
+      -0.03004768229019554
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.5697036146938308,
+      "mean_virtual_to_real_mm": 0.7321852300591553,
+      "symmetric_mean_mm": 1.150944422376493,
+      "p90_real_to_virtual_mm": 2.2943169986432705,
+      "real_coverage_3mm": 0.912621359223301,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.6440457099991561,
+      "mean_virtual_to_real_mm": 0.6565955779763324,
+      "symmetric_mean_mm": 1.1503206439877443,
+      "p90_real_to_virtual_mm": 2.7452924158836645,
+      "real_coverage_3mm": 0.9087378640776699,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.458649615733404,
+      "mean_virtual_to_real_mm": 0.4452114805611842,
+      "symmetric_mean_mm": 0.951930548147294,
+      "p90_real_to_virtual_mm": 2.6393913262238167,
+      "real_coverage_3mm": 0.9048543689320389,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 0.0006237783887488302
+  },
+  {
+    "frame_id": 5431,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "5355",
+      "5366",
+      "5376",
+      "5387",
+      "5398",
+      "5408"
+    ],
+    "holdout_frame_ids": [
+      "5419",
+      "5431"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7607928667188778,
+        0.5967603037535628,
+        0.3899671482388294,
+        0.14791863799487556
+      ],
+      "relative": [
+        1.0,
+        0.7843926117857162,
+        0.5125799219446769,
+        0.19442695175733463
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.8050300846388881,
+        -0.032099794326776454,
+        -0.009476878792778375,
+        0.5922890804318701
+      ],
+      "yaw_length_scale_mm": 21.72338119103074,
+      "normal_count": 240
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 126,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 3.2393522072910956,
+      "mean_virtual_to_real_mm": 1.8759013083767484,
+      "symmetric_mean_mm": 2.557626757833922,
+      "p90_real_to_virtual_mm": 6.717477210575436,
+      "real_coverage_3mm": 0.555,
+      "virtual_coverage_3mm": 0.7751937984496124
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 6.560508046752363,
+      "mean_virtual_to_real_mm": 5.612592083736806,
+      "symmetric_mean_mm": 6.086550065244585,
+      "p90_real_to_virtual_mm": 12.264366085586099,
+      "real_coverage_3mm": 0.2675,
+      "virtual_coverage_3mm": 0.35271317829457366
+    },
+    "training_symmetric_gain_mm": -3.528923307410663,
+    "prototype_theta_mm_rad": [
+      20.0,
+      -11.419227715883551,
+      -0.6120435687728658,
+      -0.1818197562864897
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 3.4676126520046386,
+      "mean_virtual_to_real_mm": 1.7510096882937327,
+      "symmetric_mean_mm": 2.609311170149186,
+      "p90_real_to_virtual_mm": 8.608551998794333,
+      "real_coverage_3mm": 0.55625,
+      "virtual_coverage_3mm": 0.7906976744186046
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 8.238686644534978,
+      "mean_virtual_to_real_mm": 6.800184301729051,
+      "symmetric_mean_mm": 7.519435473132015,
+      "p90_real_to_virtual_mm": 13.455247473530328,
+      "real_coverage_3mm": 0.08125,
+      "virtual_coverage_3mm": 0.11627906976744186
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 3.4799880581274816,
+      "mean_virtual_to_real_mm": 1.995468446055093,
+      "symmetric_mean_mm": 2.737728252091287,
+      "p90_real_to_virtual_mm": 7.520129232215912,
+      "real_coverage_3mm": 0.6791666666666667,
+      "virtual_coverage_3mm": 0.8604651162790697
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -4.91012430298283
+  },
+  {
+    "frame_id": 5803,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "5735",
+      "5745",
+      "5754",
+      "5763",
+      "5774",
+      "5785"
+    ],
+    "holdout_frame_ids": [
+      "5795",
+      "5803"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7530298589244557,
+        0.6765875217153151,
+        0.16410616942202358,
+        0.0567514866886565
+      ],
+      "relative": [
+        1.0,
+        0.8984869772384293,
+        0.21792783842119437,
+        0.0753641917595592
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.947222292018382,
+        0.09175966184515061,
+        -0.007565749872276359,
+        -0.30707141415373895
+      ],
+      "yaw_length_scale_mm": 23.417877951211157,
+      "normal_count": 246
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 165,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.1075915812897903,
+      "mean_virtual_to_real_mm": 1.2619148701197809,
+      "symmetric_mean_mm": 1.6847532257047857,
+      "p90_real_to_virtual_mm": 4.3243915060254325,
+      "real_coverage_3mm": 0.7525,
+      "virtual_coverage_3mm": 0.8798449612403101
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 4.8338164393769985,
+      "mean_virtual_to_real_mm": 4.038767967491147,
+      "symmetric_mean_mm": 4.436292203434073,
+      "p90_real_to_virtual_mm": 9.44925476301524,
+      "real_coverage_3mm": 0.39375,
+      "virtual_coverage_3mm": 0.49612403100775193
+    },
+    "training_symmetric_gain_mm": -2.7515389777292873,
+    "prototype_theta_mm_rad": [
+      18.0,
+      -6.379534104328631,
+      -0.4002471941040153,
+      -0.14997764253458692
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.237422728219854,
+      "mean_virtual_to_real_mm": 1.288249251144138,
+      "symmetric_mean_mm": 1.762835989681996,
+      "p90_real_to_virtual_mm": 4.809764815202926,
+      "real_coverage_3mm": 0.7171314741035857,
+      "virtual_coverage_3mm": 0.8372093023255814
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 6.2445776649982,
+      "mean_virtual_to_real_mm": 5.519900434852039,
+      "symmetric_mean_mm": 5.882239049925119,
+      "p90_real_to_virtual_mm": 10.5843821644738,
+      "real_coverage_3mm": 0.3207171314741036,
+      "virtual_coverage_3mm": 0.38372093023255816
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 2.0491307085501287,
+      "mean_virtual_to_real_mm": 1.0828489006106683,
+      "symmetric_mean_mm": 1.5659898045803984,
+      "p90_real_to_virtual_mm": 4.33737481505863,
+      "real_coverage_3mm": 0.8625498007968128,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -4.1194030602431235
+  },
+  {
+    "frame_id": 6151,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "6082",
+      "6093",
+      "6103",
+      "6111",
+      "6121",
+      "6132"
+    ],
+    "holdout_frame_ids": [
+      "6141",
+      "6151"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7669584109408716,
+        0.6539186857842189,
+        0.15358226255251378,
+        0.062094117605772034
+      ],
+      "relative": [
+        1.0,
+        0.8526129663041566,
+        0.20024848852508922,
+        0.08096151853866189
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.9618916569437034,
+        -0.032241781890367596,
+        -0.009707678108750579,
+        -0.2713497167648557
+      ],
+      "yaw_length_scale_mm": 24.153732356805886,
+      "normal_count": 247
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 174,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.8816501603935452,
+      "mean_virtual_to_real_mm": 1.1038792746817092,
+      "symmetric_mean_mm": 1.4927647175376273,
+      "p90_real_to_virtual_mm": 3.517534612676068,
+      "real_coverage_3mm": 0.8125,
+      "virtual_coverage_3mm": 0.9263565891472868
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.7536813114970253,
+      "mean_virtual_to_real_mm": 2.0967103034906787,
+      "symmetric_mean_mm": 2.4251958074938518,
+      "p90_real_to_virtual_mm": 4.396720791477132,
+      "real_coverage_3mm": 0.6725,
+      "virtual_coverage_3mm": 0.7441860465116279
+    },
+    "training_symmetric_gain_mm": -0.9324310899562245,
+    "prototype_theta_mm_rad": [
+      9.538343111465679,
+      -1.9708434889291984,
+      -0.18070418039267583,
+      -0.03758071953578195
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.825675657658723,
+      "mean_virtual_to_real_mm": 1.0446240005669127,
+      "symmetric_mean_mm": 1.435149829112818,
+      "p90_real_to_virtual_mm": 3.3244407121551864,
+      "real_coverage_3mm": 0.8490196078431372,
+      "virtual_coverage_3mm": 0.9534883720930233
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 3.5340542800435415,
+      "mean_virtual_to_real_mm": 2.9898544989951006,
+      "symmetric_mean_mm": 3.261954389519321,
+      "p90_real_to_virtual_mm": 4.378821943231852,
+      "real_coverage_3mm": 0.4117647058823529,
+      "virtual_coverage_3mm": 0.46511627906976744
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.605627988110761,
+      "mean_virtual_to_real_mm": 0.7167698983745943,
+      "symmetric_mean_mm": 1.1611989432426775,
+      "p90_real_to_virtual_mm": 2.3156774079097735,
+      "real_coverage_3mm": 0.9176470588235294,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.826804560406503
+  },
+  {
+    "frame_id": 6692,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "6622",
+      "6631",
+      "6642",
+      "6653",
+      "6663",
+      "6673"
+    ],
+    "holdout_frame_ids": [
+      "6684",
+      "6692"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7887519746024081,
+        0.5844179167571322,
+        0.3150335633260299,
+        0.1132576080149094
+      ],
+      "relative": [
+        1.0,
+        0.7409400363805415,
+        0.39940763823105624,
+        0.14359090266873814
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.7603615755093206,
+        0.3684063719964034,
+        0.0005028857858752067,
+        -0.5349081852685725
+      ],
+      "yaw_length_scale_mm": 23.412485033735305,
+      "normal_count": 239
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 182,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.6518580742114028,
+      "mean_virtual_to_real_mm": 0.8216432948103143,
+      "symmetric_mean_mm": 1.2367506845108585,
+      "p90_real_to_virtual_mm": 3.4444491229034124,
+      "real_coverage_3mm": 0.86375,
+      "virtual_coverage_3mm": 0.9534883720930233
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.6976216389730763,
+      "mean_virtual_to_real_mm": 0.8658418419399794,
+      "symmetric_mean_mm": 1.2817317404565278,
+      "p90_real_to_virtual_mm": 3.619355617533957,
+      "real_coverage_3mm": 0.8575,
+      "virtual_coverage_3mm": 0.9612403100775194
+    },
+    "training_symmetric_gain_mm": -0.04498105594566937,
+    "prototype_theta_mm_rad": [
+      1.3509822601384223,
+      0.5022788530833735,
+      -0.19054429670903944,
+      -0.004370232353040837
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.4474428227289051,
+      "mean_virtual_to_real_mm": 0.5042710417645805,
+      "symmetric_mean_mm": 0.9758569322467427,
+      "p90_real_to_virtual_mm": 2.61933503829357,
+      "real_coverage_3mm": 0.9109311740890689,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.5848958945617493,
+      "mean_virtual_to_real_mm": 0.7414666349977942,
+      "symmetric_mean_mm": 1.1631812647797717,
+      "p90_real_to_virtual_mm": 2.6898300437471,
+      "real_coverage_3mm": 0.9109311740890689,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.4721807090411125,
+      "mean_virtual_to_real_mm": 0.6737523565696255,
+      "symmetric_mean_mm": 1.072966532805369,
+      "p90_real_to_virtual_mm": 2.375568111317136,
+      "real_coverage_3mm": 0.9210526315789473,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.18732433253302894
+  },
+  {
+    "frame_id": 6966,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "6900",
+      "6909",
+      "6918",
+      "6928",
+      "6936",
+      "6946"
+    ],
+    "holdout_frame_ids": [
+      "6956",
+      "6966"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7800773326148354,
+        0.6330768907329951,
+        0.14590948881610094,
+        0.03893476691835807
+      ],
+      "relative": [
+        1.0,
+        0.8115565781291302,
+        0.18704490274958935,
+        0.04991141940741686
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.9144833713546144,
+        -0.38966425362781526,
+        -0.005060551905540098,
+        -0.1088867474717986
+      ],
+      "yaw_length_scale_mm": 24.620570314610145,
+      "normal_count": 255
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 187,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.3715483066280192,
+      "mean_virtual_to_real_mm": 0.5202403026157254,
+      "symmetric_mean_mm": 0.9458943046218723,
+      "p90_real_to_virtual_mm": 1.7279157206286961,
+      "real_coverage_3mm": 0.93,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.133481845835198,
+      "mean_virtual_to_real_mm": 1.6902178347663324,
+      "symmetric_mean_mm": 1.911849840300765,
+      "p90_real_to_virtual_mm": 3.2784488286573072,
+      "real_coverage_3mm": 0.85625,
+      "virtual_coverage_3mm": 0.9147286821705426
+    },
+    "training_symmetric_gain_mm": -0.9659555356788928,
+    "prototype_theta_mm_rad": [
+      -3.126440637641842,
+      2.0069779575191387,
+      -0.09401361072005168,
+      0.0004504243169059195
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.2803467940681126,
+      "mean_virtual_to_real_mm": 0.4417495054575173,
+      "symmetric_mean_mm": 0.861048149762815,
+      "p90_real_to_virtual_mm": 1.6781615967393366,
+      "real_coverage_3mm": 0.9302325581395349,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.6594450073392184,
+      "mean_virtual_to_real_mm": 2.3281738191933807,
+      "symmetric_mean_mm": 2.4938094132662996,
+      "p90_real_to_virtual_mm": 3.795127166548478,
+      "real_coverage_3mm": 0.718816067653277,
+      "virtual_coverage_3mm": 0.7790697674418605
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.2062756417357072,
+      "mean_virtual_to_real_mm": 0.40797215171206586,
+      "symmetric_mean_mm": 0.8071238967238865,
+      "p90_real_to_virtual_mm": 1.836125524300168,
+      "real_coverage_3mm": 0.9281183932346723,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.6327612635034847
+  },
+  {
+    "frame_id": 7130,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "7056",
+      "7068",
+      "7079",
+      "7090",
+      "7100",
+      "7109"
+    ],
+    "holdout_frame_ids": [
+      "7118",
+      "7130"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7804011080275282,
+        0.6305600513741124,
+        0.13534169889452305,
+        0.04423526255667397
+      ],
+      "relative": [
+        1.0,
+        0.8079948181619827,
+        0.1734258159071565,
+        0.056682726487253525
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.9008918526919969,
+        -0.40097018106817867,
+        -0.005571682329256769,
+        -0.16608955416688986
+      ],
+      "yaw_length_scale_mm": 24.758584733207243,
+      "normal_count": 251
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 199,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.0120746279875537,
+      "mean_virtual_to_real_mm": 0.5024816675197312,
+      "symmetric_mean_mm": 0.7572781477536424,
+      "p90_real_to_virtual_mm": 1.4602800663070166,
+      "real_coverage_3mm": 0.97625,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.0511966476402659,
+      "mean_virtual_to_real_mm": 0.5720988790222824,
+      "symmetric_mean_mm": 0.8116477633312742,
+      "p90_real_to_virtual_mm": 1.6025827411932447,
+      "real_coverage_3mm": 0.96875,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": -0.05436961557763176,
+    "prototype_theta_mm_rad": [
+      -6.470210350203536,
+      -2.266964033788443,
+      -0.015582690957333844,
+      0.04085917780579098
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.142473100085777,
+      "mean_virtual_to_real_mm": 0.4418082878321411,
+      "symmetric_mean_mm": 0.792140693958959,
+      "p90_real_to_virtual_mm": 1.5401947368196283,
+      "real_coverage_3mm": 0.9661354581673307,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.3439345091147437,
+      "mean_virtual_to_real_mm": 0.7888144246351656,
+      "symmetric_mean_mm": 1.0663744668749546,
+      "p90_real_to_virtual_mm": 1.854094131029565,
+      "real_coverage_3mm": 0.9561752988047809,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.0602418570102803,
+      "mean_virtual_to_real_mm": 0.3615371223120919,
+      "symmetric_mean_mm": 0.7108894896611861,
+      "p90_real_to_virtual_mm": 1.404862898852621,
+      "real_coverage_3mm": 0.9661354581673307,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.2742337729159956
+  },
+  {
+    "frame_id": 7290,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "7220",
+      "7229",
+      "7241",
+      "7250",
+      "7258",
+      "7269"
+    ],
+    "holdout_frame_ids": [
+      "7280",
+      "7290"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.779749126470516,
+        0.6350602518275011,
+        0.15415468046906963,
+        0.04053335368234848
+      ],
+      "relative": [
+        1.0,
+        0.8144417611624143,
+        0.1976977918100926,
+        0.05198255734613014
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        0.8483942596815942,
+        0.5215806363801596,
+        0.0020047438022885444,
+        0.09042566502312434
+      ],
+      "yaw_length_scale_mm": 24.85160664427506,
+      "normal_count": 248
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 191,
+      "iterations": 8
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 0.9932370971174896,
+      "mean_virtual_to_real_mm": 0.47097739592773485,
+      "symmetric_mean_mm": 0.7321072465226123,
+      "p90_real_to_virtual_mm": 1.5230898240868063,
+      "real_coverage_3mm": 0.97375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.4107631907224565,
+      "mean_virtual_to_real_mm": 0.9755712355770548,
+      "symmetric_mean_mm": 1.1931672131497557,
+      "p90_real_to_virtual_mm": 2.3022279011638673,
+      "real_coverage_3mm": 0.96875,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": -0.46105996662714344,
+    "prototype_theta_mm_rad": [
+      1.8488269208302919,
+      1.4853538506472963,
+      0.04448052847626897,
+      -0.0015991409300291132
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 0.9367293413789528,
+      "mean_virtual_to_real_mm": 0.3654646151702316,
+      "symmetric_mean_mm": 0.6510969782745922,
+      "p90_real_to_virtual_mm": 1.6187202880318363,
+      "real_coverage_3mm": 0.9806201550387597,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.0060769102894693,
+      "mean_virtual_to_real_mm": 1.7558971657126472,
+      "symmetric_mean_mm": 1.8809870380010583,
+      "p90_real_to_virtual_mm": 2.5094305194642974,
+      "real_coverage_3mm": 0.9593023255813954,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 0.9363963619517995,
+      "mean_virtual_to_real_mm": 0.3659045866133603,
+      "symmetric_mean_mm": 0.6511504742825799,
+      "p90_real_to_virtual_mm": 1.6200001399462098,
+      "real_coverage_3mm": 0.9806201550387597,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.2298900597264661
+  },
+  {
+    "frame_id": 7445,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "7375",
+      "7385",
+      "7394",
+      "7405",
+      "7414",
+      "7424"
+    ],
+    "holdout_frame_ids": [
+      "7434",
+      "7445"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7717415976605393,
+        0.6416652666078498,
+        0.1261917102715086,
+        0.02180976429757297
+      ],
+      "relative": [
+        1.0,
+        0.8314509267778186,
+        0.1635154961894586,
+        0.028260449305424484
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.8402438900828861,
+        -0.5262185727962089,
+        0.00022800679568571458,
+        -0.13070641466890975
+      ],
+      "yaw_length_scale_mm": 24.702060583327636,
+      "normal_count": 244
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 191,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.117391125872288,
+      "mean_virtual_to_real_mm": 0.5136708788171283,
+      "symmetric_mean_mm": 0.8155310023447081,
+      "p90_real_to_virtual_mm": 1.7822044876359913,
+      "real_coverage_3mm": 0.9625,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.1743717421458353,
+      "mean_virtual_to_real_mm": 0.6241868833289671,
+      "symmetric_mean_mm": 0.8992793127374012,
+      "p90_real_to_virtual_mm": 1.7330713519616985,
+      "real_coverage_3mm": 0.9675,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": -0.08374831039269315,
+    "prototype_theta_mm_rad": [
+      4.48665227305588,
+      2.5318855198347037,
+      0.08906511137543172,
+      -0.028304706073598772
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.2218109679333584,
+      "mean_virtual_to_real_mm": 0.48087824828078696,
+      "symmetric_mean_mm": 0.8513446081070727,
+      "p90_real_to_virtual_mm": 1.8632022451657502,
+      "real_coverage_3mm": 0.9530332681017613,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.3767203457740225,
+      "mean_virtual_to_real_mm": 0.7380358815864843,
+      "symmetric_mean_mm": 1.0573781136802534,
+      "p90_real_to_virtual_mm": 1.867781742390542,
+      "real_coverage_3mm": 0.9530332681017613,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.17455468125404,
+      "mean_virtual_to_real_mm": 0.40665501903593304,
+      "symmetric_mean_mm": 0.7906048501449865,
+      "p90_real_to_virtual_mm": 1.7042738110382227,
+      "real_coverage_3mm": 0.9549902152641878,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.20603350557318068
+  },
+  {
+    "frame_id": 7604,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "7535",
+      "7547",
+      "7555",
+      "7563",
+      "7574",
+      "7585"
+    ],
+    "holdout_frame_ids": [
+      "7594",
+      "7604"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7733021008980636,
+        0.6348359189932914,
+        0.13623886340444682,
+        0.029963445390788542
+      ],
+      "relative": [
+        1.0,
+        0.8209416711218469,
+        0.1761780593201903,
+        0.038747399439353535
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.8105678406778601,
+        -0.5727936940889268,
+        -0.0002238422569257048,
+        0.12201274345508448
+      ],
+      "yaw_length_scale_mm": 24.556534726336793,
+      "normal_count": 243
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 193,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.1215892410274888,
+      "mean_virtual_to_real_mm": 0.5687575749097288,
+      "symmetric_mean_mm": 0.8451734079686088,
+      "p90_real_to_virtual_mm": 1.747910804404503,
+      "real_coverage_3mm": 0.96375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.1955286351973542,
+      "mean_virtual_to_real_mm": 0.7022132224468849,
+      "symmetric_mean_mm": 0.9488709288221195,
+      "p90_real_to_virtual_mm": 2.0079594091131123,
+      "real_coverage_3mm": 0.965,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": -0.1036975208535107,
+    "prototype_theta_mm_rad": [
+      7.043598349588998,
+      4.356285398249383,
+      0.15067050704197388,
+      -0.04614378316235329
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.0406811296750416,
+      "mean_virtual_to_real_mm": 0.46057975050133204,
+      "symmetric_mean_mm": 0.7506304400881868,
+      "p90_real_to_virtual_mm": 1.5633422124931882,
+      "real_coverage_3mm": 0.9629629629629629,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.4367723296173331,
+      "mean_virtual_to_real_mm": 0.9677389671280893,
+      "symmetric_mean_mm": 1.2022556483727111,
+      "p90_real_to_virtual_mm": 2.180654727234546,
+      "real_coverage_3mm": 0.9649122807017544,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 0.9552949662877898,
+      "mean_virtual_to_real_mm": 0.3407733228276893,
+      "symmetric_mean_mm": 0.6480341445577396,
+      "p90_real_to_virtual_mm": 1.522518245320693,
+      "real_coverage_3mm": 0.9766081871345029,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.45162520828452435
+  },
+  {
+    "frame_id": 7764,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "7696",
+      "7705",
+      "7713",
+      "7725",
+      "7734",
+      "7743"
+    ],
+    "holdout_frame_ids": [
+      "7754",
+      "7764"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7657665252544356,
+        0.6499161716441644,
+        0.1338840112435427,
+        0.01886986940387939
+      ],
+      "relative": [
+        1.0,
+        0.8487132176850138,
+        0.17483659422048786,
+        0.024641805017018258
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.759227055139097,
+        0.6358930881031115,
+        0.002213192427034716,
+        0.13859783918511698
+      ],
+      "yaw_length_scale_mm": 24.522990635430425,
+      "normal_count": 243
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 198,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.509599143269739,
+      "mean_virtual_to_real_mm": 0.8031023097491342,
+      "symmetric_mean_mm": 1.1563507265094366,
+      "p90_real_to_virtual_mm": 3.107818929230831,
+      "real_coverage_3mm": 0.8975,
+      "virtual_coverage_3mm": 0.937984496124031
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.617475452243877,
+      "mean_virtual_to_real_mm": 0.852304235820406,
+      "symmetric_mean_mm": 1.2348898440321414,
+      "p90_real_to_virtual_mm": 3.1676482184124297,
+      "real_coverage_3mm": 0.8975,
+      "virtual_coverage_3mm": 0.9496124031007752
+    },
+    "training_symmetric_gain_mm": -0.07853911752270482,
+    "prototype_theta_mm_rad": [
+      3.309314483243722,
+      2.482653993583775,
+      -0.17432601976983925,
+      -0.031143317036709393
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.7623894796776571,
+      "mean_virtual_to_real_mm": 1.1747602528631425,
+      "symmetric_mean_mm": 1.4685748662703997,
+      "p90_real_to_virtual_mm": 5.461845551270552,
+      "real_coverage_3mm": 0.8409090909090909,
+      "virtual_coverage_3mm": 0.872093023255814
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.9681019490529557,
+      "mean_virtual_to_real_mm": 1.4549097823474937,
+      "symmetric_mean_mm": 1.7115058657002247,
+      "p90_real_to_virtual_mm": 5.272941626794518,
+      "real_coverage_3mm": 0.8450413223140496,
+      "virtual_coverage_3mm": 0.872093023255814
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.8362050970670027,
+      "mean_virtual_to_real_mm": 1.3541135043730665,
+      "symmetric_mean_mm": 1.5951593007200346,
+      "p90_real_to_virtual_mm": 4.980163248952061,
+      "real_coverage_3mm": 0.8450413223140496,
+      "virtual_coverage_3mm": 0.8604651162790697
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.242930999429825
+  },
+  {
+    "frame_id": 7923,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "7851",
+      "7860",
+      "7871",
+      "7881",
+      "7891",
+      "7902"
+    ],
+    "holdout_frame_ids": [
+      "7912",
+      "7923"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7903641808559444,
+        0.5876220489394677,
+        0.2762055465641488,
+        0.11204318626396036
+      ],
+      "relative": [
+        1.0,
+        0.7434826415122809,
+        0.3494661742704802,
+        0.1417614676599089
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.5331591111957156,
+        -0.6596404595688242,
+        -0.002719302635906057,
+        0.5297248640964471
+      ],
+      "yaw_length_scale_mm": 24.12975552863634,
+      "normal_count": 240
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 196,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.234741349898357,
+      "mean_virtual_to_real_mm": 0.737381161211595,
+      "symmetric_mean_mm": 0.986061255554976,
+      "p90_real_to_virtual_mm": 1.847474590402603,
+      "real_coverage_3mm": 0.97,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.8246619729619238,
+      "mean_virtual_to_real_mm": 1.4904210669593827,
+      "symmetric_mean_mm": 1.6575415199606534,
+      "p90_real_to_virtual_mm": 4.0230915452259675,
+      "real_coverage_3mm": 0.8175,
+      "virtual_coverage_3mm": 0.8217054263565892
+    },
+    "training_symmetric_gain_mm": -0.6714802644056773,
+    "prototype_theta_mm_rad": [
+      9.659273639121963,
+      7.651706467593579,
+      -0.1515494913489422,
+      -0.0906260049183777
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.3954841816472512,
+      "mean_virtual_to_real_mm": 0.6861590365549497,
+      "symmetric_mean_mm": 1.0408216091011004,
+      "p90_real_to_virtual_mm": 1.9218573990952217,
+      "real_coverage_3mm": 0.955078125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.6355218731869616,
+      "mean_virtual_to_real_mm": 2.144655687069008,
+      "symmetric_mean_mm": 2.390088780127985,
+      "p90_real_to_virtual_mm": 5.6376839786407835,
+      "real_coverage_3mm": 0.6953125,
+      "virtual_coverage_3mm": 0.7558139534883721
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.3226914636904303,
+      "mean_virtual_to_real_mm": 0.6185566970362555,
+      "symmetric_mean_mm": 0.9706240803633429,
+      "p90_real_to_virtual_mm": 1.7928558758593316,
+      "real_coverage_3mm": 0.95703125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -1.3492671710268844
+  },
+  {
+    "frame_id": 8089,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "8017",
+      "8027",
+      "8037",
+      "8045",
+      "8057",
+      "8068"
+    ],
+    "holdout_frame_ids": [
+      "8077",
+      "8089"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7444621344824612,
+        0.652918627237543,
+        0.1747730786291734,
+        0.13465211051649018
+      ],
+      "relative": [
+        1.0,
+        0.8770340316790486,
+        0.23476422847304784,
+        0.18087167134443752
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.3005282448133061,
+        -0.49859824349592385,
+        -0.006464786312094156,
+        0.8130441391401525
+      ],
+      "yaw_length_scale_mm": 24.77338328510331,
+      "normal_count": 244
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 185,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.46260511936998,
+      "mean_virtual_to_real_mm": 1.3601900486436882,
+      "symmetric_mean_mm": 1.411397584006834,
+      "p90_real_to_virtual_mm": 2.601001445368687,
+      "real_coverage_3mm": 0.95375,
+      "virtual_coverage_3mm": 0.9689922480620154
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.7595216455291363,
+      "mean_virtual_to_real_mm": 1.6389417618768123,
+      "symmetric_mean_mm": 1.6992317037029743,
+      "p90_real_to_virtual_mm": 3.433077341880768,
+      "real_coverage_3mm": 0.82875,
+      "virtual_coverage_3mm": 0.8837209302325582
+    },
+    "training_symmetric_gain_mm": -0.28783411969614026,
+    "prototype_theta_mm_rad": [
+      13.70878614931536,
+      11.227953799644474,
+      -0.00962604973768595,
+      -0.10079294210446506
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.5199946116551588,
+      "mean_virtual_to_real_mm": 0.9476284047685753,
+      "symmetric_mean_mm": 1.233811508211867,
+      "p90_real_to_virtual_mm": 2.754547064581561,
+      "real_coverage_3mm": 0.9475728155339805,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.4046666375434986,
+      "mean_virtual_to_real_mm": 2.055472408420978,
+      "symmetric_mean_mm": 2.2300695229822383,
+      "p90_real_to_virtual_mm": 3.796111392167577,
+      "real_coverage_3mm": 0.6330097087378641,
+      "virtual_coverage_3mm": 0.7441860465116279
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.147595964720431,
+      "mean_virtual_to_real_mm": 0.5626076533978273,
+      "symmetric_mean_mm": 0.8551018090591291,
+      "p90_real_to_virtual_mm": 1.877956391441537,
+      "real_coverage_3mm": 0.9689320388349515,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.9962580147703712
+  },
+  {
+    "frame_id": 8257,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "8186",
+      "8195",
+      "8204",
+      "8215",
+      "8224",
+      "8236"
+    ],
+    "holdout_frame_ids": [
+      "8246",
+      "8257"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7622396720203704,
+        0.6492101572571959,
+        0.14049500407961413,
+        0.023120986805971355
+      ],
+      "relative": [
+        1.0,
+        0.8517139439048328,
+        0.18431867198308133,
+        0.03033296173720208
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.6293664424065498,
+        -0.7692318284269715,
+        0.00013161403861436383,
+        0.11036420608678259
+      ],
+      "yaw_length_scale_mm": 23.947886142494895,
+      "normal_count": 242
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 193,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.414495630373672,
+      "mean_virtual_to_real_mm": 0.5920112046156081,
+      "symmetric_mean_mm": 1.0032534174946401,
+      "p90_real_to_virtual_mm": 2.393251134442146,
+      "real_coverage_3mm": 0.91875,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 3.0843751070242127,
+      "mean_virtual_to_real_mm": 2.6030995770997523,
+      "symmetric_mean_mm": 2.8437373420619823,
+      "p90_real_to_virtual_mm": 5.927893163537417,
+      "real_coverage_3mm": 0.5575,
+      "virtual_coverage_3mm": 0.6317829457364341
+    },
+    "training_symmetric_gain_mm": -1.8404839245673421,
+    "prototype_theta_mm_rad": [
+      6.417735871606372,
+      6.677675135561017,
+      -0.2074097728619891,
+      -0.0822331058324233
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.3674625354421188,
+      "mean_virtual_to_real_mm": 0.5134813059441407,
+      "symmetric_mean_mm": 0.9404719206931298,
+      "p90_real_to_virtual_mm": 2.6617800608426676,
+      "real_coverage_3mm": 0.9072978303747534,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 4.281082271905094,
+      "mean_virtual_to_real_mm": 3.8021759003938183,
+      "symmetric_mean_mm": 4.041629086149456,
+      "p90_real_to_virtual_mm": 6.984828301786473,
+      "real_coverage_3mm": 0.3767258382642998,
+      "virtual_coverage_3mm": 0.43023255813953487
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.367815061155149,
+      "mean_virtual_to_real_mm": 0.5295300717688102,
+      "symmetric_mean_mm": 0.9486725664619795,
+      "p90_real_to_virtual_mm": 2.6689040021628205,
+      "real_coverage_3mm": 0.9092702169625246,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -3.101157165456326
+  },
+  {
+    "frame_id": 8408,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "8341",
+      "8349",
+      "8357",
+      "8368",
+      "8380",
+      "8388"
+    ],
+    "holdout_frame_ids": [
+      "8397",
+      "8408"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7543921690837103,
+        0.6615996821568093,
+        0.13797942008189937,
+        0.026963702343840417
+      ],
+      "relative": [
+        1.0,
+        0.8769970172945891,
+        0.18290144799553007,
+        0.035742288227342954
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.5626988557961397,
+        0.8266543606577822,
+        -0.0017510235615060404,
+        -0.0030821433573082757
+      ],
+      "yaw_length_scale_mm": 24.069121853768966,
+      "normal_count": 246
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 203,
+      "iterations": 12
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.1285121520499006,
+      "mean_virtual_to_real_mm": 0.6310116805222622,
+      "symmetric_mean_mm": 0.8797619162860815,
+      "p90_real_to_virtual_mm": 1.7614099546249962,
+      "real_coverage_3mm": 0.965,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.2157810597274494,
+      "mean_virtual_to_real_mm": 0.7521850320117147,
+      "symmetric_mean_mm": 0.9839830458695821,
+      "p90_real_to_virtual_mm": 2.3570206551835375,
+      "real_coverage_3mm": 0.95125,
+      "virtual_coverage_3mm": 0.9844961240310077
+    },
+    "training_symmetric_gain_mm": -0.1042211295835006,
+    "prototype_theta_mm_rad": [
+      4.511833676556632,
+      4.854968445296582,
+      -0.192233366327687,
+      -0.04746186929278107
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.179133774456002,
+      "mean_virtual_to_real_mm": 0.648021834164985,
+      "symmetric_mean_mm": 0.9135778043104935,
+      "p90_real_to_virtual_mm": 1.8855576879219262,
+      "real_coverage_3mm": 0.9684418145956607,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.556787394018255,
+      "mean_virtual_to_real_mm": 1.1072515730165968,
+      "symmetric_mean_mm": 1.332019483517426,
+      "p90_real_to_virtual_mm": 2.862041520841964,
+      "real_coverage_3mm": 0.9171597633136095,
+      "virtual_coverage_3mm": 0.9418604651162791
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.068809339663011,
+      "mean_virtual_to_real_mm": 0.4984412499253894,
+      "symmetric_mean_mm": 0.7836252947942002,
+      "p90_real_to_virtual_mm": 1.700959154855575,
+      "real_coverage_3mm": 0.9684418145956607,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.4184416792069324
+  },
+  {
+    "frame_id": 8577,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "8509",
+      "8521",
+      "8531",
+      "8539",
+      "8548",
+      "8558"
+    ],
+    "holdout_frame_ids": [
+      "8568",
+      "8577"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7522938293145176,
+        0.6622229077215643,
+        0.1640474351525461,
+        0.024817082576081565
+      ],
+      "relative": [
+        1.0,
+        0.8802716198336693,
+        0.21806298119183623,
+        0.032988549964173754
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.507259940539149,
+        -0.8615319151184099,
+        -0.0023300724928835143,
+        0.021087501483166182
+      ],
+      "yaw_length_scale_mm": 23.957474589010328,
+      "normal_count": 245
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 180,
+      "iterations": 20
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.9518848072586166,
+      "mean_virtual_to_real_mm": 0.963296494195261,
+      "symmetric_mean_mm": 1.4575906507269387,
+      "p90_real_to_virtual_mm": 4.2051630360543015,
+      "real_coverage_3mm": 0.85,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.1375011446560177,
+      "mean_virtual_to_real_mm": 1.0847626747702748,
+      "symmetric_mean_mm": 1.6111319097131462,
+      "p90_real_to_virtual_mm": 4.710015385850664,
+      "real_coverage_3mm": 0.765,
+      "virtual_coverage_3mm": 0.937984496124031
+    },
+    "training_symmetric_gain_mm": -0.15354125898620752,
+    "prototype_theta_mm_rad": [
+      9.355721838293478,
+      11.364839574976966,
+      -0.11706216840570266,
+      -0.09423501957021611
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.123906950463287,
+      "mean_virtual_to_real_mm": 0.8828275768647738,
+      "symmetric_mean_mm": 1.5033672636640305,
+      "p90_real_to_virtual_mm": 5.221989413248457,
+      "real_coverage_3mm": 0.8399209486166008,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.894579248131991,
+      "mean_virtual_to_real_mm": 1.8386931872578196,
+      "symmetric_mean_mm": 2.3666362176949054,
+      "p90_real_to_virtual_mm": 5.5828181850548795,
+      "real_coverage_3mm": 0.642292490118577,
+      "virtual_coverage_3mm": 0.7906976744186046
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.982163017019334,
+      "mean_virtual_to_real_mm": 1.006834681410644,
+      "symmetric_mean_mm": 1.494498849214989,
+      "p90_real_to_virtual_mm": 4.287874077525214,
+      "real_coverage_3mm": 0.8715415019762845,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.8632689540308749
+  },
+  {
+    "frame_id": 8998,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "8932",
+      "8940",
+      "8949",
+      "8960",
+      "8970",
+      "8978"
+    ],
+    "holdout_frame_ids": [
+      "8987",
+      "8998"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7437567823818603,
+        0.671483994795937,
+        0.1659775924661125,
+        0.032468527933434965
+      ],
+      "relative": [
+        1.0,
+        0.9028273902195935,
+        0.22316111449037668,
+        0.04365476551280032
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.34720443187215205,
+        -0.9335334789653738,
+        -0.00015398497029430955,
+        0.08924294049262788
+      ],
+      "yaw_length_scale_mm": 23.661592588931835,
+      "normal_count": 249
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 171,
+      "iterations": 9
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.2145269616269228,
+      "mean_virtual_to_real_mm": 1.0323260475973928,
+      "symmetric_mean_mm": 1.6234265046121577,
+      "p90_real_to_virtual_mm": 5.054749700356883,
+      "real_coverage_3mm": 0.82125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.9946752888118306,
+      "mean_virtual_to_real_mm": 0.7155723318275798,
+      "symmetric_mean_mm": 1.3551238103197052,
+      "p90_real_to_virtual_mm": 5.287927842706527,
+      "real_coverage_3mm": 0.825,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": 0.26830269429245246,
+    "prototype_theta_mm_rad": [
+      3.620502710696369,
+      3.904166821450427,
+      -0.07077221043053532,
+      -0.035369691909127414
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.1159760203305926,
+      "mean_virtual_to_real_mm": 1.2029764377196677,
+      "symmetric_mean_mm": 1.6594762290251301,
+      "p90_real_to_virtual_mm": 3.796968580897799,
+      "real_coverage_3mm": 0.8538622129436325,
+      "virtual_coverage_3mm": 0.9302325581395349
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.005106958068822,
+      "mean_virtual_to_real_mm": 1.0434212816147463,
+      "symmetric_mean_mm": 1.5242641198417841,
+      "p90_real_to_virtual_mm": 3.863733625832224,
+      "real_coverage_3mm": 0.8455114822546973,
+      "virtual_coverage_3mm": 0.9534883720930233
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.9105023152639526,
+      "mean_virtual_to_real_mm": 1.1084903415847758,
+      "symmetric_mean_mm": 1.509496328424364,
+      "p90_real_to_virtual_mm": 3.7996175027661128,
+      "real_coverage_3mm": 0.8768267223382046,
+      "virtual_coverage_3mm": 0.9418604651162791
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 0.13521210918334603
+  },
+  {
+    "frame_id": 9238,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "9172",
+      "9181",
+      "9191",
+      "9200",
+      "9209",
+      "9220"
+    ],
+    "holdout_frame_ids": [
+      "9229",
+      "9238"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.8017836412895876,
+        0.5886559919490703,
+        0.2365933103847655,
+        0.08300005313778935
+      ],
+      "relative": [
+        1.0,
+        0.7341830908426579,
+        0.2950837335671119,
+        0.10351926487835571
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.25959401553610373,
+        -0.9241105321512184,
+        -0.021752677845428746,
+        0.279566615445382
+      ],
+      "yaw_length_scale_mm": 22.3918371297679,
+      "normal_count": 237
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 177,
+      "iterations": 17
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.9923680786480318,
+      "mean_virtual_to_real_mm": 1.0694205133912087,
+      "symmetric_mean_mm": 1.5308942960196203,
+      "p90_real_to_virtual_mm": 3.937703699061548,
+      "real_coverage_3mm": 0.85375,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.7300917763432795,
+      "mean_virtual_to_real_mm": 0.6684776111452969,
+      "symmetric_mean_mm": 1.1992846937442883,
+      "p90_real_to_virtual_mm": 3.966408486753627,
+      "real_coverage_3mm": 0.86125,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": 0.3316096022753321,
+    "prototype_theta_mm_rad": [
+      2.8409211425792513,
+      5.1264509054935425,
+      -0.0792142206838518,
+      -0.03926932496849425
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 2.109294155647033,
+      "mean_virtual_to_real_mm": 0.9736148697990389,
+      "symmetric_mean_mm": 1.541454512723036,
+      "p90_real_to_virtual_mm": 4.108222325752102,
+      "real_coverage_3mm": 0.8808080808080808,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.1034867734383376,
+      "mean_virtual_to_real_mm": 0.8245409499967319,
+      "symmetric_mean_mm": 1.4640138617175347,
+      "p90_real_to_virtual_mm": 4.731622185862138,
+      "real_coverage_3mm": 0.8747474747474747,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.9035231898478737,
+      "mean_virtual_to_real_mm": 0.7095523330027517,
+      "symmetric_mean_mm": 1.3065377614253126,
+      "p90_real_to_virtual_mm": 3.8619517383089486,
+      "real_coverage_3mm": 0.8828282828282829,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": true,
+    "symmetric_gain_mm": 0.07744065100550124
+  },
+  {
+    "frame_id": 9397,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "9329",
+      "9337",
+      "9347",
+      "9357",
+      "9369",
+      "9379"
+    ],
+    "holdout_frame_ids": [
+      "9388",
+      "9397"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7387506281859489,
+        0.6766557467066697,
+        0.17978222973990152,
+        0.039999127321808305
+      ],
+      "relative": [
+        1.0,
+        0.9159460863921601,
+        0.24335983331935523,
+        0.05414428874331899
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.20997650557683273,
+        -0.9760982036620142,
+        -0.0027005614654246057,
+        0.055989917675444034
+      ],
+      "yaw_length_scale_mm": 22.878952661124835,
+      "normal_count": 248
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 181,
+      "iterations": 19
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.531070910111694,
+      "mean_virtual_to_real_mm": 0.7942513685682973,
+      "symmetric_mean_mm": 1.1626611393399955,
+      "p90_real_to_virtual_mm": 2.5301188448804552,
+      "real_coverage_3mm": 0.92,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.5642901619111553,
+      "mean_virtual_to_real_mm": 0.6788452860444888,
+      "symmetric_mean_mm": 1.1215677239778221,
+      "p90_real_to_virtual_mm": 3.332907326752306,
+      "real_coverage_3mm": 0.8875,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": 0.04109341536217337,
+    "prototype_theta_mm_rad": [
+      -1.14896745135536,
+      -5.565803420450684,
+      -0.866279212772593,
+      0.027894785852995044
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.5423132407209377,
+      "mean_virtual_to_real_mm": 0.7111528327197212,
+      "symmetric_mean_mm": 1.1267330367203294,
+      "p90_real_to_virtual_mm": 2.6315463141397015,
+      "real_coverage_3mm": 0.9094488188976378,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 1.7876529777697894,
+      "mean_virtual_to_real_mm": 0.8474454798758813,
+      "symmetric_mean_mm": 1.3175492288228354,
+      "p90_real_to_virtual_mm": 3.6984537046204724,
+      "real_coverage_3mm": 0.8759842519685039,
+      "virtual_coverage_3mm": 1.0
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.5332678397254473,
+      "mean_virtual_to_real_mm": 0.6835842669511841,
+      "symmetric_mean_mm": 1.1084260533383157,
+      "p90_real_to_virtual_mm": 2.673340487326657,
+      "real_coverage_3mm": 0.9094488188976378,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.190816192102506
+  },
+  {
+    "frame_id": 9714,
+    "original_accepted": false,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "9644",
+      "9655",
+      "9664",
+      "9674",
+      "9686",
+      "9696"
+    ],
+    "holdout_frame_ids": [
+      "9705",
+      "9714"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.74410911401222,
+        0.6776093473499709,
+        0.21000246823167903,
+        0.03242263052964446
+      ],
+      "relative": [
+        1.0,
+        0.9106316998273495,
+        0.2822199920376601,
+        0.04357241420525324
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.03480017878911794,
+        0.9833088494458524,
+        -0.005073731303799733,
+        0.17851305668879136
+      ],
+      "yaw_length_scale_mm": 23.174244980121138,
+      "normal_count": 244
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 181,
+      "iterations": 10
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 2.1905996529684195,
+      "mean_virtual_to_real_mm": 1.1504166907122904,
+      "symmetric_mean_mm": 1.670508171840355,
+      "p90_real_to_virtual_mm": 4.839118960082633,
+      "real_coverage_3mm": 0.84,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 2.2583596195693163,
+      "mean_virtual_to_real_mm": 0.8835991229654655,
+      "symmetric_mean_mm": 1.570979371267391,
+      "p90_real_to_virtual_mm": 5.909171497728972,
+      "real_coverage_3mm": 0.78625,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_symmetric_gain_mm": 0.09952880057296398,
+    "prototype_theta_mm_rad": [
+      1.8488386917287958,
+      4.299596377550542,
+      -0.7997064968116293,
+      -0.03721978294815643
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.9654426327904464,
+      "mean_virtual_to_real_mm": 1.1635798922979939,
+      "symmetric_mean_mm": 1.5645112625442201,
+      "p90_real_to_virtual_mm": 2.8395236835861946,
+      "real_coverage_3mm": 0.9072978303747534,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.3000544705998616,
+      "mean_virtual_to_real_mm": 1.2874502268570351,
+      "symmetric_mean_mm": 1.7937523487284484,
+      "p90_real_to_virtual_mm": 3.8024060068371206,
+      "real_coverage_3mm": 0.8461538461538461,
+      "virtual_coverage_3mm": 0.9883720930232558
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.9889040972217078,
+      "mean_virtual_to_real_mm": 1.0717741740421187,
+      "symmetric_mean_mm": 1.5303391356319134,
+      "p90_real_to_virtual_mm": 2.4734170928938464,
+      "real_coverage_3mm": 0.9250493096646942,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.22924108618422823
+  },
+  {
+    "frame_id": 9886,
+    "original_accepted": true,
+    "frame_count": 8,
+    "train_frame_ids": [
+      "9816",
+      "9826",
+      "9836",
+      "9845",
+      "9854",
+      "9865"
+    ],
+    "holdout_frame_ids": [
+      "9875",
+      "9886"
+    ],
+    "all_independent_weld_points_valid": true,
+    "model_identity_verified": false,
+    "geometry": {
+      "singular_values": [
+        0.7389674155916222,
+        0.6851775406729075,
+        0.21470390953950114,
+        0.02838030921988012
+      ],
+      "relative": [
+        1.0,
+        0.9272094089890958,
+        0.2905458414125172,
+        0.038405359453039835
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        -0.0006438170548633507,
+        -0.9610836925485937,
+        -0.00258370281447734,
+        -0.2762445400302538
+      ],
+      "yaw_length_scale_mm": 23.076244567540844,
+      "normal_count": 244
+    },
+    "prototype_fit": {
+      "status": "completed",
+      "count": 182,
+      "iterations": 12
+    },
+    "training_baseline": {
+      "mean_real_to_virtual_mm": 1.8233369602372793,
+      "mean_virtual_to_real_mm": 1.3228403628219982,
+      "symmetric_mean_mm": 1.5730886615296389,
+      "p90_real_to_virtual_mm": 2.5010167720955216,
+      "real_coverage_3mm": 0.9225,
+      "virtual_coverage_3mm": 1.0
+    },
+    "training_after": {
+      "mean_real_to_virtual_mm": 1.6899692748485189,
+      "mean_virtual_to_real_mm": 0.9797830526913639,
+      "symmetric_mean_mm": 1.3348761637699413,
+      "p90_real_to_virtual_mm": 3.173590569236484,
+      "real_coverage_3mm": 0.87875,
+      "virtual_coverage_3mm": 0.9883720930232558
+    },
+    "training_symmetric_gain_mm": 0.23821249775969755,
+    "prototype_theta_mm_rad": [
+      2.171528039230236,
+      1.214366075266382,
+      -0.8061564569922034,
+      -0.022884971806377906
+    ],
+    "baseline": {
+      "mean_real_to_virtual_mm": 1.8417239994807637,
+      "mean_virtual_to_real_mm": 1.3561580873422496,
+      "symmetric_mean_mm": 1.5989410434115068,
+      "p90_real_to_virtual_mm": 2.584086544607829,
+      "real_coverage_3mm": 0.9319066147859922,
+      "virtual_coverage_3mm": 1.0
+    },
+    "temporal_holdout": {
+      "mean_real_to_virtual_mm": 2.381059565738676,
+      "mean_virtual_to_real_mm": 1.8389001319140854,
+      "symmetric_mean_mm": 2.109979848826381,
+      "p90_real_to_virtual_mm": 3.4267261465431362,
+      "real_coverage_3mm": 0.8151750972762646,
+      "virtual_coverage_3mm": 0.9302325581395349
+    },
+    "recorded_all_frames_candidate_block_diagnostic": {
+      "mean_real_to_virtual_mm": 1.3421445763807658,
+      "mean_virtual_to_real_mm": 0.6537238825651334,
+      "symmetric_mean_mm": 0.9979342294729496,
+      "p90_real_to_virtual_mm": 2.1319299643948706,
+      "real_coverage_3mm": 0.933852140077821,
+      "virtual_coverage_3mm": 1.0
+    },
+    "holdout_improved": false,
+    "symmetric_gain_mm": -0.511038805414874
+  }
+]

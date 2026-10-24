@@ -1,0 +1,129 @@
+{
+  "limitations": "Sparse downsampled virtual geometry, independent FHOG model, no native temporal replay.",
+  "checks": [
+    {
+      "frame": 10878,
+      "since_init": 34,
+      "fresh_point": [
+        459.111907822513,
+        602.7990114721221
+      ],
+      "production_point": [
+        466.999481,
+        602.257721
+      ],
+      "difference_px": 7.906124588281085,
+      "fresh_response": {
+        "dx": 28.11190782251299,
+        "dy": -3.200988527877945,
+        "peak": 0.7017961489980438
+      },
+      "production_peak": 0.797512114048,
+      "input_kind": "reprojected archived downsampled virtual line, fresh model",
+      "real_angle_template_fresh_point": [
+        452.6567404133015,
+        605.0039762182927
+      ],
+      "reference_fold": [
+        453.0,
+        601.7059564440112
+      ]
+    },
+    {
+      "frame": 3931,
+      "since_init": 0,
+      "fresh_point": [
+        452.4622623922715,
+        568.4661833576658
+      ],
+      "production_point": [
+        460.337036,
+        569.67453
+      ],
+      "difference_px": 7.966941758354821,
+      "fresh_response": {
+        "dx": 44.462262392271484,
+        "dy": -9.533816642334147,
+        "peak": 0.4396587344822875
+      },
+      "production_peak": 0.474018633366,
+      "input_kind": "reprojected archived downsampled virtual line, fresh model"
+    },
+    {
+      "frame": 3963,
+      "since_init": 16,
+      "fresh_point": [
+        406.56569601255217,
+        623.014794631403
+      ],
+      "production_point": [
+        507.57019,
+        579.324341
+      ],
+      "difference_px": 110.0489143253043,
+      "fresh_response": {
+        "dx": -2.4343039874478083,
+        "dy": 44.01479463140304,
+        "peak": 0.4373663238630341
+      },
+      "production_peak": 0.716883480549,
+      "input_kind": "reprojected archived downsampled virtual line, fresh model"
+    },
+    {
+      "frame": 4482,
+      "since_init": 16,
+      "fresh_point": [
+        487.32043622991796,
+        596.584094865299
+      ],
+      "production_point": [
+        482.525543,
+        596.389496
+      ],
+      "difference_px": 4.798840464600638,
+      "fresh_response": {
+        "dx": 7.320436229917976,
+        "dy": -1.4159051347010574,
+        "peak": 0.6151590062378651
+      },
+      "production_peak": 0.733716189861,
+      "input_kind": "reprojected archived downsampled virtual line, fresh model",
+      "real_angle_template_fresh_point": [
+        478.4013628948305,
+        598.5506400011423
+      ],
+      "reference_fold": [
+        479.0,
+        596.6676111271341
+      ]
+    },
+    {
+      "frame": 5232,
+      "since_init": 34,
+      "fresh_point": [
+        506.24754987708235,
+        592.6044212846464
+      ],
+      "production_point": [
+        498.79364,
+        592.947784
+      ],
+      "difference_px": 7.461814150055002,
+      "fresh_response": {
+        "dx": 16.247549877082324,
+        "dy": -1.395578715353631,
+        "peak": 0.7861572745597238
+      },
+      "production_peak": 0.813476979733,
+      "input_kind": "reprojected archived downsampled virtual line, fresh model",
+      "real_angle_template_fresh_point": [
+        498.2904130746942,
+        594.5820046304526
+      ],
+      "reference_fold": [
+        490.5,
+        590.7942531249789
+      ]
+    }
+  ]
+}

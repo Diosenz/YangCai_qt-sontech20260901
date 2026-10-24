@@ -1,0 +1,112 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 16: i2r_rlc_online_seam_refinement_contract_tests
+1/2 Test #16: i2r_rlc_online_seam_refinement_contract_tests ...***Failed    2.15 sec
+FAIL: initial reverse scan cannot create an initial point from CAD alone
+FAIL: reverse scan must use original-image geometry despite full CAD weight
+FAIL: later reverse-scan image supplies a fresh measured starting sample
+FAIL: reverse-scan blank tail cannot append a newer simulated starting point
+FAIL: online entry retains image measurement while CAD remains misaligned
+FAIL: clear online geometry retains independent ICP identity
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: CAD update on a missing frame cannot project a transition estimate
+FAIL: new CAD revision cannot displace a fresh accepted image measurement
+FAIL: restart without a current image cannot seed business output from simulation
+FAIL: restart with distant CAD must recover from actual image evidence
+FAIL: same-frame transport without CAD image hints still allows original-image recovery
+FAIL: initial reverse scan cannot create an initial point from CAD alone
+FAIL: reverse scan must use original-image geometry despite full CAD weight
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: later reverse-scan image supplies a fresh measured starting sample
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: reverse-scan blank tail cannot append a newer simulated starting point
+FAIL: online entry retains image measurement while CAD remains misaligned
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: clear online geometry retains independent ICP identity
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: CAD update on a missing frame cannot project a transition estimate
+FAIL: new CAD revision cannot displace a fresh accepted image measurement
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: restart without a current image cannot seed business output from simulation
+FAIL: restart with distant CAD must recover from actual image evidence
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: same-frame transport without CAD image hints still allows original-image recovery
+FAIL: diagnostic identity and displayed measurement must agree
+
+    Start 81: i2r_rlc_online_image_measurement_tests
+2/2 Test #81: i2r_rlc_online_image_measurement_tests ..........***Failed    2.03 sec
+FAIL: unanchored blank frames never manufacture a CAD measurement
+FAIL: unanchored blank frames never manufacture a CAD measurement
+FAIL: unanchored blank frames never manufacture a CAD measurement
+FAIL: unanchored blank frames never manufacture a CAD measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: anchored full image loss does not append predicted points
+FAIL: out of image CAD cannot block clear image recovery
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: anchored full image loss does not append predicted points
+FAIL: out of image CAD cannot block clear image recovery
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: wrong CAD position/direction, fusion and revision cannot move image measurement
+FAIL: anchored full image loss does not append predicted points
+FAIL: out of image CAD cannot block clear image recovery
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: raw corner orientations and diagonal curved image motion remain measurable
+FAIL: a single bright stripe cannot establish weld identity
+FAIL: online image measurement
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =   4.24 sec
+
+The following tests FAILED:
+	 16 - i2r_rlc_online_seam_refinement_contract_tests (Failed)
+	 81 - i2r_rlc_online_image_measurement_tests (Failed)
+Errors while running CTest

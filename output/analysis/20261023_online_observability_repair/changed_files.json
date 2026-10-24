@@ -1,0 +1,306 @@
+{
+  "basis": "Task backups, not repository HEAD; existing dirty changes preserved.",
+  "changedFiles": 29,
+  "files": [
+    {
+      "path": "UI/include/RuntimeWorkerAdapters.h",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "6781270420701C15630724AB78632D2947AC69E6850B6A8F0CB7C53C6C1A1829",
+      "backup": ".codex_backups/online_observability_main_20261023/UI/include/RuntimeWorkerAdapters.h",
+      "sha256": "CF5E5DE827C2A795CE5283D19FC603B7B890DDE4BB2C6945A51FA61A7FB9DF7D",
+      "bytes": 32916,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "UI/src/RuntimeWorkerAdapters.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "2A8B25DE46BBE43AFFAB4480DB42E20AE06B6A1C26F1AFC996B621D68A1CB527",
+      "backup": ".codex_backups/online_observability_main_20261023/UI/src/RuntimeWorkerAdapters.cpp",
+      "sha256": "DA3D93F2F12DC3A3A1D7AE489DB3973EB4342396E7BEDB58A6EBB3EC9F7745CA",
+      "bytes": 157756,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "UI/include/OnlineLocalRegistrationWorker.h",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "DE27074BB14C5111CE316B3F58D3AE87B61CB94E27E2A33A1B4C1341BC3CF079",
+      "backup": ".codex_backups/online_observability_main_20261023/UI/include/OnlineLocalRegistrationWorker.h",
+      "sha256": "1FDABA43FC93142AE327D67BBA6ACFC01E270F1E1DDF269E5AF49BBC08622F81",
+      "bytes": 13056,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "UI/src/OnlineLocalRegistrationWorker.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "47ECB7953C0658FA0CDEF73987285ADECD2FAE81D96D423D98C9A99824A5885B",
+      "backup": ".codex_backups/online_observability_main_20261023/UI/src/OnlineLocalRegistrationWorker.cpp",
+      "sha256": "19A7005D4911E08CA0781F47CDF8B7A6BC271A7844A2E6AA58CA97A63975CB2B",
+      "bytes": 78153,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "UI/src/RuntimeLocalRegistration.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "26BB64A324AE71904FF9201C390744054D4D242DE2C067ED07BE917195DBFA49",
+      "backup": ".codex_backups/online_observability_main_20261023/UI/src/RuntimeLocalRegistration.cpp",
+      "sha256": "07FEF4ADD539311F5E278313BBBE1E47A48C419BB73C0E53FA86D95F6CAE28C4",
+      "bytes": 67240,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "UI/include/RuntimeCoordinator.h",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "6D85844AE64D8E19A0F0C4120699AE3432E2BF381E796A28712437CC1365AD97",
+      "backup": ".codex_backups/online_observability_main_20261023/UI/include/RuntimeCoordinator.h",
+      "sha256": "57D7392D9665A6A0DE98EBD15B5E4190879DA294F37A88595E3EE21F30D56544",
+      "bytes": 30249,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "235540DC614D36DD33E2096A076CA9EC2D5DD1BA39B9913AA6EF77B8C69EC8E0",
+      "backup": ".codex_backups/online_observability_main_20261023/UI/src/OnlineCorrectionRunRecorder.cpp",
+      "sha256": "578F44587FA2FF959FEDAC471B50691517EC75936228964C5CCFE3A75D4F7EAA",
+      "bytes": 53727,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "DigitalTwin/CMakeLists.txt",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "102F31C24901072B6F67A63232734F546DBF069EF1C3036BB9F77ABA15DDF15E",
+      "backup": ".codex_backups/online_observability_main_20261023/DigitalTwin/CMakeLists.txt",
+      "sha256": "1DC8F8976A55107857FE933F546C9A26F8FEECA3F15D03F3B666F57381759925",
+      "bytes": 2275,
+      "utf8Bom": false,
+      "bareLf": 19
+    },
+    {
+      "path": "config/digital_twin/online_local_registration.ini",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "C801BF9209BBCE00AB67BFFA859F23685E503A7547AFB44F7B69FC4115437642",
+      "backup": ".codex_backups/online_observability_main_20261023/config/digital_twin/online_local_registration.ini",
+      "sha256": "1C8829FF8D38ED14C598EDE10FFAA09E26235C95181ADA037860D5067FD90876",
+      "bytes": 2237,
+      "utf8Bom": false,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "DFBEACC30BA1F859FFB9FFE233513FD4D30434FAE30EF44D739E83A78215578D",
+      "backup": ".codex_backups/online_observability_main_20261023/tests/CMakeLists.txt",
+      "sha256": "DB35B11B5DED8F5D366EC0446E692953B3B2C9C8FB87E4C4B9AC6F182FAFDC91",
+      "bytes": 38243,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/test_runtime_tracking_flow.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "70AA39E1A6C3C961ADAD87C994B1F74CB8177050D958C3408C05EF10DA5641A8",
+      "backup": ".codex_backups/online_observability_main_20261023/tests/test_runtime_tracking_flow.cpp",
+      "sha256": "957FC570267E88EF99DBE812EC1CB137DA2744BDAE8BAB28C77D1FBC00BA1435",
+      "bytes": 87207,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/test_online_local_registration_surface.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "7C27F4547D1FFB543A183D03F0AC7E3E851A2B548D7D20C196EF3189AABBB200",
+      "backup": ".codex_backups/online_observability_main_20261023/tests/test_online_local_registration_surface.cpp",
+      "sha256": "1A220883ABF0083A5BF76887198CA710CC7242FC676557E151ECEE3E143159BE",
+      "bytes": 14192,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/test_online_correction_run_recorder.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "1A06E7D2008C0879E8DD133B509ECECB862F0D087C0623EB664A2E0230E096E6",
+      "backup": ".codex_backups/online_observability_main_20261023/tests/test_online_correction_run_recorder.cpp",
+      "sha256": "74C8DE3FCDB9CA53551F9C12AC048405AE644C135CD8BF41600213F501A771EA",
+      "bytes": 29330,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "docs/online_local_registration.md",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "D68399B631345022D44105630753ECCB66C68863AC79800A4DC1D7E567D00CA4",
+      "backup": ".codex_backups/online_observability_main_20261023/docs/online_local_registration.md",
+      "sha256": "7521B09902E99020E09C0E5F4998B5588CEAAF54FBE1B87822D27D03AE396004",
+      "bytes": 89558,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "Vision/include/feature/SimulationGuidedSeamEstimator.h",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "053156D7CFB2453669D8F15D0C2CFE18F21F159A0BFE3AC48F65CEF749B93621",
+      "backup": ".codex_backups/estimator_observability_20261023_120542/Vision/include/feature/SimulationGuidedSeamEstimator.h",
+      "sha256": "04240B9DA004FC69FC979D90AF246836CAF39B00FB56024E26D862B22BFEC034",
+      "bytes": 7923,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "Vision/src/feature/SimulationGuidedSeamEstimator.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "66C46DF5F4D084142CD6894EF21B1CE96C69B795647C1188DFF12F5169CFE7FC",
+      "backup": ".codex_backups/estimator_observability_20261023_120542/Vision/src/feature/SimulationGuidedSeamEstimator.cpp",
+      "sha256": "B38FDD2688DCB507C152C056ED30D85EBBCC8481B8A71725F8B0CC4DF8CBBB28",
+      "bytes": 53638,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/test_simulation_guided_seam.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "09049B3830A77C5242DA8528228AC80D644A7DFBE62BDB0184B3ED7DF1E37B55",
+      "backup": ".codex_backups/estimator_observability_20261023_120542/tests/test_simulation_guided_seam.cpp",
+      "sha256": "4A26AABBD35370E9B0FE99F7F240F4DF051E57ECCD77A4261F87AF3B9492C1DB",
+      "bytes": 44110,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "Vision/include/track/OnlineSeamContinuity.h",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "CCD298904ADEA82B3C9B3F25455F27B5FE72BA988DE0BFF2651846D38709D61D",
+      "backup": ".codex_backups/detector_timed_recovery_20261023_120642/Vision/include/track/OnlineSeamContinuity.h",
+      "sha256": "066A7EA570B8D9D513B760B8815BAAC750A24E2C8528BD7B661911160401E898",
+      "bytes": 6125,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "Vision/src/track/OnlineSeamContinuity.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "94B98B65997BB869AA66CE0DCDE428CBC58872C31C02289AFB714DE76CFABB64",
+      "backup": ".codex_backups/detector_timed_recovery_20261023_120642/Vision/src/track/OnlineSeamContinuity.cpp",
+      "sha256": "C1DF311B620C84F16D3D5024721D347A62DB96FFA8CA1179A3C79CCA393AB3C8",
+      "bytes": 13689,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "E3CCC24F8395F529A231B71A9B177858619D6E30D3C7D493C137B7500FFCC6DB",
+      "backup": ".codex_backups/detector_timed_recovery_20261023_120642/Vision/include/track/LegacyOnlineKcfDetector.h",
+      "sha256": "338BF1177471E138621703C205D18EDAB7B567A2644BC0D1AAEDB51E68563678",
+      "bytes": 5982,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "D0640750ED3AF5CA4853C0925326D01A02256FC48961206ECF6527D86EC9654F",
+      "backup": ".codex_backups/detector_timed_recovery_20261023_120642/Vision/src/track/LegacyOnlineKcfDetector.cpp",
+      "sha256": "1066E34615EE276706136FAE50C6450348BD966B3A6470DD670BEF85F97F4676",
+      "bytes": 35822,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/test_online_seam_continuity.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "98CE453074AB4F47EC01E70DBABC032F050B7D1144252E1476E32BAA421ED751",
+      "backup": ".codex_backups/detector_timed_recovery_20261023_120642/tests/test_online_seam_continuity.cpp",
+      "sha256": "3451685C3442B69D77C23678C480936B510F9D3F16FC57A06439141A48BC30A9",
+      "bytes": 20602,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "UI/include/OnlineLocalRegistrationStability.h",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "9A911BD743A27A78122C1B30544C4566232618D7BAC1994273CFD11AD3F0C474",
+      "backup": ".codex_backups/online_observability_main_20261023/extra/UI/include/OnlineLocalRegistrationStability.h",
+      "sha256": "0D8FE8C75285BD5C0F4A21137BBE6E02873319C21E142D9831A547D14B0A7AE6",
+      "bytes": 15536,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "UI/src/UiController.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "1E977D31AA98249154DA913D92B9937BE97535E5F8289B823C4435016DA91882",
+      "backup": ".codex_backups/online_observability_main_20261023/extra/UI/src/UiController.cpp",
+      "sha256": "51896D545E6EF77FFBB711468EE303D60BCB2E9519186FA2F2308D3C8033F173",
+      "bytes": 225046,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/test_online_local_registration_stability.cpp",
+      "status": "modified_from_task_backup",
+      "baselineSha256": "DF2F8D572572E4D1C295EC70CAE39A9BC7D95AA9CA1F5516D731FB87ECB2E315",
+      "backup": ".codex_backups/online_observability_main_20261023/extra/tests/test_online_local_registration_stability.cpp",
+      "sha256": "0093AEE4DCE214154C8ED02F2F46512E9B3D9B9952CE2050D57A754799734C0D",
+      "bytes": 14334,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "DigitalTwin/include/OnlineSeamCandidateGeometry.h",
+      "status": "added_this_task",
+      "sha256": "ED4B3F2ABF6171BD0CA6B3EEA25ED406C9115152085C9D52E12888FAD384EF9C",
+      "bytes": 4305,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "DigitalTwin/src/OnlineSeamCandidateGeometry.cpp",
+      "status": "added_this_task",
+      "sha256": "43E302DA1452BAF19E4A0F07821F01AF83E5727554C28DBCE1BC1E37D0ECDEFA",
+      "bytes": 21547,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/test_online_seam_candidate_geometry.cpp",
+      "status": "added_this_task",
+      "sha256": "1E59CAB4B98C906B58A0A600C719820647D318D92315F0FA4CC651E696C9BB71",
+      "bytes": 9746,
+      "utf8Bom": true,
+      "bareLf": 0
+    },
+    {
+      "path": "tests/test_online_seam_geometry_worker.cpp",
+      "status": "added_this_task",
+      "sha256": "428B7D928D4891EF818471772A1C4587533E9430622FDAFDD61E6E8F1C825F83",
+      "bytes": 17114,
+      "utf8Bom": true,
+      "bareLf": 0
+    }
+  ],
+  "backedUpButUnchanged": [
+    {
+      "path": "UI/include/RuntimeTrackingTypes.h",
+      "sha256": "AE03CE285B41923F4EE5D24282012F4E12212EA31F113214A7FBA052CD0C45EB"
+    },
+    {
+      "path": "UI/src/RuntimeCoordinator.cpp",
+      "sha256": "C1166CBE57008843170567F4451A3A7BC11521C4A7F550FD44B832BDEA1C1F90"
+    },
+    {
+      "path": "UI/src/MainWidget.cpp",
+      "sha256": "E5E57129289428B7C5A8876B4B9DAE7C5FB7A0DBEDC05414BB4EA4407A7BCCAF"
+    },
+    {
+      "path": "config/digital_twin/robotsim_scene.txt",
+      "sha256": "A6D6631CB1677FA0DDED943715919A46738637AFAE9B5E9BB3B16D4BE4F4099B"
+    }
+  ]
+}

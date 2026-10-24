@@ -1,0 +1,65 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start 27: i2r_rlc_correction_robot_sim_offline_frame_sync_tests
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 1/16 Test #15: i2r_rlc_runtime_tracking_flow_tests ......................***Failed    6.41 sec
+FAIL: fresh supported geometry establishes a new-version anchor without applying old compensation
+FAIL: fresh supported geometry establishes a new-version anchor without applying old compensation
+
+      Start 18: i2r_rlc_online_local_registration_tests
+ 2/16 Test #27: i2r_rlc_correction_robot_sim_offline_frame_sync_tests ....***Failed   58.23 sec
+FAIL: missing RobotState should emit an explicit failure
+FAIL: frame 100 RobotSim query should enter the deterministic block
+FAIL: blocked current and latest pending frames should both reach Vision
+FAIL: while frame 100 is current, frames 101..105 must collapse to frame 105
+FAIL: only current and latest-pending frames should issue per-frame queries
+FAIL: a valid observation after one/two failures must clear the counter before Vision
+FAIL: transport failure should produce one explicit synchronization failure
+FAIL: transport failure should consume exactly the current frame query
+FAIL: old-session query should be blocked before stop
+FAIL: restarted session should route its own frame after old query returns
+FAIL: old-session Vision should enter the deterministic synchronization hook
+FAIL: new session should route after the blocked old Vision call returns
+FAIL: active correction must pause ordinary realtime RobotSim queries
+
+      Start 28: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+ 3/16 Test #28: i2r_rlc_correction_robot_sim_online_frame_sync_tests .....   Passed    2.02 sec
+      Start 20: i2r_rlc_online_local_registration_safety_tests
+ 4/16 Test #20: i2r_rlc_online_local_registration_safety_tests ...........   Passed    1.59 sec
+      Start 22: i2r_rlc_online_local_registration_history_replay_tests
+ 5/16 Test #22: i2r_rlc_online_local_registration_history_replay_tests ...   Passed    0.08 sec
+      Start 82: i2r_rlc_online_seam_refiner_tests
+ 6/16 Test #82: i2r_rlc_online_seam_refiner_tests ........................   Passed    0.35 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 7/16 Test  #8: i2r_rlc_online_correction_run_recorder_tests .............   Passed    0.57 sec
+      Start 25: i2r_rlc_local_registration_writeback_safety_tests
+ 8/16 Test #25: i2r_rlc_local_registration_writeback_safety_tests ........   Passed    0.22 sec
+      Start 21: i2r_rlc_online_local_registration_stability_tests
+ 9/16 Test #21: i2r_rlc_online_local_registration_stability_tests ........   Passed    0.08 sec
+      Start 80: i2r_rlc_online_seam_continuity_tests
+10/16 Test #80: i2r_rlc_online_seam_continuity_tests .....................   Passed    0.06 sec
+      Start 23: i2r_rlc_online_local_registration_verification_tests
+11/16 Test #23: i2r_rlc_online_local_registration_verification_tests .....   Passed    0.07 sec
+      Start 19: i2r_rlc_online_local_registration_surface_tests
+12/16 Test #19: i2r_rlc_online_local_registration_surface_tests ..........***Failed    1.44 sec
+FAIL: known small surface shift passes PCL, projected train/holdout and safety references
+
+      Start 24: i2r_rlc_online_local_surface_verification_tests
+13/16 Test #24: i2r_rlc_online_local_surface_verification_tests ..........   Passed    0.08 sec
+      Start 35: i2r_rlc_localization_surface_validation_tests
+14/16 Test #35: i2r_rlc_localization_surface_validation_tests ............   Passed    6.73 sec
+      Start 81: i2r_rlc_simulation_guided_seam_tests
+15/16 Test #81: i2r_rlc_simulation_guided_seam_tests .....................   Passed    0.29 sec
+16/16 Test #18: i2r_rlc_online_local_registration_tests ..................***Timeout 120.02 sec
+FAIL: valid history must collect despite in-flight solve, cooldown and absent solve worker
+
+
+75% tests passed, 4 tests failed out of 16
+
+Total Test time (real) = 126.56 sec
+
+The following tests FAILED:
+	 15 - i2r_rlc_runtime_tracking_flow_tests (Failed)
+	 18 - i2r_rlc_online_local_registration_tests (Timeout)
+	 19 - i2r_rlc_online_local_registration_surface_tests (Failed)
+	 27 - i2r_rlc_correction_robot_sim_offline_frame_sync_tests (Failed)
+Errors while running CTest

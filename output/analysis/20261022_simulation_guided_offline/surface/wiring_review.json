@@ -1,0 +1,60 @@
+{
+  "status": "proposal_only",
+  "couplings": [
+    {
+      "boundary": "主视觉观测输出",
+      "file": "UI/src/RuntimeWorkerAdapters.cpp",
+      "line": 1483,
+      "current": "独立点取原图refinement.point；与最终融合/预测点隔离。",
+      "proposed": "保留独立实测点可选字段；新增母材表面观测、源图支持与置信/退化证据，禁止把预测标成独立实测。"
+    },
+    {
+      "boundary": "调度与清窗",
+      "file": "UI/src/RuntimeLocalRegistration.cpp",
+      "line": 401,
+      "current": "任一独立焊点失效会清窗、升代次、撤销在途候选，并清lastVerifiedPose/历史。",
+      "proposed": "按表面观测的同帧性、身份、时效、可用性撤销表面任务；单个接缝失效不清除仍有效表面窗口。场景/会话/状态失效仍严格撤销。"
+    },
+    {
+      "boundary": "表面worker入口",
+      "file": "UI/src/OnlineLocalRegistrationWorker.cpp",
+      "line": 238,
+      "current": "表面Steger提取之前要求独立真实/仿真焊点；processClouds生产入口再次要求。",
+      "proposed": "表面观测请求与接缝观测分开；Steger与三维投影保留仿真走廊引导，先评价母材支持、反光、凸起/局部异常。"
+    },
+    {
+      "boundary": "求解与候选验收",
+      "file": "UI/src/OnlineLocalRegistrationWorker.cpp",
+      "line": 427,
+      "current": "PCA仅排除共线；求解XYZ+Rz；逐帧焊点误差必需，稳定收益验收也只针对焊点。",
+      "proposed": "增加几何约束秩及弱方向诊断；约束不足的方向保持上一可信值；采用空间/时间分块表面留出、双向覆盖、稳健残差、局部异常比例与多解检查。焊点存在时追加检查而非始终唯一凭据。"
+    },
+    {
+      "boundary": "关键点位移预算",
+      "file": "UI/src/RuntimeLocalRegistration.cpp",
+      "line": 740,
+      "current": "事务关键点只由independent.virtualWeldPoint供给，空集合在checkLocalRegistrationCandidate拒绝。",
+      "proposed": "用身份明确且覆盖当前有效母材区域的模型关键点集检查单步及累计位移；不可用无身份的临时最近邻冒充材料关键点，原单步/累计预算保留。"
+    },
+    {
+      "boundary": "写回后新帧验证",
+      "file": "UI/src/RuntimeLocalRegistration.cpp",
+      "line": 568,
+      "current": "只观察独立焊点；3坏帧或5秒超时恢复并暂停自动更新。",
+      "proposed": "独立表面新帧验证与可选焊点验证并列；新仿真查询必须按写回后实际位姿与机器人状态重算，旧交点的逆刚体变换不能当旧场景同激光平面重渲染。"
+    },
+    {
+      "boundary": "回读/恢复/归档",
+      "file": "UI/src/RuntimeWorkerAdapters.cpp",
+      "line": 1945,
+      "current": "确认场景/对象/相对位姿/代次及累计预算；已发送事务不可撤回。",
+      "proposed": "保留事务安全条件，追加表面验证状态、来源、观测方向/留出结果。表面算法改善不改变运动许可或自动恢复设备规则。"
+    }
+  ],
+  "unavailable_evidence": [
+    "No archived raw surface windows during the 512-frame geometry-invalid run.",
+    "No verified CAD material identity or weld segment identity in the 52 archived windows.",
+    "DigitalTwin localPointCloud_mm DTO field is not populated by current RobotSim service."
+  ],
+  "owner_boundary": "Vision候选提取属其负责人协作范围；Localization负责定位/几何验收；DigitalTwin负责参考/事务；UI仅装配、调度和展示。不得把新求解流程塞入UI。"
+}

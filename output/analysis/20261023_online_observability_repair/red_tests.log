@@ -1,0 +1,87 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 80: i2r_rlc_online_seam_continuity_tests
+1/2 Test #80: i2r_rlc_online_seam_continuity_tests ...***Failed    0.07 sec
+FAIL: first reacquisition starts recovery without misreading the old error as image motion
+FAIL: confirmed geometry clears a seventy-pixel history error within the configured recovery time
+FAIL: first reacquisition starts recovery without misreading the old error as image motion
+FAIL: confirmed geometry clears a seventy-pixel history error within the configured recovery time
+FAIL: first reacquisition starts recovery without misreading the old error as image motion
+FAIL: confirmed geometry clears a seventy-pixel history error within the configured recovery time
+FAIL: first reacquisition starts recovery without misreading the old error as image motion
+FAIL: confirmed geometry clears a seventy-pixel history error within the configured recovery time
+FAIL: first reacquisition starts recovery without misreading the old error as image motion
+FAIL: confirmed geometry clears a seventy-pixel history error within the configured recovery time
+FAIL: equal elapsed time gives equal history-error recovery across processing frame rates
+FAIL: supported straight reverse and turning image motion stays separate from recovery error
+
+    Start 82: i2r_rlc_simulation_guided_seam_tests
+2/2 Test #82: i2r_rlc_simulation_guided_seam_tests ...***Failed   15.64 sec
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: hidden-center gap deformation cannot become tangential drift while common normal motion remains trackable
+FAIL: shoulder uncertainty includes nonzero pixel sampling error even with tiny line RMS
+FAIL: shoulder uncertainty includes nonzero pixel sampling error even with tiny line RMS
+FAIL: nearly parallel shoulders report greater horizontal uncertainty without a path-shape restriction
+FAIL: propagated uncertainty reduces auxiliary observation weight rather than changing diagnostics alone
+FAIL: distant clustered columns expose extrapolation leverage beyond support count and line RMS
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =  15.74 sec
+
+The following tests FAILED:
+	 80 - i2r_rlc_online_seam_continuity_tests (Failed)
+	 82 - i2r_rlc_simulation_guided_seam_tests (Failed)
+Errors while running CTest

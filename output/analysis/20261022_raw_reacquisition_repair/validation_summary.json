@@ -1,0 +1,47 @@
+{
+  "completed_at": "2026-10-23T01:25:38.005722+08:00",
+  "scope": "Formal online correction; no new control/ICP/RobotSim policy changes",
+  "source_changes": 10,
+  "source_deletions": 0,
+  "build": {
+    "environment": "VS2022 x64 Developer MSVC, existing qt-debug",
+    "exit_code": 0,
+    "log": "build_green.log"
+  },
+  "red": {
+    "log": "tests_red.log",
+    "test": "i2r_rlc_simulation_guided_seam_tests",
+    "result": "Failed as expected: 8 assertions on translated shallow-stripe false competition"
+  },
+  "green": {
+    "log": "tests_green.log",
+    "passed": 11,
+    "failed": 0,
+    "seconds": 33.46
+  },
+  "exe": {
+    "path": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe",
+    "sha256": "fff43fea330f434a5cf21dcd8e9de63ca4f28d242f834a52151751e2985ab018",
+    "modified": "2026-10-23T01:21:17.756491+08:00",
+    "bytes": 11500032
+  },
+  "policy": {
+    "automatic_rollback": false,
+    "automatic_hold_added": false,
+    "estimated_still_guides_tcp": true,
+    "green_point_continuous": true,
+    "application_devices_started": false,
+    "computer_use_after_latest_prohibition": false,
+    "mouse_used": false
+  },
+  "review": "Estimator repair + detector integration + independent final generality audit",
+  "workflow_source": "Existing Notion snapshot and referenced chat; current public page unavailable",
+  "limits": [
+    "No full latest-run consecutive-image/robot/ICP replay or physical precision acceptance.",
+    "Shoulder-only shape change can be indistinguishable from real translation.",
+    "Existing business recovery limit remains 2px/frame; faster moving target convergence not claimed.",
+    "Recovery requires a candidate inside existing local search; no global search added.",
+    "Original refiner still assumes locally observable kink; trajectory is not arbitrary cross-section.",
+    "Overlapping stripes within geometric residual tolerance cannot prove identity."
+  ]
+}

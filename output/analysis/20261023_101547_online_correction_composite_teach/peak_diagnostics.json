@@ -1,0 +1,12 @@
+{
+  "frame_id": 6891,
+  "point_source": 4,
+  "geometry_valid": 0,
+  "raw_geometry_valid": 0,
+  "guided_valid": 1,
+  "guided_reacquisition_pending": 0,
+  "guided_reacquired": 0,
+  "guided_anchor_age_ms": 3544,
+  "guided_model_translation_suppressed": 1,
+  "workpiece_pose_revision": 4
+}

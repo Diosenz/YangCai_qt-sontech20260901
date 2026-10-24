@@ -1,0 +1,17 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 81: i2r_rlc_simulation_guided_seam_tests
+    Start 28: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+1/6 Test #28: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...   Passed    2.15 sec
+    Start 16: i2r_rlc_online_seam_refinement_contract_tests
+2/6 Test #81: i2r_rlc_simulation_guided_seam_tests ...................   Passed    2.77 sec
+    Start  8: i2r_rlc_online_correction_run_recorder_tests
+3/6 Test  #8: i2r_rlc_online_correction_run_recorder_tests ...........   Passed    0.19 sec
+    Start 80: i2r_rlc_online_seam_continuity_tests
+4/6 Test #80: i2r_rlc_online_seam_continuity_tests ...................   Passed    0.06 sec
+    Start 17: i2r_rlc_online_fusion_controls_tests
+5/6 Test #16: i2r_rlc_online_seam_refinement_contract_tests ..........   Passed    0.88 sec
+6/6 Test #17: i2r_rlc_online_fusion_controls_tests ...................   Passed    0.24 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =   3.28 sec

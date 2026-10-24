@@ -1,0 +1,24 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 81: i2r_rlc_online_image_measurement_tests
+1/1 Test #81: i2r_rlc_online_image_measurement_tests ...***Failed   14.67 sec
+FAIL: repeated, reversed, unknown or interrupted exposures cannot complete consecutive reacquisition
+FAIL: repeated, reversed, unknown or interrupted exposures cannot complete consecutive reacquisition
+FAIL: repeated, reversed, unknown or interrupted exposures cannot complete consecutive reacquisition
+FAIL: repeated, reversed, unknown or interrupted exposures cannot complete consecutive reacquisition
+FAIL: repeated, reversed, unknown or interrupted exposures cannot complete consecutive reacquisition
+FAIL: repeated, reversed, unknown or interrupted exposures cannot complete consecutive reacquisition
+field local geometry status=6 valid=1 support=0.985075 rms=0.547072 uncertainty=0 ambiguity=0.039801
+field frame_1120_source.png valid=1 point=[494.5, 671.845] message=原图接缝精定位测量；仿真仅辅助搜索。
+field local geometry status=2 valid=0 support=0 rms=0 uncertainty=0 ambiguity=0.326531
+field frame_2148_source.png valid=0 point=[-1, -1] message=同帧原图未通过接缝或 KCF 身份验收，不生成点。
+FAIL: existing stripe cross-section semantics recover field raw corner despite displaced CAD
+FAIL: online image measurement
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =  14.68 sec
+
+The following tests FAILED:
+	 81 - i2r_rlc_online_image_measurement_tests (Failed)
+Errors while running CTest

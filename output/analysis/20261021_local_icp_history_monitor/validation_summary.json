@@ -1,0 +1,68 @@
+{
+  "completed_at_utc": "2026-10-21T12:04:46.504550+00:00",
+  "production_build": {
+    "exit_code": 0,
+    "log": "build_final.log",
+    "executable": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe"
+  },
+  "related_ctest_targets_final_passed": 14,
+  "initial_ctest": {
+    "passed": 13,
+    "failed": 1,
+    "log": "tests_final.log",
+    "failure": "preexisting runtime protocol fixtures; isolated RED independently; fixture only synchronized"
+  },
+  "final_runtime_ctest": {
+    "exit_code": 0,
+    "log": "runtime_flow_strict_final.log",
+    "final_p_full_prefix_assertion_retained": true
+  },
+  "real_vision_image_sampling_contract": {
+    "exit_code": 0,
+    "log": "image_sampling_contract.log"
+  },
+  "frozen_field_candidates": {
+    "exit_code": 0,
+    "log": "field_candidate_replay.log",
+    "count": 90,
+    "original_rejected": 88,
+    "base_safety_rejected": 22,
+    "current_gain_rejected": 0,
+    "historical_warnings": 66,
+    "new_policy_candidate_accepted": 68,
+    "base_rejected_despite_current_gain": 3,
+    "schema2_base_safety_inferred": 90,
+    "icp_rerun": false,
+    "closed_loop_prediction": false
+  },
+  "field_closed_loop_performed": false,
+  "history_geometry_verified": false,
+  "history_enforced": false,
+  "sha256": {
+    "UI/include/OnlineLocalRegistrationStability.h": "9a911bd743a27a78122c1b30544c4566232618d7bac1994273cfd11ad3f0c474",
+    "UI/include/RuntimeCoordinator.h": "05d32bbf3910d358da897ce7490efce27e17e09c7446da4f73803e2ab503bb6d",
+    "UI/include/RuntimeTrackingTypes.h": "a42bce6eb51bd21b28281723513ac9aa1d9a9545755caadeaf36da04b61540ce",
+    "UI/include/OnlineLocalRegistrationWorker.h": "19ff9271d438f9935e828c1d34c1a76ec4846b47bbb09d50c919ddcfe7549b94",
+    "UI/include/OnlineVisionDiagnosticOptions.h": "51e8e468aa408b602551b6f962bcab707010a95a03c829fbd11afc6cf40180cc",
+    "UI/include/RuntimeWorkerAdapters.h": "6d3d17c5d00112a4bd3e83e826ea939308efe065f41f17f3ba190d07ca4de9c0",
+    "UI/include/OnlineCorrectionRunRecorder.h": "0ef5d8236536d04dabbc7e34c64db47d1f45c018f91f3061eb3793cd5d06274d",
+    "UI/include/TrackingDiagnosticImageWriter.h": "c31b3a9bc0cb6950ca5ce10945aa70e009b203951843005ef274f05e77348a49",
+    "UI/src/RuntimeCoordinator.cpp": "922ccb50b2bc690a55ce4f9c3fb4b13dadd612dd42ebaa460e79a820f2957675",
+    "UI/src/RuntimeLocalRegistration.cpp": "39ddf55fb9bb1b904ac0017a2585087e83636a0649286cd47fe2dea267321a2e",
+    "UI/src/OnlineLocalRegistrationWorker.cpp": "dface7025a7789a1a90cef5c266e1adecd78df7b694a4e6c7f4bbd0cd66c3860",
+    "UI/src/RuntimeWorkerAdapters.cpp": "6a9ec4ee7f438658280695d0c9ef1185400d30929bd00c0a253063fa4b7f9d60",
+    "UI/src/OnlineCorrectionRunRecorder.cpp": "876fd7f7a7a8ba43d4c8b72153694d70cea436826335034db8ac61a60d0c477a",
+    "UI/src/TrackingDiagnosticImageWriter.cpp": "7ff66ff70c65a4602c0a2153000a27e05a00f7288d119412acc3339d31b799bb",
+    "UI/src/MainWidget.cpp": "73f6c84344091b7e055c8455a7638f90610c0bc61e238ca895e5b3b4cab4506f",
+    "tests/test_online_local_registration_stability.cpp": "df2f8d572572e4d1c295ec70cae39a9bc7d95aa9ca1f5516d731fb87ecb2e315",
+    "tests/test_online_local_registration_history_collection.cpp": "b10c9697226cc32a6b7471b1ab2fce360672aa819a3a031fb2c941b30b327615",
+    "tests/test_online_local_registration_history_replay.cpp": "5a91d198660246c5a0571181136dd875c1b909e5908e7d18079b97c8ef8b8d93",
+    "tests/test_online_local_registration_safety.cpp": "1be9998c2131aba03ce4a69f986d86fddc64d17466347a4c0273b5e63eb88af8",
+    "tests/test_online_local_registration.cpp": "9c1ef6c45f3342dbc43ee60a2f96b7e840ee4f7be1c13c5cfb79dfb588ca9c5e",
+    "tests/test_online_correction_run_recorder.cpp": "a28fa82e98233d5a11dc0d48bc41a02fe771cc7d9fddabaf67e74a8c92de04ab",
+    "tests/test_runtime_tracking_flow.cpp": "c6f208cd6480c052b763b3bb6204389195024cbb6b197ff94302180f730e56d1",
+    "tests/test_main_widget_panels.cpp": "ae43aeb5577ffe25b802d1250c603870c993fd3bda03aa299f4d945239e3bf38",
+    "tests/CMakeLists.txt": "4737998afa4f29e08452f2473fbf87c0a15f0637b5151eb9d451a5d70259e53d",
+    "docs/online_local_registration.md": "7b8469f117c41e6170f96f05f2221bf7c1af27f6ab7cb2be1c4b165c2ed30679"
+  }
+}

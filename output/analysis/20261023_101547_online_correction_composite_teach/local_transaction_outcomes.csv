@@ -1,0 +1,55 @@
+﻿file,record_type,time_ms,phase,succeeded,verification_kind,current_pose_geometrically_verified,retained_without_geometric_verification,verified_by_independent_observation,auto_rollback_enabled,rollback_attempted,workpiece_pose_revision,message
+local_icp_1_10326_a618a763-b1ff-45cb-ba94-04727efc3a42.json.retained.json,retained,1792722081664.0,retained,True,fresh_raw_surface,False,True,True,False,False,10,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_10326_a618a763-b1ff-45cb-ba94-04727efc3a42.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,10,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_10694_43f2fefa-4dce-42eb-89d7-d30ad3014f69.json.verified.json,verified,1792722089682.0,verified,True,fresh_raw_surface,True,False,True,False,False,11,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_10694_43f2fefa-4dce-42eb-89d7-d30ad3014f69.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,11,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_11670_56cc955c-3116-4b40-84c0-7f4486db20ac.json.retained.json,retained,1792722126146.0,retained,True,fresh_raw_surface,False,True,True,False,False,12,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_11670_56cc955c-3116-4b40-84c0-7f4486db20ac.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,12,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_12637_ba4604f4-7b74-49c7-ab87-b441b2fd46ca.json.retained.json,retained,1792722157860.0,retained,True,fresh_raw_surface,False,True,True,False,False,13,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_12637_ba4604f4-7b74-49c7-ab87-b441b2fd46ca.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,13,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_12998_e671eae6-8892-448c-966a-552d75d0beba.json.verified.json,verified,1792722165977.0,verified,True,fresh_raw_surface,True,False,True,False,False,14,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_12998_e671eae6-8892-448c-966a-552d75d0beba.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,14,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_13196_2b9635c5-4167-4a3e-8e53-080d4e052f2a.json.verified.json,verified,1792722172115.0,verified,True,fresh_raw_surface,True,False,True,False,False,15,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_13196_2b9635c5-4167-4a3e-8e53-080d4e052f2a.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,15,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_13381_94db7916-f139-42ef-8d9a-be0531f9fadb.json.verified.json,verified,1792722178319.0,verified,True,fresh_raw_surface,True,False,True,False,False,16,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_13381_94db7916-f139-42ef-8d9a-be0531f9fadb.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,16,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_13571_02e1d920-8799-44c5-9a4b-a02d0f93023c.json.verified.json,verified,1792722184754.0,verified,True,fresh_raw_surface,True,False,True,False,False,17,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_13571_02e1d920-8799-44c5-9a4b-a02d0f93023c.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,17,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_13765_a3fb7b83-ea14-4621-ae7c-83435e0db2b9.json.retained.json,retained,1792722194687.0,retained,True,fresh_raw_surface,False,True,True,False,False,18,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_13765_a3fb7b83-ea14-4621-ae7c-83435e0db2b9.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,18,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_14120_b395f758-0eec-4574-8b64-e86422b996d4.json.retained.json,retained,1792722206468.0,retained,True,fresh_raw_surface,False,True,True,False,False,19,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_14120_b395f758-0eec-4574-8b64-e86422b996d4.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,19,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_14659_3afd36c3-e708-4dbd-8de2-ad3c0c68130b.json.verified.json,verified,1792722220360.0,verified,True,fresh_raw_surface,True,False,True,False,False,20,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_14659_3afd36c3-e708-4dbd-8de2-ad3c0c68130b.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,20,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_15035_8d2729fc-3d2a-45c2-978d-b57674aacba8.json.retained.json,retained,1792722236761.0,retained,True,fresh_raw_surface,False,True,True,False,False,21,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_15035_8d2729fc-3d2a-45c2-978d-b57674aacba8.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,21,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_15388_6a5af58d-c124-4aa1-a6dd-f6a60a79d69b.json.retained.json,retained,1792722247255.0,retained,True,fresh_raw_surface,False,True,True,False,False,22,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_15388_6a5af58d-c124-4aa1-a6dd-f6a60a79d69b.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,22,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_15703_ceba4f6c-5945-4f54-bc9f-5d3423308713.json.verified.json,verified,1792722254944.0,verified,True,fresh_raw_surface,True,False,True,False,False,23,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_15703_ceba4f6c-5945-4f54-bc9f-5d3423308713.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,23,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_15890_4bd1af02-0176-4f1a-b5a2-38b2eabad353.json.retained.json,retained,1792722265405.0,retained,True,fresh_raw_surface,False,True,True,False,False,24,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_15890_4bd1af02-0176-4f1a-b5a2-38b2eabad353.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,24,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_16256_eb38ba39-71b0-4726-8b06-1cb53ffa3bde.json.retained.json,retained,1792722276889.0,retained,True,fresh_raw_surface,False,True,True,False,False,25,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_16256_eb38ba39-71b0-4726-8b06-1cb53ffa3bde.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,25,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_16805_a4726c47-a518-4b88-9792-0fb036f178f9.json.verified.json,verified,1792722291409.0,verified,True,fresh_raw_surface,True,False,True,False,False,26,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_16805_a4726c47-a518-4b88-9792-0fb036f178f9.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,26,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_17384_d891f065-33cd-40b7-a611-b930038af303.json.retained.json,retained,1792722314277.0,retained,True,fresh_raw_surface,False,True,True,False,False,27,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_17384_d891f065-33cd-40b7-a611-b930038af303.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,27,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_17741_0671fcd9-ec8f-4a2a-b8c6-8bb9dfb29f93.json.retained.json,retained,1792722326026.0,retained,True,fresh_raw_surface,False,True,True,False,False,28,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_17741_0671fcd9-ec8f-4a2a-b8c6-8bb9dfb29f93.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,28,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_3712_8c6dbf78-3bc7-4091-b148-fa74ce05d7dc.json.verified.json,verified,1792721858850.0,verified,True,independent_seam,True,False,True,False,False,2,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_3712_8c6dbf78-3bc7-4091-b148-fa74ce05d7dc.json.writeback.json,writeback,,writeback,True,independent_seam,False,False,False,False,False,2,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_3909_b0cba98b-81d8-45a2-b1b4-a5a461b4f775.json.retained.json,retained,1792721869641.0,retained,True,fresh_raw_surface,False,True,True,False,False,3,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_3909_b0cba98b-81d8-45a2-b1b4-a5a461b4f775.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,3,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_4486_69912005-9436-40f4-9808-fe196ce462fd.json.retained.json,retained,1792721888748.0,retained,True,fresh_raw_surface,False,True,True,False,False,4,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_4486_69912005-9436-40f4-9808-fe196ce462fd.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,4,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_7157_21e0a4f3-5908-45cd-a75c-cac143a91555.json.retained.json,retained,1792721976857.0,retained,True,fresh_raw_surface,False,True,True,False,False,5,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_7157_21e0a4f3-5908-45cd-a75c-cac143a91555.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,5,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_8103_749572e6-1bcd-40f6-a977-347552da9558.json.retained.json,retained,1792722008338.0,retained,True,fresh_raw_surface,False,True,True,False,False,6,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_8103_749572e6-1bcd-40f6-a977-347552da9558.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,6,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_8471_bfe18ff4-bc8f-4c40-9451-026ecb8f4170.json.retained.json,retained,1792722020515.0,retained,True,fresh_raw_surface,False,True,True,False,False,7,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_8471_bfe18ff4-bc8f-4c40-9451-026ecb8f4170.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,7,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_9612_743b7512-4d7b-4b47-bbea-fa6b96885aaf.json.retained.json,retained,1792722057870.0,retained,True,fresh_raw_surface,False,True,True,False,False,8,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_9612_743b7512-4d7b-4b47-bbea-fa6b96885aaf.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,8,定位矩阵已写回并确认 RobotSim 工件 1068。
+local_icp_1_9976_4643acea-0a96-4f85-91d1-448d6a2fb430.json.retained.json,retained,1792722069718.0,retained,True,fresh_raw_surface,False,True,True,False,False,9,当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。
+local_icp_1_9976_4643acea-0a96-4f85-91d1-448d6a2fb430.json.writeback.json,writeback,,writeback,True,fresh_raw_surface,False,False,True,False,False,9,定位矩阵已写回并确认 RobotSim 工件 1068。

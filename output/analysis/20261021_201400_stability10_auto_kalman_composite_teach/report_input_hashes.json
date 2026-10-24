@@ -1,0 +1,11 @@
+{
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_185548_stability_auto_kalman_composite_teach\\metrics.csv": "d55793f5c8f65fb607496ff39c28854886e0e4a9a0d88eef742fb776924370b2",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_201400_stability10_auto_kalman_composite_teach\\metrics.csv": "9419ca52f406194fbd24217e4a51e495c3f9b88558a716d11ea008e464b5ae76",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_185548_stability_auto_kalman_composite_teach\\local_registration_summary.json": "eae7b186bf52076b83cf33eedff4b333f7e0e03eba444e64f6d8b9735cb036d8",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_201400_stability10_auto_kalman_composite_teach\\local_registration_summary.json": "fdb94e855d08e68943e5e9f3e857ec3cb8681a4d9c2ed25f7fee4669ae8e47b3",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261021_201400_950_启动在线ICP（稳定保护1.0）+ 自动卡尔曼\\vision_images\\sample_427_session_1_frame_4086_source.png": "7ba9c66fd4c1cf9b8c6b2dc3ab7e82ce4a27d3fc5751882ea0075623adda2131",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261021_201400_950_启动在线ICP（稳定保护1.0）+ 自动卡尔曼\\vision_images\\sample_427_session_1_frame_4086_enhanced.png": "f1c6ae361143726eb4857648b61fa9a2e86ed34e7dc3c8e4cc920dc53f256568",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261021_201400_950_启动在线ICP（稳定保护1.0）+ 自动卡尔曼\\vision_images\\sample_2527_session_1_frame_8350_source.png": "a8149e2d1a54b9575669f8375dcb4c0f782fc09277c11339351db35f58b110d2",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\online_correction\\20261021_201400_950_启动在线ICP（稳定保护1.0）+ 自动卡尔曼\\vision_images\\sample_2527_session_1_frame_8350_enhanced.png": "8d93409ea6d173f95c7c960a60cd7f77a77f3dd535d6bb8dadb15cf566349f85",
+  "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_201400_stability10_auto_kalman_composite_teach\\build_report.py": "29aca98fa3cb9ce4b74e07f39f9b084772eb92cf5f2f8ff7fc8e9810620fa5c7"
+}

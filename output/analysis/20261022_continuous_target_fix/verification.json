@@ -1,0 +1,70 @@
+{
+  "build": "MSVC VS2022 Developer environment; existing qt-debug; exit 0",
+  "test_summary": "3/3 passed, 6.88 sec; no further tests run",
+  "necessary_tests": {
+    "i2r_rlc_simulation_guided_seam_tests": "first-anchor lock, real vs false slow drift, budgets, transition seed and image boundary",
+    "i2r_rlc_online_seam_refinement_contract_tests": "inverse calibrated projection, revision continuity, measurement identity and fusion",
+    "i2r_rlc_correction_robot_sim_online_frame_sync_tests": "business target passes through synchronized Runtime flow"
+  },
+  "limitations": [
+    "No live camera/robot validation performed",
+    "Persistent coherent reflection cannot be proven physically correct by image geometry alone",
+    "Current public Notion read failed; followed saved original collaboration guide snapshot"
+  ],
+  "backups": "output/backups/continuous_target_fix_20261022",
+  "files": {
+    "Vision/include/feature/SimulationGuidedSeamEstimator.h": {
+      "sha256": "6687739065db5c44522d774a4a9b0656466d8583407b4a1355e908c4eedf351b",
+      "utf8_bom": true
+    },
+    "Vision/src/feature/SimulationGuidedSeamEstimator.cpp": {
+      "sha256": "5da5d127d9ba68856ebc3c52d129b785d21369cd2e17e2c7f0228f87a79ed893",
+      "utf8_bom": true
+    },
+    "Vision/include/track/LegacyOnlineKcfDetector.h": {
+      "sha256": "bbf68be2d4bb7d53418db7999bd1d2cb7b180608b4db5f2bfaba6a2d06a6df29",
+      "utf8_bom": true
+    },
+    "Vision/src/track/LegacyOnlineKcfDetector.cpp": {
+      "sha256": "821263148a68c9fda10414c795bc0687052a744109ecd149e71cb65468ad4e13",
+      "utf8_bom": true
+    },
+    "Vision/include/track/OnlineSeamContinuity.h": {
+      "sha256": "7fd553127348b058e08a363a29a585da67587600f29b03804e1e1a3eabfa6418",
+      "utf8_bom": true
+    },
+    "Vision/src/track/OnlineSeamContinuity.cpp": {
+      "sha256": "4589b2d9c7eb886fc956be03d90dada4598bcdf252d3e66260404cdaf5e3933e",
+      "utf8_bom": true
+    },
+    "Vision/include/geometry/WeldImageToSpaceProjector.h": {
+      "sha256": "a569329cb805e7bc73b62a7efaeb7dda04a0d93322db71b861c05abcb782957e",
+      "utf8_bom": true
+    },
+    "Vision/src/geometry/WeldImageToSpaceProjector.cpp": {
+      "sha256": "3c7553ef74ae368829a3d6d7091d4207aae9db54d8e522604ea5c1bc67a9de3d",
+      "utf8_bom": true
+    },
+    "UI/include/RuntimeWorkerAdapters.h": {
+      "sha256": "922d7ad70636268bfa2bda90bcb7cc276f196ce6b9c6bdbe41214f24b51b1e01",
+      "utf8_bom": true
+    },
+    "UI/src/RuntimeWorkerAdapters.cpp": {
+      "sha256": "bd20b9075a2587024c888efb41e3df7fe52a457c28dfc4d1cea6b37b96cde44c",
+      "utf8_bom": true
+    },
+    "tests/test_simulation_guided_seam.cpp": {
+      "sha256": "9fad42823092ab7e0ca175cfa744a9fd6c876559eda0da822c36870c88e10c48",
+      "utf8_bom": true
+    },
+    "tests/test_runtime_tracking_flow.cpp": {
+      "sha256": "0829273b85314b70ec7fb18736ca443b82011c1f2d71bfcec4108c54352cbae9",
+      "utf8_bom": true
+    },
+    "tests/test_correction_robot_sim_frame_sync.cpp": {
+      "sha256": "aceddd950a1e2478fd7f25d30a54210655b4a3a700023ed522af95306e7f4bb8",
+      "utf8_bom": true
+    }
+  },
+  "executable_sha256": "eadb7d907a6d7735da7aa2d2c182794fc3fb68897c63ceebe3dfc0c3fb986b1f"
+}

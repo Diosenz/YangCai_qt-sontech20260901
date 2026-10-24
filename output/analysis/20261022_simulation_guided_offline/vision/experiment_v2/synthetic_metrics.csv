@@ -1,0 +1,14 @@
+﻿name,expected_accept,accepted,source,reason,error_px,score,alternate_margin,left_coverage,right_coverage,central_coverage,passed
+clear_model_offset,True,True,image_supported_model_alignment,accepted,0.0,0.25186567164179063,2.27089552238806,1.0,1.0,1.0,True
+reflection_parallel,True,True,image_supported_model_alignment,accepted,0.0,0.25186567164179063,2.2335820895522387,1.0,1.0,1.0,True
+tack_convex_multifold,True,True,model_estimate_from_visible_shoulders,accepted,0.0,0.25186567164179063,2.2283582089552243,1.0,1.0,0.3404255319148936,True
+tack_plus_reflection,True,True,model_estimate_from_visible_shoulders,accepted,0.0,0.25186567164179063,2.225373134328359,1.0,1.0,0.3404255319148936,True
+nominal_extra_bend,True,True,image_supported_model_alignment,accepted,0.0,0.25186567164179063,2.643283582089553,1.0,1.0,1.0,True
+equal_strength_competing_seams,False,False,unavailable,ambiguous_hypotheses,,0.25186567164179063,0.0,1.0,1.0,1.0,True
+one_shoulder_missing,False,False,unavailable,ambiguous_hypotheses,,4.127238805970149,0.0007462686567167864,1.0,0.0,0.3829787234042553,True
+blank_no_evidence,False,False,unavailable,ambiguous_hypotheses,,8.0,0.0,0.0,0.0,0.0,True
+wrong_model_shape,False,False,unavailable,ambiguous_hypotheses,,5.042910447761194,0.0,0.26865671641791045,0.31343283582089554,0.0,True
+offset_outside_validated_search,False,False,unavailable,insufficient_image_support,,4.148507462686567,0.334328358208956,0.0,1.0,0.02127659574468085,True
+subpixel_pose_offset,True,True,image_supported_model_alignment,accepted,0.5000000000000113,0.36231343283582057,2.0402985074626874,1.0,1.0,1.0,True
+strong_partial_reflection,True,True,image_supported_model_alignment,accepted,0.0,0.25186567164179063,2.2335820895522387,1.0,1.0,1.0,True
+sole_model_like_reflection,False,True,image_supported_model_alignment,accepted,18.0,0.25186567164179063,2.2335820895522387,1.0,1.0,1.0,False

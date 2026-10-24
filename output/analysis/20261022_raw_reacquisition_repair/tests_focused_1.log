@@ -1,0 +1,11 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 80: i2r_rlc_online_seam_continuity_tests
+1/3 Test #80: i2r_rlc_online_seam_continuity_tests ...   Passed    0.13 sec
+    Start 81: i2r_rlc_online_image_geometry_tests
+2/3 Test #81: i2r_rlc_online_image_geometry_tests ....   Passed   17.98 sec
+    Start 82: i2r_rlc_simulation_guided_seam_tests
+3/3 Test #82: i2r_rlc_simulation_guided_seam_tests ...   Passed    5.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  23.23 sec

@@ -1,0 +1,58 @@
+{
+  "status": "offline prototype incomplete; production integration is not supported by this evidence",
+  "synthetic_candidate_case_count": 14,
+  "synthetic_candidate_pass_count": 12,
+  "known_candidate_false_accepts": [
+    {
+      "case": "sole_model_like_reflection",
+      "error_px": 18.0
+    },
+    {
+      "case": "weaker_model_like_reflection_with_real_shape_mismatch",
+      "error_px": 31.622776601683793
+    }
+  ],
+  "synthetic_height_lifecycle_case_count": 5,
+  "synthetic_height_lifecycle_pass_count": 5,
+  "real_saved_image_count": 28,
+  "exact_frame_reference_count": 1,
+  "exact_frame_id": 7891,
+  "independent_real_pixel_roundtrip_error_px": 3.2697550978540743e-07,
+  "calibration_hash_match": true,
+  "real_v1_minus_old_geometry_height_px": -3.878343931902098,
+  "real_v3_minus_old_geometry_height_px": 0.5326747494652864,
+  "neither_real_output_is_independent_truth": true,
+  "production_code_modified": false,
+  "devices_used": false,
+  "mouse_used": false,
+  "dependencies": [
+    "Python 3 bundled runtime",
+    "numpy",
+    "Pillow"
+  ],
+  "reproduce": [
+    "python validate_candidates.py --output-dir NEW_DIRECTORY",
+    "python validate_height_semantics.py --output-dir NEW_DIRECTORY"
+  ],
+  "candidate_results": "experiment_v4_review/summary.json",
+  "height_results": "height_v3/summary.json",
+  "limitations": [
+    "not a production algorithm; fixed translation, no 3-D registration",
+    "central exclusion is specified experimental design, not automatic tack detection",
+    "only one exact-frame real image/reference pair, no physical seam ground truth",
+    "sole model-like reflection is indistinguishable in static images and yields a false accept",
+    "weaker reflection matching the model beats brighter real seam with different flank slopes; false accept about 31.62px",
+    "exact-frame shoulder alignment differs from existing GapCenter height by about 3.88px; neither is independent truth",
+    "remaining 27 saved images cannot be replayed with full same-frame model profile",
+    "no continuous image recording or closed-loop accuracy validation",
+    "seam X is provided for synthetic unit cases; not complete candidate-detection validation",
+    "model-selected image branch remains prior-dependent",
+    "history example uses scalar image-height residual only; production needs material coordinates and fresh simulation",
+    "stale residual invalidation proves no double compensation; it does not provide continuity after pose updates",
+    "sole model-like reflection counterexample from experiment_v2 remains unresolved"
+  ],
+  "script_sha256": {
+    "validate_candidates.py": "88cadd33382c97cc822fb5eaa40e8f6c76e4db409ba7c3a2709a30656efecbee",
+    "validate_height_semantics.py": "03a1f2bd6eded5d769df2ae5d84381bdae384734925b33c6aeb53a8e4e65ef03"
+  }
+}

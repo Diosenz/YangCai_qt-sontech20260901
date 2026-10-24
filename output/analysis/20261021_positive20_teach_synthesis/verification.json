@@ -1,0 +1,19 @@
+{
+  "unique_source_geometries": 4,
+  "source_weights_sum": 1.0,
+  "copied_source_hashes": "passed",
+  "rigid_alignment": "passed",
+  "generated_points_on_circle": "passed",
+  "preserved_template_metadata": "passed",
+  "all_point_analytic_circle_distance": "passed",
+  "input_hashes_verified": 19,
+  "source_files_deleted": false,
+  "runtime_configuration_changed": false,
+  "mouse_used": false,
+  "actual_browser_ui": "not performed",
+  "independent_cross_product_circle_formula": "passed",
+  "metric_csv_readback": "passed",
+  "same_TCP_KCF_measurements": "passed",
+  "generated_W_T_readback": "passed",
+  "viewer_defaults_and_trace_counts": "passed"
+}

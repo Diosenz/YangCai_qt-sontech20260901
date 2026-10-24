@@ -1,0 +1,21 @@
+const fs=require('fs'),crypto=require('crypto');
+const dir='output/analysis/20261023_online_observability_repair/';
+const logs=['integrated_tests3.log','safety_regression_tests.log','final_boundary_tests.log'];
+const cases=new Map();
+for(const log of logs){const text=fs.readFileSync(dir+log,'utf8');for(const match of text.matchAll(/^.*Test\s+#\d+:\s+(\S+).*?(Passed|\*{3}Failed)\s+([\d.]+) sec/gm)){cases.set(match[1],{name:match[1],status:match[2]==='Passed'?'passed':'failed',seconds:Number(match[3]),log});}}
+const records=[...cases.values()];const pass=records.filter(x=>x.status==='passed').length;const fail=records.filter(x=>x.status==='failed').length;
+if(records.length!==24||pass!==23||fail!==1)throw new Error('unexpected test accounting '+JSON.stringify({total:records.length,pass,fail}));
+const exe='out/build/qt-debug/UI/i2r_rlc.exe';const b=fs.readFileSync(exe);
+const report={testAccounting:'Unique test names; latest run among recorded logs. No full repository or field validation claimed.',total:records.length,passed:pass,failed:fail,tests:records,build:{environment:'Existing VS2022 x64 Developer and qt-debug build tree, explicit user authorization',status:'succeeded',log:'final_build.log',executable:exe,sha256:crypto.createHash('sha256').update(b).digest('hex').toUpperCase(),bytes:b.length},failedCaseDisposition:'Offline frame sync fixture preflight/start order mismatch verified against static call chain and unchanged task baseline. Left unchanged; no pre-task binary comparison.',protectedBoundaries:['No Computer Use or mouse','No edits to RobotSim/oldproject/external scene or model','No removal commands or cleanup','No app/device/robot launch','No automatic hold/stop or rollback'],reviews:['Detector reviewed estimator motion and uncertainty repairs','Estimator reviewed detector time adjacency and UI reset wiring','Geometry owner reviewed worker gates pose lifecycle and candidate/history separation'],workflow:'Previously read complete Notion body snapshot; live body could not be fetched this turn.'};
+fs.writeFileSync(dir+'validation_summary.json',JSON.stringify(report,null,2)+'\n');
+let plan=fs.readFileSync(dir+'plan.md','utf8').replace('4. [进行中]','4. [完成]');
+plan+='\n最终结果：主程序MSVC构建成功（final_build.log）。24个不同CTest项23通过，1个既有离线frame_sync夹具与启动预检契约冲突未修改，详review_findings.md；九项专项全通过76.71秒，最终五项时间边界/合法半步/原图合同31.38秒全通过。半步129? 实际上限128点/帧用例329ms，生产2500ms预算不变。\n';
+plan=plan.replace('半步129? 实际上限128点/帧','半步局部128点/帧');
+plan+='未启动设备/主程序/RobotSim，不声称现场通过。原有五秒后验、冷却及新曝光门禁保留，多交点/身份未确认保留旧门；新几何缓存不自动热载。修改清单SHA256见changed_files.json；最终可执行文件SHA256见validation_summary.json。\n';
+fs.writeFileSync(dir+'plan.md',plan);
+let doc=fs.readFileSync('docs/online_local_registration.md','utf8');
+const old='第三轮九项专项 CTest 全通过（76.71 秒）；最终应用构建、追加 UI 时间边界/缩步成功路径及周边安全回归结果以本轮 evidence/plan 记录为准。';
+if(!doc.includes(old))throw new Error('doc final marker missing');
+doc=doc.replace(old,'第三轮九项专项 CTest 全通过（76.71 秒）；最终主程序 MSVC 构建成功，追加五项 UI 时间边界/合法缩步等回归全部通过（31.38 秒）。三批去重共 24 项，23 项通过；唯一失败是既有离线 frame_sync 夹具未按当前预检先 idle 后 running 的启动契约准备，调用链及未改动基线比对见 review_findings.md，本轮未扩改该夹具或离线生产。未做修改前二进制对照，不声称全量仓库通过。合法半步用例在局部 128 点/帧测试规模约 329 ms 完成；生产 2500 ms 统一上限不变，大窗多候选仍可能因超时拒绝。');
+fs.writeFileSync('docs/online_local_registration.md',doc);
+console.log(JSON.stringify({total:records.length,passed:pass,failed:fail,executableSha256:report.build.sha256},null,2));

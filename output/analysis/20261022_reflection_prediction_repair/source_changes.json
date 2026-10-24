@@ -1,0 +1,140 @@
+[
+  {
+    "path": "UI/src/UiController.cpp",
+    "status": "modified",
+    "before_sha256": "5dd901d32b983237436d8a8d31225528ec7b1359c3248c084d4ede41e337ebfa",
+    "after_sha256": "1e977d31aa98249154da913d92b9937be97535e5f8289b823c4435016da91882"
+  },
+  {
+    "path": "UI/src/RuntimeWorkerAdapters.cpp",
+    "status": "modified",
+    "before_sha256": "b67140cddf4e7ad7e3afcd01176bada8d180c13fdfad99ca525602793bbccc93",
+    "after_sha256": "2a8b25de46bbe43affab4480db42e20ae06b6a1c26f1afc996b621d68a1cb527"
+  },
+  {
+    "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+    "status": "modified",
+    "before_sha256": "3806db2f1904d66def001cbd1f3d1fd9afb127259c9014eab16011f377a6cecd",
+    "after_sha256": "235540dc614d36dd33e2096a076ca9ec2d5dd1ba39b9913aa6ef77b8c69ec8e0"
+  },
+  {
+    "path": "docs/online_local_registration.md",
+    "status": "modified",
+    "before_sha256": "17bdad967a186282ca1c0f94aed219792a53c45789a25af60bbf2f16a28e31c8",
+    "after_sha256": "1ddebacec6dde2f9ed7cc68e9ebfd984267f0115cab84b969f87f56e89106073"
+  },
+  {
+    "path": "Vision/include/track/OnlineSeamContinuity.h",
+    "status": "modified",
+    "before_sha256": "d0cf0d77800028599cbbc58c28260fdf295ee9e13a9f46e2c81ee4adb90bbd05",
+    "after_sha256": "08b98c4aa17e4cbe81e209d289b4c8bcd4e1b3ba2761742b0fde11717e70d839"
+  },
+  {
+    "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+    "status": "modified",
+    "before_sha256": "70ed4c899cc43fef28fc535eb53a80d7a3254942b7774fd4471a9fcf7af0e26a",
+    "after_sha256": "0bab468be463db869a368bc17454f907dcf2198acc15c17742f881e5270d40d8"
+  },
+  {
+    "path": "Vision/include/track/KcfTracker.h",
+    "status": "modified",
+    "before_sha256": "a742a575568954956edb23167d4b4681c573e63f1df0505af0ada11160617a63",
+    "after_sha256": "cf60a6c25dea26f1d463cba99fbe3b79b973674481635066e09360d4ef99dd96"
+  },
+  {
+    "path": "tests/CMakeLists.txt",
+    "status": "modified",
+    "before_sha256": "4f8b5e082de92bf1c457e2cd439656a6dee3ec803da6f132951f1175f40ceb12",
+    "after_sha256": "dfbeacc30ba1f859ffb9ffe233513fd4d30434fae30ef44d739e83a78215578d"
+  },
+  {
+    "path": "Vision/src/track/OnlineSeamContinuity.cpp",
+    "status": "modified",
+    "before_sha256": "c1f129d4bb7a839bf275c4b8c0b8020723752b0d1377c5d289ef02cf5acd3b5c",
+    "after_sha256": "ce74c1518be616278c9c4089f41dfcd8527c4bae0a9bbf3a872d6ddacc6c9f6e"
+  },
+  {
+    "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+    "status": "modified",
+    "before_sha256": "b15aa125b9ceee22502c3ec09c9ebc36b7ffc02e3b94c5a6666be6f7efb7446d",
+    "after_sha256": "7f2d7c2c40b4c5af16c14f2e4ab484046f7a5a700b5672f3b4f0e7627aa324de"
+  },
+  {
+    "path": "Vision/src/track/KcfTracker.cpp",
+    "status": "modified",
+    "before_sha256": "84a332981bc37320f70874f236f59aaca39e6ec5729c4660198e6702b01a6ff3",
+    "after_sha256": "b2797c9f641fa74c0a0d2def62a37357aaf19c2309a8bd2914c90d08b5e0824e"
+  },
+  {
+    "path": "tests/test_online_correction_run_recorder.cpp",
+    "status": "modified",
+    "before_sha256": "029ac97d368e2f846432073a4c248e39a21fd67428754ba9c78eeb2ab10a84d0",
+    "after_sha256": "1a06e7d2008c0879e8dd133b509ececb862f0d087c0623eb664a2e0230e096e6"
+  },
+  {
+    "path": "tests/test_online_fusion_controls.cpp",
+    "status": "modified",
+    "before_sha256": "bfd6c5ee107f156f69b921091151f2145bd3a6061c32891a646ec107acb350d2",
+    "after_sha256": "046a4015bd50a358f19315cb0081defc39112eb08fe0360b081a9f5f66610873"
+  },
+  {
+    "path": "Vision/include/feature/OnlineSeamRefiner.h",
+    "status": "modified",
+    "before_sha256": "204ab902fc5edf5b310c32cffceaa8991a8740252ec8071cb2aff05fb10342c7",
+    "after_sha256": "0bc64e5e360658cfc4758611bb1271e90d2ee0d30c3e68e3771a0ca0ba541f5f"
+  },
+  {
+    "path": "Vision/include/feature/SimulationGuidedSeamEstimator.h",
+    "status": "modified",
+    "before_sha256": "c58486c23faf937d3c0961e2ec2748dc75ca51dab0c136d978e8d3356fa749a0",
+    "after_sha256": "e02fed888f42adba5fa1cbedf49f1b8b500d62d5385bb76c2f4ee1220286dc8e"
+  },
+  {
+    "path": "Vision/src/feature/OnlineSeamRefiner.cpp",
+    "status": "modified",
+    "before_sha256": "ee66e5aa5dfdeb764a274ca4fead3f3e69126193e60cebe70911d417f91210bf",
+    "after_sha256": "8bb4701b1e8eaf171c3782c54e9c4e7a424bca0a0afb60f5c6a841b22414f200"
+  },
+  {
+    "path": "tests/test_online_seam_continuity.cpp",
+    "status": "modified",
+    "before_sha256": "454e7acbb2666e49532861fd6a332d7f165d639a65936c3836a270c649dadcf2",
+    "after_sha256": "436fea27c89ef5cc97cd4f08c2f9c44cbc908a98fb751f9131991988a16999bb"
+  },
+  {
+    "path": "Vision/src/feature/SimulationGuidedSeamEstimator.cpp",
+    "status": "modified",
+    "before_sha256": "0d559fec9c9a8ebca469aa91ea64eb3932663d2acc7dea1561c8f1bde9cbc1a4",
+    "after_sha256": "79d97e5194132824a56b701c6d1fc8dff98308855852adfbdf920ed98e15975e"
+  },
+  {
+    "path": "tests/test_runtime_tracking_flow.cpp",
+    "status": "modified",
+    "before_sha256": "68d67b6860b803ea387f8991f85d01b9d459d27b477f04ca669632e70239685d",
+    "after_sha256": "70aa39e1a6c3c961adad87c994b1f74cb8177050d958c3408c05ef10da5641a8"
+  },
+  {
+    "path": "tests/test_online_image_geometry.cpp",
+    "status": "added",
+    "after_sha256": "dc26d49419891f60904e9d05752be3f77048e9b9bc7486fe24910ca18e77f1e3",
+    "bytes": 9136
+  },
+  {
+    "path": "tests/fixtures/online_image_geometry/frame_14591.png",
+    "status": "added",
+    "after_sha256": "85894c434b64ee48f84b81a838a8de749a2a80cefab59fa2c67ed913f0446439",
+    "bytes": 465507
+  },
+  {
+    "path": "tests/fixtures/online_image_geometry/frame_15248.png",
+    "status": "added",
+    "after_sha256": "59601d7d1049bcb5fcb98066708c0c20615996e67b79b76046d50989d67ce939",
+    "bytes": 513094
+  },
+  {
+    "path": "tests/fixtures/online_image_geometry/provenance.json",
+    "status": "added",
+    "after_sha256": "5b4b01bce8deeb95261896f075fd8d0d2faddebb789c2133919666f491e6346d",
+    "bytes": 3426
+  }
+]

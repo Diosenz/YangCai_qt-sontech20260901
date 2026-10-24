@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "protected_source_config_test_doc_files_unchanged": 488,
+  "incident_input_hashes_verified": 120,
+  "surface_archive_hashes_verified": 52,
+  "visual_calibration_and_log_hashes_verified": 3,
+  "temporal_blocks_disjoint_and_ordered": 52,
+  "holdout_result_consistency": "passed",
+  "visual_candidate_cases_checked": 14,
+  "known_visual_failures_preserved": 2,
+  "height_unit_cases_checked": 5,
+  "exact_real_frame_pairs_checked": 1,
+  "independent_review": "complete_not_ready_for_production",
+  "analytic_geometry_crosscheck": "passed",
+  "existing_executable_tests_passed": 2,
+  "browser": "passed",
+  "production_code_modified": false,
+  "msvc_rebuild_performed": false,
+  "device_or_motion_calls": false,
+  "mouse_used": false,
+  "scope_limit": "artifact consistency checks, not production acceptance or physical accuracy"
+}

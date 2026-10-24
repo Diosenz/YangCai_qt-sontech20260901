@@ -1,0 +1,73 @@
+{
+  "completed_at": "2026-10-22T18:20:07.029519+08:00",
+  "scope": "Formal online correction only; enableOnlineObservationFusion; no Control/RobotComm/DigitalTwin/Localization changes against task baseline. Initial scan and default entries retain existing algorithms.",
+  "source_changes": 23,
+  "source_baseline_files": 497,
+  "source_deletions": 0,
+  "backup": "output/backups/reflection_prediction_repair_20261022/main_baseline/",
+  "exe": {
+    "path": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe",
+    "sha256": "18a8de5254a4644619fb3e61354f673bd8a4a881da420424bc3af59b1eb4e8a0",
+    "bytes": 11500032,
+    "modified": "2026-10-22T18:17:08.425248"
+  },
+  "build": {
+    "toolchain": "VS2022 x64 Developer MSVC, existing qt-debug",
+    "log": "build_5.log",
+    "exit_code": 0
+  },
+  "tests": {
+    "log": "tests_final.log",
+    "exit_code": 0,
+    "passed": 10,
+    "failed": 0,
+    "elapsed_seconds": 11.9
+  },
+  "field_geometry": {
+    "anchor_frame": 14591,
+    "target_frame": 15248,
+    "point": [
+      429.5,
+      610.055
+    ],
+    "shoulder_columns": [
+      56,
+      56
+    ],
+    "image_quality": 0.627181,
+    "semantics": "Current-pixel history-constrained estimated point, not physical ground truth, not independent ICP weld point, not complete robot-loop replay."
+  },
+  "policy": {
+    "automatic_workpiece_rollback": false,
+    "posterior_failure": "Retain confirmed pose and continue subsequent ICP",
+    "automatic_hold_added": false,
+    "estimated_still_guides_tcp": true,
+    "green_point_continuous": true,
+    "camera_robot_or_application_started": false,
+    "computer_use": false
+  },
+  "limits": [
+    "No full hardware or complete image/robot/ICP closed-loop replay.",
+    "Long fully missing image still yields estimated control inputs; bounded image drift does not prove collision avoidance under changing robot/positioner transforms.",
+    "Existing Gabor preprocessing still uses simulated directions; raw-image recovery and geometry use gray8.",
+    "Normal raw geometry retains existing manual/automatic fusion choice; degraded path uses image/history constraints.",
+    "No unrelated full offline suite claim."
+  ],
+  "failed_attempts_preserved": [
+    "build_1: wrong pre-existing target name; corrected without starting compiler",
+    "tests_1: native field-image direction bootstrap failed",
+    "tests_2: native field-image center mask remained at old X; fixed without changing source images or loosening field assertion"
+  ],
+  "review": "main integration + independent boundary review + independent archived image/provenance review",
+  "final_independent_review": {
+    "result": "No newly established blockers in full task-baseline diff.",
+    "reviewed": [
+      "Default tracking path isolation",
+      "Raw image direction fields",
+      "Independent ICP point admission",
+      "Template training admission",
+      "Center mask branch union",
+      "Control and no-rollback transaction unchanged"
+    ]
+  }
+}

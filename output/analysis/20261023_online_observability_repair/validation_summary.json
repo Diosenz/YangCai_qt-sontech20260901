@@ -1,0 +1,174 @@
+{
+  "testAccounting": "Unique test names; latest run among recorded logs. No full repository or field validation claimed.",
+  "total": 24,
+  "passed": 23,
+  "failed": 1,
+  "tests": [
+    {
+      "name": "i2r_rlc_online_correction_run_recorder_tests",
+      "status": "passed",
+      "seconds": 0.22,
+      "log": "integrated_tests3.log"
+    },
+    {
+      "name": "i2r_rlc_online_seam_refinement_contract_tests",
+      "status": "passed",
+      "seconds": 4.34,
+      "log": "final_boundary_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_local_registration_surface_tests",
+      "status": "passed",
+      "seconds": 17.87,
+      "log": "integrated_tests3.log"
+    },
+    {
+      "name": "i2r_rlc_online_local_registration_stability_tests",
+      "status": "passed",
+      "seconds": 0.14,
+      "log": "integrated_tests3.log"
+    },
+    {
+      "name": "i2r_rlc_online_seam_continuity_tests",
+      "status": "passed",
+      "seconds": 0.18,
+      "log": "integrated_tests3.log"
+    },
+    {
+      "name": "i2r_rlc_online_image_geometry_tests",
+      "status": "passed",
+      "seconds": 17.82,
+      "log": "integrated_tests3.log"
+    },
+    {
+      "name": "i2r_rlc_simulation_guided_seam_tests",
+      "status": "passed",
+      "seconds": 15.78,
+      "log": "integrated_tests3.log"
+    },
+    {
+      "name": "i2r_rlc_online_seam_candidate_geometry_tests",
+      "status": "passed",
+      "seconds": 0.24,
+      "log": "final_boundary_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_seam_geometry_worker_tests",
+      "status": "passed",
+      "seconds": 19.01,
+      "log": "final_boundary_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_correction_tests",
+      "status": "passed",
+      "seconds": 0.29,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_correction_p001_contract_tests",
+      "status": "passed",
+      "seconds": 0.02,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_fusion_controls_tests",
+      "status": "passed",
+      "seconds": 0.33,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_local_registration_tests",
+      "status": "passed",
+      "seconds": 3.94,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_local_registration_safety_tests",
+      "status": "passed",
+      "seconds": 0.94,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_local_registration_verification_tests",
+      "status": "passed",
+      "seconds": 0.08,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_local_surface_verification_tests",
+      "status": "passed",
+      "seconds": 0.1,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_local_registration_writeback_safety_tests",
+      "status": "passed",
+      "seconds": 0.23,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_correction_robot_sim_offline_frame_sync_tests",
+      "status": "failed",
+      "seconds": 55.31,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_correction_robot_sim_online_frame_sync_tests",
+      "status": "passed",
+      "seconds": 2.2,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_localization_surface_validation_tests",
+      "status": "passed",
+      "seconds": 7.53,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_seam_refiner_tests",
+      "status": "passed",
+      "seconds": 0.36,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_vision_kcf_tracker_tests",
+      "status": "passed",
+      "seconds": 0.33,
+      "log": "safety_regression_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_calibration_contract_tests",
+      "status": "passed",
+      "seconds": 0.74,
+      "log": "final_boundary_tests.log"
+    },
+    {
+      "name": "i2r_rlc_runtime_tracking_flow_tests",
+      "status": "passed",
+      "seconds": 7.05,
+      "log": "final_boundary_tests.log"
+    }
+  ],
+  "build": {
+    "environment": "Existing VS2022 x64 Developer and qt-debug build tree, explicit user authorization",
+    "status": "succeeded",
+    "log": "final_build.log",
+    "executable": "out/build/qt-debug/UI/i2r_rlc.exe",
+    "sha256": "A2A6486BA95DCA5C8A33E6133AAC85B5515E558AF0343A523B876ECCBF205FD6",
+    "bytes": 11737600
+  },
+  "failedCaseDisposition": "Offline frame sync fixture preflight/start order mismatch verified against static call chain and unchanged task baseline. Left unchanged; no pre-task binary comparison.",
+  "protectedBoundaries": [
+    "No Computer Use or mouse",
+    "No edits to RobotSim/oldproject/external scene or model",
+    "No removal commands or cleanup",
+    "No app/device/robot launch",
+    "No automatic hold/stop or rollback"
+  ],
+  "reviews": [
+    "Detector reviewed estimator motion and uncertainty repairs",
+    "Estimator reviewed detector time adjacency and UI reset wiring",
+    "Geometry owner reviewed worker gates pose lifecycle and candidate/history separation"
+  ],
+  "workflow": "Previously read complete Notion body snapshot; live body could not be fetched this turn."
+}

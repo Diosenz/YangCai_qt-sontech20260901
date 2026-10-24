@@ -1,0 +1,32 @@
+{
+  "scope": "Formal online correction: no automatic rollback; retain current confirmed pose and continue subsequent ICP",
+  "latest_run_before_fix": {
+    "session": "20261022_164042_961",
+    "writebacks": 24,
+    "verified": 7,
+    "rollbacks": 17
+  },
+  "current_working_pose_anchor": "Separate from geometrically verified pose; checked against actual scene before next candidate",
+  "retention": "Read-only GET confirmation, no SET, no geometric promotion, clear pending only for known confirmed write",
+  "resampling": "Preserve pose revision, clear window/history, keep cooldown and require new exposure/frame id",
+  "budgets": "Initial baseline and cumulative limits preserved",
+  "exceptions": "Unknown original write, external changes, stale/cancelled identity or archive failure keep automatic pose update paused; no restore command",
+  "build": {
+    "succeeded": true,
+    "log": "build.log"
+  },
+  "tests": {
+    "passed": 5,
+    "failed": 0,
+    "seconds": 15.37,
+    "log": "tests.log"
+  },
+  "production_rollback_calls": 0,
+  "independent_review": "One read-only reviewer; archive success flag corrected before build",
+  "changed_files": 8,
+  "outside_scope_changes": [],
+  "main_executable": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe",
+  "main_executable_sha256": "45c7ce9cb3882ad45b57a3b08464548df285b35b7d1755284b425f3924d6400f",
+  "field_run": "Not started; no camera, robot or live RobotSim loop launched",
+  "computer_use": "Not used; existing authorized VS2022 Developer CLI only"
+}

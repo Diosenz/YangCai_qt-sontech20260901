@@ -1,0 +1,5 @@
+right-biased coarse point valid=1 point=[150.5, 109.989] confidence=0.654288
+left-biased coarse point valid=1 point=[149.5, 109.751] confidence=0.654412
+translated physical seam valid=1 point=[167.5, 120.989] confidence=0.654512
+dominant true stripe with weak parallel reflection valid=1 point=[150.5, 109.989] confidence=0.654288
+frame6469 horizontalValid=1 valid=0 x=498.5

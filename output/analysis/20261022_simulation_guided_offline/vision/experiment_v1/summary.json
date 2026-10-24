@@ -1,0 +1,24 @@
+{
+  "synthetic_case_count": 10,
+  "synthetic_pass_count": 10,
+  "original_saved_images": 28,
+  "exact_frame_prior_pairs": 1,
+  "calibration_hash_matches_prior_run": true,
+  "claims": [
+    "bounded shape matching can estimate a hidden nominal seam from visible shoulders in synthetic scenes",
+    "no absolute distance-to-simulation reward, competing full profiles must remain ambiguous"
+  ],
+  "limitations": [
+    "not a production algorithm; fixed translation, no 3-D registration",
+    "central exclusion is specified experimental design, not automatic tack detection",
+    "only one exact-frame real image/reference pair, no physical seam ground truth",
+    "remaining 27 saved images cannot be replayed with full same-frame model profile",
+    "no continuous image recording or closed-loop accuracy validation"
+  ],
+  "files": [
+    "synthetic_metrics.csv",
+    "synthetic_cases.json",
+    "exact_frame_reference.json",
+    "input_hashes.json"
+  ]
+}

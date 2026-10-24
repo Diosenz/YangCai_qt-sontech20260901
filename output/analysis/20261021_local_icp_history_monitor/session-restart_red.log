@@ -1,0 +1,2 @@
+FAIL: stop and restart should create a newer nonzero correction session
+FAIL: new current frame should retain the restarted session correlation

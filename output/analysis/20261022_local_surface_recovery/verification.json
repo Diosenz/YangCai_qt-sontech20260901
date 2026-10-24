@@ -1,0 +1,70 @@
+{
+  "build": {
+    "result": "passed",
+    "compiler": "VS2022 MSVC x64 Developer environment",
+    "existing_build_tree": "out/build/qt-debug",
+    "log": "build.log",
+    "main_binary": "out/build/qt-debug/UI/i2r_rlc.exe"
+  },
+  "review": {
+    "baseline": "output\\backups\\local_surface_recovery_20261022",
+    "task_diff": "task.patch",
+    "scope": [
+      "docs/online_local_registration.md",
+      "tests/test_localization_surface_validation.cpp",
+      "tests/test_local_registration_writeback_safety.cpp",
+      "tests/test_online_local_registration_surface.cpp",
+      "tests/test_online_local_surface_verification.cpp",
+      "UI/CMakeLists.txt",
+      "Localization/include/LocalizationSurfaceValidation.h",
+      "Localization/src/LocalizationSurfaceValidation.cpp",
+      "UI/include/OnlineLocalRegistrationWorker.h",
+      "UI/include/OnlineLocalSurfaceVerification.h",
+      "UI/include/RuntimeCoordinator.h",
+      "UI/src/OnlineLocalRegistrationWorker.cpp",
+      "UI/src/RuntimeCoordinator.cpp",
+      "UI/src/RuntimeLocalRegistration.cpp",
+      "UI/src/RuntimeWorkerAdapters.cpp",
+      "UI/include/OnlineLocalRegistrationRecovery.h"
+    ],
+    "no_oldproject_RobotSim_Vision_Control_changes_by_this_task": true,
+    "source_files_removed": [],
+    "encoding_errors": []
+  },
+  "validation_limits": [
+    "No physical camera, robot or live RobotSim welding loop was started.",
+    "Paired posterior metric is a bounded frozen local-plane approximation, not CAD counterfactual reintersection.",
+    "The old run lacks fresh posterior point clouds; synthetic paired evidence is not presented as the old run physical truth.",
+    "Unknown writes, readback/archive failures, insufficient local support and absolute limits continue to reject verification."
+  ],
+  "computer_use_after_prohibition": false,
+  "tests": [
+    {
+      "name": "i2r_rlc_online_local_registration_surface_tests",
+      "time_seconds": "7.89917",
+      "passed": true
+    },
+    {
+      "name": "i2r_rlc_online_local_surface_verification_tests",
+      "time_seconds": "0.0537702",
+      "passed": true
+    },
+    {
+      "name": "i2r_rlc_local_registration_writeback_safety_tests",
+      "time_seconds": "0.195379",
+      "passed": true
+    },
+    {
+      "name": "i2r_rlc_correction_robot_sim_online_frame_sync_tests",
+      "time_seconds": "2.32491",
+      "passed": true
+    },
+    {
+      "name": "i2r_rlc_localization_surface_validation_tests",
+      "time_seconds": "7.1404",
+      "passed": true
+    }
+  ],
+  "selected": 5,
+  "passed": 5
+}

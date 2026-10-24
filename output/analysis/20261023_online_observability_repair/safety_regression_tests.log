@@ -1,0 +1,49 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  3: i2r_rlc_online_correction_tests
+ 1/13 Test  #3: i2r_rlc_online_correction_tests .........................   Passed    0.29 sec
+      Start  4: i2r_rlc_online_correction_p001_contract_tests
+ 2/13 Test  #4: i2r_rlc_online_correction_p001_contract_tests ...........   Passed    0.02 sec
+      Start 17: i2r_rlc_online_fusion_controls_tests
+ 3/13 Test #17: i2r_rlc_online_fusion_controls_tests ....................   Passed    0.33 sec
+      Start 18: i2r_rlc_online_local_registration_tests
+ 4/13 Test #18: i2r_rlc_online_local_registration_tests .................   Passed    3.94 sec
+      Start 20: i2r_rlc_online_local_registration_safety_tests
+ 5/13 Test #20: i2r_rlc_online_local_registration_safety_tests ..........   Passed    0.94 sec
+      Start 23: i2r_rlc_online_local_registration_verification_tests
+ 6/13 Test #23: i2r_rlc_online_local_registration_verification_tests ....   Passed    0.08 sec
+      Start 24: i2r_rlc_online_local_surface_verification_tests
+ 7/13 Test #24: i2r_rlc_online_local_surface_verification_tests .........   Passed    0.10 sec
+      Start 25: i2r_rlc_local_registration_writeback_safety_tests
+ 8/13 Test #25: i2r_rlc_local_registration_writeback_safety_tests .......   Passed    0.23 sec
+      Start 27: i2r_rlc_correction_robot_sim_offline_frame_sync_tests
+ 9/13 Test #27: i2r_rlc_correction_robot_sim_offline_frame_sync_tests ...***Failed   55.31 sec
+FAIL: missing RobotState should emit an explicit failure
+FAIL: frame 100 RobotSim query should enter the deterministic block
+FAIL: blocked current and latest pending frames should both reach Vision
+FAIL: while frame 100 is current, frames 101..105 must collapse to frame 105
+FAIL: only current and latest-pending frames should issue per-frame queries
+FAIL: a valid observation after one/two failures must clear the counter before Vision
+FAIL: transport failure should produce one explicit synchronization failure
+FAIL: transport failure should consume exactly the current frame query
+FAIL: old-session query should be blocked before stop
+FAIL: restarted session should route its own frame after old query returns
+FAIL: old-session Vision should enter the deterministic synchronization hook
+FAIL: new session should route after the blocked old Vision call returns
+FAIL: active correction must pause ordinary realtime RobotSim queries
+
+      Start 28: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+10/13 Test #28: i2r_rlc_correction_robot_sim_online_frame_sync_tests ....   Passed    2.20 sec
+      Start 35: i2r_rlc_localization_surface_validation_tests
+11/13 Test #35: i2r_rlc_localization_surface_validation_tests ...........   Passed    7.53 sec
+      Start 83: i2r_rlc_online_seam_refiner_tests
+12/13 Test #83: i2r_rlc_online_seam_refiner_tests .......................   Passed    0.36 sec
+      Start 85: i2r_rlc_vision_kcf_tracker_tests
+13/13 Test #85: i2r_rlc_vision_kcf_tracker_tests ........................   Passed    0.33 sec
+
+92% tests passed, 1 tests failed out of 13
+
+Total Test time (real) =  71.68 sec
+
+The following tests FAILED:
+	 27 - i2r_rlc_correction_robot_sim_offline_frame_sync_tests (Failed)
+Errors while running CTest

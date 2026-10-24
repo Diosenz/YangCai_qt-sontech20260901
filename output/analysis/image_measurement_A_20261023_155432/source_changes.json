@@ -1,0 +1,236 @@
+{
+  "baseline_manifest": ".codex_backups/image_measurement_A_20261023_155432/manifest.json",
+  "existing_files": [
+    {
+      "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+      "baseline_sha256": "E3CCC24F8395F529A231B71A9B177858619D6E30D3C7D493C137B7500FFCC6DB",
+      "current_sha256": "032C684AE7854CC1EC9BAEC36F8C718D544A48256109680FD43EEADDCD4DAD4D",
+      "changed": true
+    },
+    {
+      "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+      "baseline_sha256": "D0640750ED3AF5CA4853C0925326D01A02256FC48961206ECF6527D86EC9654F",
+      "current_sha256": "CC7914FE52BEE89CC498CF03E732E16AB457DF89A1A995E94CE10F95BFB6F9E3",
+      "changed": true
+    },
+    {
+      "path": "Vision/include/track/KcfTracker.h",
+      "baseline_sha256": "CF60A6C25DEA26F1D463CBA99FBE3B79B973674481635066E09360D4EF99DD96",
+      "current_sha256": "CF60A6C25DEA26F1D463CBA99FBE3B79B973674481635066E09360D4EF99DD96",
+      "changed": false
+    },
+    {
+      "path": "Vision/src/track/KcfTracker.cpp",
+      "baseline_sha256": "B2797C9F641FA74C0A0D2DEF62A37357AAF19C2309A8BD2914C90D08B5E0824E",
+      "current_sha256": "B2797C9F641FA74C0A0D2DEF62A37357AAF19C2309A8BD2914C90D08B5E0824E",
+      "changed": false
+    },
+    {
+      "path": "Vision/include/feature/OnlineSeamRefiner.h",
+      "baseline_sha256": "0BC64E5E360658CFC4758611BB1271E90D2EE0D30C3E68E3771A0CA0BA541F5F",
+      "current_sha256": "0BC64E5E360658CFC4758611BB1271E90D2EE0D30C3E68E3771A0CA0BA541F5F",
+      "changed": false
+    },
+    {
+      "path": "Vision/src/feature/OnlineSeamRefiner.cpp",
+      "baseline_sha256": "8BB4701B1E8EAF171C3782C54E9C4E7A424BCA0A0AFB60F5C6A841B22414F200",
+      "current_sha256": "8BB4701B1E8EAF171C3782C54E9C4E7A424BCA0A0AFB60F5C6A841B22414F200",
+      "changed": false
+    },
+    {
+      "path": "UI/include/RuntimeWorkerAdapters.h",
+      "baseline_sha256": "6781270420701C15630724AB78632D2947AC69E6850B6A8F0CB7C53C6C1A1829",
+      "current_sha256": "0A142E12F6FE95778DEC4AE067B59B7BF3F0B00FF3414780F75606585A8DB93F",
+      "changed": true
+    },
+    {
+      "path": "UI/src/RuntimeWorkerAdapters.cpp",
+      "baseline_sha256": "2A8B25DE46BBE43AFFAB4480DB42E20AE06B6A1C26F1AFC996B621D68A1CB527",
+      "current_sha256": "9AC0B0EADC5EEF1E200682968BF591B5B3CBD025E9615FE87D26C05455C9AD9F",
+      "changed": true
+    },
+    {
+      "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+      "baseline_sha256": "235540DC614D36DD33E2096A076CA9EC2D5DD1BA39B9913AA6EF77B8C69EC8E0",
+      "current_sha256": "C785BA2DE0C7BFB21402AC9F782A7FEB7CB1CDDD2A302F3BE7D25894C37F7279",
+      "changed": true
+    },
+    {
+      "path": "UI/src/UiController.cpp",
+      "baseline_sha256": "1E977D31AA98249154DA913D92B9937BE97535E5F8289B823C4435016DA91882",
+      "current_sha256": "7BC39D180C021097F661727AA223EDD99C9E6653C50B21F2E22A139B79151E50",
+      "changed": true
+    },
+    {
+      "path": "UI/include/RuntimeTrackingTypes.h",
+      "baseline_sha256": "AE03CE285B41923F4EE5D24282012F4E12212EA31F113214A7FBA052CD0C45EB",
+      "current_sha256": "C3E012565A9ED8D57968EE8C33B9AD701FD770E51F5F2A8930654FE50FBE49A8",
+      "changed": true
+    },
+    {
+      "path": "tests/test_runtime_tracking_flow.cpp",
+      "baseline_sha256": "70AA39E1A6C3C961ADAD87C994B1F74CB8177050D958C3408C05EF10DA5641A8",
+      "current_sha256": "912502C1FFE9D8FDCB5AF3A4E097E384F31B23D468D4AA1E9319858319C85189",
+      "changed": true
+    },
+    {
+      "path": "tests/test_online_correction_run_recorder.cpp",
+      "baseline_sha256": "1A06E7D2008C0879E8DD133B509ECECB862F0D087C0623EB664A2E0230E096E6",
+      "current_sha256": "230B2991DDC88CF957C6A81D4B8E956903C1E2F9C9F5EB713CAEACB98E912B90",
+      "changed": true
+    },
+    {
+      "path": "tests/test_online_image_geometry.cpp",
+      "baseline_sha256": "458BFA2D398B03D7BE8A285723B112A8295CF503D3914D9507058CA63AD32107",
+      "current_sha256": "458BFA2D398B03D7BE8A285723B112A8295CF503D3914D9507058CA63AD32107",
+      "changed": false
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "baseline_sha256": "DFBEACC30BA1F859FFB9FFE233513FD4D30434FAE30EF44D739E83A78215578D",
+      "current_sha256": "897A290187C14342A8917256A7676A33F77BAA6A13DCBC11770715D47270DF0E",
+      "changed": true
+    },
+    {
+      "path": "Vision/CMakeLists.txt",
+      "baseline_sha256": "9D1F3E34F4ABD41975320CA26A834101FCC281858AB35E85E5FBD02F60AABD43",
+      "current_sha256": "9D1F3E34F4ABD41975320CA26A834101FCC281858AB35E85E5FBD02F60AABD43",
+      "changed": false
+    },
+    {
+      "path": "docs/online_local_registration.md",
+      "baseline_sha256": "D68399B631345022D44105630753ECCB66C68863AC79800A4DC1D7E567D00CA4",
+      "current_sha256": "144FFE5D74D6EC08B77BAF531839A34C5AE54F80A6F05FBA298FFC28EBBE3C17",
+      "changed": true
+    },
+    {
+      "path": "Control/include/OnlineCorrectionTypes.h",
+      "baseline_sha256": "325AB7CACCF6C436428DA8B5ACF059805C98D43ECB41D1BAF8419CB11C7CB41C",
+      "current_sha256": "325AB7CACCF6C436428DA8B5ACF059805C98D43ECB41D1BAF8419CB11C7CB41C",
+      "changed": false
+    },
+    {
+      "path": "Control/src/OnlineCorrectionController.cpp",
+      "baseline_sha256": "C9C961E1569822C0E9CE99AC2CB2E137A9F1A82336C99FD0B905EB3FED953729",
+      "current_sha256": "C9C961E1569822C0E9CE99AC2CB2E137A9F1A82336C99FD0B905EB3FED953729",
+      "changed": false
+    },
+    {
+      "path": "Control/src/OnlineCorrectionExceptionProcessor.cpp",
+      "baseline_sha256": "8D6FF065FF4FC1A6083B66F1C8C8D1962B8826A925C25DE5DD1BC9D2A090A378",
+      "current_sha256": "8D6FF065FF4FC1A6083B66F1C8C8D1962B8826A925C25DE5DD1BC9D2A090A378",
+      "changed": false
+    },
+    {
+      "path": "tests/test_online_correction_controller.cpp",
+      "baseline_sha256": "42FE082C1AFCB10EC012EE4EF86584B5995DDC186C211608A14D24AF6CFBC0A6",
+      "current_sha256": "42FE082C1AFCB10EC012EE4EF86584B5995DDC186C211608A14D24AF6CFBC0A6",
+      "changed": false
+    },
+    {
+      "path": "tests/test_correction_robot_sim_frame_sync.cpp",
+      "baseline_sha256": "ACEDDD950A1E2478FD7F25D30A54210655B4A3A700023ED522AF95306E7F4BB8",
+      "current_sha256": "98EE9D41F8B5272D8025E4B93F1960C91508E96F20D77B4CA05DBDC0C65029A3",
+      "changed": true
+    }
+  ],
+  "new_files": [
+    {
+      "path": "tests/test_online_image_measurement.cpp",
+      "current_sha256": "4667B25B75D51377CDFD04679375BB4A3C14D65621D547499206C679CF2734F0"
+    },
+    {
+      "path": "tests/fixtures/online_image_measurement/frame_1120_source.png",
+      "current_sha256": "9898C4827FC823AAFD0706708985F119F8FBF948BBF44752865CCC89D6F82F04"
+    },
+    {
+      "path": "tests/fixtures/online_image_measurement/frame_2148_source.png",
+      "current_sha256": "4BF7FCEDA99AA8742E105396316780B4A199A48068E2A475D985CCF3052DCA61"
+    },
+    {
+      "path": "tests/fixtures/online_image_measurement/provenance.json",
+      "current_sha256": "6282CC4BF629218AEEFE125445690A8C9C7322CF8EF75A511B5F3F9868E556D0"
+    }
+  ],
+  "encoding": [
+    {
+      "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "UI/include/RuntimeWorkerAdapters.h",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "UI/src/RuntimeWorkerAdapters.cpp",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "UI/src/UiController.cpp",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "UI/include/RuntimeTrackingTypes.h",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "tests/test_runtime_tracking_flow.cpp",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "tests/test_online_correction_run_recorder.cpp",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "docs/online_local_registration.md",
+      "valid_utf8": true,
+      "bom": false,
+      "bare_lf": 0
+    },
+    {
+      "path": "tests/test_correction_robot_sim_frame_sync.cpp",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    },
+    {
+      "path": "tests/test_online_image_measurement.cpp",
+      "valid_utf8": true,
+      "bom": true,
+      "bare_lf": 0
+    }
+  ],
+  "protected_control_unchanged": true
+}

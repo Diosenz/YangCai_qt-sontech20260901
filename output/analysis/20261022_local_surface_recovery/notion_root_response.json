@@ -1,0 +1,3416 @@
+{
+  "cursor": {
+    "stack": []
+  },
+  "recordMap": {
+    "__version__": 3,
+    "block": {
+      "3f7aa04f-a8a9-8179-8bda-eec496f904f1": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "value": {
+            "id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "version": 361,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "个人工作偏好｜AI 协作指南"
+                ]
+              ]
+            },
+            "content": [
+              "061735d1-b9f5-40b8-ad8a-8b52602dae50",
+              "935b2669-bbb9-4140-a40c-2fd7ab1b92ae",
+              "c5ff5f36-25e3-42ab-8731-ef1a739f8d20",
+              "3fdaa04f-a8a9-8148-9d0e-d533e2bbff85",
+              "3fdaa04f-a8a9-81c5-bc2a-dd7bc7b81b4f",
+              "3fdaa04f-a8a9-81c0-bffc-c614cbc03b4c",
+              "2ef58ef6-1cfc-4ccd-99e1-2edc0bc4f674",
+              "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+              "3fdaa04f-a8a9-8110-83ad-fac2b8baf115",
+              "3fdaa04f-a8a9-812d-9c96-eca7b6a4c071",
+              "fabab840-7931-4f04-a0fd-66c8aca9caf1",
+              "3fdaa04f-a8a9-809e-8041-f842d3bcb132",
+              "3feaa04f-a8a9-816c-9f51-c32fad802a46",
+              "401aa04f-a8a9-8007-98bc-ef9f31373d7c"
+            ],
+            "format": {
+              "site_id": "3ffaa04f-a8a9-8088-9570-00794615076c",
+              "page_icon": "🧭",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "permissions": [
+              {
+                "role": "reader",
+                "type": "public_permission",
+                "is_site": true,
+                "added_timestamp": 1792495174512
+              }
+            ],
+            "created_time": 1791774323584,
+            "last_edited_time": 1792651380266,
+            "parent_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "parent_table": "space",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "space",
+            "nav_parent_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_data": {
+              "title": {
+                "r": "aWV8XI3kRJ8qOYbUzF7zwg,\"start\",\"end\"",
+                "n": {
+                  "aWV8XI3kRJ8qOYbUzF7zwg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "aWV8XI3kRJ8qOYbUzF7zwg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "P8yd4S0ulZ3U",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 14,
+                          "c": "个人工作偏好｜AI 协作指南"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "061735d1-b9f5-40b8-ad8a-8b52602dae50": {
+        "value": {
+          "value": {
+            "id": "061735d1-b9f5-40b8-ad8a-8b52602dae50",
+            "version": 24,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "任务方向一致时，优先参考我们积累的协作方式、风格与范例，再按具体问题灵活调整，保留 AI 自主判断与探索空间。当前指令优先；未经允许不删除文件。"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1791968221900,
+            "last_edited_time": 1792290589033,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "tWgvBh-OKZE_LSrtfafGeA,\"start\",\"end\"",
+                "n": {
+                  "tWgvBh-OKZE_LSrtfafGeA,\"start\",\"end\"": {
+                    "s": {
+                      "x": "tWgvBh-OKZE_LSrtfafGeA",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "agKHFACeadwp",
+                            106
+                          ],
+                          "o": "start",
+                          "l": 18,
+                          "c": "任务方向一致时，优先参考我们积累的协"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "oLS9lsgZy7VP",
+                            69
+                          ],
+                          "o": "start",
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "sgmIlUgKDV7d",
+                            1
+                          ],
+                          "o": "start",
+                          "l": -3,
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "tWgvBh-OKZE_LSrtfafGeA",
+                              "l": "",
+                              "i": [
+                                "sgmIlUgKDV7d",
+                                68
+                              ],
+                              "s": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  1
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  20
+                                ],
+                                "a": "b"
+                              },
+                              "a": [
+                                "b"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "sgmIlUgKDV7d",
+                            4
+                          ],
+                          "o": [
+                            "sgmIlUgKDV7d",
+                            3
+                          ],
+                          "l": -1,
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "tWgvBh-OKZE_LSrtfafGeA",
+                              "l": "",
+                              "i": [
+                                "sgmIlUgKDV7d",
+                                68
+                              ],
+                              "s": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  1
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  20
+                                ],
+                                "a": "b"
+                              },
+                              "a": [
+                                "b"
+                              ]
+                            },
+                            {
+                              "t": "r",
+                              "x": "tWgvBh-OKZE_LSrtfafGeA",
+                              "l": "",
+                              "i": [
+                                "oLS9lsgZy7VP",
+                                74
+                              ],
+                              "s": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  4
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "oLS9lsgZy7VP",
+                                  70
+                                ],
+                                "a": "b"
+                              },
+                              "k": "b"
+                            }
+                          ]
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "oLS9lsgZy7VP",
+                            70
+                          ],
+                          "o": [
+                            "sgmIlUgKDV7d",
+                            4
+                          ],
+                          "l": 1,
+                          "c": "作",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "tWgvBh-OKZE_LSrtfafGeA",
+                              "l": "",
+                              "i": [
+                                "sgmIlUgKDV7d",
+                                68
+                              ],
+                              "s": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  1
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  20
+                                ],
+                                "a": "b"
+                              },
+                              "a": [
+                                "b"
+                              ]
+                            },
+                            {
+                              "t": "r",
+                              "x": "tWgvBh-OKZE_LSrtfafGeA",
+                              "l": "",
+                              "i": [
+                                "oLS9lsgZy7VP",
+                                73
+                              ],
+                              "s": {
+                                "i": [
+                                  "oLS9lsgZy7VP",
+                                  70
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  5
+                                ],
+                                "a": "b"
+                              },
+                              "k": "b"
+                            }
+                          ]
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "agKHFACeadwp",
+                            124
+                          ],
+                          "o": [
+                            "oLS9lsgZy7VP",
+                            70
+                          ],
+                          "l": 3,
+                          "c": "方式、"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "oLS9lsgZy7VP",
+                            71
+                          ],
+                          "o": [
+                            "oLS9lsgZy7VP",
+                            70
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "RKbhLGDfzV4f",
+                            75
+                          ],
+                          "o": [
+                            "oLS9lsgZy7VP",
+                            72
+                          ],
+                          "l": -3
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "RKbhLGDfzV4f",
+                            78
+                          ],
+                          "o": [
+                            "RKbhLGDfzV4f",
+                            77
+                          ],
+                          "l": 2,
+                          "c": "风格"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "agKHFACeadwp",
+                            127
+                          ],
+                          "o": [
+                            "RKbhLGDfzV4f",
+                            79
+                          ],
+                          "l": 1,
+                          "c": "与"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "RKbhLGDfzV4f",
+                            80
+                          ],
+                          "o": [
+                            "RKbhLGDfzV4f",
+                            79
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "RKbhLGDfzV4f",
+                            86
+                          ],
+                          "o": [
+                            "RKbhLGDfzV4f",
+                            85
+                          ],
+                          "l": 2,
+                          "c": "范例"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "agKHFACeadwp",
+                            128
+                          ],
+                          "o": [
+                            "RKbhLGDfzV4f",
+                            87
+                          ],
+                          "l": 27,
+                          "c": "，再按具体问题灵活调整，保留 AI 自主判断与探索空间"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "RKbhLGDfzV4f",
+                            88
+                          ],
+                          "o": [
+                            "RKbhLGDfzV4f",
+                            87
+                          ],
+                          "l": 18,
+                          "c": "。当前指令优先；未经允许不删除文件。"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "sgmIlUgKDV7d",
+                            5
+                          ],
+                          "o": [
+                            "sgmIlUgKDV7d",
+                            4
+                          ],
+                          "l": -15,
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "tWgvBh-OKZE_LSrtfafGeA",
+                              "l": "",
+                              "i": [
+                                "sgmIlUgKDV7d",
+                                68
+                              ],
+                              "s": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  1
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "sgmIlUgKDV7d",
+                                  20
+                                ],
+                                "a": "b"
+                              },
+                              "a": [
+                                "b"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "sgmIlUgKDV7d",
+                            20
+                          ],
+                          "o": [
+                            "sgmIlUgKDV7d",
+                            19
+                          ],
+                          "l": -48,
+                          "b": []
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "935b2669-bbb9-4140-a40c-2fd7ab1b92ae": {
+        "value": {
+          "value": {
+            "id": "935b2669-bbb9-4140-a40c-2fd7ab1b92ae",
+            "version": 19,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "工作方向"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1791968221900,
+            "last_edited_time": 1792290238489,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "75F3Lexx-Q4Bq0y835FIFQ,\"start\",\"end\"",
+                "n": {
+                  "75F3Lexx-Q4Bq0y835FIFQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "75F3Lexx-Q4Bq0y835FIFQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "THhpo4Hx_QX5",
+                            106
+                          ],
+                          "o": "start",
+                          "l": 2,
+                          "c": "工作"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "dyLr_njS_QIS",
+                            63
+                          ],
+                          "o": "start",
+                          "l": -19
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "IOSgOMvNQdfK",
+                            1
+                          ],
+                          "o": "start",
+                          "l": -7,
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "75F3Lexx-Q4Bq0y835FIFQ",
+                              "l": "",
+                              "i": [
+                                "IOSgOMvNQdfK",
+                                62
+                              ],
+                              "s": {
+                                "i": [
+                                  "IOSgOMvNQdfK",
+                                  1
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "IOSgOMvNQdfK",
+                                  9
+                                ],
+                                "a": "b"
+                              },
+                              "a": [
+                                "b"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "IOSgOMvNQdfK",
+                            8
+                          ],
+                          "o": [
+                            "IOSgOMvNQdfK",
+                            7
+                          ],
+                          "l": -1,
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "75F3Lexx-Q4Bq0y835FIFQ",
+                              "l": "",
+                              "i": [
+                                "IOSgOMvNQdfK",
+                                62
+                              ],
+                              "s": {
+                                "i": [
+                                  "IOSgOMvNQdfK",
+                                  1
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "IOSgOMvNQdfK",
+                                  9
+                                ],
+                                "a": "b"
+                              },
+                              "a": [
+                                "b"
+                              ]
+                            },
+                            {
+                              "t": "r",
+                              "x": "75F3Lexx-Q4Bq0y835FIFQ",
+                              "l": "",
+                              "i": [
+                                "dyLr_njS_QIS",
+                                105
+                              ],
+                              "s": {
+                                "i": [
+                                  "IOSgOMvNQdfK",
+                                  8
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "dyLr_njS_QIS",
+                                  82
+                                ],
+                                "a": "b"
+                              },
+                              "k": "b"
+                            }
+                          ]
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "dyLr_njS_QIS",
+                            82
+                          ],
+                          "o": [
+                            "IOSgOMvNQdfK",
+                            8
+                          ],
+                          "l": -1,
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "75F3Lexx-Q4Bq0y835FIFQ",
+                              "l": "",
+                              "i": [
+                                "IOSgOMvNQdfK",
+                                62
+                              ],
+                              "s": {
+                                "i": [
+                                  "IOSgOMvNQdfK",
+                                  1
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "IOSgOMvNQdfK",
+                                  9
+                                ],
+                                "a": "b"
+                              },
+                              "a": [
+                                "b"
+                              ]
+                            },
+                            {
+                              "t": "r",
+                              "x": "75F3Lexx-Q4Bq0y835FIFQ",
+                              "l": "",
+                              "i": [
+                                "dyLr_njS_QIS",
+                                90
+                              ],
+                              "s": {
+                                "i": [
+                                  "dyLr_njS_QIS",
+                                  82
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "IOSgOMvNQdfK",
+                                  9
+                                ],
+                                "a": "b"
+                              },
+                              "k": "b"
+                            }
+                          ]
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "dyLr_njS_QIS",
+                            83
+                          ],
+                          "o": [
+                            "dyLr_njS_QIS",
+                            82
+                          ],
+                          "l": 2,
+                          "c": "方向"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "dyLr_njS_QIS",
+                            85
+                          ],
+                          "o": [
+                            "dyLr_njS_QIS",
+                            84
+                          ],
+                          "l": -5
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "IOSgOMvNQdfK",
+                            9
+                          ],
+                          "o": [
+                            "IOSgOMvNQdfK",
+                            8
+                          ],
+                          "l": -4,
+                          "b": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "dyLr_njS_QIS",
+                            91
+                          ],
+                          "o": [
+                            "IOSgOMvNQdfK",
+                            12
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "IOSgOMvNQdfK",
+                            13
+                          ],
+                          "o": [
+                            "IOSgOMvNQdfK",
+                            12
+                          ],
+                          "l": -20
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "dyLr_njS_QIS",
+                            93
+                          ],
+                          "o": [
+                            "IOSgOMvNQdfK",
+                            32
+                          ],
+                          "l": -12
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "IOSgOMvNQdfK",
+                            33
+                          ],
+                          "o": [
+                            "IOSgOMvNQdfK",
+                            32
+                          ],
+                          "l": -29
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "c5ff5f36-25e3-42ab-8731-ef1a739f8d20": {
+        "value": {
+          "value": {
+            "id": "c5ff5f36-25e3-42ab-8731-ef1a739f8d20",
+            "version": 6,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "‣",
+                  [
+                    [
+                      "p",
+                      "3feaa04f-a8a9-816c-9f51-c32fad802a46",
+                      "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                    ]
+                  ]
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792419283797,
+            "last_edited_time": 1792419283797,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "E0GAf3aC8UVvF2nm7Eue3Q,\"start\",\"end\"",
+                "n": {
+                  "E0GAf3aC8UVvF2nm7Eue3Q,\"start\",\"end\"": {
+                    "s": {
+                      "x": "E0GAf3aC8UVvF2nm7Eue3Q",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "UiXQTJd5BJLC",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "E0GAf3aC8UVvF2nm7Eue3Q",
+                              "l": "",
+                              "i": [
+                                "UiXQTJd5BJLC",
+                                2
+                              ],
+                              "s": {
+                                "i": [
+                                  "UiXQTJd5BJLC",
+                                  1
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "UiXQTJd5BJLC",
+                                  1
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "p",
+                                "3feaa04f-a8a9-816c-9f51-c32fad802a46",
+                                "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3fdaa04f-a8a9-8148-9d0e-d533e2bbff85": {
+        "value": {
+          "value": {
+            "id": "3fdaa04f-a8a9-8148-9d0e-d533e2bbff85",
+            "version": 56,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "PPT 与科研配图｜风格与注意事项"
+                ]
+              ]
+            },
+            "content": [
+              "9357260a-a069-443b-9355-fe3eedbb10e3",
+              "09ee7164-dc9d-4377-81f5-1a34f61ce65a",
+              "c0b82a66-6b36-4f80-9cd0-40698e5e7361",
+              "a8d9bd35-55c6-4079-8b59-a16ff0386102",
+              "01f623ab-7631-4cd0-b987-04a7920419c3",
+              "04a91b74-192b-4279-b421-da88c1ffc6b9",
+              "69f03887-96ff-4701-a1a1-85997b899e26",
+              "adf54bcb-6876-48d8-b611-8ad99f808cc0",
+              "cd11ddff-e03b-4dc3-887e-df2ce18208e4",
+              "1af327d5-9194-4df2-91e4-611e92f495b5",
+              "c8f84174-1850-4512-aa65-76c68391981f",
+              "ba843208-a1a1-4f79-99eb-b1d9f007bb4a",
+              "3e3bf26b-3f44-4a27-bb5e-05bf92b655b3",
+              "929a1490-28e7-4272-9cd4-f89c5a4b310a",
+              "05cb0784-711b-46ec-a7b8-3f3f1e52091c",
+              "d9e18263-69c4-4019-9e33-e77a33368683",
+              "f64b6a5f-d57e-4382-a538-af77f972a9dc",
+              "cdd8e869-297a-4a1f-8ab0-c4250bae3688",
+              "1f27a0b0-a64b-438b-bbc5-f5b1d00cd728",
+              "e1b44816-f726-4278-9105-b329f60b149c",
+              "0b8ec250-a799-45e9-81a2-e146ca204e3b",
+              "6372d1ab-49a7-48bd-b50e-c6286604a379",
+              "2009e5fe-b655-4b6f-b822-1521e1d7bc2b",
+              "87e803ea-d5d1-4d80-9e65-16cd303d36ba",
+              "6c1aac64-daa3-4e96-b466-0dee8e08c4bf",
+              "868cefd7-3757-447f-9305-a3675af5efde",
+              "733d594a-5db0-441e-a225-d179f610bb75",
+              "6bbece2e-78de-4a43-bfca-29fdbc32edb8",
+              "1d359012-28a5-4947-8ab2-05a908b17f64",
+              "fa064fa4-616e-4b5e-865b-fbc620a61116",
+              "ab3107a1-b1a3-4a50-a9ff-7866af2a68da",
+              "2892838a-d4d6-4447-ad32-9f0b33d70a28",
+              "19db2244-3999-463e-82b5-c9436291e9e7",
+              "303df596-81fa-4fb4-963b-72923c499548",
+              "a15ceb03-b571-4731-9755-6bf1ca75c4ea",
+              "6dd477cb-071d-4f48-a95d-06d30a25e780",
+              "67323fb5-8fb8-4306-a820-5c2b2a418096"
+            ],
+            "format": {
+              "page_icon": "📊",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792290121025,
+            "last_edited_time": 1792419282642,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "eL4umz_1Bi3YjGuWBkkfWg,\"start\",\"end\"",
+                "n": {
+                  "eL4umz_1Bi3YjGuWBkkfWg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "eL4umz_1Bi3YjGuWBkkfWg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "UqQGhL13QTMU",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 17,
+                          "c": "PPT 与科研配图｜风格与注意事项"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3fdaa04f-a8a9-81c5-bc2a-dd7bc7b81b4f": {
+        "value": {
+          "value": {
+            "id": "3fdaa04f-a8a9-81c5-bc2a-dd7bc7b81b4f",
+            "version": 8,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "Word 与研究文稿｜风格与审查"
+                ]
+              ]
+            },
+            "content": [
+              "a4bd7e46-cafb-4451-947b-72a918fbb870",
+              "6c40fab6-73d0-4107-871b-3223636b9315",
+              "21b6ee86-4193-42f8-9c73-282a316a26d9",
+              "427fdcdb-2145-4130-849c-72fe72833a04",
+              "71b8c2aa-daf6-429b-ae85-61207b7bce14",
+              "7611a991-a43c-4104-b1a5-cf908335c770",
+              "41220667-4905-412c-96cf-af8341f3376f",
+              "95d8d322-1bc9-4689-bae7-f57f78015f1e",
+              "9d3d5cf1-f158-444d-af85-26b6756f8047",
+              "ab6ce861-ab87-445f-a8dd-be819ecd3d3c",
+              "21dc9e53-0fc3-4b8e-bd87-84267197ccad",
+              "0d0d3a8a-1ced-4723-a484-b800a4c7c4bf",
+              "942f013e-c4f4-41db-8a1f-e7a918e7b796",
+              "98bf4ffb-d617-44b0-9e8b-93c803545bd4",
+              "a401d31b-6bf6-41b0-ab85-94b0b93b3a96",
+              "22040ff1-7379-4140-b1ae-7ed1a5005578",
+              "007d375f-ed58-4184-9743-f7946f0e11f8",
+              "40a3b9a1-e9e5-4b94-b74c-f2be24ebe968",
+              "e25daf97-4682-4e18-aee7-ffda7f3b8e7c",
+              "96002df0-d16d-4e40-8d99-8a250ed78789",
+              "b81a9e22-5316-40d9-aa54-164e29911b33",
+              "882bf3e7-ec8c-4253-a4b9-d4a2cf3cdccf"
+            ],
+            "format": {
+              "page_icon": "📝",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792290121025,
+            "last_edited_time": 1792290121025,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "CKjpYXdole72z2nX5JpURA,\"start\",\"end\"",
+                "n": {
+                  "CKjpYXdole72z2nX5JpURA,\"start\",\"end\"": {
+                    "s": {
+                      "x": "CKjpYXdole72z2nX5JpURA",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "KI1W5dKrVzg7",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 16,
+                          "c": "Word 与研究文稿｜风格与审查"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3fdaa04f-a8a9-81c0-bffc-c614cbc03b4c": {
+        "value": {
+          "value": {
+            "id": "3fdaa04f-a8a9-81c0-bffc-c614cbc03b4c",
+            "version": 8,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "文字表达与内容解读｜风格偏好"
+                ]
+              ]
+            },
+            "content": [
+              "5947c573-48be-4fb9-bbcc-1e3818222ada",
+              "465cb22a-10b2-49d7-8ba9-c3b2d6f47ab4",
+              "692e1d6a-ef06-438c-b121-ddc3023503e6",
+              "de23117f-3e2b-405b-ab26-c98bac9e6bb5",
+              "573b4926-e1ea-43ff-8625-e3116c158b84",
+              "982d5e6a-d796-4be2-ba44-ca5efdfd0854",
+              "59310fd9-99c6-4503-91a9-718da96a81bd",
+              "d66a76e2-9bcf-45d4-afc9-c58f4d662b62",
+              "ff91515d-f391-40f6-9e66-69e0420f9539",
+              "686453e7-9bc5-4f98-ba8b-53de2a361dcd",
+              "9f48d75b-491c-444e-9a97-20a360231fdf",
+              "055fe2e9-62d9-4f9c-afd6-e29d73772e12",
+              "bb6c57b0-294b-40ae-9403-b04739b2a06b",
+              "1b896de8-81ca-4338-a633-c4ffcf0701d1",
+              "5ee3483c-2141-4d4e-8f9e-810104b0cfaf",
+              "9005a900-7fc3-4d09-83cb-0bd48c67684c",
+              "eaf036b0-77f4-4c04-8db1-51534db0fbfd",
+              "d0193aef-8268-4ff7-9c0f-3071575d7cf5",
+              "05dd4f6a-ab07-4503-bf9d-2d631f9530e0",
+              "eb1a3fec-7d67-4932-920d-8922fa8aff23",
+              "bc1d83e7-b143-41e8-8f9b-69440056171d",
+              "f46faff4-c4ec-4487-b804-21640c69ecdf"
+            ],
+            "format": {
+              "page_icon": "✍️",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792290093212,
+            "last_edited_time": 1792290093212,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "G0ixVGBcGQb8nbe3i62ADg,\"start\",\"end\"",
+                "n": {
+                  "G0ixVGBcGQb8nbe3i62ADg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "G0ixVGBcGQb8nbe3i62ADg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "5nLjow-gxe8d",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 14,
+                          "c": "文字表达与内容解读｜风格偏好"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "2ef58ef6-1cfc-4ccd-99e1-2edc0bc4f674": {
+        "value": {
+          "value": {
+            "id": "2ef58ef6-1cfc-4ccd-99e1-2edc0bc4f674",
+            "version": 12,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "协作与成长"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792290148335,
+            "last_edited_time": 1792290238489,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "seA4lS_fOMm_NlRN9sNowQ,\"start\",\"end\"",
+                "n": {
+                  "seA4lS_fOMm_NlRN9sNowQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "seA4lS_fOMm_NlRN9sNowQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "iye7jsKMRCwn",
+                            5
+                          ],
+                          "o": "start",
+                          "l": 5,
+                          "c": "协作与成长"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "QkYxnD1E1Czy",
+                            1
+                          ],
+                          "o": "start",
+                          "l": -4
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630": {
+        "value": {
+          "value": {
+            "id": "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+            "version": 17,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "AI 协作工作流｜持续优化"
+                ]
+              ]
+            },
+            "content": [
+              "95e87bb4-f7fc-494a-93f8-93e5801f51ad",
+              "885b26fe-cbf5-4fe3-a746-88929fdba564",
+              "8a2be07a-41f3-47b3-b585-fa46c6f98fb0",
+              "298cd4a4-d695-4a56-bed4-0e4d106f9f31",
+              "fe3da384-33cc-4178-b9cd-f97032cadc16",
+              "61368066-10df-4562-8cc1-d9ed8e8d3d00",
+              "f71d59a0-b7f1-4aee-ab3d-da2c1e0cff55",
+              "9d9d3d37-d8c9-434d-bb83-3fb65fff492b",
+              "9c45e1ef-d61b-41b9-a4ea-2e6296b79627",
+              "f57b8966-bbcb-459c-a777-33169d23ba8a",
+              "14898f1c-a0ac-4dc6-84e8-05bc31ba8835",
+              "6b5d45c1-69e9-470e-b557-a69660b0e8d4",
+              "3449549d-9fc3-42af-b5be-8206c838f285",
+              "3318c53c-d8d1-4cd4-9fbf-7ada0eeda4e0",
+              "70d27fab-e824-4902-b024-9c3746135f87",
+              "d7446ae3-5c08-4cc0-8344-52dd0033942c",
+              "94e50296-ed30-44aa-b33c-828cb2bc3e7c",
+              "8e5369b7-b7f3-4c6a-958d-ea8f98892cea",
+              "3db90720-72fb-4c8d-9fb8-da30f1734bf7",
+              "8bbd87ca-a916-42c1-8cc2-0f65709d89bf",
+              "de5a4180-5024-4283-9f3c-fc15013c68a7",
+              "1b2e2391-26b1-4ba7-9632-e64f8b55adc8",
+              "28b0faf4-a3ce-4079-bf15-fa23752eca13",
+              "e9ed48ad-67dd-4b82-945c-3ea04b4ea5cd",
+              "b7cad1b4-0e88-4a36-b1f1-ce1ab0277dae",
+              "61c1d846-3dca-4db4-9111-fb6f114229e5",
+              "c5580db1-dc83-489b-b422-43a9b48f09d1",
+              "d2b5ba87-e01e-419d-8429-2614268d30dd",
+              "e9e68438-1431-4649-9cfd-769b8f7ef06c",
+              "1e0e2842-c3e0-4d83-8efc-f066e3e260b1",
+              "bb35a695-cf0e-4637-b560-20765849317e",
+              "af917180-ed21-433a-a093-25741e0b86b3",
+              "cee55252-ba85-4c04-a560-e68c19a66692",
+              "6c2625f3-6cd1-48db-82e3-1be0423563b1",
+              "d7815d91-9352-4ede-8a39-40a2b171ecb6",
+              "e2752753-c155-42e8-bb8b-1e4f04be28a3",
+              "4a89a688-f374-441e-8aac-3b23af18c768",
+              "38bb7def-4c2f-457e-b3af-08077b458be6",
+              "fa8e49a6-e256-4989-aa4b-f968cd71d490",
+              "0f6952c1-c5ed-4bc0-9aa9-1a5879d1f550",
+              "907b8f31-c0e1-4b05-accc-b1c81099c222",
+              "24056e43-b2eb-4819-bc1d-ac74e168a769",
+              "1e57a3e8-ce15-41cc-9d1c-13a0590bd4c2",
+              "95770f81-4c3e-47bc-bb29-bf3ba2275fd9",
+              "7688b90f-3e40-49bc-9c3e-787c30c081a0",
+              "c22a21ce-a583-4966-a680-326e272c28a8",
+              "317db124-7ae3-461e-9686-a35679120367",
+              "26176d12-ae09-4112-8cc9-efd24196ebcc",
+              "29556df8-f4b2-4877-b379-c32af408e97c",
+              "72dd30c1-ea17-40d4-8c23-8f7601a1e833",
+              "0d468f52-8cad-4650-ac78-29e7985106ca",
+              "c3de22b4-2a2e-4016-b179-5b56da478320",
+              "5284d385-66e3-4093-94bb-659ebda49caf",
+              "10b3edc7-61ac-4bba-ba25-4688329a4dc7",
+              "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+              "3faaa04f-a8a9-815f-b8aa-db92a77f8b13",
+              "3faaa04f-a8a9-81ae-93ef-fcad1a7b8230"
+            ],
+            "format": {
+              "page_icon": "🔄",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792289581930,
+            "last_edited_time": 1792290590972,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "kQ7UXZr2mkHl2PmwJBMRYg,\"start\",\"end\"",
+                "n": {
+                  "kQ7UXZr2mkHl2PmwJBMRYg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "kQ7UXZr2mkHl2PmwJBMRYg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "VZnBk2aUO1tJ",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 13,
+                          "c": "AI 协作工作流｜持续优化"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3fdaa04f-a8a9-8110-83ad-fac2b8baf115": {
+        "value": {
+          "value": {
+            "id": "3fdaa04f-a8a9-8110-83ad-fac2b8baf115",
+            "version": 14,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "AI 对我的理解｜能力、思路与协作方式"
+                ]
+              ]
+            },
+            "content": [
+              "a75317ff-85a7-4b96-9c74-1d2db12f5c24",
+              "6cb67764-13e6-4cb3-a2f2-4b76be4fe77a",
+              "7c782a4f-5986-4f7f-b546-d8059dc8c901",
+              "d9b496d3-5cbc-4a05-9816-b28ac21e9ba1",
+              "46e06c68-03f8-4ca0-9567-6e3a6710b0f9",
+              "b5cf9074-fb32-4689-b3ba-b7d3f3f26e53",
+              "21084453-81af-4d37-a8f1-cf761d6cb883",
+              "37bc18ef-c9fb-45a8-8f87-737b21d433da",
+              "08f1681a-97f4-4acd-92a9-038c5749e1b1",
+              "b0ba136e-ba54-4a97-8832-8d66b60cbfe5",
+              "830dded6-9291-4902-bfbd-a1696530d9c3",
+              "c866d75d-325a-4262-a014-f483804a6ec6",
+              "f27effad-c906-45b0-bf16-d6f88309ecbd",
+              "d581e39e-9b14-4c65-9c7d-9611b0f5bbe5",
+              "09fdb5c3-6214-4820-89f7-63c8d82e1d09",
+              "fc1148fa-87f9-4f44-bb4a-8b93b8c50386",
+              "73c07ea8-21e5-4a23-9863-a23d87d93877",
+              "98f6835f-76ac-437f-b274-97e7e3e58068",
+              "bee700e5-0aad-4076-8305-2eca1ee3bb8a",
+              "19a441b5-fc67-4a54-8918-39ba0261a5ba",
+              "b16eac0f-77e5-4254-9dfa-9fba653c9694",
+              "42ba108b-dde7-4ff8-88bd-da0a9104b9a2",
+              "6ed4c575-f29a-4cb6-b05e-5739f066c87e",
+              "7ed1ce83-ea8a-42b8-9a17-6dd86abf41aa",
+              "b97d1899-5c06-4c37-8b6e-626b87d910cd",
+              "a1787225-c3d5-4240-9ed0-36b21df9e1f9",
+              "8c0a9262-a4fd-4228-8361-d261a1fbefb2",
+              "63692f40-b7f5-4ff7-adf7-4daf704b16eb",
+              "381be3e0-17f2-438e-9060-8ba588a4b8ce",
+              "f2b11698-ec79-4756-9ace-282fc9ee4d1a",
+              "a839d155-f546-40f4-9f36-f64f63c507b0",
+              "c789185f-8c0e-413f-be86-44ec6ebde162",
+              "862ade71-ec65-4155-9b38-644e4da4559f",
+              "442018bb-ddb5-4355-b9a7-9bc05575bc09",
+              "9d31fd12-7e9e-4909-84bf-446c9e8c6308",
+              "2805ad89-5cc5-40aa-9830-baae7f121b35",
+              "2f10cb1e-7e70-46cb-9be8-29f338f53470",
+              "96839455-4c79-4935-b3d6-d61cbd239001",
+              "673a1c8e-b28d-4b41-82c4-13e17736074e",
+              "50b7015f-f46f-4036-9193-c96adeddb070",
+              "4c284a72-c0e5-496a-8862-50f1a81367c8",
+              "eb7c920d-95a1-41c5-b735-4102e90c1a49",
+              "42459181-b485-4986-822c-7b0a230bc90c",
+              "88b618e0-0c72-4e92-86e3-737eddb20dc3",
+              "219acb13-1d7f-4cb9-a9b3-37182c8f4fc2",
+              "7ff7d7e6-c88a-485a-bb7c-89fb9a0dd2d5",
+              "982e29b3-c1fc-418a-9fc5-5281a12b553e",
+              "091e9915-15e6-4d9b-b91a-067b16e235a2",
+              "fbdae770-ef2b-46a0-a78a-ee650b636875",
+              "cd7aef2d-5be9-40c2-b073-71034c055bbe",
+              "038af7a6-f98f-4fc1-899c-30b8557fe30c",
+              "1672970c-4eb4-4929-8dcb-c462332d53c9",
+              "57abb9b4-38b5-4d47-9ac5-2480a56ebf0d",
+              "4e4bcb34-6eee-4a97-a262-7b6bf8265722",
+              "3a95c286-938e-4ccf-8390-b787916f0358",
+              "904d5bb4-3d8d-4a09-9173-f6b9fa7ccd8f",
+              "9d93f30c-7c80-4195-93c7-23a1b54f0cce",
+              "fcfa688f-7327-49ab-af60-4b94661cfe14"
+            ],
+            "format": {
+              "page_icon": "🪞",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792289275721,
+            "last_edited_time": 1792289673078,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "kJmnTCzOdNcWEx0tXnlxEw,\"start\",\"end\"",
+                "n": {
+                  "kJmnTCzOdNcWEx0tXnlxEw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "kJmnTCzOdNcWEx0tXnlxEw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ES1eEvw-MZ8p",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 19,
+                          "c": "AI 对我的理解｜能力、思路与协作方式"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3fdaa04f-a8a9-812d-9c96-eca7b6a4c071": {
+        "value": {
+          "value": {
+            "id": "3fdaa04f-a8a9-812d-9c96-eca7b6a4c071",
+            "version": 22,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "通用协作偏好｜边界与维护"
+                ]
+              ]
+            },
+            "content": [
+              "425b94cd-8085-479b-86b3-0cfb68889b85",
+              "96c37a36-d6c2-4170-952f-64950e92f17f",
+              "d7a20411-414b-49bf-8868-2daba768e510",
+              "493d9a43-e801-4004-b2ef-335a1105dc38",
+              "9a5f7810-c494-40d9-89ac-3f6771d1b8c5",
+              "46dea911-136a-4309-ba9d-9af92a3bd444",
+              "dce7aaaf-059d-4db4-b395-d8df7ea7bc4e",
+              "234ab4ea-28f7-4b9b-babc-8b8f42aa1e4a",
+              "68fb18bb-2992-4096-b009-b682e2f5ad4d",
+              "252185da-fd48-4637-aded-aa7d6da4fda5",
+              "74dcc690-bfb2-45f0-bd98-eee3175c48f8",
+              "6304427d-9269-4d40-8062-aeed7a66bb7c",
+              "00be8df0-7852-48fd-9b09-b81ef313b4dc",
+              "bba36301-5edf-4a79-9cb0-9de2bcc1cdf7",
+              "4bebb0f7-ab87-42f4-9af8-18a1823bf97b",
+              "83feec17-6ee7-4637-a1e4-3e4151896702",
+              "be3dd8fd-6c4c-4135-901c-3264db334535",
+              "6f332fc4-2e09-469f-b89c-3fee563f900a",
+              "4a8c5483-1a9e-4b2b-9e17-2d72649c7565",
+              "489608e1-2dce-42c4-a1a8-22a31946ca1c",
+              "c27409d7-ce79-49d5-86f7-ba83ab7e073d",
+              "bf561e57-d9ed-4c16-a6ce-49b5372b89f7",
+              "1b8c5e25-b1d0-453c-b038-fe806191b98f",
+              "05be40b8-fb9e-4b09-bce6-daf9266ece33",
+              "f6cf0ed2-5a7d-46b6-9695-cf045946f13f",
+              "9e203702-0ad6-4c27-9ad4-acede90cbe12",
+              "dde33600-8dc2-4c8a-9b9c-7cfea13dee23",
+              "267d11f2-3c6b-49f9-b626-4a82d7d6f81a",
+              "7bdbbaac-6e58-43ef-9441-e58434c59df0",
+              "266dc316-f42e-4c3e-abd3-a1efdef52c57",
+              "b6146367-d79c-43a3-9132-b03cdcc8ad34",
+              "6ed3e2d3-635c-434f-b947-ec9b5d7e222f",
+              "b1176827-b166-4a65-874f-0148c7bfcd55",
+              "0bbcbc64-007d-4507-999c-8fffbb40e653",
+              "38128ff8-c5b9-4dfe-95d6-cf42b383b81d",
+              "db633b18-183f-44ab-bddf-b75ebd1ee927",
+              "ad93913e-b043-409f-a403-e47fe748634d",
+              "21ee5464-7635-48bc-bebf-687b0ed40177",
+              "0f4fb948-ae40-4fc6-bc74-1aa0484d8d9f",
+              "4d8e435f-82ab-4aa0-9e0c-da3f00fe8eb5",
+              "67b18ab4-264a-453d-9160-7bbc25e576b7",
+              "ba8f6ba6-fa5b-4004-a436-2c04ce5162cd",
+              "4ddd7a78-2aab-420d-9b23-d18c67c05880",
+              "cf62ee12-dfe6-4394-a620-66b31d78b796",
+              "ed154814-b231-409a-8ecf-06ea0c4f15f4",
+              "a21959f3-9bc3-4589-aa26-9debd1f4ab07",
+              "b59dacab-100b-4603-a12f-d15f3ccb2cc7",
+              "414af08f-a871-43a9-8b56-b40ccdab8637",
+              "2216e036-bcef-4335-8d37-e43f31dd9dc0",
+              "8b182fc4-a531-4614-9b87-2347cf50a343",
+              "19a2081a-f586-416b-8c84-d1337e5d7d98",
+              "db07438f-ff07-48b2-998a-effa6586bf08",
+              "beabf025-0ea2-4c31-bc8f-c4b89ba8310c",
+              "df7aa76f-3836-4a76-90c1-cb475544d2bb"
+            ],
+            "format": {
+              "page_icon": "🤝",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792290093212,
+            "last_edited_time": 1792290589864,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "FhnEgNIFYtwOjxfOZC9QTQ,\"start\",\"end\"",
+                "n": {
+                  "FhnEgNIFYtwOjxfOZC9QTQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "FhnEgNIFYtwOjxfOZC9QTQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "QInp0831OhOi",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 12,
+                          "c": "通用协作偏好｜边界与维护"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "fabab840-7931-4f04-a0fd-66c8aca9caf1": {
+        "value": {
+          "value": {
+            "id": "fabab840-7931-4f04-a0fd-66c8aca9caf1",
+            "version": 617,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "AI 根据实际任务按需读取相关页，同一对话复用已读内容；反馈与经验更新到对应页，首页保持导航。进行任何测试的时候，都必须先反问，这个测试是否有进行的必要，依据是什么，如果不能狗找出与之对应的证据支撑，那么该测试则不用进行，避免无用冗余测试。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792290238489,
+            "last_edited_time": 1792651402750,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "owNjUjp554n3V6PiMlEVQg,\"start\",\"end\"",
+                "n": {
+                  "owNjUjp554n3V6PiMlEVQg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "owNjUjp554n3V6PiMlEVQg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ywVuWnYzSa5D",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 47,
+                          "c": "AI 根据实际任务按需读取相关页，同一对话复用已读内容；反馈与经验更新到对应页，首页保持导航。"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            56
+                          ],
+                          "o": [
+                            "ywVuWnYzSa5D",
+                            47
+                          ],
+                          "l": 2,
+                          "c": "进行"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            64
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            57
+                          ],
+                          "l": 2,
+                          "c": "任何"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            72
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            65
+                          ],
+                          "l": 2,
+                          "c": "测试"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            76
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            73
+                          ],
+                          "l": 1,
+                          "c": "的"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            84
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            76
+                          ],
+                          "l": 3,
+                          "c": "时候，"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            90
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            86
+                          ],
+                          "l": 1,
+                          "c": "都"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            95
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            90
+                          ],
+                          "l": 2,
+                          "c": "必须"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            101
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            96
+                          ],
+                          "l": 1,
+                          "c": "先"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            109
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            101
+                          ],
+                          "l": 3,
+                          "c": "反问，"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            118
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            111
+                          ],
+                          "l": 2,
+                          "c": "这个"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            131
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            119
+                          ],
+                          "l": 2,
+                          "c": "测试"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            143
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            132
+                          ],
+                          "l": 2,
+                          "c": "是否"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            148
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            144
+                          ],
+                          "l": 1,
+                          "c": "有"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            159
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            148
+                          ],
+                          "l": 2,
+                          "c": "进行"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            163
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            160
+                          ],
+                          "l": 1,
+                          "c": "的"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            170
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            163
+                          ],
+                          "l": 3,
+                          "c": "必要，"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            184
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            172
+                          ],
+                          "l": 2,
+                          "c": "依据"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            190
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            185
+                          ],
+                          "l": 1,
+                          "c": "是"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            198
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            190
+                          ],
+                          "l": 3,
+                          "c": "什么，"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            207
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            200
+                          ],
+                          "l": 2,
+                          "c": "如果"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            246
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            208
+                          ],
+                          "l": 3,
+                          "c": "不能狗"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            257
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            248
+                          ],
+                          "l": 2,
+                          "c": "找出"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            282
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            258
+                          ],
+                          "l": 4,
+                          "c": "与之对应"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            288
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            285
+                          ],
+                          "l": 1,
+                          "c": "的"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            299
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            288
+                          ],
+                          "l": 2,
+                          "c": "证据"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            310
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            300
+                          ],
+                          "l": 3,
+                          "c": "支撑，"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            318
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            312
+                          ],
+                          "l": 2,
+                          "c": "那么"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            323
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            319
+                          ],
+                          "l": 1,
+                          "c": "该"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            330
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            323
+                          ],
+                          "l": 2,
+                          "c": "测试"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            334
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            331
+                          ],
+                          "l": 1,
+                          "c": "则"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            342
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            334
+                          ],
+                          "l": 2,
+                          "c": "不用"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            352
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            343
+                          ],
+                          "l": 3,
+                          "c": "进行，"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            362
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            354
+                          ],
+                          "l": 2,
+                          "c": "避免"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            371
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            363
+                          ],
+                          "l": 2,
+                          "c": "无用"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            391
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            372
+                          ],
+                          "l": 5,
+                          "c": "冗余测试。"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            376
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            372
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            383
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            381
+                          ],
+                          "l": -8
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            382
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            381
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            375
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            372
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            373
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            372
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            364
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            363
+                          ],
+                          "l": -7
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            355
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            354
+                          ],
+                          "l": -7
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            344
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            343
+                          ],
+                          "l": -8
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            335
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            334
+                          ],
+                          "l": -7
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            332
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            331
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            324
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            323
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            320
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            319
+                          ],
+                          "l": -3
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            313
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            312
+                          ],
+                          "l": -5
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            301
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            300
+                          ],
+                          "l": -9
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            289
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            288
+                          ],
+                          "l": -5
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            296
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            293
+                          ],
+                          "l": -3
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            294
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            293
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            286
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            285
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            267
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            258
+                          ],
+                          "l": -15
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            265
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            258
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            259
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            258
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            249
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            248
+                          ],
+                          "l": -8
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            235
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            208
+                          ],
+                          "l": -11
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            229
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            208
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            209
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            208
+                          ],
+                          "l": -3
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            217
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            211
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            212
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            211
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            227
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            212
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            214
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            212
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            213
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            212
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            219
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            213
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            215
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            213
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            225
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            216
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            220
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            216
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            226
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            221
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            222
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            221
+                          ],
+                          "l": -3
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            228
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            224
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            201
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            200
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            191
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            190
+                          ],
+                          "l": -7
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            186
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            185
+                          ],
+                          "l": -4
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            179
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            172
+                          ],
+                          "l": -5
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            177
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            172
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            173
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            172
+                          ],
+                          "l": -4
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            164
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            163
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            161
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            160
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            149
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            148
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            152
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            150
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            151
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            150
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            153
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            151
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            156
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            154
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            155
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            154
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            157
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            155
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            145
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            144
+                          ],
+                          "l": -3
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            133
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            132
+                          ],
+                          "l": -4
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            139
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            136
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            137
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            136
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            141
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            137
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            140
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            137
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            142
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            140
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            138
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            137
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            124
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            119
+                          ],
+                          "l": -7
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            123
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            119
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            120
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            119
+                          ],
+                          "l": -3
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            112
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            111
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            102
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            101
+                          ],
+                          "l": -7
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            97
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            96
+                          ],
+                          "l": -4
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            91
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            90
+                          ],
+                          "l": -4
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            87
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            86
+                          ],
+                          "l": -3
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            77
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            76
+                          ],
+                          "l": -7
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            74
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            73
+                          ],
+                          "l": -2
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            66
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            65
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            58
+                          ],
+                          "o": [
+                            "ZesDNP8gNDjW",
+                            57
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZesDNP8gNDjW",
+                            48
+                          ],
+                          "o": [
+                            "ywVuWnYzSa5D",
+                            47
+                          ],
+                          "l": -8
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3fdaa04f-a8a9-809e-8041-f842d3bcb132": {
+        "value": {
+          "value": {
+            "id": "3fdaa04f-a8a9-809e-8041-f842d3bcb132",
+            "version": 3,
+            "type": "text",
+            "created_time": 1792290627116,
+            "last_edited_time": 1792290627132,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "LfEp11CZOnGJyDgFWJJXsQ,\"start\",\"end\"",
+                "n": {
+                  "LfEp11CZOnGJyDgFWJJXsQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "LfEp11CZOnGJyDgFWJJXsQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3feaa04f-a8a9-816c-9f51-c32fad802a46": {
+        "value": {
+          "value": {
+            "id": "3feaa04f-a8a9-816c-9f51-c32fad802a46",
+            "version": 7,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "数据分析｜图示与交互展示偏好"
+                ]
+              ]
+            },
+            "content": [
+              "fa089641-fa12-4d81-97b0-57eb9ae14dcf",
+              "b63c638d-d656-44f3-a747-94d46bdb31c8",
+              "e9ff5b8b-3306-4382-8eb2-796bda272931",
+              "3e5c8ef0-5188-4bb8-a1ea-7d1d57a8020c",
+              "33c6d978-8d40-4c32-b2a8-7f813f2288f6",
+              "dfd432eb-cab5-4e3e-93f4-2c0ba3bb4353",
+              "0bafd2b0-6d88-4c1b-bae6-07fb70744d6f",
+              "69d59452-ed75-4a17-98e0-a11929a5c0bd",
+              "3cb26879-b7a2-4276-b995-24dd090a3a0e",
+              "22a8b988-d12b-4ae6-97fb-981cac30df3f",
+              "67371d91-3a02-4563-ad69-ff7d89b1acb8",
+              "3caa08d9-bc77-485a-b2a8-4d24e833de6d",
+              "1fccdde1-3e1b-4cd2-8182-8ddb6528b92e",
+              "830da653-beb1-4e64-8e68-8dc741bb73b3",
+              "08b4988b-b5e1-4caa-bd37-8e6618c27353",
+              "d7a6412a-6545-4861-b456-f8beb3d69f9b",
+              "1f4bd4a8-67ba-4967-983e-1b181d325482",
+              "c99d8852-4dc1-411e-b75d-0d5ffb2b9209",
+              "fb57ce5f-4e49-4502-9a6d-444b7145c037",
+              "b423ad1d-c550-480b-ae9c-bfd8adb57204",
+              "f7c6d7a8-759f-4ba0-8e78-0640f9639049",
+              "ba3faf9e-4977-4906-a988-48fad73ad694",
+              "d0f96395-28a4-46a9-976d-14f1d091024d"
+            ],
+            "format": {
+              "page_icon": "📈",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792419267013,
+            "last_edited_time": 1792419267013,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "qN-HOFBx0W1TMlMN6P0JTQ,\"start\",\"end\"",
+                "n": {
+                  "qN-HOFBx0W1TMlMN6P0JTQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "qN-HOFBx0W1TMlMN6P0JTQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "wI6cTf2896lL",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 14,
+                          "c": "数据分析｜图示与交互展示偏好"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "401aa04f-a8a9-8007-98bc-ef9f31373d7c": {
+        "value": {
+          "value": {
+            "id": "401aa04f-a8a9-8007-98bc-ef9f31373d7c",
+            "version": 3,
+            "type": "text",
+            "created_time": 1792651347218,
+            "last_edited_time": 1792651347231,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "yfusjH3kLbdc8uccjgFYUw,\"start\",\"end\"",
+                "n": {
+                  "yfusjH3kLbdc8uccjgFYUw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "yfusjH3kLbdc8uccjgFYUw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      }
+    }
+  }
+}

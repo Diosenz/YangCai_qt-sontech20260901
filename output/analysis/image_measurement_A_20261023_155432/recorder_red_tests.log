@@ -1,0 +1,14 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 8: i2r_rlc_online_correction_run_recorder_tests
+1/1 Test #8: i2r_rlc_online_correction_run_recorder_tests ...***Failed    0.31 sec
+FAIL: KCF stage identity preserves initial admission and formal ICP exclusion without geometry
+FAIL: KCF stage identity preserves initial admission and formal ICP exclusion without geometry
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.32 sec
+
+The following tests FAILED:
+	  8 - i2r_rlc_online_correction_run_recorder_tests (Failed)
+Errors while running CTest

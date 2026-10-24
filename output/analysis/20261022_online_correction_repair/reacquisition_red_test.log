@@ -1,0 +1,14 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 81: i2r_rlc_simulation_guided_seam_tests
+1/1 Test #81: i2r_rlc_simulation_guided_seam_tests ...***Failed    2.53 sec
+FAIL: visible historical seam blocks reacquisition by a brighter eighteen-pixel reflection
+FAIL: nearby competing reflection never replaces the original measured anchor
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   2.54 sec
+
+The following tests FAILED:
+	 81 - i2r_rlc_simulation_guided_seam_tests (Failed)
+Errors while running CTest

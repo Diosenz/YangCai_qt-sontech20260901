@@ -1,0 +1,45 @@
+{
+  "session": "20261021_152328_050",
+  "reference_radius_mm": 142.03533963525268,
+  "reference_circle": "moved_synthesized_circle.json",
+  "KCF_over_3mm_event_count": 6,
+  "KCF_over_3mm_point_count": 25,
+  "KCF_peak_event": {
+    "trajectory": "raw_KCF",
+    "start": "15:26:40.919",
+    "end": "15:26:41.579",
+    "span_ms": 660,
+    "point_count": 10,
+    "max_mm": 6.470628905304498,
+    "max_time": "15:26:41.282",
+    "signed_radial_at_max_mm": 6.398957689371798,
+    "plane_height_at_max_mm": 0.9604056017077498,
+    "angle_at_max_deg": 334.07386512143404
+  },
+  "error_components": [
+    {
+      "trajectory": "TCP",
+      "radial_mean_mm": 0.03188483394242305,
+      "radial_rmse_mm": 0.7464671329915123,
+      "plane_height_mean_mm": 0.01670078031166597,
+      "plane_height_rmse_mm": 0.49377609243138476
+    },
+    {
+      "trajectory": "raw_KCF",
+      "radial_mean_mm": -0.047966084060369105,
+      "radial_rmse_mm": 0.7693624375453003,
+      "plane_height_mean_mm": 0.005663391079915895,
+      "plane_height_rmse_mm": 0.46812431844271934
+    },
+    {
+      "trajectory": "final_vision",
+      "radial_mean_mm": -0.06714384588415177,
+      "radial_rmse_mm": 0.768296958472457,
+      "plane_height_mean_mm": 0.017085690456379275,
+      "plane_height_rmse_mm": 0.4608834899045752
+    }
+  ],
+  "primary_entry": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_positive20_teach_synthesis\\report.html",
+  "updated_previous_entry": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261021_152328_050_retest\\report.html",
+  "raw_measurements_changed": false
+}

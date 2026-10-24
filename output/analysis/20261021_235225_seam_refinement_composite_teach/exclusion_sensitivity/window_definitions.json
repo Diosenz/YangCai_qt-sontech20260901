@@ -1,0 +1,42 @@
+[
+  {
+    "key": "all",
+    "label": "全量有效记录",
+    "removed_visual_count": 0,
+    "start": null,
+    "end": null,
+    "start_frame": null,
+    "end_frame": null,
+    "contiguous": true
+  },
+  {
+    "key": "screenshot_prediction_segment",
+    "label": "剔除截图所在连续仿真预测段",
+    "removed_visual_count": 187,
+    "start": "10-22 00:00:28.310",
+    "end": "10-22 00:00:40.652",
+    "start_frame": 17558,
+    "end_frame": 17932,
+    "contiguous": true
+  },
+  {
+    "key": "screenshot_geometry_outage",
+    "label": "剔除截图所在整段精定位失效",
+    "removed_visual_count": 512,
+    "start": "10-22 00:00:06.728",
+    "end": "10-22 00:00:40.652",
+    "start_frame": 16904,
+    "end_frame": 17932,
+    "contiguous": true
+  },
+  {
+    "key": "all_prediction_sources",
+    "label": "剔除全程所有仿真预测来源帧",
+    "removed_visual_count": 993,
+    "start": "10-21 23:53:10.173",
+    "end": "10-22 00:01:22.759",
+    "start_frame": 4281,
+    "end_frame": 19208,
+    "contiguous": false
+  }
+]

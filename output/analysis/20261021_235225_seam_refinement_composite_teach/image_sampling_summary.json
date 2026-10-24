@@ -1,0 +1,13 @@
+{
+  "pairs": 28,
+  "image_diagnostic_schema": "4",
+  "buckets": {
+    "4": 9,
+    "1": 6,
+    "2": 6,
+    "3": 4,
+    "0": 3
+  },
+  "first_saved_time": "10-21 23:52:41.099",
+  "last_saved_time": "10-22 00:01:11.078"
+}

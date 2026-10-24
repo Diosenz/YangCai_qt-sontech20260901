@@ -1,0 +1,351 @@
+[
+  {
+    "name": "clear_model_offset",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": true,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": 0.0,
+    "passed": true,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      138.0,
+      134.0
+    ],
+    "dx": 18,
+    "dy": -6,
+    "score": 0.25186567164179063,
+    "alternate_margin": 2.27089552238806,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "image_supported_model_alignment",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "reflection_parallel",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": true,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": 0.0,
+    "passed": true,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      138.0,
+      134.0
+    ],
+    "dx": 18,
+    "dy": -6,
+    "score": 0.25186567164179063,
+    "alternate_margin": 2.2335820895522387,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "image_supported_model_alignment",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "tack_convex_multifold",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": true,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": 0.0,
+    "passed": true,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      138.0,
+      134.0
+    ],
+    "dx": 18,
+    "dy": -6,
+    "score": 0.25186567164179063,
+    "alternate_margin": 2.2283582089552243,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 0.3404255319148936,
+    "source": "model_estimate_from_visible_shoulders",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "tack_plus_reflection",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": true,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": 0.0,
+    "passed": true,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      138.0,
+      134.0
+    ],
+    "dx": 18,
+    "dy": -6,
+    "score": 0.25186567164179063,
+    "alternate_margin": 2.225373134328359,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 0.3404255319148936,
+    "source": "model_estimate_from_visible_shoulders",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "nominal_extra_bend",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": true,
+    "truth_point": [
+      104.0,
+      148.0
+    ],
+    "error_px": 0.0,
+    "passed": true,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      104.0,
+      148.0
+    ],
+    "dx": -16,
+    "dy": 8,
+    "score": 0.25186567164179063,
+    "alternate_margin": 2.643283582089553,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "image_supported_model_alignment",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "equal_strength_competing_seams",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": false,
+    "truth_point": [
+      120.0,
+      140.0
+    ],
+    "error_px": null,
+    "passed": true,
+    "accepted": false,
+    "reason": "ambiguous_hypotheses",
+    "point": null,
+    "dx": 0,
+    "dy": -18,
+    "score": 0.25186567164179063,
+    "alternate_margin": 0.0,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "unavailable",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "one_shoulder_missing",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": false,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": null,
+    "passed": true,
+    "accepted": false,
+    "reason": "ambiguous_hypotheses",
+    "point": null,
+    "dx": 18,
+    "dy": -6,
+    "score": 4.127238805970149,
+    "alternate_margin": 0.0007462686567167864,
+    "left_coverage": 1.0,
+    "right_coverage": 0.0,
+    "central_coverage": 0.3829787234042553,
+    "source": "unavailable",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "blank_no_evidence",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": false,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": null,
+    "passed": true,
+    "accepted": false,
+    "reason": "ambiguous_hypotheses",
+    "point": null,
+    "dx": -30,
+    "dy": -25,
+    "score": 8.0,
+    "alternate_margin": 0.0,
+    "left_coverage": 0.0,
+    "right_coverage": 0.0,
+    "central_coverage": 0.0,
+    "source": "unavailable",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "wrong_model_shape",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": false,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": null,
+    "passed": true,
+    "accepted": false,
+    "reason": "ambiguous_hypotheses",
+    "point": null,
+    "dx": -30,
+    "dy": -8,
+    "score": 5.042910447761194,
+    "alternate_margin": 0.0,
+    "left_coverage": 0.26865671641791045,
+    "right_coverage": 0.31343283582089554,
+    "central_coverage": 0.0,
+    "source": "unavailable",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "offset_outside_validated_search",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": false,
+    "truth_point": [
+      180.0,
+      134.0
+    ],
+    "error_px": null,
+    "passed": true,
+    "accepted": false,
+    "reason": "insufficient_image_support",
+    "point": null,
+    "dx": 33,
+    "dy": 2,
+    "score": 4.148507462686567,
+    "alternate_margin": 0.334328358208956,
+    "left_coverage": 0.0,
+    "right_coverage": 1.0,
+    "central_coverage": 0.02127659574468085,
+    "source": "unavailable",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "subpixel_pose_offset",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": true,
+    "truth_point": [
+      138.4,
+      133.3
+    ],
+    "error_px": 0.5000000000000113,
+    "passed": true,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      138.0,
+      133.0
+    ],
+    "dx": 18,
+    "dy": -7,
+    "score": 0.36231343283582057,
+    "alternate_margin": 2.0402985074626874,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "image_supported_model_alignment",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "strong_partial_reflection",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": true,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": 0.0,
+    "passed": true,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      138.0,
+      134.0
+    ],
+    "dx": 18,
+    "dy": -6,
+    "score": 0.25186567164179063,
+    "alternate_margin": 2.2335820895522387,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "image_supported_model_alignment",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "sole_model_like_reflection",
+    "kind": "synthetic_known_generator_truth",
+    "expected_accept": false,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": 18.0,
+    "passed": false,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      138.0,
+      116.0
+    ],
+    "dx": 18,
+    "dy": -24,
+    "score": 0.25186567164179063,
+    "alternate_margin": 2.2335820895522387,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "image_supported_model_alignment",
+    "fitting_exclusion_half_width_px": 24
+  },
+  {
+    "name": "weaker_model_like_reflection_with_real_shape_mismatch",
+    "kind": "synthetic_known_generator_truth_independent_review",
+    "expected_accept": false,
+    "truth_point": [
+      138.0,
+      134.0
+    ],
+    "error_px": 31.622776601683793,
+    "passed": false,
+    "accepted": true,
+    "reason": "accepted",
+    "point": [
+      120.0,
+      160.0
+    ],
+    "dx": 0,
+    "dy": 20,
+    "score": 0.25186567164179086,
+    "alternate_margin": 1.8589552238805969,
+    "left_coverage": 1.0,
+    "right_coverage": 1.0,
+    "central_coverage": 1.0,
+    "source": "image_supported_model_alignment",
+    "fitting_exclusion_half_width_px": 24
+  }
+]

@@ -1,0 +1,42 @@
+<!doctype html><meta charset="utf-8"><title>帧17927异常段剔除分析</title><style>body{font:16px/1.7 system-ui,Microsoft YaHei;margin:30px;color:#203345}table{border-collapse:collapse}td,th{padding:8px;border:1px solid #ccc}th{background:#eef4fa}pre{white-space:pre-wrap}</style><h1>截图帧17927异常段剔除敏感性分析</h1><p>固定此前移动后综合示教圆，半径142.035339635 mm，不重新拟合参考、不改原始日志。保留点仍采用连续圆解析距离。</p><p>只删除粗KCF显示/统计点不会改变已执行TCP，也不会重算已经产生的最终输出。下表对最终视觉及TCP的过滤是同时间窗口的独立描述，不是反事实重放。</p><pre>[
+  {
+    &quot;key&quot;: &quot;all&quot;,
+    &quot;label&quot;: &quot;全量有效记录&quot;,
+    &quot;removed_visual_count&quot;: 0,
+    &quot;start&quot;: null,
+    &quot;end&quot;: null,
+    &quot;start_frame&quot;: null,
+    &quot;end_frame&quot;: null,
+    &quot;contiguous&quot;: true
+  },
+  {
+    &quot;key&quot;: &quot;screenshot_prediction_segment&quot;,
+    &quot;label&quot;: &quot;剔除截图所在连续仿真预测段&quot;,
+    &quot;removed_visual_count&quot;: 187,
+    &quot;start&quot;: &quot;10-22 00:00:28.310&quot;,
+    &quot;end&quot;: &quot;10-22 00:00:40.652&quot;,
+    &quot;start_frame&quot;: 17558,
+    &quot;end_frame&quot;: 17932,
+    &quot;contiguous&quot;: true
+  },
+  {
+    &quot;key&quot;: &quot;screenshot_geometry_outage&quot;,
+    &quot;label&quot;: &quot;剔除截图所在整段精定位失效&quot;,
+    &quot;removed_visual_count&quot;: 512,
+    &quot;start&quot;: &quot;10-22 00:00:06.728&quot;,
+    &quot;end&quot;: &quot;10-22 00:00:40.652&quot;,
+    &quot;start_frame&quot;: 16904,
+    &quot;end_frame&quot;: 17932,
+    &quot;contiguous&quot;: true
+  },
+  {
+    &quot;key&quot;: &quot;all_prediction_sources&quot;,
+    &quot;label&quot;: &quot;剔除全程所有仿真预测来源帧&quot;,
+    &quot;removed_visual_count&quot;: 993,
+    &quot;start&quot;: &quot;10-21 23:53:10.173&quot;,
+    &quot;end&quot;: &quot;10-22 00:01:22.759&quot;,
+    &quot;start_frame&quot;: 4281,
+    &quot;end_frame&quot;: 19208,
+    &quot;contiguous&quot;: false
+  }
+]</pre><table><tr><th>筛选口径</th><th>轨迹</th><th>剔除点数</th><th>保留点数</th><th>平均/mm</th><th>RMSE/mm</th><th>最大/mm</th><th>超3mm点数</th><th>峰值时间</th></tr><tr><td>全量有效记录</td><td>raw_KCF</td><td>0</td><td>7056</td><td>0.8261</td><td>1.0562</td><td>12.4837</td><td>63</td><td>10-21 23:53:57.032</td></tr><tr><td>全量有效记录</td><td>final_vision</td><td>0</td><td>7056</td><td>0.7811</td><td>1.1929</td><td>4.7672</td><td>389</td><td>10-22 00:00:56.822</td></tr><tr><td>全量有效记录</td><td>TCP</td><td>0</td><td>5854</td><td>0.8442</td><td>1.2317</td><td>4.8124</td><td>304</td><td>10-22 00:01:24.093</td></tr><tr><td>剔除截图所在连续仿真预测段</td><td>raw_KCF</td><td>187</td><td>6869</td><td>0.8198</td><td>1.0554</td><td>12.4837</td><td>63</td><td>10-21 23:53:57.032</td></tr><tr><td>剔除截图所在连续仿真预测段</td><td>final_vision</td><td>187</td><td>6869</td><td>0.7418</td><td>1.1504</td><td>4.7672</td><td>389</td><td>10-22 00:00:56.822</td></tr><tr><td>剔除截图所在连续仿真预测段</td><td>TCP</td><td>140</td><td>5714</td><td>0.8491</td><td>1.2410</td><td>4.8124</td><td>304</td><td>10-22 00:01:24.093</td></tr><tr><td>剔除截图所在整段精定位失效</td><td>raw_KCF</td><td>512</td><td>6544</td><td>0.8130</td><td>1.0570</td><td>12.4837</td><td>63</td><td>10-21 23:53:57.032</td></tr><tr><td>剔除截图所在整段精定位失效</td><td>final_vision</td><td>512</td><td>6544</td><td>0.7235</td><td>1.1486</td><td>4.7672</td><td>389</td><td>10-22 00:00:56.822</td></tr><tr><td>剔除截图所在整段精定位失效</td><td>TCP</td><td>384</td><td>5470</td><td>0.8561</td><td>1.2566</td><td>4.8124</td><td>304</td><td>10-22 00:01:24.093</td></tr><tr><td>剔除全程所有仿真预测来源帧</td><td>raw_KCF</td><td>993</td><td>6063</td><td>0.7662</td><td>0.8920</td><td>6.0393</td><td>16</td><td>10-21 23:55:38.605</td></tr><tr><td>剔除全程所有仿真预测来源帧</td><td>final_vision</td><td>993</td><td>6063</td><td>0.5199</td><td>0.6562</td><td>4.5811</td><td>23</td><td>10-22 00:00:56.887</td></tr></table><p>剔除全程仿真预测来源是额外敏感性口径，并不代表仅截图这一段。预测来源帧的before_fusion仍是粗KCF数据，final则是预测输出。</p><p>该分析由已观察异常选择排除范围，只用于定位影响，不替代全量指标或实际运行质量。时间为北京时间，10-22指2026-10-22。</p><p><a href="../report.html">全量主报告</a> | <a href="metrics.csv">统计CSV</a> | <a href="window_definitions.json">剔除范围</a></p>

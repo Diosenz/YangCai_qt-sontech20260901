@@ -1,0 +1,43 @@
+{
+  "status": "passed",
+  "browser": "Edge headless",
+  "local_3d_render": "passed",
+  "controls_verified_by": "DOM events, no mouse input",
+  "axes": {
+    "traces": 9,
+    "canvas": 3
+  },
+  "sources": [
+    4061,
+    2308,
+    310,
+    209,
+    5791
+  ],
+  "report": {
+    "title": "20261023 10:15 在线纠偏误差｜移动后综合原始示教",
+    "overflow": false,
+    "iframes": [
+      "index.html",
+      "axis_fluctuations.html"
+    ]
+  },
+  "mobile": {
+    "overflow": false
+  },
+  "errors": [],
+  "trace_counts": [
+    5791,
+    6888,
+    6888,
+    1441,
+    1441,
+    1368,
+    1368
+  ],
+  "zscale_and_independent_selectors": "passed",
+  "view_presets": "passed",
+  "coordinate_immutability": "passed",
+  "mouse_used": false,
+  "manual_drag_zoom_pan": "not performed"
+}

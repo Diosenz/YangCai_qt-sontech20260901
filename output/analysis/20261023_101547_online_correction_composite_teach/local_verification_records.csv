@@ -1,0 +1,10 @@
+﻿file,succeeded,independently_verified,phase,rollback_attempted,samples,good_samples,time_ms,time,cumulative_translation_mm,cumulative_rotation_deg,maximum_keypoint_displacement_mm,message
+local_icp_1_10694_43f2fefa-4dce-42eb-89d7-d30ad3014f69.json.verified.json,True,True,verified,False,3,0,1792722089682,10-23 10:21:29.682,11.314726733946358,0.6135431611361151,9.914388359510603,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_12998_e671eae6-8892-448c-966a-552d75d0beba.json.verified.json,True,True,verified,False,3,0,1792722165977,10-23 10:22:45.977,10.93594875066405,0.04546294777393221,11.082537079594248,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_13196_2b9635c5-4167-4a3e-8e53-080d4e052f2a.json.verified.json,True,True,verified,False,3,0,1792722172115,10-23 10:22:52.115,11.34205567211155,0.034201285317904624,11.26864011511678,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_13381_94db7916-f139-42ef-8d9a-be0531f9fadb.json.verified.json,True,True,verified,False,3,0,1792722178319,10-23 10:22:58.319,12.497081490991244,0.4185510182732103,11.585403387123858,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_13571_02e1d920-8799-44c5-9a4b-a02d0f93023c.json.verified.json,True,True,verified,False,3,0,1792722184754,10-23 10:23:04.754,12.774489344371338,0.4387086676382548,11.819099343835449,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_14659_3afd36c3-e708-4dbd-8de2-ad3c0c68130b.json.verified.json,True,True,verified,False,3,0,1792722220360,10-23 10:23:40.360,17.2714634421013,1.9513938830299946,12.824144210285967,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_15703_ceba4f6c-5945-4f54-bc9f-5d3423308713.json.verified.json,True,True,verified,False,3,0,1792722254944,10-23 10:24:14.944,17.282465486871708,1.4535650562735838,14.078041949891066,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_16805_a4726c47-a518-4b88-9792-0fb036f178f9.json.verified.json,True,True,verified,False,3,0,1792722291409,10-23 10:24:51.409,17.359884537038774,0.8961429002073822,15.357703811937315,独立新帧验证后，工件位姿已晋升为可信位姿。
+local_icp_1_3712_8c6dbf78-3bc7-4091-b148-fa74ce05d7dc.json.verified.json,True,True,verified,False,3,3,1792721858850,10-23 10:17:38.850,7.093343133605895,1.1066497609999095,6.71568206746903,独立新帧验证后，工件位姿已晋升为可信位姿。

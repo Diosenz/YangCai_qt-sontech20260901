@@ -1,0 +1,1731 @@
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Localization\\src\\LocalizationSurfaceValidation.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Localization\\src\\LocalizationSurfaceValidation.cpp"
+index 4a1f7a0..66b430d 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Localization\\src\\LocalizationSurfaceValidation.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Localization\\src\\LocalizationSurfaceValidation.cpp"
+@@ -393,6 +393,140 @@ PairedSurfaceMetrics compareFreshSurface(const std::vector<Point3D_mm> &freshRea
+     return result;
+ }
+ 
++PairedSurfaceMetrics compareFreshSurfaceWithCurrentReference(
++    const std::vector<Point3D_mm> &freshReal,
++    const std::vector<Point3D_mm> &currentVirtual,
++    const std::vector<Point3D_mm> &frozenVirtual,
++    const RigidTransform &correction, const Options &options)
++{
++    PairedSurfaceMetrics result;
++    Eigen::Matrix3d rotation;
++    Eigen::Vector3d translation;
++    double yaw = 0.0;
++    if (!validOptions(options) || !validCloud(freshReal, options)
++        || !validCloud(currentVirtual, options) || !validCloud(frozenVirtual, options)
++        || !readCandidate(correction, rotation, translation, yaw)
++        || !std::isfinite(options.maximumModelContinuationMm)
++        || options.maximumModelContinuationMm <= 0.0
++        || options.maximumModelContinuationMm > 10.0
++        || !std::isfinite(options.maximumModelPlaneDeviationMm)
++        || options.maximumModelPlaneDeviationMm <= 0.0
++        || options.maximumModelPlaneDeviationMm > 0.05) { return result; }
++
++    struct Patch {
++        Eigen::Vector3d center;
++        Eigen::Vector3d normal;
++        Eigen::Vector3d currentCenter;
++        Eigen::Vector3d currentNormal;
++        Eigen::Matrix<double, 3, 2> currentTangents;
++        Eigen::Vector2d minimumTangent;
++        Eigen::Vector2d maximumTangent;
++    };
++    std::vector<Patch> patches;
++    const auto count = static_cast<std::size_t>(options.normalNeighborCount);
++    for (const auto &point : frozenVirtual) {
++        std::vector<std::pair<double, std::size_t>> nearest;
++        nearest.reserve(frozenVirtual.size());
++        for (std::size_t index = 0; index < frozenVirtual.size(); ++index) {
++            nearest.emplace_back((vector(point) - vector(frozenVirtual[index])).squaredNorm(), index);
++        }
++        if (nearest.size() > count) {
++            std::nth_element(nearest.begin(), nearest.begin() + count, nearest.end());
++            nearest.resize(count);
++        }
++        Eigen::Vector3d center = Eigen::Vector3d::Zero();
++        for (const auto &item : nearest) { center += vector(frozenVirtual[item.second]); }
++        center /= static_cast<double>(nearest.size());
++        Eigen::Matrix3d covariance = Eigen::Matrix3d::Zero();
++        for (const auto &item : nearest) {
++            const Eigen::Vector3d delta = vector(frozenVirtual[item.second]) - center;
++            covariance += delta * delta.transpose();
++        }
++        covariance /= static_cast<double>(nearest.size());
++        const Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> solver(covariance);
++        if (solver.info() != Eigen::Success || !solver.eigenvalues().allFinite()
++            || solver.eigenvalues()[1] < options.minimumNeighborhoodSecondVarianceMm2
++            || solver.eigenvalues()[0] > solver.eigenvalues()[1]
++                * options.maximumNormalPlanarityRatio) { continue; }
++        const Eigen::Vector3d normal = solver.eigenvectors().col(0);
++        const Eigen::Matrix<double, 3, 2> tangents = solver.eigenvectors().rightCols<2>();
++        Eigen::Vector2d minimumTangent = Eigen::Vector2d::Constant(std::numeric_limits<double>::max());
++        Eigen::Vector2d maximumTangent = -minimumTangent;
++        for (const auto &item : nearest) {
++            const Eigen::Vector2d coordinate = tangents.transpose()
++                * (vector(frozenVirtual[item.second]) - center);
++            minimumTangent = minimumTangent.cwiseMin(coordinate);
++            maximumTangent = maximumTangent.cwiseMax(coordinate);
++        }
++        patches.push_back({center, normal, rotation * center + translation, rotation * normal,
++            rotation * tangents, minimumTangent, maximumTangent});
++    }
++    result.frozenPatchCount = static_cast<int>(patches.size());
++    result.status = FreshSurfaceComparisonStatus::InsufficientFrozenSupport;
++    if (patches.size() < static_cast<std::size_t>(options.minimumPointCount)
++        || static_cast<double>(patches.size()) / frozenVirtual.size()
++            < options.minimumNormalSupportRatio) { return result; }
++
++    // 只由当前模型确定对应面；不能按真实点选择最有利的候选面。
++    // 法向容差独立于真实覆盖；切向足迹仅由冻结近邻确定，距足迹外延最多10mm。
++    // 使用到矩形的欧氏距离，避免两个切轴各放宽10mm形成更大的对角预算。
++    const double continuationSquared = options.maximumModelContinuationMm
++        * options.maximumModelContinuationMm;
++    std::vector<const Patch *> currentPatches(currentVirtual.size(), nullptr);
++    for (std::size_t index = 0; index < currentVirtual.size(); ++index) {
++        double bestTangent = std::numeric_limits<double>::max();
++        for (const auto &patch : patches) {
++            const Eigen::Vector3d delta = vector(currentVirtual[index]) - patch.currentCenter;
++            const double normalDistance = std::abs(patch.currentNormal.dot(delta));
++            const Eigen::Vector2d tangentCoordinate = patch.currentTangents.transpose() * delta;
++            const Eigen::Vector2d outside = (patch.minimumTangent - tangentCoordinate)
++                .cwiseMax(tangentCoordinate - patch.maximumTangent).cwiseMax(0.0);
++            const double continuationDistanceSquared = outside.squaredNorm();
++            const double tangentSquared = tangentCoordinate.squaredNorm();
++            if (normalDistance <= options.maximumModelPlaneDeviationMm
++                && continuationDistanceSquared <= continuationSquared && tangentSquared < bestTangent) {
++                currentPatches[index] = &patch;
++                bestTangent = tangentSquared;
++            }
++        }
++        if (currentPatches[index] != nullptr) { ++result.currentModelSupportedPointCount; }
++    }
++    result.currentModelSupportedRatio = static_cast<double>(result.currentModelSupportedPointCount)
++        / currentVirtual.size();
++    const double coverageSquared = options.coverageDistanceMm * options.coverageDistanceMm;
++    for (const auto &point : freshReal) {
++        const Eigen::Vector3d real = vector(point);
++        double nearestDistance = std::numeric_limits<double>::max();
++        std::size_t nearestIndex = 0;
++        for (std::size_t index = 0; index < currentVirtual.size(); ++index) {
++            const double distance = (real - vector(currentVirtual[index])).squaredNorm();
++            if (distance < nearestDistance) {
++                nearestDistance = distance;
++                nearestIndex = index;
++            }
++        }
++        const Patch *selected = currentPatches[nearestIndex];
++        if (nearestDistance > coverageSquared || selected == nullptr) { continue; }
++        result.previousResidualMm += std::abs(selected->normal.dot(real - selected->center));
++        result.currentResidualMm += std::abs(selected->currentNormal.dot(real - selected->currentCenter));
++        ++result.supportedPointCount;
++    }
++    result.supportedRatio = static_cast<double>(result.supportedPointCount) / freshReal.size();
++    if (result.supportedPointCount > 0) {
++        result.previousResidualMm /= result.supportedPointCount;
++        result.currentResidualMm /= result.supportedPointCount;
++    }
++    const bool modelSupported = result.currentModelSupportedPointCount >= options.minimumPointCount
++        && result.currentModelSupportedRatio >= options.minimumBidirectionalCoverage;
++    result.valid = modelSupported && result.supportedPointCount >= options.minimumPointCount
++        && result.supportedRatio >= options.minimumBidirectionalCoverage
++        && std::isfinite(result.previousResidualMm) && std::isfinite(result.currentResidualMm);
++    result.status = result.valid ? FreshSurfaceComparisonStatus::Succeeded
++        : (modelSupported ? FreshSurfaceComparisonStatus::InsufficientRealSupport
++            : FreshSurfaceComparisonStatus::InsufficientCurrentModelSupport);
++    return result;
++}
++
+ Metrics measure(const std::vector<Point3D_mm> &real,
+     const std::vector<Point3D_mm> &reference, const Options &options)
+ {
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\src\\RuntimeWorkerAdapters.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\RuntimeWorkerAdapters.cpp"
+index 6e3c4ba..55156a1 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\src\\RuntimeWorkerAdapters.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\RuntimeWorkerAdapters.cpp"
+@@ -1434,6 +1434,8 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
+         detectorOptions.fusion = m_options.fusion;
+         detectorOptions.enableSeamRefinement = true;
+         detectorOptions.enableSimulationGuidance = true;
++        // 新融合仅作用于正式在线跟随，初始反向扫描沿用原检测策略。
++        detectorOptions.enableOnlineObservationFusion = m_activeCorrelation.onlineControlWindowActive;
+         detectorOptions.referenceRevision = m_activeCorrelation.workpiecePoseRevision;
+         if (m_lastBusinessPointInParent.valid
+             && m_lastBusinessPointSessionId == m_activeCorrelation.sessionId
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\src\\RuntimeLocalRegistration.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\RuntimeLocalRegistration.cpp"
+index 1b20d31..d6d03e4 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\src\\RuntimeLocalRegistration.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\RuntimeLocalRegistration.cpp"
+@@ -787,9 +787,20 @@ void CRuntimeCoordinator::submitOnlineLocalSurfaceVerification(
+                                 {QStringLiteral("valid"), result.valid},
+                                 {QStringLiteral("evidence_kind"), QStringLiteral("fresh_raw_surface")},
+                                 {QStringLiteral("accepted_observation"), current.surfaceCheck->lastObservationGood()},
++                                {QStringLiteral("observation_status"), static_cast<int>(current.surfaceCheck->lastObservationStatus())},
++                                {QStringLiteral("unavailable_observation_count"), current.surfaceCheck->unavailableFrameCount()},
+                                 {QStringLiteral("real_to_virtual_mean_mm"), result.metrics.realToVirtualMeanMm},
+                                 {QStringLiteral("virtual_to_real_mean_mm"), result.metrics.virtualToRealMeanMm},
+-                                {QStringLiteral("comparison_kind"), QStringLiteral("same_frame_frozen_local_surface")},
++                                {QStringLiteral("comparison_kind"), QStringLiteral("same_frame_current_cad_supported_frozen_surface")},
++                                {QStringLiteral("comparison_status"), static_cast<int>(result.comparison.status)},
++                                {QStringLiteral("frozen_patch_count"), result.comparison.frozenPatchCount},
++                                {QStringLiteral("current_model_supported_count"), result.comparison.currentModelSupportedPointCount},
++                                {QStringLiteral("current_model_supported_ratio"), result.comparison.currentModelSupportedRatio},
++                                {QStringLiteral("maximum_model_continuation_mm"),
++                                    std::min(10.0, coordinator->m_localRegistrationOptions.maximumCorrespondenceDistanceMm)},
++                                {QStringLiteral("maximum_model_plane_deviation_mm"),
++                                    std::max(1e-6, std::min(0.05,
++                                        coordinator->m_localRegistrationOptions.maximumIndependentWorseningMm * 0.5))},
+                                 {QStringLiteral("comparison_valid"), result.comparison.valid},
+                                 {QStringLiteral("paired_previous_residual_mm"), result.comparison.previousResidualMm},
+                                 {QStringLiteral("paired_current_residual_mm"), result.comparison.currentResidualMm},
+@@ -954,7 +965,8 @@ bool CRuntimeCoordinator::dispatchOnlineLocalRegistrationWriteback()
+             surfaceVerificationMetrics(result.surfaceValidation.holdoutAfter),
+             surfaceVerificationOptions(m_localRegistrationOptions));
+         if (!m_lastVerifiedLocalWorkpiecePose.has_value() || !result.surfaceValidation.accepted
+-            || !check.baselineUsable() || result.safetyKeypointsInParent_mm.empty()
++            || !check.baselineUsable() || !result.surfaceVerificationPreflight.valid
++            || result.safetyKeypointsInParent_mm.empty()
+             || result.surfaceVerificationReference_mm.size() < 24U) {
+             m_pendingLocalCorrection.reset();
+             emit statusMessage(QStringLiteral("表面候选缺少有效留出基线或可信位姿，取消写回。"));
+@@ -1032,8 +1044,16 @@ bool CRuntimeCoordinator::dispatchOnlineLocalRegistrationWriteback()
+                                 if (!coordinator.isNull() && coordinator->m_localVerification.has_value()
+                                     && coordinator->m_localVerification->sessionId == sessionId
+                                     && coordinator->m_localVerification->generation == generation) {
+-                                    coordinator->m_localVerification->rollbackRequested = true;
+-                                    coordinator->dispatchPendingVisionFrame();
++                                    auto &pending = *coordinator->m_localVerification;
++                                    const bool waiting = pending.surfaceCheck.has_value()
++                                        ? pending.surfaceCheck->decision() == COnlineLocalSurfaceVerification::Decision::Waiting
++                                        : (pending.check.has_value()
++                                            && pending.check->decision() == COnlineLocalRegistrationVerification::Decision::Waiting);
++                                    // 已通过的后验可能仍在等待仿真通道晋升，计时器不能改写该终态。
++                                    if (waiting) {
++                                        pending.rollbackRequested = true;
++                                        coordinator->dispatchPendingVisionFrame();
++                                    }
+                                 }
+                             });
+                     } else {
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\src\\OnlineLocalRegistrationWorker.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\OnlineLocalRegistrationWorker.cpp"
+index 94896cb..fbbab33 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\src\\OnlineLocalRegistrationWorker.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\OnlineLocalRegistrationWorker.cpp"
+@@ -468,8 +468,13 @@ COnlineLocalRegistrationWorker::measureSurfaceForVerification(const Input &input
+ {
+     auto result = measureSurface(input);
+     if (result.valid) {
+-        result.comparison = localization::surface_validation::compareFreshSurface(
+-            result.realPoints_mm, frozenVirtual, correction, surfaceOptions(m_options));
++        auto options = surfaceOptions(m_options);
++        // 只作用于在线后验；当前模型须先支持有限续展，真实覆盖/绝对残差不放宽。
++        options.maximumModelContinuationMm = std::min(10.0, m_options.maximumCorrespondenceDistanceMm);
++        options.maximumModelPlaneDeviationMm = std::max(1e-6, std::min(0.05,
++            m_options.maximumIndependentWorseningMm * 0.5));
++        result.comparison = localization::surface_validation::compareFreshSurfaceWithCurrentReference(
++            result.realPoints_mm, result.virtualPoints_mm, frozenVirtual, correction, options);
+     }
+     return result;
+ }
+@@ -868,12 +873,31 @@ COnlineLocalRegistrationWorker::processSurfaceWindow(const std::deque<CloudFrame
+         // 仅作当前冻结模型参考的位移预算，不宣称这些激光交点具有固定材料身份。
+         result.safetyKeypointsInParent_mm = request.virtualWindowPoints_mm;
+         result.surfaceVerificationReference_mm = request.virtualWindowPoints_mm;
++        auto preflightOptions = surfaceOptions(m_options);
++        preflightOptions.maximumModelContinuationMm = std::min(10.0, m_options.maximumCorrespondenceDistanceMm);
++        preflightOptions.maximumModelPlaneDeviationMm = std::max(1e-6, std::min(0.05,
++            m_options.maximumIndependentWorseningMm * 0.5));
++        const auto movedHoldoutReference = localization::pipeline_math::transformPoints(
++            surfaceRequest.holdoutVirtual_mm, result.correction);
++        // 这里只验证末两帧有冻结面支持；刚体变换旧切片不是写后CAD重新求交真值。
++        result.surfaceVerificationPreflight = localization::surface_validation::compareFreshSurfaceWithCurrentReference(
++            surfaceRequest.holdoutReal_mm, movedHoldoutReference,
++            request.virtualWindowPoints_mm, result.correction, preflightOptions);
++        result.solveElapsedMs = solveTimer.elapsed();
++        result.accepted = result.accepted && result.surfaceVerificationPreflight.valid
++            && result.solveElapsedMs <= m_options.maximumSolveTimeMs;
+         result.safetyKeypointsInParent_mm.insert(result.safetyKeypointsInParent_mm.end(),
+             surfaceRequest.holdoutVirtual_mm.begin(), surfaceRequest.holdoutVirtual_mm.end());
+         result.message = result.accepted
+             ? QStringLiteral("母材表面可观测投影及完整帧留出通过；不使用估计焊点自证，待新帧表面后验。")
+             : QStringLiteral("母材表面投影、留出、完整两向残差、跨度或幅度/耗时未通过：%1")
+                 .arg(checked.message);
++        if (!result.surfaceVerificationPreflight.valid) {
++            result.message += QStringLiteral(" 写前冻结面配对支持不足，取消本次写回（状态=%1，实测支持=%2，模型支持=%3）。")
++                .arg(static_cast<int>(result.surfaceVerificationPreflight.status))
++                .arg(result.surfaceVerificationPreflight.supportedRatio, 0, 'f', 3)
++                .arg(result.surfaceVerificationPreflight.currentModelSupportedRatio, 0, 'f', 3);
++        }
+         // 缺失观测允许表面支路工作，但不能因此丢弃同窗其他真实焊点的反证。
+         // 始终检查最终投影候选，不用PCL原矩阵或估计焊点替代这些原图点。
+         for (const auto &frame : frames) {
+@@ -1052,6 +1076,18 @@ bool COnlineLocalRegistrationWorker::archiveAttempt(const std::deque<CloudFrame>
+         {QStringLiteral("training_real_to_virtual_initial_guess_row_major"), initialGuessMatrix},
+         {QStringLiteral("source_image"), sourceImageRecord},
+         {QStringLiteral("surface_only"), result.surfaceOnly},
++        {QStringLiteral("surface_postverification_preflight"), QJsonObject{
++            {QStringLiteral("valid"), result.surfaceVerificationPreflight.valid},
++            {QStringLiteral("status"), static_cast<int>(result.surfaceVerificationPreflight.status)},
++            {QStringLiteral("frozen_patch_count"), result.surfaceVerificationPreflight.frozenPatchCount},
++            {QStringLiteral("current_model_supported_count"), result.surfaceVerificationPreflight.currentModelSupportedPointCount},
++            {QStringLiteral("current_model_supported_ratio"), result.surfaceVerificationPreflight.currentModelSupportedRatio},
++            {QStringLiteral("real_supported_count"), result.surfaceVerificationPreflight.supportedPointCount},
++            {QStringLiteral("real_supported_ratio"), result.surfaceVerificationPreflight.supportedRatio},
++            {QStringLiteral("maximum_model_continuation_mm"), std::min(10.0, m_options.maximumCorrespondenceDistanceMm)},
++            {QStringLiteral("maximum_model_plane_deviation_mm"), std::max(1e-6, std::min(0.05,
++                m_options.maximumIndependentWorseningMm * 0.5))},
++            {QStringLiteral("semantics"), QStringLiteral("frozen_holdout_supportability_not_fresh_cad_rerender")}}},
+         {QStringLiteral("surface_validation"), QJsonObject{
+             {QStringLiteral("accepted"), result.surfaceValidation.accepted},
+             {QStringLiteral("projected"), result.surfaceValidation.projected},
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\src\\OnlineCorrectionRunRecorder.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\OnlineCorrectionRunRecorder.cpp"
+index 1f54123..2eb04c0 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\src\\OnlineCorrectionRunRecorder.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\src\\OnlineCorrectionRunRecorder.cpp"
+@@ -283,7 +283,11 @@ bool COnlineCorrectionRunRecorder::beginSession(
+         "guided_shoulder_support\tguided_gap_center_supported\tguided_ambiguous\tguided_raw_jump_rejected\t"
+         "guided_degraded_frames\tguided_anchor_age_ms\tguided_reference_travel_px\t"
+         "guided_left_support_columns\tguided_right_support_columns\tguided_ambiguous_columns\tguided_max_branch_rms_px\t"
+-        "guided_prediction_x_px\tguided_prediction_y_px\tguided_x_px\tguided_y_px\tworkpiece_pose_revision\n"))) {
++        "guided_prediction_x_px\tguided_prediction_y_px\tguided_x_px\tguided_y_px\tworkpiece_pose_revision\t"
++        "online_observation_fusion_enabled\traw_geometry_horizontal_valid\traw_geometry_valid\traw_geometry_status\t"
++        "raw_geometry_x_px\traw_geometry_y_px\tcoarse_observation_quality\tcoarse_observation_used\t"
++        "observation_weight_x\tobservation_weight_y\tguided_reacquisition_pending\tguided_reacquired\t"
++        "guided_reacquisition_blocked_previous_branch\tguided_reacquisition_frames\n"))) {
+             if (errorMessage != nullptr) *errorMessage = m_lastError;
+             return false;
+         }
+@@ -316,7 +320,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
+     m_active = true;
+     const bool summaryWritten =
+         appendSummary(QStringLiteral("session_state"), QStringLiteral("running"))
+-        && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("5"))
++        && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("6"))
+         && appendSummary(QStringLiteral("vision_diagnostics_enabled"), boolText(m_visionDiagnosticOptions.enabled))
+         && appendSummary(QStringLiteral("vision_images_enabled"), boolText(m_visionDiagnosticOptions.imagesEnabled))
+         && appendSummary(QStringLiteral("vision_image_sample_every_n"), QString::number(m_visionDiagnosticOptions.imageSampleEveryN))
+@@ -577,6 +581,23 @@ bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
+     addImagePoint(guided.prediction, guided.valid);
+     addImagePoint(guided.point, guided.valid);
+     fields << QString::number(result.correlation.workpiecePoseRevision);
++    // 原图候选与接受后的几何分别保存，避免时序否决掩盖本帧真实检测。
++    const auto &rawGeometry = algorithm.rawRefinement;
++    fields << boolText(algorithm.onlineObservationFusionEnabled)
++           << boolText(rawGeometry.horizontalValid) << boolText(rawGeometry.valid)
++           << (algorithm.refinementAttempted
++               ? QString::number(static_cast<int>(rawGeometry.status)) : QString());
++    addImagePoint(rawGeometry.point, rawGeometry.valid);
++    fields << (algorithm.onlineObservationFusionEnabled
++                   ? numberText(algorithm.coarseObservationQuality) : QString())
++           << boolText(algorithm.coarseObservationUsed)
++           << (algorithm.onlineObservationFusionEnabled
++                   ? numberText(algorithm.continuity.observationWeightX) : QString())
++           << (algorithm.onlineObservationFusionEnabled
++                   ? numberText(algorithm.continuity.observationWeightY) : QString())
++           << boolText(guided.reacquisitionPending) << boolText(guided.reacquired)
++           << boolText(guided.reacquisitionBlockedByPreviousBranch)
++           << QString::number(guided.reacquisitionFrames);
+     const bool written = appendFields(QString::fromLatin1(kVisionDiagnosticFileName), fields);
+     if (m_imageWriter && !m_imageErrorReported && !m_imageWriter->lastError().isEmpty()) {
+         m_imageErrorReported = true;
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Localization\\include\\LocalizationSurfaceValidation.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Localization\\include\\LocalizationSurfaceValidation.h"
+index af0bf23..e2cc924 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Localization\\include\\LocalizationSurfaceValidation.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Localization\\include\\LocalizationSurfaceValidation.h"
+@@ -31,6 +31,11 @@ struct Options {
+     double maximumResidualMm = 5.5;
+     double minimumImprovementRatio = 0.05;
+     double maximumHoldoutWorseningMm = 0.1;
++    /// @brief 仅在线后验：当前CAD切片距冻结近邻切向足迹的有限外延上限，mm。
++    /// 不扩大真实点覆盖距离；调用方仍须限制会话、曝光及位姿版本。
++    double maximumModelContinuationMm = 10.0;
++    /// @brief 当前CAD切片对冻结面法向一致的容差，须小于恶化容差。
++    double maximumModelPlaneDeviationMm = 0.05;
+ };
+ 
+ /** @brief 两向最近邻诊断；无材料身份时不代表真实对应或绝对定位精度。 */
+@@ -43,6 +48,15 @@ struct Metrics {
+     double virtualCoverageRatio = 0.0;
+ };
+ 
++/** @brief 新帧配对证据不足与有效配对必须保留不同的诊断原因。 */
++enum class FreshSurfaceComparisonStatus {
++    InvalidInput,
++    InsufficientFrozenSupport,
++    InsufficientCurrentModelSupport,
++    InsufficientRealSupport,
++    Succeeded
++};
++
+ /**
+  * @brief 同一新帧真实点对冻结局部面的配对误差，长度单位 mm。
+  * @details 面仅从写回前训练虚拟云估计；同一局部面分别保持原位和应用候选，
+@@ -55,6 +69,10 @@ struct PairedSurfaceMetrics {
+     double supportedRatio = 0.0;
+     double previousResidualMm = 0.0;
+     double currentResidualMm = 0.0;
++    FreshSurfaceComparisonStatus status = FreshSurfaceComparisonStatus::InvalidInput;
++    int frozenPatchCount = 0;
++    int currentModelSupportedPointCount = 0;
++    double currentModelSupportedRatio = 0.0;
+ };
+ 
+ /**
+@@ -67,6 +85,20 @@ PairedSurfaceMetrics compareFreshSurface(const std::vector<Point3D_mm> &freshRea
+     const std::vector<Point3D_mm> &frozenVirtual, const RigidTransform &correction,
+     const Options &options);
+ 
++/**
++ * @brief 仅在线后验：用当前重新求交的CAD切片证明冻结面的有限切向续展。
++ * @details 法向仍只由冻结训练虚拟云拟合，真实新帧及当前切片不拟合面；
++ * 当前虚拟点须满足严格法向一致，距训练近邻PCA切向矩形足迹的欧氏外延
++ * 不得超过冻结预算；新实测仍须接近当前虚拟点，不放宽真实覆盖距离。
++ * 同一冻结面用于修正前后误差，真实点不须同时落入旧面中心的覆盖球。
++ * 这是有限局部平面的一致性检查，不能证明CAD材料身份或无限延长表面。
++ */
++PairedSurfaceMetrics compareFreshSurfaceWithCurrentReference(
++    const std::vector<Point3D_mm> &freshReal,
++    const std::vector<Point3D_mm> &currentVirtual,
++    const std::vector<Point3D_mm> &frozenVirtual,
++    const RigidTransform &correction, const Options &options);
++
+ /**
+  * @brief 时序训练与留出点云及生产 ICP 已求得的虚拟到真实候选。
+  * @details 调用方必须按不同完整帧分块，禁止将同帧密集点随机拆分冒充独立验证。
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\docs\\online_local_registration.md" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\docs\\online_local_registration.md"
+index f77c6bb..ab540e7 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\docs\\online_local_registration.md"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\docs\\online_local_registration.md"
+@@ -328,3 +328,48 @@ Vision 保留原图几何观测，同时增加 `CSimulationGuidedSeamEstimator`
+ 
+ 
+ 2026-10-22 连续目标修复验证：在既有 qt-debug 与 VS2022 Developer 环境下生成主程序成功，仅执行三项直接相关专项（仿真辅助时序、在线精定位/逆投影合同、在线帧同步），3/3 通过，耗时6.88秒。日志位于 `output/analysis/20261022_continuous_target_fix/`；未进行现场相机/机器人闭环验证，也未重跑无关的定位及离线测试。
++
++
++## 2026-10-22 在线纠偏后验与真实观测融合修复
++
++### 修改范围与入口隔离
++
++本次只修复界面“在线纠偏”的正式在线控制窗口。`enableOnlineObservationFusion` 缺省关闭，runtime 仅在 `purpose == OnlineCorrection` 且 `onlineControlWindowActive` 时开启。初始反向扫描、离线纠偏、全局定位和普通 IBVS 沿用原策略；共用 KCF tracker、通用投影器、Control 运动协议和 RobotSim 未修改。新表面配对入口只由在线工件局部定位 worker 调用，旧 `compareFreshSurface` 的计算语义保留。
++
++### 移动扫描的有限表面支持
++
++现场 `20261022_073051_527_session_1` 中，40 次写回只有首次独立焊点通道晋升，之后 39 次恢复。117 份后验中 114 份真实表面有效，111 份满足当前切片的双向绝对残差/覆盖门槛；旧配对支持均无效。旧配对要求真实点同时落入修正前、后冻结局部面中心的 3 mm 球，持续运动的扫描切片在求解完成后往往已离开这些小球。无配对证据不能直接解释为位姿确实恶化。
++
++新 `compareFreshSurfaceWithCurrentReference` 仍只从写前训练虚拟云的 12 近邻拟合法向，并以这 12 点在局部 PCA 两切轴上的实测矩形作为有限面片足迹。当前重新求交的虚拟切片只负责证明面片的有限切向延伸：到冻结矩形的欧氏外延不超过 `min(10 mm, maximum_correspondence_distance_mm)`，法向偏差不超过 `max(1e-6 mm, min(0.05 mm, maximum_independent_worsening_mm / 2))`。不采用每轴分别 10 mm 的方形扩张，也不由新实测或当前虚拟切片扩大冻结足迹、拟合法向或重新优化候选。
++
++真实点仍须落在同帧当前虚拟点的原 `coverage_distance_mm` 邻域内；既有两向完整均值、70% 覆盖及至少 24 个支持点继续生效。同一冻结面分别用于修正前/后点面误差。此一致性检查不证明 CAD 材料身份，也不允许无限延伸局部平面。当前模型曲率或表面身份不一致、冻结法向退化及超出有限区域时，仍保持证据不足。
++
++写回前还使用完整帧留出数据检查冻结面配对支持；不支持的候选在写回前拒绝。这份准入使用的是刚体变换后的旧留出参考，只证明可支持性，不冒充写后 CAD 重新求交真值。
++
++### 后验三态与事务边界
++
++新表面后验区分 `Unavailable`、`Good`、`Worsened`：原图/数值无效、冻结面或当前模型支持不足不累计恶化帧，也不能晋升；有效表面超出原绝对门槛，或有效配对证明恶化时才累计坏帧。缺证据会打断连续好/坏证据，三份连续合格帧晋升、三份连续明确坏帧恢复。原 5 秒有界超时、pending 禁止叠加、曝光/版本/会话门禁及恢复幂等性保留。
++
++超时回调只处理仍处于 Waiting 的事务；三帧已经通过、但暂时等待仿真通道安全晋升的事务，不会再被迟到的定时器改成回退。归档追加 observation_status、comparison_status、冻结面片数、当前模型支持比例、实测支持及有限延伸预算；不能用缺省零误差解释未形成的配对。
++
++### 真实 KCF 观测与连续业务点
++
++每个有效处理帧仍先执行真实 KCF。新在线策略保留时序门控前 `rawRefinement`，接受后的 `refinement` 仍是独立焊点的唯一来源；被时序否决的候选不能靠归档或业务点有效标记绕过验收。
++
++精定位非致命退化时，粗 KCF 需要原图局部唯一窄峰、足够对比度和支持列，再结合相关响应、条纹歧义与运动补偿创新计算业务权重。支持不足或局部竞争峰仍预测。有图像证据的 `CorrectedKcf` 不再被 guided 分支无条件覆盖，权重低于可靠几何；估计点不能刷新原图实测锚，也不能进入独立验收。母材肩部可见时保留预焊点凸起反证，避免重新追随预焊点表面。
++
++重捕获仅对正式在线新策略启用，要求连续三份严格高质量、相互一致的新原图候选，不以接近仿真点作为实测证明。版本切换、会话及尺寸边界清历史；位姿版本切换的业务点先用当前曝光标定重投影续接。降级/恢复新增修正仍受每帧 2 px 限制；无效参考或投影不能伪造目标。
++
++绿色点继续显示最终有效业务目标，并保留精定位、KCF 辅助、肩部辅助和仿真预测的来源说明；显示不绑定独立焊点或 ICP 成功标记。视觉诊断 schema 升至 6，旧列位置保留，在 workpiece_pose_revision 后追加新策略开关、原始几何有效性/坐标、粗观测质量/使用标记、实际观测系数和重捕获状态。实际系数包含质量、创新和过渡限幅，与原 tracker 的 Kalman 增益分别记录。
++
++### 本轮验证记录
++
++源文件修改前备份位于 `output/backups/online_correction_repair_20261022/`；构建、专项、原生归档对照和最终审查证据位于 `output/analysis/20261022_online_correction_repair/`。用户明确禁止 Computer Use，并授权 VS2022 x64 Developer 命令行及既有 qt-debug 构建目录。未启动相机、真实机器人或现场 RobotSim 闭环。
++
++首轮 MSVC 主程序及必要专项目标构建成功，10 项直接相关 CTest 全部通过，耗时 14.56 秒。原生生产比较器只读回放 39 份原始恢复归档、117 份后验：旧配对 0 份有效，新配对 59 份有效；15 组原始三帧均满足新检查。第 12680 帧对应的三份后验支持率为 93.6%、92.1%、90.0%，配对误差约由 4.06～4.15 mm 降至 0.44～0.48 mm。其余证据不足未强行接受。这是固定归档的比较器对照，不是完整现场重跑，不能当作新闭环恢复次数或成功率。
++
++独立复核指出 24 px 内竞争反光的真实可达反例，已按 RED → GREEN 完成：实际原图精定位器可选中横移 18 px、更亮的相似 V 反光；旧策略第三帧会错误替换仍可见的真实锚，原生专项确实失败。修复增加历史分支存在性检查：从旧运动补偿预测附近的全部合格窄峰中选最近者，而不是只取最亮峰；旧双侧分支仍有支持时阻止重捕获并清空连续计数，归档 `guided_reacquisition_blocked_previous_branch`。旧分支移走后仍允许原三帧新候选重捕获，24 px 门槛与默认关闭语义不变。
++
++最终 MSVC 主程序重建成功。只重跑受到该增量影响的 6 项 KCF、在线投影合同、同帧同步、诊断和融合控制专项，6/6 通过，耗时 3.28 秒；结合首轮其他 4 项的最后结果，选定 10 项全部通过。最终原生归档回放仍为 59/117 份新配对有效，第 12680 次三份全部通过；写前支持性检查在这批 39 份旧候选中有 37 份可通过，其余不会在新策略下先写回。这不意味着其余 24 组原三帧证据不足均已解决：有限范围之外或几何不一致仍可能触发 5 秒超时恢复，需要后续现场记录判别。
++
++最终主程序为 `out/build/qt-debug/UI/i2r_rlc.exe`。未自动启动相机、机器人或现场仿真闭环，也未重复运行无关离线专项；原有在线/离线共享完整门禁不能据本次在线专项单独宣称全部通过。源码变化清单、SHA256、审查范围及各次原始日志见同目录 `source_changes.json`、`source_changes.diff`、`validation_summary.json`。
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_localization_surface_validation.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_localization_surface_validation.cpp"
+index 473b0f1..4f7f2fa 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_localization_surface_validation.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_localization_surface_validation.cpp"
+@@ -1,14 +1,21 @@
+ ﻿/**
+  * @file test_localization_surface_validation.cpp
+  * @brief 表面弱模式冻结、局部凸起及分时留出恶化的合成反例。
+- * @details 生成几何与真值变换独立给定，不运行 PCL、不读现场数据或访问设备。
++ * @details 默认合成几何与真值变换独立给定；可选--replay-dir只读回放现场归档，均不访问设备。
+  * 合成通过只验证此验收器的边界，不能作为图像提取或现场配准可靠性证明。
+  */
++#include <algorithm>
+ #include <cmath>
+ #include <cstdio>
+ #include <limits>
+ #include <vector>
+ 
++#include <QDir>
++#include <QFile>
++#include <QJsonArray>
++#include <QJsonDocument>
++#include <QJsonObject>
++
+ #include "LocalizationSurfaceValidation.h"
+ 
+ namespace {
+@@ -208,13 +215,202 @@ bool freshSurfaceUsesSamePointsAndBoundedPatches()
+     return ok;
+ }
+ 
++/** @brief 复现现场：求解后扫描离开训练网格3mm球，但当前CAD仍支持同一局部面。 */
++bool movingCurrentCadSupportsFiniteContinuation()
++{
++    const auto reference = plane();
++    std::vector<Point> newSlice;
++    for (int index = -25; index <= 25; ++index) {
++        newSlice.push_back({100.0 + index * 0.4, -48.0, 10.0});
++    }
++    const auto truth = correction(0.0, 0.0, 0.6, 0.0);
++    const auto measured = move(newSlice, truth);
++    const auto currentVirtual = move(newSlice, truth);
++    surface::Options options;
++    const auto previous = surface::compareFreshSurface(measured, reference, truth, options);
++    const auto supported = surface::compareFreshSurfaceWithCurrentReference(
++        measured, currentVirtual, reference, truth, options);
++    bool ok = expect(!previous.valid && previous.supportedPointCount == 0,
++        "old shared 3mm center balls reproduce the moving-slice evidence failure");
++    ok &= expect(supported.valid && supported.supportedRatio > 0.99
++        && supported.currentModelSupportedRatio > 0.99 && supported.frozenPatchCount >= 24
++        && std::abs(supported.previousResidualMm - 0.6) < 1e-6
++        && supported.currentResidualMm < 1e-6,
++        "current CAD supports a finite tangential continuation without widening real coverage");
++
++    const auto wrong = correction(0.0, 0.0, -0.6, 0.0);
++    const auto wrongModel = move(newSlice, wrong);
++    const auto worsening = surface::compareFreshSurfaceWithCurrentReference(
++        measured, wrongModel, reference, wrong, options);
++    ok &= expect(worsening.valid
++        && worsening.currentResidualMm > worsening.previousResidualMm + 0.5,
++        "same finite surface correspondence still exposes genuine candidate worsening");
++    auto bentCurrentModel = currentVirtual;
++    for (auto &point : bentCurrentModel) { point.z_mm += 0.2; }
++    const auto unsupportedShape = surface::compareFreshSurfaceWithCurrentReference(
++        bentCurrentModel, bentCurrentModel, reference, truth, options);
++    ok &= expect(!unsupportedShape.valid
++        && unsupportedShape.status == surface::FreshSurfaceComparisonStatus::InsufficientCurrentModelSupport,
++        "even perfect real/current-model coincidence cannot extend an inconsistent frozen plane");
++    auto tooFar = newSlice;
++    for (auto &point : tooFar) { point.y_mm += 25.0; }
++    const auto farModel = move(tooFar, truth);
++    ok &= expect(!surface::compareFreshSurfaceWithCurrentReference(
++        farModel, farModel, reference, truth, options).valid,
++        "current CAD cannot extend frozen support beyond the finite tangential budget");
++    options.maximumModelContinuationMm = 11.0;
++    ok &= expect(!surface::compareFreshSurfaceWithCurrentReference(
++        measured, currentVirtual, reference, truth, options).valid,
++        "online continuation limit cannot be silently relaxed beyond 10mm");
++    return ok;
++}
++
++/** @brief 可选现场归档回放；只调用生产比较器，不重新拟合ICP或修改原始记录。 */
++int replayArchivedSurfaces(const QString &directory)
++{
++    const QDir archive(directory);
++    const auto files = archive.entryList({QStringLiteral("*.rollback.json")}, QDir::Files);
++    if (files.isEmpty()) {
++        std::fprintf(stderr, "FAIL: no rollback archives supplied for replay\n");
++        return 1;
++    }
++    const auto readObject = [](const QString &path, QJsonObject *object) {
++        QFile file(path);
++        if (!file.open(QIODevice::ReadOnly)) { return false; }
++        QJsonParseError error;
++        const auto document = QJsonDocument::fromJson(file.readAll(), &error);
++        if (error.error != QJsonParseError::NoError || !document.isObject()) { return false; }
++        *object = document.object();
++        return true;
++    };
++    const auto points = [](const QJsonValue &value) {
++        std::vector<Point> result;
++        for (const auto item : value.toArray()) {
++            const auto xyz = item.toArray();
++            if (xyz.size() != 3 || !xyz[0].isDouble()
++                || !xyz[1].isDouble() || !xyz[2].isDouble()) { return std::vector<Point>{}; }
++            result.push_back({xyz[0].toDouble(), xyz[1].toDouble(), xyz[2].toDouble()});
++        }
++        return result;
++    };
++    int sampleCount = 0;
++    int oldValidCount = 0;
++    int newValidCount = 0;
++    int newEligibleCount = 0;
++    int focusEligibleCount = 0;
++    int preflightPassCount = 0;
++    bool ok = true;
++    for (const auto &name : files) {
++        QJsonObject rollback;
++        QJsonObject attempt;
++        QString attemptName = name;
++        attemptName.chop(QStringLiteral(".rollback.json").size());
++        if (!readObject(archive.filePath(name), &rollback)
++            || !readObject(archive.filePath(attemptName), &attempt)) {
++            std::fprintf(stderr, "FAIL: cannot parse archived surface transaction\n");
++            return 1;
++        }
++        const auto matrix = attempt.value(QStringLiteral("virtual_to_real_row_major")).toArray();
++        if (matrix.size() != 16) {
++            std::fprintf(stderr, "FAIL: archived correction is missing\n");
++            return 1;
++        }
++        Transform transform;
++        for (int index = 0; index < 16; ++index) {
++            transform.rowMajor[static_cast<std::size_t>(index)] = matrix[index].toDouble();
++        }
++        surface::Options options;
++        const auto frozenOptions = attempt.value(QStringLiteral("options")).toObject();
++        options.coverageDistanceMm = frozenOptions.value(QStringLiteral("coverage_distance_mm")).toDouble(3.0);
++        options.minimumBidirectionalCoverage = frozenOptions.value(QStringLiteral("minimum_bidirectional_coverage")).toDouble(0.7);
++        options.maximumResidualMm = frozenOptions.value(QStringLiteral("maximum_residual_mm")).toDouble(5.5);
++        options.maximumHoldoutWorseningMm = frozenOptions.value(QStringLiteral("maximum_independent_worsening_mm")).toDouble(0.1);
++        options.maximumModelContinuationMm = std::min(10.0,
++            frozenOptions.value(QStringLiteral("maximum_correspondence_distance_mm")).toDouble(10.0));
++        options.maximumModelPlaneDeviationMm = std::max(1e-6,
++            std::min(0.05, options.maximumHoldoutWorseningMm * 0.5));
++        const auto frozen = points(attempt.value(QStringLiteral("solve_virtual_parent_mm")));
++        const auto holdout = attempt.value(QStringLiteral("surface_validation")).toObject();
++        auto movedHoldout = points(holdout.value(QStringLiteral("holdout_virtual_parent_mm")));
++        const auto &matrixValues = transform.rowMajor;
++        for (auto &point : movedHoldout) {
++            const Point original = point;
++            point = {matrixValues[0] * original.x_mm + matrixValues[1] * original.y_mm
++                    + matrixValues[2] * original.z_mm + matrixValues[3],
++                matrixValues[4] * original.x_mm + matrixValues[5] * original.y_mm
++                    + matrixValues[6] * original.z_mm + matrixValues[7],
++                matrixValues[8] * original.x_mm + matrixValues[9] * original.y_mm
++                    + matrixValues[10] * original.z_mm + matrixValues[11]};
++        }
++        const auto preflight = surface::compareFreshSurfaceWithCurrentReference(
++            points(holdout.value(QStringLiteral("holdout_real_parent_mm"))),
++            movedHoldout, frozen, transform, options);
++        preflightPassCount += preflight.valid ? 1 : 0;
++        for (const auto value : rollback.value(QStringLiteral("post_write_samples")).toArray()) {
++            const auto sample = value.toObject();
++            const auto measured = points(sample.value(QStringLiteral("fresh_real_parent_mm")));
++            const auto current = points(sample.value(QStringLiteral("fresh_virtual_parent_mm")));
++            const auto previous = surface::compareFreshSurface(measured, frozen, transform, options);
++            const auto repaired = surface::compareFreshSurfaceWithCurrentReference(
++                measured, current, frozen, transform, options);
++            const bool absolutePass = sample.value(QStringLiteral("valid")).toBool()
++                && sample.value(QStringLiteral("real_to_virtual_mean_mm")).toDouble() <= options.maximumResidualMm
++                && sample.value(QStringLiteral("virtual_to_real_mean_mm")).toDouble() <= options.maximumResidualMm
++                && sample.value(QStringLiteral("real_coverage_ratio")).toDouble() >= options.minimumBidirectionalCoverage
++                && sample.value(QStringLiteral("virtual_coverage_ratio")).toDouble() >= options.minimumBidirectionalCoverage;
++            const bool eligible = absolutePass && repaired.valid
++                && repaired.currentResidualMm <= options.maximumResidualMm
++                && repaired.currentResidualMm <= repaired.previousResidualMm + options.maximumHoldoutWorseningMm;
++            ++sampleCount;
++            oldValidCount += previous.valid ? 1 : 0;
++            newValidCount += repaired.valid ? 1 : 0;
++            newEligibleCount += eligible ? 1 : 0;
++            if (attempt.value(QStringLiteral("frame_id")).toString() == QStringLiteral("12680")) {
++                focusEligibleCount += eligible ? 1 : 0;
++                ok = eligible && ok;
++            }
++            const QJsonObject record{
++                {QStringLiteral("attempt_frame"), attempt.value(QStringLiteral("frame_id"))},
++                {QStringLiteral("frame"), sample.value(QStringLiteral("frame_id"))},
++                {QStringLiteral("preflight_valid"), preflight.valid},
++                {QStringLiteral("old_pair_valid"), previous.valid},
++                {QStringLiteral("new_pair_valid"), repaired.valid},
++                {QStringLiteral("comparison_status"), static_cast<int>(repaired.status)},
++                {QStringLiteral("absolute_pass"), absolutePass},
++                {QStringLiteral("eligible"), eligible},
++                {QStringLiteral("support_count"), repaired.supportedPointCount},
++                {QStringLiteral("support_ratio"), repaired.supportedRatio},
++                {QStringLiteral("current_model_support_ratio"), repaired.currentModelSupportedRatio},
++                {QStringLiteral("before_mm"), repaired.previousResidualMm},
++                {QStringLiteral("after_mm"), repaired.currentResidualMm}};
++            const auto line = QJsonDocument(record).toJson(QJsonDocument::Compact);
++            std::printf("%s\n", line.constData());
++        }
++    }
++    const QJsonObject summary{
++        {QStringLiteral("archive_transactions"), files.size()},
++        {QStringLiteral("samples"), sampleCount},
++        {QStringLiteral("preflight_pass_transactions"), preflightPassCount},
++        {QStringLiteral("old_pair_valid"), oldValidCount},
++        {QStringLiteral("new_pair_valid"), newValidCount},
++        {QStringLiteral("new_eligible"), newEligibleCount},
++        {QStringLiteral("frame_12680_eligible"), focusEligibleCount}};
++    const auto line = QJsonDocument(summary).toJson(QJsonDocument::Compact);
++    std::printf("SUMMARY: %s\n", line.constData());
++    return ok && sampleCount > 0 ? 0 : 1;
++}
++
+ } // namespace
+ 
+-int main()
++int main(int argc, char **argv)
+ {
++    if (argc == 3 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--replay-dir")) {
++        return replayArchivedSurfaces(QString::fromLocal8Bit(argv[2]));
++    }
+     const bool ok = planeFreezesTangentialAndYaw() && vShapeFreezesAlongSeamAtCenter()
+         && fullGeometryAndBump() && heldoutWorseningAndMissingEvidence()
+-        && freshSurfaceUsesSamePointsAndBoundedPatches();
++        && freshSurfaceUsesSamePointsAndBoundedPatches()
++        && movingCurrentCadSupportsFiniteContinuation();
+     if (ok) { std::printf("PASS: surface subspace projection and heldout validation\n"); }
+     return ok ? 0 : 1;
+ }
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_online_correction_run_recorder.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_correction_run_recorder.cpp"
+index 8f730f7..6f28951 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_online_correction_run_recorder.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_correction_run_recorder.cpp"
+@@ -393,6 +393,13 @@ int main(int argc, char **argv)
+     guided.maximumBranchRmsPixel = 0.75;
+     guided.prediction = {100, 205};
+     guided.point = {100.5, 205};
++    guided.reacquisitionPending = true;
++    guided.reacquisitionFrames = 2;
++    auto &fusionDiagnostic = tracking.diagnostic->algorithm;
++    fusionDiagnostic.onlineObservationFusionEnabled = true;
++    fusionDiagnostic.rawRefinement = diagnosticSnapshot->algorithm.refinement;
++    fusionDiagnostic.coarseObservationQuality = 0.42;
++    fusionDiagnostic.coarseObservationUsed = false;
+     ok &= expect(recorder.recordTrackingResult(tracking, control::OnlineCorrectionPhase::OnlineRunning),
+                  "record guided estimate even if caller forgot estimated provenance");
+     const auto guidedRows = readRows(recorder.sessionDirectory(), "vision_diagnostics.tsv");
+@@ -406,8 +413,10 @@ int main(int argc, char **argv)
+         };
+         ok &= expect(row.size() == header.size()
+             && header.indexOf("guided_attempted") == header.indexOf("estimated") + 1
+-            && header.last() == "workpiece_pose_revision",
+-            "guided schema only appends columns without moving existing fields");
++            && header.indexOf("online_observation_fusion_enabled")
++                == header.indexOf("workpiece_pose_revision") + 1
++            && header.last() == "guided_reacquisition_frames",
++            "online fusion schema appends columns without moving existing fields");
+         ok &= expect(value("estimated") == "1" && value("point_source") == "4"
+             && value("geometry_valid") == "0" && value("geometry_x_px").isEmpty()
+             && value("guided_valid") == "1" && value("guided_prediction_budget_valid") == "1"
+@@ -418,6 +427,18 @@ int main(int argc, char **argv)
+             && value("guided_prediction_x_px") == "100.000000"
+             && value("guided_x_px") == "100.500000" && value("workpiece_pose_revision") == "1234",
+             "guided estimates retain support and pose provenance without becoming independent geometry");
++        ok &= expect(value("online_observation_fusion_enabled") == "1"
++            && value("raw_geometry_valid") == "1" && value("geometry_valid") == "0"
++            && value("raw_geometry_x_px") == "99.000000"
++            && value("raw_geometry_y_px") == "204.000000"
++            && value("coarse_observation_quality") == "0.420000"
++            && value("coarse_observation_used") == "0"
++            && value("observation_weight_x") == "0.000000"
++            && value("guided_reacquisition_pending") == "1"
++            && value("guided_reacquired") == "0"
++            && value("guided_reacquisition_blocked_previous_branch") == "0"
++            && value("guided_reacquisition_frames") == "2",
++            "raw candidate and reacquisition diagnostics do not invent accepted geometry or weight");
+     }
+     const QString firstSession = recorder.sessionDirectory();
+     ok &= expect(recorder.finishSession("completed", "test"), "finish session");
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_online_seam_continuity.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_seam_continuity.cpp"
+index b285c4f..c576a3d 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_online_seam_continuity.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_seam_continuity.cpp"
+@@ -61,6 +61,49 @@ int main()
+         && startup.point==cv::Point2d(250,120), "first-frame glare cannot seed persistent false offset");
+     auto missing=continuity.update(size,{-1,120},{250,120},true,tracker,geometry,options);
+     check(!missing.valid, "missing reference is explicit invalid input, never fabricated point");
++    // 现场旧锚/分支不一致将正常 KCF 整点替换为预测；新入口仅降低其权重。
++    v::COnlineSeamContinuity highQuality;
++    v::COnlineSeamContinuity lowQuality;
++    v::COnlineSeamContinuity legacy;
++    geometry.valid = true;
++    geometry.point = {250, 120};
++    highQuality.updateOnline(size, {250,120}, {250,120}, 1.0, tracker, geometry, options);
++    lowQuality.updateOnline(size, {250,120}, {250,120}, 1.0, tracker, geometry, options);
++    legacy.update(size, {250,120}, {250,120}, true, tracker, geometry, options);
++    geometry.valid = false;
++    const auto high = highQuality.updateOnline(size, {250,120}, {268,120}, 1.0,
++        tracker, geometry, options);
++    const auto low = lowQuality.updateOnline(size, {250,120}, {268,120}, 0.1,
++        tracker, geometry, options);
++    check(high.valid && low.valid && high.source == v::OnlineSeamPointSource::CorrectedKcf
++        && low.source == v::OnlineSeamPointSource::CorrectedKcf
++        && high.point.x > low.point.x && low.point.x > 250.0
++        && high.observationWeightX > low.observationWeightX
++        && low.observationWeightX > 0.0
++        && high.point.x <= 252.0,
++        "online quality weakens a supported KCF observation without replacing it by pure prediction");
++    const auto unchanged = legacy.update(size, {250,120}, {268,120}, true,
++        tracker, geometry, options);
++    check(unchanged.source == v::OnlineSeamPointSource::SimulationPrediction,
++        "legacy entry keeps its original twelve-pixel rejection boundary");
++    const auto smoke = highQuality.updateOnline(size, {251,120}, {269,120}, 0.0,
++        tracker, geometry, options);
++    check(smoke.valid && smoke.source == v::OnlineSeamPointSource::SimulationPrediction
++        && smoke.observationWeightX == 0.0 && smoke.observationWeightY == 0.0
++        && std::abs(smoke.point.x - high.point.x - 1.0) < 1e-7,
++        "zero image quality predicts with current motion and keeps the business point visible");
++    const auto farPeak = highQuality.updateOnline(size, {251,120}, {300,120}, 1.0,
++        tracker, geometry, options);
++    check(farPeak.valid && farPeak.source == v::OnlineSeamPointSource::SimulationPrediction,
++        "quality weighting still rejects an unrelated distant response");
++    v::COnlineSeamContinuity revised;
++    geometry.valid = true;
++    geometry.point = {270, 120};
++    const auto revisedPoint = revised.updateOnline(size, {250,120}, {270,120}, 1.0,
++        tracker, geometry, options, {260,120});
++    check(revisedPoint.valid && revisedPoint.transitionLimited
++        && cv::norm(revisedPoint.point - cv::Point2d(260,120)) <= 2.000001,
++        "revision reprojects the last business target and limits the first recovered raw frame");
+     if(ok) std::cout<<"PASS: continuous targets, 400-frame occlusion, glare, bounded drift, recovery, reset\n";
+     return ok?0:1;
+ }
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_online_local_surface_verification.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_local_surface_verification.cpp"
+index 882c641..1ef5cb0 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_online_local_surface_verification.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_local_surface_verification.cpp"
+@@ -64,8 +64,9 @@ bool testBadStreakAndCoverage()
+     observe(verification, 1, true, clear);
+     observe(verification, 2, true, clear);
+     bool ok = expect(observe(verification, 3, false, clear) == Decision::Waiting
+-        && verification.goodFrameCount() == 0 && verification.badFrameCount() == 1,
+-        "missing real surface breaks a consecutive good streak");
++        && verification.goodFrameCount() == 0 && verification.badFrameCount() == 0
++        && verification.lastObservationStatus() == Verification::ObservationStatus::Unavailable,
++        "missing real surface breaks good streak without manufacturing worsening evidence");
+     observe(verification, 4, true, clear);
+     ok &= expect(verification.badFrameCount() == 0 && verification.goodFrameCount() == 1,
+         "a new good surface resets consecutive bad evidence");
+@@ -76,7 +77,7 @@ bool testBadStreakAndCoverage()
+     ok &= expect(observe(verification, 6, false, {}) == Decision::Waiting
+         && verification.badFrameCount() == 2,
+         "duplicate bad frame cannot cause rollback");
+-    ok &= expect(observe(verification, 7, false, clear) == Decision::Rollback
++    ok &= expect(observe(verification, 7, true, poorRealCoverage) == Decision::Rollback
+         && verification.badFrameCount() == 3,
+         "three bad distinct frames request rollback");
+     ok &= expect(observe(verification, 8, true, clear) == Decision::Rollback,
+@@ -129,8 +130,9 @@ bool testInvalidEvidenceAndConfiguration()
+     };
+     for (const auto &metrics : invalidMetrics) {
+         Verification invalid(baseline(), options);
+-        ok &= expect(observe(invalid, 1, true, metrics) == Decision::Rollback,
+-            "invalid or nonfinite metrics cannot be verified by a valid flag");
++        ok &= expect(observe(invalid, 1, true, metrics) == Decision::Waiting
++            && invalid.badFrameCount() == 0 && invalid.unavailableFrameCount() == 1,
++            "invalid or nonfinite metrics are missing evidence, never a fabricated worsening");
+     }
+     Verification missingBaseline({}, Verification::Options{});
+     ok &= expect(!missingBaseline.baselineUsable()
+@@ -181,8 +183,15 @@ bool testMovingSliceAndSameFrameCounterfactual()
+     for (int index = 0; index < 3; ++index) {
+         unsupported.observe(20 + index, true, fresh[index], {false, 0.8, 0.6, 0.9});
+     }
+-    ok &= expect(unsupported.decision() == Decision::Rollback,
+-        "no frozen local support cannot be accepted by absolute slice metrics alone");
++    ok &= expect(unsupported.decision() == Decision::Waiting
++        && unsupported.badFrameCount() == 0 && unsupported.goodFrameCount() == 0
++        && unsupported.unavailableFrameCount() == 3,
++        "missing frozen support remains pending without being mistaken for three worsening frames");
++    for (int index = 0; index < 3; ++index) {
++        unsupported.observe(30 + index, true, fresh[index], {true, 0.8, 0.6, 0.9});
++    }
++    ok &= expect(unsupported.decision() == Decision::Verified,
++        "new current-CAD supported evidence can verify a previously unsupported pending candidate");
+     return ok;
+ }
+ 
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_online_local_registration_surface.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_local_registration_surface.cpp"
+index ecdde54..0b61851 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_online_local_registration_surface.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_online_local_registration_surface.cpp"
+@@ -130,6 +130,11 @@ bool completeFramesAndEvidence(const QString &directory)
+     const auto seed = record.value(QStringLiteral("training_real_to_virtual_initial_guess_row_major")).toArray();
+     ok &= expect(seed.size() == 16 && std::abs(seed[11].toDouble() + 0.25) < 1e-6,
+         "training-only real-to-virtual seed preserves direction and is recorded separately from correction");
++    const auto preflight = record.value(QStringLiteral("surface_postverification_preflight")).toObject();
++    ok &= expect(result.surfaceVerificationPreflight.valid
++        && preflight.value(QStringLiteral("valid")).toBool()
++        && preflight.value(QStringLiteral("real_supported_ratio")).toDouble() >= 0.7,
++        "accepted surface writeback has immutable holdout supportability before touching the scene");
+     const auto validation = record.value(QStringLiteral("surface_validation")).toObject();
+     const auto train = validation.value(QStringLiteral("training_frame_ids")).toArray();
+     const auto holdout = validation.value(QStringLiteral("holdout_frame_ids")).toArray();
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\include\\OnlineLocalSurfaceVerification.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\OnlineLocalSurfaceVerification.h"
+index b6743ad..1471438 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\include\\OnlineLocalSurfaceVerification.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\OnlineLocalSurfaceVerification.h"
+@@ -23,6 +23,8 @@ namespace i2r_rlc::ui {
+ class COnlineLocalSurfaceVerification final {
+ public:
+     enum class Decision { Waiting, Verified, Rollback };
++    /** @brief 证据缺失不能计作有效观测证明候选恶化。 */
++    enum class ObservationStatus { Unavailable, Good, Worsened };
+ 
+     /**
+      * @brief 同一评估口径下的双向表面指标；长度单位 mm，覆盖比例为 [0,1]。
+@@ -72,40 +74,54 @@ public:
+ 
+     /**
+      * @brief 接收已完成曝光/位姿版本门控的新帧，重复旧帧不产生新证据。
+-     * @details valid=false 表示原图表面、关联或投影无效；有效新帧也须同时
+-     * 满足新切片双向绝对残差/覆盖，以及同帧配对局部面恶化上限。终态不再采样。
++     * @details 原图/数值无效或配对支持不足只打断连续证据，不累计恶化帧。
++     * 有效表面超出绝对残差/覆盖门槛，或有效配对证明恶化，才累计坏帧。
++     * 证据不足不晋升位姿，事务仍由调用方的有界超时结束；终态不再采样。
+      */
+     Decision observe(qint64 frameId, bool valid, const Metrics &metrics,
+         const Comparison &comparison)
+     {
+         m_lastObservationGood = false;
++        m_lastObservationStatus = ObservationStatus::Unavailable;
+         if (m_decision != Decision::Waiting || frameId <= m_lastFrameId) {
+             return m_decision;
+         }
+         m_lastFrameId = frameId;
+         m_currentMetrics = metrics;
+-        const bool good = valid && withinAbsoluteLimits(metrics, m_options)
+-            && comparison.valid && validRatio(comparison.supportedRatio)
++        const bool observedSurface = valid && validMetrics(metrics);
++        const bool absoluteGood = observedSurface && withinAbsoluteLimits(metrics, m_options);
++        const bool pairedEvidence = comparison.valid && validRatio(comparison.supportedRatio)
+             && comparison.supportedRatio >= m_options.minimumBidirectionalCoverage
+             && std::isfinite(comparison.previousResidualMm)
+             && std::isfinite(comparison.currentResidualMm)
+-            && comparison.previousResidualMm >= 0.0 && comparison.currentResidualMm >= 0.0
++            && comparison.previousResidualMm >= 0.0 && comparison.currentResidualMm >= 0.0;
++        const bool pairedGood = pairedEvidence
+             && comparison.currentResidualMm <= m_options.maximumResidualMm
+             && comparison.currentResidualMm
+                 <= comparison.previousResidualMm + m_options.maximumWorseningMm;
++        const bool good = absoluteGood && pairedGood;
++        const bool worsened = observedSurface
++            && (!absoluteGood || (pairedEvidence && !pairedGood));
+         m_lastObservationGood = good;
+         if (good) {
++            m_lastObservationStatus = ObservationStatus::Good;
+             ++m_goodFrames;
+             m_badFrames = 0;
+             if (m_goodFrames >= m_options.requiredGoodFrames) {
+                 m_decision = Decision::Verified;
+             }
+-        } else {
++        } else if (worsened) {
++            m_lastObservationStatus = ObservationStatus::Worsened;
+             m_goodFrames = 0;
+             ++m_badFrames;
+             if (m_badFrames >= m_options.maximumBadFrames) {
+                 m_decision = Decision::Rollback;
+             }
++        } else {
++            // 离开冻结面或遮挡不是候选变差的反证；仍不能承接前面的合格帧。
++            m_goodFrames = 0;
++            m_badFrames = 0;
++            ++m_unavailableFrames;
+         }
+         return m_decision;
+     }
+@@ -113,6 +129,8 @@ public:
+     Decision decision() const { return m_decision; }
+     bool baselineUsable() const { return m_baselineUsable; }
+     bool lastObservationGood() const { return m_lastObservationGood; }
++    ObservationStatus lastObservationStatus() const { return m_lastObservationStatus; }
++    int unavailableFrameCount() const { return m_unavailableFrames; }
+     const Metrics &baselineMetrics() const { return m_baselineMetrics; }
+     const Metrics &currentMetrics() const { return m_currentMetrics; }
+     int goodFrameCount() const { return m_goodFrames; }
+@@ -136,6 +154,15 @@ private:
+         return std::isfinite(value) && value >= 0.0 && value <= 1.0;
+     }
+ 
++    static bool validMetrics(const Metrics &metrics)
++    {
++        return std::isfinite(metrics.realToVirtualResidualMm)
++            && metrics.realToVirtualResidualMm >= 0.0
++            && std::isfinite(metrics.virtualToRealResidualMm)
++            && metrics.virtualToRealResidualMm >= 0.0
++            && validRatio(metrics.realCoverageRatio) && validRatio(metrics.virtualCoverageRatio);
++    }
++
+     static bool withinAbsoluteLimits(
+         const Metrics &metrics, const Options &options)
+     {
+@@ -158,6 +185,8 @@ private:
+     qint64 m_lastFrameId = -1;
+     int m_goodFrames = 0;
+     int m_badFrames = 0;
++    int m_unavailableFrames = 0;
++    ObservationStatus m_lastObservationStatus = ObservationStatus::Unavailable;
+     Decision m_decision = Decision::Waiting;
+     bool m_baselineUsable = false;
+     bool m_lastObservationGood = false;
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_simulation_guided_seam.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_simulation_guided_seam.cpp"
+index 408b72c..76aa02e 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_simulation_guided_seam.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_simulation_guided_seam.cpp"
+@@ -62,6 +62,16 @@ v::OnlineSeamRefinementResult rawPoint(const cv::Point2d &point, double gap)
+     return raw;
+ }
+ 
++v::OnlineSeamRefinementResult supportedRawPoint(const cv::Point2d &point, double gap)
++{
++    auto raw = rawPoint(point, gap);
++    raw.supportRatio = 1.0;
++    raw.fitRmsPixel = 0.1;
++    raw.confidence = 0.9;
++    raw.leftSupportColumns = raw.rightSupportColumns = 60;
++    return raw;
++}
++
+ } // namespace
+ 
+ int main()
+@@ -188,6 +198,78 @@ int main()
+     result = estimator.update(blank, reference(simulated), simulated, missing, 5, options);
+     check(result.valid && result.estimated && !result.predictionBudgetValid,
+         "elapsed time expires quality budget while preserving a marked business estimate");
++    // 现场原图接缝已清晰恢复，但旧锚窄分支长期否决；需连续新证据而非单帧换锚。
++    options.maximumPredictionTimeMs = 12000;
++    options.enableRawReacquisition = true;
++    estimator.reset();
++    estimator.update(clear, reference(simulated), simulated, rawPoint(actual, -8.0), 8, options);
++    const cv::Point2d shiftedActual = actual + cv::Point2d(18.0, 0.0);
++    const auto shiftedImage = makeImage(shiftedActual, -8.0, false, true, false);
++    for (int frame = 1; frame <= 3; ++frame) {
++        result = estimator.update(shiftedImage, reference(simulated), simulated,
++            supportedRawPoint(shiftedActual, -8.0), 8, options);
++        check(result.reacquisitionFrames == frame
++            && result.reacquisitionPending == (frame < 3)
++            && result.rawJumpRejected == (frame < 3)
++            && result.reacquired == (frame == 3),
++            "only three consecutive high-quality new raw frames can replace a stale anchor");
++    }
++    result = estimator.update(blank, reference(simulated), simulated, missing, 8, options);
++    check(result.valid && cv::norm(result.point - shiftedActual) < 0.01,
++        "reacquisition prediction uses the latest measured anchor rather than the stale branch");
++    // 审查反例：旧真实 V 仍清晰，18px 内更亮反光能独立通过原图精定位。
++    // 次峰低于0.8亮度比不代表旧分支消失，不能只凭新候选连续性替换实测锚。
++    cv::Mat competingImage = clear.clone();
++    for (int y = 0; y < competingImage.rows; ++y) {
++        for (int x = 0; x < competingImage.cols; ++x) {
++            const double previousStripe = 14.0
++                + (competingImage.at<unsigned char>(y, x) - 14.0) * 0.55;
++            competingImage.at<unsigned char>(y, x) = std::max(
++                cv::saturate_cast<unsigned char>(previousStripe),
++                shiftedImage.at<unsigned char>(y, x));
++        }
++    }
++    v::OnlineSeamRefinementOptions competingOptions;
++    competingOptions.heightPolicy = v::OnlineSeamHeightPolicy::GapCenter;
++    const auto competingRaw = v::COnlineSeamRefiner::refine(
++        competingImage, shiftedActual, competingOptions);
++    check(competingRaw.valid && cv::norm(competingRaw.point - shiftedActual) < 2.0,
++        "nearby brighter competing V produces a reachable high-quality raw candidate");
++    estimator.reset();
++    estimator.update(clear, reference(simulated), simulated, rawPoint(actual, -8.0), 12, options);
++    for (int frame = 0; frame < 3; ++frame) {
++        result = estimator.update(competingImage, reference(simulated), simulated,
++            competingRaw, 12, options);
++        check(result.rawJumpRejected && !result.reacquired,
++            "visible historical seam blocks reacquisition by a brighter eighteen-pixel reflection");
++    }
++    result = estimator.update(blank, reference(simulated), simulated, missing, 12, options);
++    check(result.valid && cv::norm(result.point - actual) < 0.01,
++        "nearby competing reflection never replaces the original measured anchor");
++    estimator.reset();
++    estimator.update(clear, reference(simulated), simulated, rawPoint(actual, -8.0), 9, options);
++    estimator.update(shiftedImage, reference(simulated), simulated,
++        supportedRawPoint(shiftedActual, -8.0), 9, options);
++    estimator.update(blank, reference(simulated), simulated, missing, 9, options);
++    result = estimator.update(shiftedImage, reference(simulated), simulated,
++        supportedRawPoint(shiftedActual, -8.0), 9, options);
++    check(result.reacquisitionFrames == 1 && result.rawJumpRejected,
++        "missing original-image evidence breaks the reacquisition sequence");
++    for (int frame = 0; frame < 5; ++frame) {
++        result = estimator.update(glare, reference(simulated), simulated,
++            supportedRawPoint({actual.x - 18.0, actual.y + 26.0}, 0.0), 9, options);
++        check(result.rawJumpRejected && !result.reacquired,
++            "a persistent distant model-like reflection cannot replace the measured anchor");
++    }
++    options.enableRawReacquisition = false;
++    estimator.reset();
++    estimator.update(clear, reference(simulated), simulated, rawPoint(actual, -8.0), 10, options);
++    for (int frame = 0; frame < 4; ++frame) {
++        result = estimator.update(shiftedImage, reference(simulated), simulated,
++            supportedRawPoint(shiftedActual, -8.0), 10, options);
++        check(result.rawJumpRejected && !result.reacquired && !result.reacquisitionPending,
++            "default guided entry preserves the original rejection behavior");
++    }
+     // 验证生产接线：空图可提供显式仿真估计，但不能产生原图实测。
+     v::CLegacyOnlineKcfDetector detector;
+     i2r_rlc::digital_twin::DigitalTwinVisionLaserObservation observation;
+@@ -217,6 +299,36 @@ int main()
+         && !detected.diagnostic.refinement.valid
+         && detected.diagnostic.continuity.source == v::OnlineSeamPointSource::SimulationPrediction,
+         "production detector emits a projected model estimate without inventing raw measurement");
++    // 保持正常 KCF 原图输入，仅由已存在的高度策略令精定位降级，验证最终选择生产分支。
++    v::CLegacyOnlineKcfDetector onlineDetector;
++    detectorOptions.enableOnlineObservationFusion = true;
++    detectorOptions.referenceRevision = 11;
++    observation.weldPointImage_px = {actual.x, actual.y};
++    observation.laserLineImagePoints_px.clear();
++    for (const auto &point : reference(actual)) {
++        observation.laserLineImagePoints_px.push_back({point.x, point.y});
++    }
++    bool usedRawKcf = false;
++    for (int frame = 0; frame < 8; ++frame) {
++        const auto degraded = onlineDetector.process(clear, observation,
++            projectionContext, detectorOptions);
++        check(degraded.valid && degraded.diagnostic.attempted,
++            "online geometry degradation keeps detecting KCF and displaying a projected business point");
++        if (degraded.diagnostic.coarseObservationUsed) {
++            usedRawKcf = true;
++            check(!degraded.diagnostic.refinement.valid
++                && degraded.diagnostic.coarseObservationQuality > 0.0
++                && degraded.diagnostic.continuity.source == v::OnlineSeamPointSource::CorrectedKcf,
++                "supported coarse observation survives the guided branch and remains non-independent");
++        }
++    }
++    check(usedRawKcf, "production online fusion uses supported real KCF during nonfatal geometry degradation");
++    const auto occluded = onlineDetector.process(blank, observation, projectionContext, detectorOptions);
++    check(occluded.valid && !occluded.diagnostic.coarseObservationUsed
++        && occluded.diagnostic.coarseObservationQuality == 0.0
++        && !occluded.diagnostic.refinement.valid
++        && occluded.diagnostic.continuity.source == v::OnlineSeamPointSource::SimulationPrediction,
++        "fully occluded production frame predicts visibly without using fake KCF evidence");
+     if (passed) {
+         std::cout << "PASS: temporal anchor, valid-looking reflection, tack GapCenter, pose version, motion compensation, drift and budgets\n";
+     }
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\include\\OnlineLocalRegistrationWorker.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\OnlineLocalRegistrationWorker.h"
+index a4240b8..b5d043d 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\UI\\include\\OnlineLocalRegistrationWorker.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\UI\\include\\OnlineLocalRegistrationWorker.h"
+@@ -121,6 +121,8 @@ public:
+         bool surfaceOnly = false;
+         quint64 workpiecePoseRevision = 0;
+         localization::surface_validation::Result surfaceValidation;
++        /// @brief 末两帧对冻结训练面的配对可支持性；只作写前准入，非新帧证明。
++        localization::surface_validation::PairedSurfaceMetrics surfaceVerificationPreflight;
+         /// @brief 表面候选投影前的PCL矩阵，供归档复核，不可直接写回。
+         localization::RigidTransform originalSurfaceCorrection;
+         std::vector<localization::Point3D_mm> safetyKeypointsInParent_mm;
+@@ -165,7 +167,7 @@ public:
+     };
+     /** @brief 仅在本worker所属线程调用，供写回后新帧表面后验复用。 */
+     SurfaceFrameResult measureSurface(const Input &input) const;
+-    /** @brief 新帧绝对切片检查及同帧局部面对照；冻结参考与候选只能来自本次事务。 */
++    /** @brief 在线新帧绝对切片检查及当前CAD支持的有限局部面对照；参考与候选冻结。 */
+     SurfaceFrameResult measureSurfaceForVerification(const Input &input,
+         const std::vector<localization::Point3D_mm> &frozenVirtual,
+         const localization::RigidTransform &correction) const;
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_runtime_tracking_flow.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_runtime_tracking_flow.cpp"
+index fdc136d..9a6fe5f 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\tests\\test_runtime_tracking_flow.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\tests\\test_runtime_tracking_flow.cpp"
+@@ -1322,6 +1322,7 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+         worker.startTracking();
+         qint64 frameId = 0;
+         quint64 poseRevision = 1;
++        bool onlineWindow = true;
+         const auto submit = [&](bool blank) {
+             auto frame = makeOnlineSeamFrame();
+             frame.frameId = ++frameId;
+@@ -1338,6 +1339,7 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+             ui::RuntimeVisionCorrelation correlation;
+             correlation.sessionId = diagnostics ? 710 : 711;
+             correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
++            correlation.onlineControlWindowActive = onlineWindow;
+             correlation.frameId = frame.frameId;
+             correlation.workpiecePoseRevision = poseRevision;
+             worker.submitFrameWithRobotStateObservationAndCorrelation(
+@@ -1363,7 +1365,10 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+                 "business projection corresponds to final displayed pixel");
+             if (first.diagnostic.has_value()) {
+                 const auto &algorithm = first.diagnostic->algorithm;
+-                ok &= expectTrue(algorithm.refinement.valid
++                ok &= expectTrue(algorithm.onlineObservationFusionEnabled
++                        && algorithm.rawRefinement.valid && algorithm.refinement.valid
++                        && std::abs(algorithm.rawRefinement.point.x
++                            - algorithm.refinement.point.x) < 1.0e-9
+                         && std::abs(algorithm.refinement.point.x - 160.0) <= 1.5
+                         && std::abs(algorithm.finalPoint.x - first.imageXPixel) < 1e-9,
+                     "diagnostics distinguish original geometry and final fused output");
+@@ -1378,6 +1383,15 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+                 && predicted.pointSource == vision::OnlineSeamPointSource::SimulationPrediction
+                 && std::abs(predicted.imageXPixel - first.imageXPixel) < 1e-6,
+             "blank frame keeps a marked same-frame prediction without inventing independent geometry");
++        if (predicted.diagnostic.has_value()) {
++            const auto &algorithm = predicted.diagnostic->algorithm;
++            ok &= expectTrue(algorithm.onlineObservationFusionEnabled
++                    && algorithm.attempted && algorithm.tracker.completed
++                    && !algorithm.coarseObservationUsed
++                    && std::abs(algorithm.continuity.observationWeightX) < 1.0e-12
++                    && std::abs(algorithm.continuity.observationWeightY) < 1.0e-12,
++                "online blank-frame prediction still runs KCF without fabricating an observation weight");
++        }
+         const auto recovered = submit(false);
+         ok &= expectTrue(recovered.valid && recovered.independentWeldPointInParent_mm.valid,
+             "coarse tracking survives invalid geometry and can recover on a new supported frame");
+@@ -1481,6 +1495,12 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
+                 && !restartedWithoutAnchor.independentWeldPointInParent_mm.valid
+                 && std::abs(restartedWithoutAnchor.imageXPixel - 180.0) < 1.0e-6,
+             "restart clears old transition seed and a valid current simulation supplies a marked target");
++        onlineWindow = false;
++        const auto initialStage = submit(false);
++        ok &= expectTrue(initialStage.valid
++                && (!initialStage.diagnostic.has_value()
++                    || !initialStage.diagnostic->algorithm.onlineObservationFusionEnabled),
++            "initial reverse-scan stage keeps the new online-only observation policy disabled");
+         worker.stopTracking();
+     }
+     return ok;
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\src\\track\\OnlineSeamContinuity.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\src\\track\\OnlineSeamContinuity.cpp"
+index dad8546..81ce216 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\src\\track\\OnlineSeamContinuity.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\src\\track\\OnlineSeamContinuity.cpp"
+@@ -38,6 +38,41 @@ OnlineSeamContinuityResult COnlineSeamContinuity::update(
+     const cv::Size &size, const cv::Point2d &simulated, const cv::Point2d &coarse,
+     bool coarseUsable, const CKcfUpdateDiagnostic &tracker,
+     const OnlineSeamRefinementResult &geometry, const KcfFusionOptions &fusion)
++{
++    return updateImpl(size, simulated, coarse, coarseUsable, tracker,
++        geometry, fusion, false, 1.0);
++}
++OnlineSeamContinuityResult COnlineSeamContinuity::updateOnline(
++    const cv::Size &size, const cv::Point2d &simulated, const cv::Point2d &coarse,
++    double observationQuality, const CKcfUpdateDiagnostic &tracker,
++    const OnlineSeamRefinementResult &geometry, const KcfFusionOptions &fusion)
++{
++    const double quality = std::isfinite(observationQuality)
++        ? std::clamp(observationQuality, 0.0, 1.0) : 0.0;
++    return updateImpl(size, simulated, coarse, quality > 0.0, tracker,
++        geometry, fusion, true, quality);
++}
++OnlineSeamContinuityResult COnlineSeamContinuity::updateOnline(
++    const cv::Size &size, const cv::Point2d &simulated, const cv::Point2d &coarse,
++    double observationQuality, const CKcfUpdateDiagnostic &tracker,
++    const OnlineSeamRefinementResult &geometry, const KcfFusionOptions &fusion,
++    const cv::Point2d &transitionTarget)
++{
++    if (inside(transitionTarget, size)) {
++        // 新版本仅接续最终业务坐标，不能携带旧版本的观测身份与模板偏差。
++        reset();
++        m_previousFusion = fusion;
++        synchronizeEstimate(transitionTarget, simulated, 0);
++        m_recoveryFrames = 1;
++    }
++    return updateOnline(size, simulated, coarse, observationQuality,
++        tracker, geometry, fusion);
++}
++OnlineSeamContinuityResult COnlineSeamContinuity::updateImpl(
++    const cv::Size &size, const cv::Point2d &simulated, const cv::Point2d &coarse,
++    bool coarseUsable, const CKcfUpdateDiagnostic &tracker,
++    const OnlineSeamRefinementResult &geometry, const KcfFusionOptions &fusion,
++    bool qualityWeighted, double observationQuality)
+ {
+     OnlineSeamContinuityResult result;
+     if (!inside(simulated, size)) { reset(); return result; }
+@@ -64,6 +99,12 @@ OnlineSeamContinuityResult COnlineSeamContinuity::update(
+             result.point.y = simulated.y + std::clamp(tracker.gainY, 0.0, 1.0)
+                 * (geometry.point.y - simulated.y);
+         }
++        if (qualityWeighted) {
++            result.observationWeightX = tracker.fusionApplied
++                ? std::clamp(tracker.gainX, 0.0, 1.0) : 1.0;
++            result.observationWeightY = tracker.fusionApplied
++                ? std::clamp(tracker.gainY, 0.0, 1.0) : 1.0;
++        }
+         if (coarseUsable) {
+             const auto observedBias = bounded(geometry.point - coarse, 40.0);
+             m_bias = m_biasValid ? m_bias + bounded((observedBias - m_bias) * 0.2, 2.0)
+@@ -75,14 +116,29 @@ OnlineSeamContinuityResult COnlineSeamContinuity::update(
+     } else {
+         ++m_degradedFrames;
+         const auto corrected = coarse + (m_biasValid ? m_bias : cv::Point2d());
++        if (coarseUsable && inside(corrected, size)) { result.correctedCoarsePoint = corrected; }
++        const double innovation = cv::norm(corrected - anchoredPrediction);
+         // 响应强度不等于焊点可靠性；还需与同帧仿真推进的目标相容。
+         if (coarseUsable && inside(corrected, size)
+-            && cv::norm(corrected - anchoredPrediction) <= 12.0) {
++            && innovation <= (qualityWeighted ? 24.0 : 12.0)) {
+             result.source = OnlineSeamPointSource::CorrectedKcf;
+             double gainX = tracker.fusionApplied ? tracker.gainX : 0.35;
+             double gainY = tracker.fusionApplied ? tracker.gainY : 0.35;
+             if (fusion.mode == KcfFusionMode::KcfOnly) { gainX = gainY = 1.0; }
+             else { gainX = std::clamp(gainX, 0.0, 0.35); gainY = std::clamp(gainY, 0.0, 0.35); }
++            if (qualityWeighted) {
++                // 质量低或创新大时增大等效观测噪声，而不是瞬间丢弃有图像支持的 KCF。
++                // 仍以最近几何参考约束总偏移；估计输出不会刷新该参考。
++                const double noiseScale = observationQuality
++                    / (1.0 + innovation * innovation / (12.0 * 12.0));
++                gainX *= noiseScale;
++                gainY *= noiseScale;
++                result.observationWeightX = gainX;
++                result.observationWeightY = gainY;
++                if (gainX <= 1e-9 && gainY <= 1e-9) {
++                    result.source = OnlineSeamPointSource::SimulationPrediction;
++                }
++            }
+             result.point = cv::Point2d(prediction.x + gainX * (corrected.x - prediction.x),
+                 prediction.y + gainY * (corrected.y - prediction.y));
+         } else {
+@@ -94,6 +150,11 @@ OnlineSeamContinuityResult COnlineSeamContinuity::update(
+     if (m_initialized && (m_degradedFrames > 0 || m_recoveryFrames > 0)) {
+         const auto delta = result.point - prediction;
+         result.transitionLimited = cv::norm(delta) > 2.0;
++        if (result.transitionLimited) {
++            const double scale = 2.0 / cv::norm(delta);
++            result.observationWeightX *= scale;
++            result.observationWeightY *= scale;
++        }
+         result.point = prediction + bounded(delta, 2.0);
+         if (m_recoveryFrames > 0) m_recoveryFrames = result.transitionLimited ? 1 : 0;
+     }
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\src\\track\\LegacyOnlineKcfDetector.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\src\\track\\LegacyOnlineKcfDetector.cpp"
+index b15a716..1ba9f48 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\src\\track\\LegacyOnlineKcfDetector.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\src\\track\\LegacyOnlineKcfDetector.cpp"
+@@ -131,6 +131,71 @@ cv::Mat enhancedImage(
+     return output;
+ }
+ 
++/**
++ * @brief 检查粗 KCF 附近原图的唯一窄峰支撑，避免增强相关峰在遮挡时自证。
++ * @details 只产生业务估计权重；局部支撑不证明接缝材料身份，不能作为独立焊点。
++ * 大窗口含竞争条纹时仍可保留局部唯一且时序相容的低权重粗观测。
++ */
++double coarseObservationQuality(const cv::Mat &gray8, const cv::Point2d &coarse,
++    const CKcfUpdateDiagnostic &tracker, const OnlineSeamRefinementResult &raw)
++{
++    if (raw.status == OnlineSeamRefinementStatus::InvalidInput
++        || !std::isfinite(raw.ambiguousColumnRatio)
++        || !std::isfinite(coarse.x) || !std::isfinite(coarse.y)
++        || coarse.x < 0.0 || coarse.x >= gray8.cols
++        || coarse.y < 0.0 || coarse.y >= gray8.rows) { return 0.0; }
++    const int centerX = static_cast<int>(std::lround(coarse.x));
++    const int centerY = static_cast<int>(std::lround(coarse.y));
++    const int xBegin = std::max(0, centerX - 16);
++    const int xEnd = std::min(gray8.cols - 1, centerX + 16);
++    const int yBegin = std::max(1, centerY - 24);
++    const int yEnd = std::min(gray8.rows - 2, centerY + 24);
++    if (xEnd - xBegin < 16 || yEnd - yBegin < 16) { return 0.0; }
++    int supported = 0;
++    int ambiguous = 0;
++    const auto smooth = [&gray8](int x, int y) {
++        return (gray8.at<unsigned char>(y - 1, x)
++            + gray8.at<unsigned char>(y, x)
++            + gray8.at<unsigned char>(y + 1, x)) / 3.0;
++    };
++    for (int x = xBegin; x <= xEnd; ++x) {
++        double background = 255.0;
++        double peak = 0.0;
++        int peakY = yBegin;
++        for (int y = yBegin; y <= yEnd; ++y) {
++            background = std::min(background,
++                static_cast<double>(gray8.at<unsigned char>(y, x)));
++            const double value = smooth(x, y);
++            if (value > peak) { peak = value; peakY = y; }
++        }
++        if (peak - background < 40.0) { continue; }
++        const double halfHeight = background + (peak - background) * 0.5;
++        int top = peakY;
++        int bottom = peakY;
++        while (top > yBegin && gray8.at<unsigned char>(top - 1, x) > halfHeight) { --top; }
++        while (bottom < yEnd && gray8.at<unsigned char>(bottom + 1, x) > halfHeight) { ++bottom; }
++        if (bottom - top + 1 > 12) { continue; }
++        bool competing = false;
++        for (int y = yBegin + 1; y < yEnd; ++y) {
++            if (std::abs(y - peakY) < 8) { continue; }
++            const double value = smooth(x, y);
++            if (value - background >= (peak - background) * 0.8
++                && value >= smooth(x, y - 1) && value >= smooth(x, y + 1)) {
++                competing = true;
++                break;
++            }
++        }
++        if (competing) { ++ambiguous; }
++        else { ++supported; }
++    }
++    const double columns = xEnd - xBegin + 1.0;
++    if (supported < 16 || supported / columns < 0.6
++        || ambiguous / columns > 0.2) { return 0.0; }
++    const double responseQuality = std::clamp((tracker.responsePeak - 0.35) / 0.45, 0.0, 1.0);
++    const double ambiguityPenalty = 1.0 / (1.0 + 3.0 * raw.ambiguousColumnRatio);
++    return std::clamp(responseQuality * supported / columns * ambiguityPenalty, 0.0, 1.0);
++}
++
+ } // namespace
+ 
+ CLegacyOnlineKcfDetector::CLegacyOnlineKcfDetector()
+@@ -158,6 +223,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
+     const LegacyOnlineKcfOptions &options)
+ {
+     LegacyOnlineKcfResult result;
++    result.diagnostic.onlineObservationFusionEnabled = options.enableOnlineObservationFusion;
+     result.diagnostic.imageSize = gray8.size();
+     result.diagnostic.seamRefinementEnabled = options.enableSeamRefinement;
+     if (gray8.empty() || gray8.type() != CV_8UC1) {
+@@ -309,15 +375,22 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
+             result.diagnostic.refinementElapsedMs = std::chrono::duration<double, std::milli>(
+                 std::chrono::steady_clock::now() - refinementStarted).count();
+         }
++        result.diagnostic.rawRefinement = result.diagnostic.refinement;
++        if (options.enableOnlineObservationFusion && coarseUsable) {
++            result.diagnostic.coarseObservationQuality = coarseObservationQuality(gray8,
++                result.diagnostic.beforeFusionPoint, tracking, result.diagnostic.rawRefinement);
++        }
+         if (options.enableSimulationGuidance) {
+             std::vector<cv::Point2d> referencePolyline;
+             referencePolyline.reserve(simulatedLaserPoints.size());
+             for (const auto &point : simulatedLaserPoints) {
+                 referencePolyline.push_back({point.px, point.py});
+             }
++            auto guidedOptions = options.guidedOptions;
++            guidedOptions.enableRawReacquisition = options.enableOnlineObservationFusion;
+             result.diagnostic.guided = m_guidedEstimator.update(gray8,
+                 referencePolyline, simulatedPoint, result.diagnostic.refinement,
+-                options.referenceRevision, options.guidedOptions,
++                options.referenceRevision, guidedOptions,
+                 options.hasReferenceTransitionPoint
+                     ? options.referenceTransitionPoint : cv::Point2d(-1.0, -1.0));
+             if (result.diagnostic.guided.rawJumpRejected) {
+@@ -326,11 +399,30 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
+                 result.diagnostic.refinement.status = OnlineSeamRefinementStatus::UnstablePosition;
+             }
+         }
+-        result.diagnostic.continuity = m_continuity.update(gray8.size(), simulatedPoint,
+-            result.diagnostic.beforeFusionPoint, coarseUsable, tracking,
+-            result.diagnostic.refinement, options.fusion);
++        result.diagnostic.continuity = options.enableOnlineObservationFusion
++            ? m_continuity.updateOnline(gray8.size(), simulatedPoint,
++                result.diagnostic.beforeFusionPoint, result.diagnostic.coarseObservationQuality,
++                tracking, result.diagnostic.refinement, options.fusion,
++                options.hasReferenceTransitionPoint
++                    ? options.referenceTransitionPoint : cv::Point2d(-1.0, -1.0))
++            : m_continuity.update(gray8.size(), simulatedPoint,
++                result.diagnostic.beforeFusionPoint, coarseUsable, tracking,
++                result.diagnostic.refinement, options.fusion);
++        result.diagnostic.coarseObservationUsed = options.enableOnlineObservationFusion
++            && result.diagnostic.continuity.source == OnlineSeamPointSource::CorrectedKcf;
++        if (result.diagnostic.coarseObservationUsed
++            && result.diagnostic.guided.hasRawShoulderSupport
++            && cv::norm(result.diagnostic.continuity.correctedCoarsePoint
++                - result.diagnostic.guided.point)
++                > options.guidedOptions.maximumLocalCorrectionPixel * 2.0) {
++            // 预焊点中心仍可能给出强 KCF；可见两侧母材反证其偏离时继续沿原接缝，
++            // 不能因恢复粗观测参与而重新追随凸起。肩部点本身仍是 estimated。
++            result.diagnostic.coarseObservationUsed = false;
++        }
+         if (options.enableSimulationGuidance) {
+-            if (!result.diagnostic.refinement.valid) {
++            // 有原图局部支撑的低权重 KCF 已经通过连续器的创新/限幅检查，
++            // 不再因精定位退化被辅助预测无条件覆盖；其来源仍是 estimated。
++            if (!result.diagnostic.refinement.valid && !result.diagnostic.coarseObservationUsed) {
+                 const auto &guided = result.diagnostic.guided;
+                 // 参考或估计坐标无效才中断；无锚及预算耗尽由来源与质量标记表达。
+                 if (!guided.valid) {
+@@ -363,6 +455,8 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
+                 result.diagnostic.continuity.point = businessPoint;
+                 result.diagnostic.continuity.valid = true;
+                 result.diagnostic.continuity.degradedFrames = guided.degradedFrames;
++                result.diagnostic.continuity.observationWeightX = 0.0;
++                result.diagnostic.continuity.observationWeightY = 0.0;
+                 result.diagnostic.continuity.source = guided.hasRawShoulderSupport
+                     ? OnlineSeamPointSource::GuidedEstimate
+                     : OnlineSeamPointSource::SimulationPrediction;
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\src\\feature\\SimulationGuidedSeamEstimator.cpp" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\src\\feature\\SimulationGuidedSeamEstimator.cpp"
+index 3cc213e..4e311e5 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\src\\feature\\SimulationGuidedSeamEstimator.cpp"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\src\\feature\\SimulationGuidedSeamEstimator.cpp"
+@@ -167,6 +167,84 @@ double referenceSlope(const std::vector<cv::Point2d> &polyline,
+     return bestSlope;
+ }
+ 
++/**
++ * @brief 以新候选本身的原图支撑确认重捕获资格，不靠它与仿真点接近来确认。
++ * @details 该门槛比普通原图候选更严格；明显多峰、宽峰和单侧支撑不能换掉旧锚。
++ */
++bool reacquisitionSupported(const cv::Mat &gray8,
++    const OnlineSeamRefinementResult &raw,
++    const std::vector<cv::Point2d> &polyline, const cv::Point2d &simulated)
++{
++    if (!std::isfinite(raw.supportRatio) || !std::isfinite(raw.fitRmsPixel)
++        || !std::isfinite(raw.xUncertaintyPixel) || !std::isfinite(raw.ambiguousColumnRatio)
++        || !std::isfinite(raw.confidence) || !std::isfinite(raw.leftEndpoint.y)
++        || !std::isfinite(raw.rightEndpoint.y)
++        || raw.supportRatio < 0.85 || raw.fitRmsPixel > 1.0
++        || raw.xUncertaintyPixel > 3.0 || raw.ambiguousColumnRatio > 0.05
++        || raw.confidence < 0.35 || raw.leftSupportColumns < 25
++        || raw.rightSupportColumns < 25) { return false; }
++    const auto left = fitBranch(gray8, raw.point, -1, 25, 70,
++        referenceSlope(polyline, simulated, -1, 0.3),
++        raw.leftEndpoint.y - raw.point.y, 20.0, 25);
++    const auto right = fitBranch(gray8, raw.point, 1, 25, 70,
++        referenceSlope(polyline, simulated, 1, -0.3),
++        raw.rightEndpoint.y - raw.point.y, 20.0, 25);
++    return left.valid && right.valid && left.rms <= 1.0 && right.rms <= 1.0
++        && left.ambiguousColumns == 0 && right.ambiguousColumns == 0
++        && std::abs(left.intercept - raw.leftEndpoint.y) <= 1.5
++        && std::abs(right.intercept - raw.rightEndpoint.y) <= 1.5;
++}
++
++/**
++ * @brief 独立检查旧实测分支是否仍存在，不以更亮新峰将旧峰解释成已消失。
++ * @details 选择最接近历史预测的原图窄峰，再检查整侧的支撑、端部和拟合残差；
++ * 历史预测只用于识别竞争证据，不据此生成新的实测点或放宽候选准入。
++ */
++bool historicalBranchPresent(const cv::Mat &gray8, const cv::Point2d &prediction,
++    int side, double slope, double heightOffset, double searchRadius, int minimumColumns)
++{
++    std::vector<cv::Point2d> samples;
++    for (int offset = 25; offset <= 70; ++offset) {
++        const int x = static_cast<int>(std::lround(prediction.x)) + side * offset;
++        if (x < 0 || x >= gray8.cols) { continue; }
++        const double dx = x - prediction.x;
++        const double expected = prediction.y + heightOffset + slope * dx;
++        const auto peaks = findPeaks(gray8, x, expected, searchRadius);
++        if (peaks.empty()) { continue; }
++        const auto nearest = std::min_element(peaks.begin(), peaks.end(),
++            [expected](const Peak &left, const Peak &right) {
++                return std::abs(left.y - expected) < std::abs(right.y - expected);
++            });
++        if (std::abs(nearest->y - expected) <= searchRadius) {
++            samples.push_back({dx, nearest->y});
++        }
++    }
++    if (samples.size() < static_cast<std::size_t>(minimumColumns)) { return false; }
++    double sx = 0.0;
++    double sy = 0.0;
++    double sxx = 0.0;
++    double sxy = 0.0;
++    for (const auto &sample : samples) {
++        sx += sample.x;
++        sy += sample.y;
++        sxx += sample.x * sample.x;
++        sxy += sample.x * sample.y;
++    }
++    const double count = static_cast<double>(samples.size());
++    const double determinant = count * sxx - sx * sx;
++    if (determinant <= 1e-9) { return false; }
++    const double fittedSlope = (count * sxy - sx * sy) / determinant;
++    const double fittedIntercept = (sy - fittedSlope * sx) / count;
++    double errorSquared = 0.0;
++    for (const auto &sample : samples) {
++        const double error = sample.y - fittedIntercept - fittedSlope * sample.x;
++        errorSquared += error * error;
++    }
++    return std::isfinite(fittedIntercept) && std::abs(fittedSlope - slope) <= 0.25
++        && std::abs(fittedIntercept - prediction.y - heightOffset) <= 3.0
++        && std::sqrt(errorSquared / count) <= 1.8;
++}
++
+ } // namespace
+ 
+ void CSimulationGuidedSeamEstimator::reset()
+@@ -177,6 +255,9 @@ void CSimulationGuidedSeamEstimator::reset()
+     m_versionAnchorOffset = {};
+     m_anchorSimulation = {};
+     m_degradedFrames = 0;
++    m_reacquisitionOffset = {};
++    m_reacquisitionGapHeight = 0.0;
++    m_reacquisitionFrames = 0;
+ }
+ 
+ SimulationGuidedSeamResult CSimulationGuidedSeamEstimator::update(
+@@ -255,6 +336,46 @@ SimulationGuidedSeamResult CSimulationGuidedSeamEstimator::update(
+                 || std::abs(right.intercept + right.slope * dx - rawRefinement.rightEndpoint.y) > 3.0;
+         }
+     }
++    const bool withinReacquisitionRange = rawUsable
++        && cv::norm(rawRefinement.point - simulatedSeam - m_referenceOffset)
++            <= options.maximumAnchorInnovationPixel * 2.0;
++    if (options.enableRawReacquisition && result.rawJumpRejected
++        && withinReacquisitionRange && m_hasDirections) {
++        const cv::Point2d prediction = simulatedSeam + m_referenceOffset;
++        const double leftDirection = m_leftSlope + std::clamp(
++            referenceSlope(simulatedPolyline, simulatedSeam, -1, m_anchorLeftModelSlope)
++                - m_anchorLeftModelSlope, -0.25, 0.25);
++        const double rightDirection = m_rightSlope + std::clamp(
++            referenceSlope(simulatedPolyline, simulatedSeam, 1, m_anchorRightModelSlope)
++                - m_anchorRightModelSlope, -0.25, 0.25);
++        result.reacquisitionBlockedByPreviousBranch = historicalBranchPresent(gray8,
++            prediction, -1, leftDirection, m_leftHeightOffset,
++            options.maximumBranchDistancePixel, options.minimumShoulderColumns)
++            && historicalBranchPresent(gray8, prediction, 1, rightDirection, m_rightHeightOffset,
++                options.maximumBranchDistancePixel, options.minimumShoulderColumns);
++    }
++    if (options.enableRawReacquisition && result.rawJumpRejected
++        && withinReacquisitionRange && !result.reacquisitionBlockedByPreviousBranch
++        && reacquisitionSupported(gray8, rawRefinement, simulatedPolyline, simulatedSeam)) {
++        const auto offset = rawRefinement.point - simulatedSeam;
++        const double gapHeight = rawRefinement.rightEndpoint.y - rawRefinement.leftEndpoint.y;
++        const bool consecutive = m_reacquisitionFrames > 0
++            && cv::norm(offset - m_reacquisitionOffset) <= 2.0
++            && std::abs(gapHeight - m_reacquisitionGapHeight) <= 2.0;
++        m_reacquisitionFrames = consecutive ? m_reacquisitionFrames + 1 : 1;
++        m_reacquisitionOffset = offset;
++        m_reacquisitionGapHeight = gapHeight;
++        result.reacquisitionFrames = m_reacquisitionFrames;
++        result.reacquisitionPending = m_reacquisitionFrames < 3;
++        if (!result.reacquisitionPending) {
++            // 三份连续高质量原图证据替换过旧的分支约束；本帧仍用原始候选，
++            // 不把此前的粗 KCF、仿真或肩部估计变成独立实测。
++            result.rawJumpRejected = false;
++            result.reacquired = true;
++        }
++    } else {
++        m_reacquisitionFrames = 0;
++    }
+     if (rawUsable && !result.rawJumpRejected) {
+         if (!m_hasAnchor) {
+             m_versionAnchorOffset = rawRefinement.point - simulatedSeam;
+@@ -279,6 +400,7 @@ SimulationGuidedSeamResult CSimulationGuidedSeamEstimator::update(
+         m_rightSlope = right.slope;
+         result.hasTrustedAnchor = true;
+         result.predictionBudgetValid = true;
++        m_reacquisitionFrames = 0;
+         return result;
+     }
+     result.hasTrustedAnchor = m_hasAnchor;
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\include\\track\\OnlineSeamContinuity.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\include\\track\\OnlineSeamContinuity.h"
+index 8a22574..66168ef 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\include\\track\\OnlineSeamContinuity.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\include\\track\\OnlineSeamContinuity.h"
+@@ -16,9 +16,14 @@ struct OnlineSeamContinuityResult {
+     cv::Point2d point{-1.0, -1.0};
+     /// @brief 最终上一业务点按同帧仿真运动推进的位置，用于统一恢复限幅。
+     cv::Point2d motionPrediction{-1.0, -1.0};
++    /// @brief 使用最近几何偏差校正后的粗观测；仅业务估计，不能作为独立原图焊点。
++    cv::Point2d correctedCoarsePoint{-1.0, -1.0};
+     OnlineSeamPointSource source = OnlineSeamPointSource::Unavailable;
+     int degradedFrames = 0;
+     bool transitionLimited = false;
++    /// @brief 在线质量降权及过渡限幅后的原图观测系数；纯预测和旧入口为 0。
++    double observationWeightX = 0.0;
++    double observationWeightY = 0.0;
+ };
+ /**
+  * @brief 视觉线程独占的连续估计器；不读设备、不产生控制指令。
+@@ -35,7 +40,26 @@ public:
+     OnlineSeamContinuityResult update(const cv::Size &size, const cv::Point2d &simulated,
+         const cv::Point2d &coarse, bool coarseUsable, const CKcfUpdateDiagnostic &tracker,
+         const OnlineSeamRefinementResult &geometry, const KcfFusionOptions &fusion);
++    /**
++     * @brief 正式在线纠偏按原图质量和运动创新降权粗观测，仍限制新增修正为每帧 2 px。
++     * @details observationQuality 范围 [0,1]；粗点只能形成估计，不能刷新实测锚。
++     * 旧 update 入口不使用该策略，避免改变离线与未启用的新行为。
++     */
++    OnlineSeamContinuityResult updateOnline(const cv::Size &size,
++        const cv::Point2d &simulated, const cv::Point2d &coarse,
++        double observationQuality, const CKcfUpdateDiagnostic &tracker,
++        const OnlineSeamRefinementResult &geometry, const KcfFusionOptions &fusion);
++    /** @brief 位姿版本切换时以重投影业务点限定过渡，不继承旧实测锚或粗点偏差。 */
++    OnlineSeamContinuityResult updateOnline(const cv::Size &size,
++        const cv::Point2d &simulated, const cv::Point2d &coarse,
++        double observationQuality, const CKcfUpdateDiagnostic &tracker,
++        const OnlineSeamRefinementResult &geometry, const KcfFusionOptions &fusion,
++        const cv::Point2d &transitionTarget);
+ private:
++    OnlineSeamContinuityResult updateImpl(const cv::Size &size,
++        const cv::Point2d &simulated, const cv::Point2d &coarse, bool coarseUsable,
++        const CKcfUpdateDiagnostic &tracker, const OnlineSeamRefinementResult &geometry,
++        const KcfFusionOptions &fusion, bool qualityWeighted, double observationQuality);
+     bool m_initialized = false;
+     bool m_biasValid = false;
+     KcfFusionOptions m_previousFusion;
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\include\\track\\LegacyOnlineKcfDetector.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\include\\track\\LegacyOnlineKcfDetector.h"
+index ef7e21e..3970bb6 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\include\\track\\LegacyOnlineKcfDetector.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\include\\track\\LegacyOnlineKcfDetector.h"
+@@ -35,6 +35,8 @@ struct LegacyOnlineKcfOptions {
+     OnlineSeamRefinementOptions seamRefinement;
+     /// @brief 在线运行时显式启用；辅助结果永不成为独立原图焊点。
+     bool enableSimulationGuidance = false;
++    /// @brief 仅正式在线纠偏启用原图质量降权与连续新观测重捕获；其他入口保持旧策略。
++    bool enableOnlineObservationFusion = false;
+     /// @brief 实际工件写回/回滚版本；不是每次定位采样的任务代次。
+     std::uint64_t referenceRevision = 0;
+     SimulationGuidedSeamOptions guidedOptions;
+@@ -49,6 +51,7 @@ struct LegacyOnlineKcfOptions {
+  * @brief 检测器阶段快照，随本帧结果按值传递，不拥有跟踪器状态。
+  */
+ struct CLegacyOnlineKcfDiagnostic {
++    bool onlineObservationFusionEnabled = false;
+     bool attempted = false;
+     bool templateReinitialized = false;
+     bool gaborSucceeded = false;
+@@ -63,7 +66,12 @@ struct CLegacyOnlineKcfDiagnostic {
+     cv::Point2d coarseFinalPoint;
+     bool seamRefinementEnabled = false;
+     bool refinementAttempted = false;
++    /// @brief 时序门控前的原图候选；仅诊断，不能直接作为独立验收点。
++    OnlineSeamRefinementResult rawRefinement;
+     OnlineSeamRefinementResult refinement;
++    /// @brief 原图局部窄峰及相关响应的质量分数，非标定概率。
++    double coarseObservationQuality = 0.0;
++    bool coarseObservationUsed = false;
+     double refinementElapsedMs = 0.0;
+     OnlineSeamContinuityResult continuity;
+     SimulationGuidedSeamResult guided;
+
+diff --git "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\include\\feature\\SimulationGuidedSeamEstimator.h" "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\include\\feature\\SimulationGuidedSeamEstimator.h"
+index b370c64..3368866 100644
+--- "a/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\backups\\online_correction_repair_20261022\\main_baseline\\Vision\\include\\feature\\SimulationGuidedSeamEstimator.h"
++++ "b/H:\\YangCai_Code\\YangCai_qt-sontech20260901\\Vision\\include\\feature\\SimulationGuidedSeamEstimator.h"
+@@ -17,6 +17,8 @@ namespace i2r_rlc::vision {
+ 
+ /** @brief 仅为工程续接预算；像素/处理帧均不代表机器人安全距离。 */
+ struct SimulationGuidedSeamOptions {
++    /// @brief 仅在线纠偏显式启用连续高质量原图重捕获；缺省沿用旧时序门控。
++    bool enableRawReacquisition = false;
+     int maximumDegradedFrames = 180;
+     int maximumPredictionTimeMs = 12000;
+     double maximumReferenceTravelPixel = 180.0;
+@@ -40,6 +42,12 @@ struct SimulationGuidedSeamResult {
+     bool ambiguous = false;
+     /// @brief 原图候选虽局部有效，但不满足同位姿版本的运动补偿时序约束。
+     bool rawJumpRejected = false;
++    /// @brief 旧锚拒绝后，连续新原图证据正在重建或已经重建当前实测锚。
++    bool reacquisitionPending = false;
++    bool reacquired = false;
++    /// @brief 旧实测两侧分支仍有原图支撑，新亮分支不能凭连续出现替换它。
++    bool reacquisitionBlockedByPreviousBranch = false;
++    int reacquisitionFrames = 0;
+     bool accumulatedCorrectionExceeded = false;
+     int degradedFrames = 0;
+     std::int64_t anchorAgeMs = 0;
+@@ -100,6 +108,9 @@ private:
+     double m_leftHeightOffset = 0.0;
+     double m_rightHeightOffset = 0.0;
+     int m_degradedFrames = 0;
++    cv::Point2d m_reacquisitionOffset;
++    double m_reacquisitionGapHeight = 0.0;
++    int m_reacquisitionFrames = 0;
+ };
+ 
+ } // namespace i2r_rlc::vision

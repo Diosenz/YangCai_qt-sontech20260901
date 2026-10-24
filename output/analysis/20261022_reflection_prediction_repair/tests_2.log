@@ -1,0 +1,32 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  3: i2r_rlc_online_correction_tests
+ 1/10 Test  #3: i2r_rlc_online_correction_tests ........................   Passed    0.16 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 2/10 Test  #8: i2r_rlc_online_correction_run_recorder_tests ...........   Passed    0.64 sec
+      Start 16: i2r_rlc_online_seam_refinement_contract_tests
+ 3/10 Test #16: i2r_rlc_online_seam_refinement_contract_tests ..........   Passed    4.27 sec
+      Start 17: i2r_rlc_online_fusion_controls_tests
+ 4/10 Test #17: i2r_rlc_online_fusion_controls_tests ...................   Passed    0.26 sec
+      Start 24: i2r_rlc_online_local_surface_verification_tests
+ 5/10 Test #24: i2r_rlc_online_local_surface_verification_tests ........   Passed    0.04 sec
+      Start 25: i2r_rlc_local_registration_writeback_safety_tests
+ 6/10 Test #25: i2r_rlc_local_registration_writeback_safety_tests ......   Passed    0.22 sec
+      Start 28: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+ 7/10 Test #28: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...   Passed    2.16 sec
+      Start 80: i2r_rlc_online_seam_continuity_tests
+ 8/10 Test #80: i2r_rlc_online_seam_continuity_tests ...................   Passed    0.06 sec
+      Start 81: i2r_rlc_online_image_geometry_tests
+ 9/10 Test #81: i2r_rlc_online_image_geometry_tests ....................***Failed    3.25 sec
+field shoulder=1 point=[435.5, 610.441] quality=0.627181 rms=0.594435 supports=56,56 anchorSlopes=0.352104,-0.271972
+FAIL: field frame15248 remains on visible V instead of model-led old output395.84,626.80
+
+      Start 82: i2r_rlc_simulation_guided_seam_tests
+10/10 Test #82: i2r_rlc_simulation_guided_seam_tests ...................   Passed    2.51 sec
+
+90% tests passed, 1 tests failed out of 10
+
+Total Test time (real) =  13.62 sec
+
+The following tests FAILED:
+	 81 - i2r_rlc_online_image_geometry_tests (Failed)
+Errors while running CTest

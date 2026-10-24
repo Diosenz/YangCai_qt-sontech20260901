@@ -1,0 +1,179 @@
+{
+  "stage_metrics": [
+    {
+      "stage": "coarse_fused",
+      "n": 7056,
+      "mean_mm": 0.8247502966024483,
+      "max_mm": 12.167275530236198,
+      "rmse_mm": 1.041885320265635,
+      "median_mm": 0.772695740686985,
+      "p95_mm": 1.5916158928304254,
+      "above_3mm_count": 57
+    },
+    {
+      "stage": "geometry_valid",
+      "n": 4159,
+      "mean_mm": 0.45005629640733313,
+      "max_mm": 4.674730399069533,
+      "rmse_mm": 0.5871792647541229,
+      "median_mm": 0.4090188603676075,
+      "p95_mm": 0.7179809436725414,
+      "above_3mm_count": 28
+    }
+  ],
+  "point_sources": [
+    {
+      "source": 1,
+      "name": "Geometry",
+      "n": 4159,
+      "mean_mm": 0.47365587296942063,
+      "max_mm": 4.581139554994519,
+      "rmse_mm": 0.5999734442177689,
+      "median_mm": 0.4287058319858616,
+      "p95_mm": 0.8577537778961329,
+      "raw_kcf_rmse_mm": 0.8893497771253083,
+      "above_3mm_count": 21
+    },
+    {
+      "source": 2,
+      "name": "CorrectedKcf",
+      "n": 1904,
+      "mean_mm": 0.6208955064039117,
+      "max_mm": 3.8029869359556656,
+      "rmse_mm": 0.7647549649516338,
+      "median_mm": 0.4910153592974543,
+      "p95_mm": 1.4775900220154707,
+      "raw_kcf_rmse_mm": 0.8976605385957335,
+      "above_3mm_count": 2
+    },
+    {
+      "source": 3,
+      "name": "SimulationPrediction",
+      "n": 993,
+      "mean_mm": 2.376141526841978,
+      "max_mm": 4.767200742670352,
+      "rmse_mm": 2.735290669600436,
+      "median_mm": 2.2089847107394025,
+      "p95_mm": 4.478504985571097,
+      "raw_kcf_rmse_mm": 1.751888178194457,
+      "above_3mm_count": 366
+    }
+  ],
+  "estimated_count": 2897,
+  "transition_limited_count": 314,
+  "geometry_valid_count": 4159,
+  "stage_effects": [
+    {
+      "transition": "raw_to_coarse",
+      "n": 7056,
+      "before_rmse_mm": 1.056200853063096,
+      "after_rmse_mm": 1.041885320265635,
+      "movement_mean_mm": 0.04569389751062519,
+      "improved": 3725,
+      "worsened": 3192
+    },
+    {
+      "transition": "raw_to_geometry",
+      "n": 4159,
+      "before_rmse_mm": 0.8893497771253085,
+      "after_rmse_mm": 0.5871792647541229,
+      "movement_mean_mm": 0.89502417110223,
+      "improved": 3172,
+      "worsened": 987
+    },
+    {
+      "transition": "geometry_to_final",
+      "n": 4159,
+      "before_rmse_mm": 0.5871792647541229,
+      "after_rmse_mm": 0.5999734442177693,
+      "movement_mean_mm": 0.0861407535542813,
+      "improved": 809,
+      "worsened": 3269
+    },
+    {
+      "transition": "raw_to_final",
+      "n": 7056,
+      "before_rmse_mm": 1.056200853063096,
+      "after_rmse_mm": 1.1928609749503598,
+      "movement_mean_mm": 1.064699169627775,
+      "improved": 4480,
+      "worsened": 2576
+    }
+  ],
+  "raw_stage_semantics": "before_fusion coarse KCF; final output includes seam refinement/continuity and fusion",
+  "archive_independent_semantics": "geometry_x/y original-image refinement, not raw KCF",
+  "robot_phases": [
+    {
+      "phase": "idle",
+      "n": 147,
+      "start_ms": 1792597945360,
+      "end_ms": 1792597961097,
+      "start": "10-21 23:52:25.360",
+      "end": "10-21 23:52:41.097"
+    },
+    {
+      "phase": "initial_detection_running",
+      "n": 151,
+      "start_ms": 1792597961185,
+      "end_ms": 1792597977601,
+      "start": "10-21 23:52:41.185",
+      "end": "10-21 23:52:57.601"
+    },
+    {
+      "phase": "sending_initial_teach_points",
+      "n": 5,
+      "start_ms": 1792597978192,
+      "end_ms": 1792597978205,
+      "start": "10-21 23:52:58.192",
+      "end": "10-21 23:52:58.205"
+    },
+    {
+      "phase": "waiting_initial_teach_point_ack",
+      "n": 4,
+      "start_ms": 1792597978420,
+      "end_ms": 1792597979123,
+      "start": "10-21 23:52:58.420",
+      "end": "10-21 23:52:59.123"
+    },
+    {
+      "phase": "waiting_initial_approach",
+      "n": 89,
+      "start_ms": 1792597979337,
+      "end_ms": 1792597988900,
+      "start": "10-21 23:52:59.337",
+      "end": "10-21 23:53:08.900"
+    },
+    {
+      "phase": "waiting_online_start",
+      "n": 2,
+      "start_ms": 1792597989002,
+      "end_ms": 1792597989110,
+      "start": "10-21 23:53:09.002",
+      "end": "10-21 23:53:09.110"
+    },
+    {
+      "phase": "online_running",
+      "n": 5855,
+      "start_ms": 1792597989186,
+      "end_ms": 1792598504837,
+      "start": "10-21 23:53:09.186",
+      "end": "10-22 00:01:44.837"
+    },
+    {
+      "phase": "waiting_detection_reset",
+      "n": 1,
+      "start_ms": 1792598504967,
+      "end_ms": 1792598504967,
+      "start": "10-22 00:01:44.967",
+      "end": "10-22 00:01:44.967"
+    },
+    {
+      "phase": "waiting_robot_program_stop",
+      "n": 443,
+      "start_ms": 1792598505034,
+      "end_ms": 1792598553335,
+      "start": "10-22 00:01:45.034",
+      "end": "10-22 00:02:33.335"
+    }
+  ]
+}

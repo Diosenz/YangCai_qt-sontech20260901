@@ -1,0 +1,738 @@
+[
+  {
+    "scene": "plane",
+    "bump": false,
+    "robust": false,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.0,
+      0.0,
+      0.6,
+      0.0
+    ],
+    "affected_count": 0,
+    "translation_error_mm": 0.8062257748298549,
+    "yaw_error_deg": 0.8,
+    "clean_surface_normal_rmse_mm": 0.0,
+    "observation": {
+      "singular_values": [
+        0.9999999999999987,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "relative": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rank_at_1percent": 1,
+      "rank_at_5percent": 1,
+      "weakest_mode_xyz_edge_yaw": [
+        -1.0000000000000002,
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "yaw_length_scale_mm": 25.495097567963924,
+      "normal_count": 625
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "plane",
+    "bump": false,
+    "robust": true,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.0,
+      0.0,
+      0.6,
+      0.0
+    ],
+    "affected_count": 0,
+    "translation_error_mm": 0.8062257748298549,
+    "yaw_error_deg": 0.8,
+    "clean_surface_normal_rmse_mm": 0.0,
+    "observation": {
+      "singular_values": [
+        0.9999999999999987,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "relative": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rank_at_1percent": 1,
+      "rank_at_5percent": 1,
+      "weakest_mode_xyz_edge_yaw": [
+        -1.0000000000000002,
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "yaw_length_scale_mm": 25.495097567963924,
+      "normal_count": 625
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "plane",
+    "bump": true,
+    "robust": false,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.0,
+      0.0,
+      1.3775999999999995,
+      0.0
+    ],
+    "affected_count": 81,
+    "translation_error_mm": 1.1201168510472463,
+    "yaw_error_deg": 0.8,
+    "clean_surface_normal_rmse_mm": 0.7775999999999995,
+    "observation": {
+      "singular_values": [
+        0.9999999999999987,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "relative": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rank_at_1percent": 1,
+      "rank_at_5percent": 1,
+      "weakest_mode_xyz_edge_yaw": [
+        -1.0000000000000002,
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "yaw_length_scale_mm": 25.495097567963924,
+      "normal_count": 625
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "plane",
+    "bump": true,
+    "robust": true,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.0,
+      0.0,
+      0.6178676470637717,
+      0.0
+    ],
+    "affected_count": 81,
+    "translation_error_mm": 0.8064237427132186,
+    "yaw_error_deg": 0.8,
+    "clean_surface_normal_rmse_mm": 0.01786764706377175,
+    "observation": {
+      "singular_values": [
+        0.9999999999999987,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "relative": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rank_at_1percent": 1,
+      "rank_at_5percent": 1,
+      "weakest_mode_xyz_edge_yaw": [
+        -1.0000000000000002,
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "yaw_length_scale_mm": 25.495097567963924,
+      "normal_count": 625
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "single_side",
+    "bump": false,
+    "robust": false,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      -0.11111373427510922,
+      -0.0015515412341238837,
+      0.27781141563074013,
+      0.013962634015954644
+    ],
+    "affected_count": 0,
+    "translation_error_mm": 0.9594123973143572,
+    "yaw_error_deg": 3.975693351829396e-16,
+    "clean_surface_normal_rmse_mm": 3.2444356526278766e-16,
+    "observation": {
+      "singular_values": [
+        0.9999999999999952,
+        0.26261286571944525,
+        1.7469778790936306e-15,
+        5.614906847774806e-19
+      ],
+      "relative": [
+        1.0,
+        0.26261286571944653,
+        1.7469778790936389e-15,
+        5.614906847774833e-19
+      ],
+      "rank_at_1percent": 2,
+      "rank_at_5percent": 2,
+      "weakest_mode_xyz_edge_yaw": [
+        0.005804624939910115,
+        -0.9999778289275965,
+        -0.003263124661716188,
+        -1.1474674481886985e-16
+      ],
+      "yaw_length_scale_mm": 25.495097567963924,
+      "normal_count": 625
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "single_side",
+    "bump": false,
+    "robust": true,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      -0.11111373427510966,
+      -0.0015515412341236942,
+      0.27781141563073924,
+      0.013962634015954638
+    ],
+    "affected_count": 0,
+    "translation_error_mm": 0.959412397314358,
+    "yaw_error_deg": 9.93923337957349e-17,
+    "clean_surface_normal_rmse_mm": 4.3349340062446195e-16,
+    "observation": {
+      "singular_values": [
+        0.9999999999999952,
+        0.26261286571944525,
+        1.7469778790936306e-15,
+        5.614906847774806e-19
+      ],
+      "relative": [
+        1.0,
+        0.26261286571944653,
+        1.7469778790936389e-15,
+        5.614906847774833e-19
+      ],
+      "rank_at_1percent": 2,
+      "rank_at_5percent": 2,
+      "weakest_mode_xyz_edge_yaw": [
+        0.005804624939910115,
+        -0.9999778289275965,
+        -0.003263124661716188,
+        -1.1474674481886985e-16
+      ],
+      "yaw_length_scale_mm": 25.495097567963924,
+      "normal_count": 625
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "single_side",
+    "bump": true,
+    "robust": false,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      -0.37922552829911976,
+      -0.005295331382992674,
+      0.9481562432169478,
+      0.013962634015954644
+    ],
+    "affected_count": 81,
+    "translation_error_mm": 1.2007215689124244,
+    "yaw_error_deg": 3.975693351829396e-16,
+    "clean_surface_normal_rmse_mm": 0.7219834748323783,
+    "observation": {
+      "singular_values": [
+        0.9999999999999952,
+        0.26261286571944525,
+        1.7469778790936306e-15,
+        5.614906847774806e-19
+      ],
+      "relative": [
+        1.0,
+        0.26261286571944653,
+        1.7469778790936389e-15,
+        5.614906847774833e-19
+      ],
+      "rank_at_1percent": 2,
+      "rank_at_5percent": 2,
+      "weakest_mode_xyz_edge_yaw": [
+        0.005804624939910115,
+        -0.9999778289275965,
+        -0.003263124661716188,
+        -1.1474674481886985e-16
+      ],
+      "yaw_length_scale_mm": 25.495097567963924,
+      "normal_count": 625
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "single_side",
+    "bump": true,
+    "robust": true,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      -0.11774896496335635,
+      -0.0016441925528640443,
+      0.2944011094481965,
+      0.013962634015954687
+    ],
+    "affected_count": 81,
+    "translation_error_mm": 0.9595787622347596,
+    "yaw_error_deg": 2.882377680076312e-15,
+    "clean_surface_normal_rmse_mm": 0.01786764706138157,
+    "observation": {
+      "singular_values": [
+        0.9999999999999952,
+        0.26261286571944525,
+        1.7469778790936306e-15,
+        5.614906847774806e-19
+      ],
+      "relative": [
+        1.0,
+        0.26261286571944653,
+        1.7469778790936389e-15,
+        5.614906847774833e-19
+      ],
+      "rank_at_1percent": 2,
+      "rank_at_5percent": 2,
+      "weakest_mode_xyz_edge_yaw": [
+        0.005804624939910115,
+        -0.9999778289275965,
+        -0.003263124661716188,
+        -1.1474674481886985e-16
+      ],
+      "yaw_length_scale_mm": 25.495097567963924,
+      "normal_count": 625
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "two_sides",
+    "bump": false,
+    "robust": false,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.6942792125194093,
+      0.009694596561320086,
+      0.6000000000000001,
+      0.013962634015954637
+    ],
+    "affected_count": 0,
+    "translation_error_mm": 0.4097345358411235,
+    "yaw_error_deg": 0.0,
+    "clean_surface_normal_rmse_mm": 5.757408107625444e-16,
+    "observation": {
+      "singular_values": [
+        0.9284838410551377,
+        0.3713906763541028,
+        0.24403691477294515,
+        5.72121933572934e-17
+      ],
+      "relative": [
+        1.0,
+        0.3999969196362652,
+        0.26283377694071586,
+        6.161894351578261e-17
+      ],
+      "rank_at_1percent": 3,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.01396218033914543,
+        -0.9999025240093042,
+        -2.252215079467464e-18,
+        9.921992142773428e-17
+      ],
+      "yaw_length_scale_mm": 27.433556094680835,
+      "normal_count": 1250
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "two_sides",
+    "bump": false,
+    "robust": true,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.6942792125194094,
+      0.009694596561319551,
+      0.5999999999999996,
+      0.013962634015954633
+    ],
+    "affected_count": 0,
+    "translation_error_mm": 0.40973453584112296,
+    "yaw_error_deg": 1.987846675914698e-16,
+    "clean_surface_normal_rmse_mm": 4.780431263618802e-16,
+    "observation": {
+      "singular_values": [
+        0.9284838410551377,
+        0.3713906763541028,
+        0.24403691477294515,
+        5.72121933572934e-17
+      ],
+      "relative": [
+        1.0,
+        0.3999969196362652,
+        0.26283377694071586,
+        6.161894351578261e-17
+      ],
+      "rank_at_1percent": 3,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.01396218033914543,
+        -0.9999025240093042,
+        -2.252215079467464e-18,
+        9.921992142773428e-17
+      ],
+      "yaw_length_scale_mm": 27.433556094680835,
+      "normal_count": 1250
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "two_sides",
+    "bump": true,
+    "robust": false,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.6942792125194103,
+      0.0096945965613201,
+      1.2048000000000003,
+      0.013962633719160674
+    ],
+    "affected_count": 126,
+    "translation_error_mm": 0.7305240789056452,
+    "yaw_error_deg": 1.7005041445967984e-08,
+    "clean_surface_normal_rmse_mm": 0.5615427026474056,
+    "observation": {
+      "singular_values": [
+        0.9284838410551377,
+        0.3713906763541028,
+        0.24403691477294515,
+        5.72121933572934e-17
+      ],
+      "relative": [
+        1.0,
+        0.3999969196362652,
+        0.26283377694071586,
+        6.161894351578261e-17
+      ],
+      "rank_at_1percent": 3,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.01396218033914543,
+        -0.9999025240093042,
+        -2.252215079467464e-18,
+        9.921992142773428e-17
+      ],
+      "yaw_length_scale_mm": 27.433556094680835,
+      "normal_count": 1250
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "two_sides",
+    "bump": true,
+    "robust": true,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.6942792125216021,
+      0.009694596561352558,
+      0.6144882014042268,
+      0.013962634015962833
+    ],
+    "affected_count": 126,
+    "translation_error_mm": 0.4099906070154192,
+    "yaw_error_deg": 4.696287771848474e-13,
+    "clean_surface_normal_rmse_mm": 0.013451957296675797,
+    "observation": {
+      "singular_values": [
+        0.9284838410551377,
+        0.3713906763541028,
+        0.24403691477294515,
+        5.72121933572934e-17
+      ],
+      "relative": [
+        1.0,
+        0.3999969196362652,
+        0.26283377694071586,
+        6.161894351578261e-17
+      ],
+      "rank_at_1percent": 3,
+      "rank_at_5percent": 3,
+      "weakest_mode_xyz_edge_yaw": [
+        0.01396218033914543,
+        -0.9999025240093042,
+        -2.252215079467464e-18,
+        9.921992142773428e-17
+      ],
+      "yaw_length_scale_mm": 27.433556094680835,
+      "normal_count": 1250
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "three_patches",
+    "bump": false,
+    "robust": false,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "affected_count": 0,
+    "translation_error_mm": 0.0,
+    "yaw_error_deg": 0.0,
+    "clean_surface_normal_rmse_mm": 0.0,
+    "observation": {
+      "singular_values": [
+        0.7070378552525235,
+        0.5773502691896268,
+        0.577350269189626,
+        0.5773502691896238
+      ],
+      "relative": [
+        1.0,
+        0.8165761774996081,
+        0.8165761774996069,
+        0.8165761774996039
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -1.0,
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "yaw_length_scale_mm": 20.816659994661325,
+      "normal_count": 1875
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "three_patches",
+    "bump": false,
+    "robust": true,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "affected_count": 0,
+    "translation_error_mm": 0.0,
+    "yaw_error_deg": 0.0,
+    "clean_surface_normal_rmse_mm": 0.0,
+    "observation": {
+      "singular_values": [
+        0.7070378552525235,
+        0.5773502691896268,
+        0.577350269189626,
+        0.5773502691896238
+      ],
+      "relative": [
+        1.0,
+        0.8165761774996081,
+        0.8165761774996069,
+        0.8165761774996039
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -1.0,
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "yaw_length_scale_mm": 20.816659994661325,
+      "normal_count": 1875
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "three_patches",
+    "bump": true,
+    "robust": false,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.7,
+      -0.4000000000000001,
+      1.3776000000000004,
+      0.013962634015954637
+    ],
+    "affected_count": 81,
+    "translation_error_mm": 0.7776000000000004,
+    "yaw_error_deg": 0.0,
+    "clean_surface_normal_rmse_mm": 0.42819785005997735,
+    "observation": {
+      "singular_values": [
+        0.7070378552525235,
+        0.5773502691896268,
+        0.577350269189626,
+        0.5773502691896238
+      ],
+      "relative": [
+        1.0,
+        0.8165761774996081,
+        0.8165761774996069,
+        0.8165761774996039
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -1.0,
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "yaw_length_scale_mm": 20.816659994661325,
+      "normal_count": 1875
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  },
+  {
+    "scene": "three_patches",
+    "bump": true,
+    "robust": true,
+    "truth_mm_rad": [
+      0.7,
+      -0.4,
+      0.6,
+      0.013962634015954637
+    ],
+    "estimate_mm_rad": [
+      0.7,
+      -0.4,
+      0.6178676470637717,
+      0.013962634015954637
+    ],
+    "affected_count": 81,
+    "translation_error_mm": 0.017867647063771752,
+    "yaw_error_deg": 0.0,
+    "clean_surface_normal_rmse_mm": 0.009839105013294143,
+    "observation": {
+      "singular_values": [
+        0.7070378552525235,
+        0.5773502691896268,
+        0.577350269189626,
+        0.5773502691896238
+      ],
+      "relative": [
+        1.0,
+        0.8165761774996081,
+        0.8165761774996069,
+        0.8165761774996039
+      ],
+      "rank_at_1percent": 4,
+      "rank_at_5percent": 4,
+      "weakest_mode_xyz_edge_yaw": [
+        -1.0,
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "yaw_length_scale_mm": 20.816659994661325,
+      "normal_count": 1875
+    },
+    "note": "Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP."
+  }
+]

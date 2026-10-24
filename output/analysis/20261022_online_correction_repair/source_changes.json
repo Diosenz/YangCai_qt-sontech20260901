@@ -1,0 +1,161 @@
+{
+  "changed_file_count": 22,
+  "changed_files": [
+    {
+      "path": "Localization/src/LocalizationSurfaceValidation.cpp",
+      "sha256_before": "61FD066C24AB02D9BE21D86D2CD9B4D9E9EC78BAB2F5DDF0FBE9CD02821CA1B2",
+      "sha256_after": "58DC090C5D823DEF562B79E4F813EE2A159F8ADDA3F7D9AFF819E2D56FB603D3",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "UI/src/RuntimeWorkerAdapters.cpp",
+      "sha256_before": "0CCB241049A29D2B665908326A9A5A175050F7A7C0AA1BBBCAAF2607D2CEE91E",
+      "sha256_after": "0277D5447F22EA804CF22C6C2470B8F686B9CBF60FC77021536B3F4AF9B86A89",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "UI/src/RuntimeLocalRegistration.cpp",
+      "sha256_before": "09B30A5308CFF75035759EECFE132F32A8274D020B4E1AF9D6DB0847AE14B18A",
+      "sha256_after": "C1EAFE7A644B2C53C71B7C596020C603F11C203B5AE4E7470EC90D9258046EBC",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "UI/src/OnlineLocalRegistrationWorker.cpp",
+      "sha256_before": "5E2E57941164D8A58335F278B448BFDC23630204CE0F4CBE52D3D4B3E8A27752",
+      "sha256_after": "47ECB7953C0658FA0CDEF73987285ADECD2FAE81D96D423D98C9A99824A5885B",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+      "sha256_before": "137DBC09CA96F2F589326384ABD820B77CDDF2200A130E28A46B7A591279DEC1",
+      "sha256_after": "3806DB2F1904D66DEF001CBD1F3D1FD9AFB127259C9014EAB16011F377A6CECD",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "Localization/include/LocalizationSurfaceValidation.h",
+      "sha256_before": "C795574BE8F04ECCCB39A86B1D874471323E9BDAB3128F1B5FC01CEBE557019D",
+      "sha256_after": "61D778B8C65FC5B15F2458F3E1289EDA79A1965AE50312014D368BB863FE888B",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "docs/online_local_registration.md",
+      "sha256_before": "08CB27A81495C09577785A5DCBF8206E833CBD1A1E3AC00CA3C0ABB152DC1278",
+      "sha256_after": "134E70218EA2ED3D26AC7C67B3195E84AE1E9EA45D064808058F21FCC8885813",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "tests/test_localization_surface_validation.cpp",
+      "sha256_before": "790C2A51BD189CEA67FDFDA4B30EE7145A9C7D6F754B80A5F7E3BD68229CF373",
+      "sha256_after": "83D6F3D255BA9E40F513D82F35C44BBB50ABA2E724A3772A1B3BF3B3AC33F2BF",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "tests/test_online_correction_run_recorder.cpp",
+      "sha256_before": "CE1A16B1EDA784E5CA8F7C50B9205CDB81E46D1F326DB4EEFDBC494CC9B33848",
+      "sha256_after": "029AC97D368E2F846432073A4C248E39A21FD67428754BA9C78EEB2AB10A84D0",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "tests/test_online_seam_continuity.cpp",
+      "sha256_before": "6BDDA8B6F6587E296419AA187B630BCE25E69F85A600772017B5FA33C1E53DA7",
+      "sha256_after": "454E7ACBB2666E49532861FD6A332D7F165D639A65936C3836A270C649DADCF2",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "tests/test_online_local_surface_verification.cpp",
+      "sha256_before": "BEA39D1F235BE6C8EFFD7D1516CC0C0DCDB08ADC4C10DB71DDA952C8B39FD208",
+      "sha256_after": "239BA8DB488EC6522806DBB745D40E60C758F2DC76B119C96328EF0BD9C9D9A2",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "tests/test_online_local_registration_surface.cpp",
+      "sha256_before": "48BAD891E296A00BD86B9222894213A9595E42E6D0C8E6CA66809E5ED90AA72E",
+      "sha256_after": "7C27F4547D1FFB543A183D03F0AC7E3E851A2B548D7D20C196EF3189AABBB200",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "UI/include/OnlineLocalSurfaceVerification.h",
+      "sha256_before": "2E3A7D9166D6B522DD6E6E6BFB7B92A9EDE813FC43F2A7018D75C667DEA7262C",
+      "sha256_after": "28963A1E9B3333AA0FF0803E38F19932B878C785949776C8ABFA4917A620B0AD",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "tests/test_simulation_guided_seam.cpp",
+      "sha256_before": "9FAD42823092AB7E0CA175CFA744A9FD6C876559EDA0DA822C36870C88E10C48",
+      "sha256_after": "45C47FEA991957DA5C006B7E1F94BF5806476B17E67EB6123012BF40EEFD1040",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "UI/include/OnlineLocalRegistrationWorker.h",
+      "sha256_before": "3E12FD5AE8A37F36368F63D39B6C138896D68B5D41D48370ED0EF396AFB21533",
+      "sha256_after": "DE27074BB14C5111CE316B3F58D3AE87B61CB94E27E2A33A1B4C1341BC3CF079",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "tests/test_runtime_tracking_flow.cpp",
+      "sha256_before": "0829273B85314B70EC7FB18736CA443B82011C1F2D71BFCEC4108C54352CBAE9",
+      "sha256_after": "68D67B6860B803EA387F8991F85D01B9D459D27B477F04CA669632E70239685D",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "Vision/src/track/OnlineSeamContinuity.cpp",
+      "sha256_before": "4589B2D9C7EB886FC956BE03D90DADA4598BCDF252D3E66260404CDAF5E3933E",
+      "sha256_after": "C1F129D4BB7A839BF275C4B8C0B8020723752B0D1377C5D289EF02CF5ACD3B5C",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+      "sha256_before": "821263148A68C9FDA10414C795BC0687052A744109ECD149E71CB65468AD4E13",
+      "sha256_after": "B15AA125B9CEEE22502C3EC09C9EBC36B7FFC02E3B94C5A6666BE6F7EFB7446D",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "Vision/src/feature/SimulationGuidedSeamEstimator.cpp",
+      "sha256_before": "5DA5D127D9BA68856EBC3C52D129B785D21369CD2E17E2C7F0228F87A79ED893",
+      "sha256_after": "0D559FEC9C9A8EBCA469AA91EA64EB3932663D2ACC7DEA1561C8F1BDE9CBC1A4",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "Vision/include/track/OnlineSeamContinuity.h",
+      "sha256_before": "7FD553127348B058E08A363A29A585DA67587600F29B03804E1E1A3EABFA6418",
+      "sha256_after": "D0CF0D77800028599CBBC58C28260FDF295EE9E13A9F46E2C81EE4ADB90BBD05",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+      "sha256_before": "BBF68BE2D4BB7D53418DB7999BD1D2CB7B180608B4DB5F2BFABA6A2D06A6DF29",
+      "sha256_after": "70ED4C899CC43FEF28FC535EB53A80D7A3254942B7774FD4471A9FCF7AF0E26A",
+      "utf8_bom": true,
+      "utf8_valid": true
+    },
+    {
+      "path": "Vision/include/feature/SimulationGuidedSeamEstimator.h",
+      "sha256_before": "6687739065DB5C44522D774A4A9B0656466D8583407B4A1355E908C4EEDF351B",
+      "sha256_after": "C58486C23FAF937D3C0961E2EC2748DC75CA51DAB0C136D978E8D3356FA749A0",
+      "utf8_bom": true,
+      "utf8_valid": true
+    }
+  ],
+  "scope_violations": [],
+  "baseline_file_count": 462
+}

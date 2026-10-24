@@ -1,0 +1,24 @@
+{
+  "archive": "20261021_155225_278_session_1",
+  "candidate_count": 52,
+  "schema_versions": [
+    3
+  ],
+  "accepted_count": 24,
+  "rejected_count": 28,
+  "writeback_record_count": 19,
+  "verification_record_count": 19,
+  "verified_success_count": 19,
+  "rollback_attempted_count": 0,
+  "stability_enabled_count": 52,
+  "stability_evaluated_count": 25,
+  "stability_reject_count": 1,
+  "base_status_counts": {
+    "recorded_reject": 27,
+    "recorded_pass": 25
+  },
+  "evaluated_history_not_enforced_count": 25,
+  "evaluated_conflict_count": 7,
+  "raw_archive_replay_count": 416,
+  "raw_archive_replay_max_mm": 1.1572942644831711e-07
+}

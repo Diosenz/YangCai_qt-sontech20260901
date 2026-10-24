@@ -1,0 +1,62 @@
+{
+  "changed_file_count": 8,
+  "files": [
+    {
+      "path": "UI/include/RuntimeWorkerAdapters.h",
+      "sha256_before": "922d7ad70636268bfa2bda90bcb7cc276f196ce6b9c6bdbe41214f24b51b1e01",
+      "sha256_after": "6781270420701c15630724ab78632d2947ac69e6850b6a8f0cb7c53c6c1a1829",
+      "utf8": true,
+      "utf8_bom": true
+    },
+    {
+      "path": "UI/src/RuntimeWorkerAdapters.cpp",
+      "sha256_before": "0277d5447f22ea804cf22c6c2470b8f686b9cbf60fc77021536b3f4af9b86a89",
+      "sha256_after": "b67140cddf4e7ad7e3afcd01176bada8d180c13fdfad99ca525602793bbccc93",
+      "utf8": true,
+      "utf8_bom": true
+    },
+    {
+      "path": "UI/include/RuntimeCoordinator.h",
+      "sha256_before": "3d74335cc8a12b582c191dfbefe110170fd78a809da58e317d4ea0e4d04ebfd0",
+      "sha256_after": "6d85844ae64d8e19a0f0c4120699ae3432e2bf381e796a28712437cc1365ad97",
+      "utf8": true,
+      "utf8_bom": true
+    },
+    {
+      "path": "UI/src/RuntimeLocalRegistration.cpp",
+      "sha256_before": "c1eafe7a644b2c53c71b7c596020c603f11c203b5ae4e7470ec90d9258046ebc",
+      "sha256_after": "26bb64a324ae71904ff9201c390744054d4d242de2c067ed07be917195dbfa49",
+      "utf8": true,
+      "utf8_bom": true
+    },
+    {
+      "path": "UI/include/OnlineLocalRegistrationRecovery.h",
+      "sha256_before": "0914e20cc9c9e33db1b87784bf1eb16c2da21bad77354c5e764c348fed08d138",
+      "sha256_after": "688821da6f18474a4144b16b76d2baeba65b2ee0a7e240338a1b6c698d719905",
+      "utf8": true,
+      "utf8_bom": true
+    },
+    {
+      "path": "tests/test_local_registration_writeback_safety.cpp",
+      "sha256_before": "05d60e6f39206bf36ce28c5b2e146d6eaa20eb424f60fded52bd3773affa8d87",
+      "sha256_after": "3a5fb0a732662dcdcf3f033013b454d62990e967dba5f38c807086ed54f3c818",
+      "utf8": true,
+      "utf8_bom": true
+    },
+    {
+      "path": "tests/test_online_local_surface_verification.cpp",
+      "sha256_before": "239ba8db488ec6522806dbb745d40e60c758f2dc76b119c96328ef0bd9c9d9a2",
+      "sha256_after": "639c5c665aee4b2550e769e5d9f84ad463380cd8d58397980101c498d149e738",
+      "utf8": true,
+      "utf8_bom": true
+    },
+    {
+      "path": "docs/online_local_registration.md",
+      "sha256_before": "134e70218ea2ed3d26ac7c67b3195e84ae1e9ea45d064808058f21fcc8885813",
+      "sha256_after": "17bdad967a186282ca1c0f94aed219792a53c45789a25af60bbf2f16a28e31c8",
+      "utf8": true,
+      "utf8_bom": true
+    }
+  ],
+  "other_changes_since_previous_delivery": []
+}

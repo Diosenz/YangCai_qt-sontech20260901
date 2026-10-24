@@ -1,0 +1,110 @@
+{
+  "roots": [
+    "E:\\SontechWorks",
+    "E:\\SontechWorks - 20230222",
+    "E:\\SontechWorks - 20230407",
+    "E:\\SontechWorks - 副本",
+    "E:\\SontechWorks -20230615",
+    "E:\\SontechWorks-new",
+    "E:\\SontechWorks20230706",
+    "E:\\SW-20230214backup"
+  ],
+  "files": 210,
+  "unique_file_hashes": 52,
+  "unique_W_geometry": 25,
+  "parse_failures": [
+    "E:\\SontechWorks-new\\SontechWorks\\SWv1\\data\\Robotleadingdata\\WorkPiece\\20260610CHUFENGKOUFLIP_W.txt"
+  ],
+  "mappings": [
+    {
+      "root": "E:\\SontechWorks",
+      "file": "E:\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 13235,
+      "context": "\t\t\tbreak;\n\t\tcase 3:\n\t\tcase 4:\n\t\t\tworkpieceTeachTraj = \"20230529CHUFENGKOUFLIP\";\n\t\t\tbreak;\n\t\tcase 5:"
+    },
+    {
+      "root": "E:\\SontechWorks",
+      "file": "E:\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 13238,
+      "context": "\t\t\tworkpieceTeachTraj = \"20230529CHUFENGKOUFLIP\";\n\t\t\tbreak;\n\t\tcase 5:\n\t\t\tworkpieceTeachTraj = \"20230608CHUFENGKOU\";\n\t\t\tbreak;\n\t\tcase 6:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks_IBVS\\SWv1\\robotleadingDlg.cpp",
+      "line": 15593,
+      "context": "\t\t\tworkpieceTeachTraj = \"20240828PENZUI\";\n\t\t\tbreak;\n\t\tcase 3:\n\t\t\tworkpieceTeachTraj = \"20250112CHUFENGKOUFLIP\";  //\"20240523CHUFENGKOUFLIP\";\n\t\t\tbreak;\n\t\tcase 4:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks_IBVS\\SWv1\\robotleadingDlg.cpp",
+      "line": 15596,
+      "context": "\t\t\tworkpieceTeachTraj = \"20250112CHUFENGKOUFLIP\";  //\"20240523CHUFENGKOUFLIP\";\n\t\t\tbreak;\n\t\tcase 4:\n\t\t\tworkpieceTeachTraj = \"20250606CHUFENGKOU\";   //出风口正\n\t\t\tbreak;\n\t\tcase 5:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks_IBVS\\SWv1\\robotleadingDlg.cpp",
+      "line": 15599,
+      "context": "\t\t\tworkpieceTeachTraj = \"20250606CHUFENGKOU\";   //出风口正\n\t\t\tbreak;\n\t\tcase 5:\n\t\t\tworkpieceTeachTraj = \"20250606CHUFENGKOU\";   //出风口大反\n\t\t\tbreak;\n\t\tcase 6:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\robotleadingDlg.cpp",
+      "line": 16295,
+      "context": "\t\t\tworkpieceTeachTraj = \"20240828PENZUI\";\n\t\t\tbreak;\n\t\tcase 3:\n\t\t\tworkpieceTeachTraj = \"20250112CHUFENGKOUFLIP\";  //\"20240523CHUFENGKOUFLIP\";\n\t\t\tbreak;\n\t\tcase 4:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\robotleadingDlg.cpp",
+      "line": 16298,
+      "context": "\t\t\tworkpieceTeachTraj = \"20250112CHUFENGKOUFLIP\";  //\"20240523CHUFENGKOUFLIP\";\n\t\t\tbreak;\n\t\tcase 4:\n\t\t\tworkpieceTeachTraj = \"20260404CHUFENGKOU1\";   //出风口正 20260404CHUFENGKOU 20260308CHUFENGKOU\n\t\t\tbreak;\n\t\tcase 5:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks_Weld_Merge\\SWv1\\robotleadingDlg.cpp",
+      "line": 16301,
+      "context": "\t\t\tworkpieceTeachTraj = \"20260404CHUFENGKOU1\";   //出风口正 20260404CHUFENGKOU 20260308CHUFENGKOU\n\t\t\tbreak;\n\t\tcase 5:\n\t\t\tworkpieceTeachTraj = \"20250606CHUFENGKOU\";   //出风口大反\n\t\t\tbreak;\n\t\tcase 6:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 15273,
+      "context": "\t\t\tworkpieceTeachTraj = \"20240828PENZUI\";\n\t\t\tbreak;\n\t\tcase 3:\n\t\t\tworkpieceTeachTraj = \"20260327CHUFENGKOUFLIP\";  // \"20260319CHUFENGKOUFLIP\"\"20250112CHUFENGKOUFLIP\"\n\t\t\tbreak;\n\t\tcase 4:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 15276,
+      "context": "\t\t\tworkpieceTeachTraj = \"20260327CHUFENGKOUFLIP\";  // \"20260319CHUFENGKOUFLIP\"\"20250112CHUFENGKOUFLIP\"\n\t\t\tbreak;\n\t\tcase 4:\n\t\t\tworkpieceTeachTraj = \"20260308CHUFENGKOU\";   //出风口正 20250606CHUFENGKOU\n\t\t\tbreak;\n\t\tcase 5:"
+    },
+    {
+      "root": "E:\\SontechWorks-new",
+      "file": "E:\\SontechWorks-new\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 15279,
+      "context": "\t\t\tworkpieceTeachTraj = \"20260308CHUFENGKOU\";   //出风口正 20250606CHUFENGKOU\n\t\t\tbreak;\n\t\tcase 5:\n\t\t\tworkpieceTeachTraj = \"20250606CHUFENGKOU\";   //出风口大反\n\t\t\tbreak;\n\t\tcase 6:"
+    },
+    {
+      "root": "E:\\SontechWorks20230706",
+      "file": "E:\\SontechWorks20230706\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 13164,
+      "context": "\t\t\tworkpieceTeachTraj = \"20230511PENZUI\";\n\t\t\tbreak;\n\t\tcase 2:\n\t\t\tworkpieceTeachTraj = \"20230529CHUFENGKOUFLIP\";\n\t\t\tbreak;\n\t\tcase 3:"
+    },
+    {
+      "root": "E:\\SontechWorks20230706",
+      "file": "E:\\SontechWorks20230706\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 13167,
+      "context": "\t\t\tworkpieceTeachTraj = \"20230529CHUFENGKOUFLIP\";\n\t\t\tbreak;\n\t\tcase 3:\n\t\t\tworkpieceTeachTraj = \"20230608CHUFENGKOU\";\n\t\t\tbreak;\n\t\t\t/*\tcase 4:"
+    },
+    {
+      "root": "E:\\SontechWorks20230706",
+      "file": "E:\\SontechWorks20230706\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 13170,
+      "context": "\t\t\tworkpieceTeachTraj = \"20230608CHUFENGKOU\";\n\t\t\tbreak;\n\t\t\t/*\tcase 4:\n\t\t\t\t\tworkpieceTeachTraj = \"20230529CHUFENGKOUFLIP\";\n\t\t\t\t\tbreak;\n\t\t\t\tcase 5:"
+    },
+    {
+      "root": "E:\\SontechWorks20230706",
+      "file": "E:\\SontechWorks20230706\\SontechWorks\\SWv1\\robotleadingDlg.cpp",
+      "line": 13173,
+      "context": "\t\t\t\t\tworkpieceTeachTraj = \"20230529CHUFENGKOUFLIP\";\n\t\t\t\t\tbreak;\n\t\t\t\tcase 5:\n\t\t\t\t\tworkpieceTeachTraj = \"20230608CHUFENGKOU\";\n\t\t\t\t\tbreak;\n\t\t\t\tcase 6:"
+    }
+  ]
+}

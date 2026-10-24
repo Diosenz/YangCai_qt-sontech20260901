@@ -1,0 +1,352 @@
+"""Offline surface evidence study. Never imports runtime code or writes scene state.
+
+Field experiments use archived clouds only. The new solver is a NumPy
+point-to-plane prototype, not a replay of production PCL. Temporal train/test
+blocks share a short correlated window and are not independent ground truth.
+Synthetic cases have externally specified transforms and surface normals.
+"""
+from pathlib import Path
+import argparse
+import csv
+import hashlib
+import json
+import math
+import numpy as np
+
+
+class NumpyNearestIndex:
+    """Bounded brute-force neighbor search; no optional dependency required."""
+
+    def __init__(self, points):
+        self.points = np.asarray(points, dtype=float)
+
+    def query(self, points, k=1):
+        all_distances, all_indices = [], []
+        for start in range(0, len(points), 64):
+            delta = np.asarray(points[start:start + 64])[:, None, :] - self.points[None, :, :]
+            distances = np.einsum('ijk,ijk->ij', delta, delta)
+            if k == 1:
+                indices = np.argmin(distances, axis=1)
+                chosen = distances[np.arange(len(indices)), indices]
+            else:
+                indices = np.argpartition(distances, k - 1, axis=1)[:, :k]
+                chosen = np.take_along_axis(distances, indices, axis=1)
+            all_distances.append(np.sqrt(chosen))
+            all_indices.append(indices)
+        return np.concatenate(all_distances), np.concatenate(all_indices)
+
+ROOT = Path(__file__).resolve().parents[4]
+OUT = Path(__file__).resolve().parent
+ARCHIVE = ROOT / 'output/online_local_registration/20261021_155225_278_session_1'
+RNG = np.random.default_rng(20261022)
+
+
+def write_json(name, data):
+    (OUT / name).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+
+
+def sample(points, maximum=800):
+    a = np.asarray(points, dtype=float).reshape(-1, 3)
+    a = a[np.isfinite(a).all(axis=1)]
+    if len(a) > maximum:
+        a = a[np.linspace(0, len(a) - 1, maximum, dtype=int)]
+    return a
+
+
+def move(points, theta):
+    c, s = math.cos(theta[3]), math.sin(theta[3])
+    rot = np.array([[c, -s, 0], [s, c, 0], [0, 0, 1.]])
+    return points @ rot.T + theta[:3]
+
+
+def normals(points, k=16):
+    _, indices = NumpyNearestIndex(points).query(points, k=min(k, len(points)))
+    neighbors = points[indices]
+    centered = neighbors - neighbors.mean(axis=1, keepdims=True)
+    cov = np.einsum('nki,nkj->nij', centered, centered)
+    values, vectors = np.linalg.eigh(cov)
+    stable = (values[:, 1] > 1e-5) & (values[:, 0] / np.maximum(values[:, 1], 1e-12) < .3)
+    return vectors[:, :, 0], stable
+
+
+def jacobian(points, ns, origin, scale):
+    lever = points - origin
+    yaw = (ns[:, 1] * lever[:, 0] - ns[:, 0] * lever[:, 1]) / scale
+    return np.column_stack([ns, yaw])
+
+
+def spectrum(points, ns):
+    origin = points.mean(axis=0)
+    scale = max(1., np.sqrt(np.mean(np.sum((points[:, :2] - origin[:2]) ** 2, axis=1))))
+    j = jacobian(points, ns, origin, scale)
+    _, singular, vt = np.linalg.svd(j / math.sqrt(len(j)), full_matrices=False)
+    ratio = singular / max(singular[0], 1e-12)
+    return dict(singular_values=singular.tolist(), relative=ratio.tolist(),
+                rank_at_1percent=int(np.sum(ratio > .01)),
+                rank_at_5percent=int(np.sum(ratio > .05)),
+                weakest_mode_xyz_edge_yaw=vt[-1].tolist(),
+                yaw_length_scale_mm=float(scale), normal_count=len(ns))
+
+
+def nn_stats(real, virtual):
+    d1, _ = NumpyNearestIndex(virtual).query(real)
+    d2, _ = NumpyNearestIndex(real).query(virtual)
+    return dict(mean_real_to_virtual_mm=float(d1.mean()),
+                mean_virtual_to_real_mm=float(d2.mean()),
+                symmetric_mean_mm=float((d1.mean() + d2.mean()) / 2),
+                p90_real_to_virtual_mm=float(np.quantile(d1, .9)),
+                real_coverage_3mm=float(np.mean(d1 <= 3)),
+                virtual_coverage_3mm=float(np.mean(d2 <= 3)))
+
+
+def field_fit(reference, real):
+    """Regularized nearest-neighbor prototype, without explicit weak-mode freezing.
+
+    Regularization stabilizes numerical solutions but does not supply new evidence.
+    Reported field score is geometry consistency, never pose accuracy.
+    """
+    ns, stable = normals(real)
+    tree = NumpyNearestIndex(real)
+    theta = np.zeros(4)
+    final_count = 0
+    for iteration in range(20):
+        transformed = move(reference, theta)
+        distances, ix = tree.query(transformed)
+        good = stable[ix] & (distances <= 10)
+        if np.sum(good) < 30:
+            return theta, dict(status='insufficient_correspondences', count=int(np.sum(good)))
+        q, target, n = transformed[good], real[ix[good]], ns[ix[good]]
+        residual = np.sum(n * (q - target), axis=1)
+        # Trim strong local clutter, retaining 80% of current correspondences.
+        keep = np.abs(residual) <= max(.15, np.quantile(np.abs(residual), .8))
+        q, n, residual = q[keep], n[keep], residual[keep]
+        j = np.column_stack([n, n[:, 1] * (q[:, 0] - theta[0]) - n[:, 0] * (q[:, 1] - theta[1])])
+        weights = np.minimum(1., .3 / np.maximum(np.abs(residual), 1e-12))
+        a, b = j * np.sqrt(weights[:, None]), -residual * np.sqrt(weights)
+        # Translation prior 0 and small yaw prior are explicit regularization.
+        a = np.vstack([a, np.diag([.1, .1, .1, 3.])])
+        b = np.r_[b, -np.array([.1, .1, .1, 3.]) * theta]
+        step = np.linalg.lstsq(a, b, rcond=1e-8)[0]
+        step[:3] = np.clip(step[:3], -1., 1.)
+        step[3] = np.clip(step[3], -.01, .01)
+        theta += step
+        final_count = len(q)
+        if np.linalg.norm(step) < 1e-5:
+            break
+    return theta, dict(status='completed', count=final_count, iterations=iteration + 1)
+
+
+def archived_cases():
+    result = []
+    hashes = {}
+    for file in sorted(ARCHIVE.glob('*.json')):
+        if any(x in file.name for x in ['.verified.', '.writeback.', '.rollback.']):
+            continue
+        obj = json.loads(file.read_text(encoding='utf-8-sig'))
+        hashes[str(file.relative_to(ROOT))] = hashlib.sha256(file.read_bytes()).hexdigest()
+        frames = obj['raw_frames']
+        # First six vs last two frames for eight-frame windows; never random dense split.
+        split = max(2, len(frames) - 2)
+        train, holdout = frames[:split], frames[split:]
+        real = sample(np.concatenate([f['raw_real_parent_mm'] for f in train]))
+        ref = sample(np.concatenate([f['raw_virtual_parent_mm'] for f in train]))
+        test_real = sample(np.concatenate([f['raw_real_parent_mm'] for f in holdout]))
+        test_ref = sample(np.concatenate([f['raw_virtual_parent_mm'] for f in holdout]))
+        n, stable = normals(ref)
+        geom = spectrum(ref[stable], n[stable])
+        theta, fit = field_fit(ref, real)
+        train_baseline = nn_stats(real, ref)
+        train_fitted = nn_stats(real, move(ref, theta))
+        baseline, fitted = nn_stats(test_real, test_ref), nn_stats(test_real, move(test_ref, theta))
+        recorded = np.array(obj['virtual_to_real_row_major']).reshape(4, 4)
+        rec_cloud = test_ref @ recorded[:3, :3].T + recorded[:3, 3]
+        recorded_stats = nn_stats(test_real, rec_cloud)
+        result.append(dict(frame_id=int(obj['frame_id']),
+            original_accepted=bool(obj['accepted_before_archive']),
+            frame_count=len(frames), train_frame_ids=[f['frame_id'] for f in train],
+            holdout_frame_ids=[f['frame_id'] for f in holdout],
+            all_independent_weld_points_valid=all(f['independent']['valid'] for f in frames),
+            model_identity_verified=all(f['evidence_context'].get('geometry_correspondence_verified', False) for f in frames),
+            geometry=geom, prototype_fit=fit,
+            training_baseline=train_baseline, training_after=train_fitted,
+            training_symmetric_gain_mm=train_baseline['symmetric_mean_mm'] - train_fitted['symmetric_mean_mm'],
+            prototype_theta_mm_rad=theta.tolist(), baseline=baseline,
+            temporal_holdout=fitted, recorded_all_frames_candidate_block_diagnostic=recorded_stats,
+            holdout_improved=fitted['symmetric_mean_mm'] < baseline['symmetric_mean_mm'],
+            symmetric_gain_mm=baseline['symmetric_mean_mm'] - fitted['symmetric_mean_mm']))
+    write_json('field_cases.json', result)
+    write_json('input_hashes.json', hashes)
+    columns = ['frame_id', 'original_accepted', 'rank_1percent', 'rank_5percent',
+               'weakest_relative_singular', 'holdout_before_mm', 'holdout_after_mm',
+               'holdout_gain_mm', 'training_gain_mm', 'fit_status', 'all_weld_points_valid']
+    with (OUT / 'field_metrics.csv').open('w', encoding='utf-8-sig', newline='') as f:
+        writer = csv.DictWriter(f, columns)
+        writer.writeheader()
+        for r in result:
+            writer.writerow(dict(frame_id=r['frame_id'], original_accepted=r['original_accepted'],
+                rank_1percent=r['geometry']['rank_at_1percent'], rank_5percent=r['geometry']['rank_at_5percent'],
+                weakest_relative_singular=r['geometry']['relative'][-1],
+                holdout_before_mm=r['baseline']['symmetric_mean_mm'],
+                holdout_after_mm=r['temporal_holdout']['symmetric_mean_mm'],
+                holdout_gain_mm=r['symmetric_gain_mm'], fit_status=r['prototype_fit']['status'],
+                training_gain_mm=r['training_symmetric_gain_mm'],
+                all_weld_points_valid=r['all_independent_weld_points_valid']))
+    return result
+
+
+def synthetic_scene(kind):
+    grid = np.linspace(-30, 30, 25)
+    u, v = np.meshgrid(grid, grid)
+    u, v = u.ravel(), v.ravel()
+    if kind == 'plane':
+        return np.c_[u, v, u * 0], np.tile([0., 0., 1.], (len(u), 1))
+    if kind == 'single_side':
+        return np.c_[u, v, .4 * u], np.tile(np.array([-.4, 0, 1.]) / np.sqrt(1.16), (len(u), 1))
+    if kind == 'two_sides':
+        u = np.abs(u) + 3
+        p = np.r_[np.c_[-u, v, -.4 * u], np.c_[u, v, -.4 * u]]
+        n = np.r_[np.tile(np.array([-.4, 0, 1.]) / np.sqrt(1.16), (len(u), 1)),
+                  np.tile(np.array([.4, 0, 1.]) / np.sqrt(1.16), (len(u), 1))]
+        return p, n
+    # Three nonparallel reference patches. They represent added usable geometry,
+    # not an assertion that the latest real workpiece has these patches.
+    p = np.r_[np.c_[u, v, u * 0], np.c_[u * 0, u, v], np.c_[u, u * 0, v]]
+    n = np.r_[np.tile([0., 0., 1.], (len(u), 1)), np.tile([1., 0., 0.], (len(u), 1)), np.tile([0., 1., 0.], (len(u), 1))]
+    return p, n
+
+
+def synthetic_solve(ref, real, ns, robust):
+    theta = np.zeros(4)
+    for _ in range(30):
+        q = move(ref, theta)
+        residual = np.sum(ns * (q - real), axis=1)
+        j = np.column_stack([ns, ns[:, 1] * (q[:, 0] - theta[0]) - ns[:, 0] * (q[:, 1] - theta[1])])
+        weights = np.minimum(1., .12 / np.maximum(np.abs(residual), 1e-12)) if robust else np.ones(len(q))
+        a, b = j * np.sqrt(weights[:, None]), -residual * np.sqrt(weights)
+        step = np.linalg.lstsq(a, b, rcond=1e-6)[0]
+        theta += step
+        if np.linalg.norm(step) < 1e-8:
+            break
+    return theta
+
+
+def synthetic_cases():
+    truth = np.array([.7, -.4, .6, np.deg2rad(.8)])
+    rows = []
+    for kind in ['plane', 'single_side', 'two_sides', 'three_patches']:
+        ref, ns = synthetic_scene(kind)
+        # Analytic normal rotation shares only known synthetic surface identity.
+        ns = move(ns, np.r_[np.zeros(3), truth[3]])
+        clean = move(ref, truth)
+        for bump in [False, True]:
+            real = clean.copy()
+            if bump:
+                affected = (np.abs(ref[:, 0]) < 11) & (np.abs(ref[:, 1]) < 11) & (ns[:, 2] > .8)
+                real[affected, 2] += 6.
+            else:
+                affected = np.zeros(len(ref), dtype=bool)
+            for robust in [False, True]:
+                theta = synthetic_solve(ref, real, ns, robust)
+                moved = move(ref, theta)
+                residual = np.abs(np.sum(ns * (moved - clean), axis=1))
+                cleanmask = ~affected
+                row = dict(scene=kind, bump=bump, robust=robust, truth_mm_rad=truth.tolist(),
+                    estimate_mm_rad=theta.tolist(), affected_count=int(np.sum(affected)),
+                    translation_error_mm=float(np.linalg.norm(theta[:3] - truth[:3])),
+                    yaw_error_deg=float(abs(np.rad2deg(theta[3] - truth[3]))),
+                    clean_surface_normal_rmse_mm=float(np.sqrt(np.mean(residual[cleanmask] ** 2))),
+                    observation=spectrum(ref, ns),
+                    note='Known correspondence and analytic normals; tests identifiability/outlier handling, not image segmentation or full ICP.')
+                rows.append(row)
+    write_json('synthetic_cases.json', rows)
+    # Specific independent assertions distinguish geometric fit from full pose.
+    clear = next(r for r in rows if r['scene'] == 'three_patches' and not r['bump'] and r['robust'])
+    plane = next(r for r in rows if r['scene'] == 'plane' and not r['bump'] and r['robust'])
+    two = next(r for r in rows if r['scene'] == 'two_sides' and not r['bump'] and r['robust'])
+    robust = next(r for r in rows if r['scene'] == 'three_patches' and r['bump'] and r['robust'])
+    plain = next(r for r in rows if r['scene'] == 'three_patches' and r['bump'] and not r['robust'])
+    checks = dict(full_geometry_known_transform=clear['translation_error_mm'] < .01 and clear['yaw_error_deg'] < .01,
+        plane_has_nullspace=plane['observation']['rank_at_1percent'] == 1 and plane['translation_error_mm'] > .5,
+        two_sides_still_has_tangential_nullspace=two['observation']['rank_at_1percent'] == 3 and abs(two['estimate_mm_rad'][1]) < .01,
+        robust_local_bump_reduces_pose_bias=robust['translation_error_mm'] < .1 and robust['translation_error_mm'] < plain['translation_error_mm'] * .3)
+    if not all(checks.values()):
+        raise RuntimeError(checks)
+    return rows, checks
+
+
+def main():
+    global OUT
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', type=Path,
+                        help='New result directory; an existing path is rejected. Default: script directory.')
+    args = parser.parse_args()
+    if args.output_dir is not None:
+        requested = args.output_dir.resolve()
+        if requested.exists():
+            parser.error('--output-dir must not exist: ' + str(requested))
+        requested.mkdir(parents=True, exist_ok=False)
+        OUT = requested
+    fields = archived_cases()
+    synthetic, checks = synthetic_cases()
+    summary = dict(scope='Offline prototype only; no production source edits, PCL/MSVC build, runtime, robot or scene commands.',
+        reproduction=dict(command='python validate_surface.py --output-dir <new-directory>',
+                          output_directory=str(OUT), existing_directory_policy='Explicit --output-dir must not exist; omitted argument preserves default script-directory behavior.',
+                          script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()),
+        field_candidate_count=len(fields),
+        temporal_split='First N-2 raw frames fit; final 2 frames evaluate. Spatial density is bounded, no random point split.',
+        all_archived_windows_have_valid_weld_points=all(r['all_independent_weld_points_valid'] for r in fields),
+        any_verified_material_correspondence=any(r['model_identity_verified'] for r in fields),
+        rank_counts_at_1percent={str(k): sum(r['geometry']['rank_at_1percent'] == k for r in fields) for k in range(1, 5)},
+        rank_counts_at_5percent={str(k): sum(r['geometry']['rank_at_5percent'] == k for r in fields) for k in range(1, 5)},
+        prototype_completed=sum(r['prototype_fit']['status'] == 'completed' for r in fields),
+        temporal_holdout_improved_count=sum(r['holdout_improved'] for r in fields),
+        training_symmetric_improved_count=sum(r['training_symmetric_gain_mm'] > 0 for r in fields),
+        training_improved_but_holdout_worsened_count=sum(r['training_symmetric_gain_mm'] > 0 and not r['holdout_improved'] for r in fields),
+        training_gain_mm_quantiles=np.quantile([r['training_symmetric_gain_mm'] for r in fields], [0, .25, .5, .75, 1]).tolist(),
+        recorded_all_frames_candidate_block_improved_count=sum(r['recorded_all_frames_candidate_block_diagnostic']['symmetric_mean_mm'] < r['baseline']['symmetric_mean_mm'] for r in fields),
+        recorded_block_score_is_not_holdout=True,
+        symmetric_gain_mm_quantiles=np.quantile([r['symmetric_gain_mm'] for r in fields], [0, .25, .5, .75, 1]).tolist(),
+        synthetic_assertions=checks,
+        decision='Do not connect this exploratory solver or bypass weld-point gates in production. Establish surface extraction/identity, observable-subspace updates and prospective surface validation first.',
+        limitations=['Field archives were collected only after seam observation passed; no claim that missing-seam frames provide usable surfaces.',
+            'Point-to-plane local normals and threshold ranks are diagnostic; clutter or a narrow scan strip can create spurious apparent rank.',
+            'Neighbor frame holdout tests short-range consistency and is temporally correlated; not physical weld truth or long-horizon closed loop.',
+            'Both train and heldout virtual laser slices are rigidly transformed as an approximation, not re-intersected/rendered for each candidate pose.',
+            'Finite stride sampling caps each split at 800 points. The simplified solver uses local PCA normals, trim/Huber regularization and per-step limits, with no explicit unobservable-mode freezing or line-search guarantee.',
+            'Recorded production transforms used all frames; their final-two-frame score is explicitly not a holdout test.',
+            'Synthetic normals and correspondence identities are supplied; image extraction, branch selection and correspondence ambiguity remain unvalidated.',
+            'No fixed physical acceptance thresholds are approved by these experiments.'])
+    write_json('summary.json', summary)
+    couplings = [
+        dict(boundary='主视觉观测输出', file='UI/src/RuntimeWorkerAdapters.cpp', line=1483,
+             current='独立点取原图refinement.point；与最终融合/预测点隔离。',
+             proposed='保留独立实测点可选字段；新增母材表面观测、源图支持与置信/退化证据，禁止把预测标成独立实测。'),
+        dict(boundary='调度与清窗', file='UI/src/RuntimeLocalRegistration.cpp', line=401,
+             current='任一独立焊点失效会清窗、升代次、撤销在途候选，并清lastVerifiedPose/历史。',
+             proposed='按表面观测的同帧性、身份、时效、可用性撤销表面任务；单个接缝失效不清除仍有效表面窗口。场景/会话/状态失效仍严格撤销。'),
+        dict(boundary='表面worker入口', file='UI/src/OnlineLocalRegistrationWorker.cpp', line=238,
+             current='表面Steger提取之前要求独立真实/仿真焊点；processClouds生产入口再次要求。',
+             proposed='表面观测请求与接缝观测分开；Steger与三维投影保留仿真走廊引导，先评价母材支持、反光、凸起/局部异常。'),
+        dict(boundary='求解与候选验收', file='UI/src/OnlineLocalRegistrationWorker.cpp', line=427,
+             current='PCA仅排除共线；求解XYZ+Rz；逐帧焊点误差必需，稳定收益验收也只针对焊点。',
+             proposed='增加几何约束秩及弱方向诊断；约束不足的方向保持上一可信值；采用空间/时间分块表面留出、双向覆盖、稳健残差、局部异常比例与多解检查。焊点存在时追加检查而非始终唯一凭据。'),
+        dict(boundary='关键点位移预算', file='UI/src/RuntimeLocalRegistration.cpp', line=740,
+             current='事务关键点只由independent.virtualWeldPoint供给，空集合在checkLocalRegistrationCandidate拒绝。',
+             proposed='用身份明确且覆盖当前有效母材区域的模型关键点集检查单步及累计位移；不可用无身份的临时最近邻冒充材料关键点，原单步/累计预算保留。'),
+        dict(boundary='写回后新帧验证', file='UI/src/RuntimeLocalRegistration.cpp', line=568,
+             current='只观察独立焊点；3坏帧或5秒超时恢复并暂停自动更新。',
+             proposed='独立表面新帧验证与可选焊点验证并列；新仿真查询必须按写回后实际位姿与机器人状态重算，旧交点的逆刚体变换不能当旧场景同激光平面重渲染。'),
+        dict(boundary='回读/恢复/归档', file='UI/src/RuntimeWorkerAdapters.cpp', line=1945,
+             current='确认场景/对象/相对位姿/代次及累计预算；已发送事务不可撤回。',
+             proposed='保留事务安全条件，追加表面验证状态、来源、观测方向/留出结果。表面算法改善不改变运动许可或自动恢复设备规则。'),
+    ]
+    write_json('wiring_review.json', dict(status='proposal_only', couplings=couplings,
+        unavailable_evidence=['No archived raw surface windows during the 512-frame geometry-invalid run.',
+                              'No verified CAD material identity or weld segment identity in the 52 archived windows.',
+                              'DigitalTwin localPointCloud_mm DTO field is not populated by current RobotSim service.'],
+        owner_boundary='Vision候选提取属其负责人协作范围；Localization负责定位/几何验收；DigitalTwin负责参考/事务；UI仅装配、调度和展示。不得把新求解流程塞入UI。'))
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+
+if __name__ == '__main__':
+    main()

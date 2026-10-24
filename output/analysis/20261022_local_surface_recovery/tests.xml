@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="5"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="9"
+	timestamp="2026-10-22T15:28:04"
+	>
+	<testcase name="i2r_rlc_online_local_registration_surface_tests" classname="i2r_rlc_online_local_registration_surface_tests" time="7.89917" status="run">
+		<properties/>
+		<system-out>PASS: production surface-only training/holdout and schema4 evidence
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_surface_verification_tests" classname="i2r_rlc_online_local_surface_verification_tests" time="0.0537702" status="run">
+		<properties/>
+		<system-out>PASS: online local surface verification tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_local_registration_writeback_safety_tests" classname="i2r_rlc_local_registration_writeback_safety_tests" time="0.195379" status="run">
+		<properties/>
+		<system-out>PASS: local registration writeback safety tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_correction_robot_sim_online_frame_sync_tests" classname="i2r_rlc_correction_robot_sim_online_frame_sync_tests" time="2.32491" status="run">
+		<properties/>
+		<system-out>PASS: online correction RobotSim frame sync tests; frame mismatch=0, max current=1, max pending=1, post-stop query=0, old-session route=0, stale observation reuse=0
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_localization_surface_validation_tests" classname="i2r_rlc_localization_surface_validation_tests" time="7.1404" status="run">
+		<properties/>
+		<system-out>PASS: surface subspace projection and heldout validation
+</system-out>
+	</testcase>
+</testsuite>

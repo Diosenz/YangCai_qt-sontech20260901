@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-22",
+  "phase": "offline_design_review_before_prototype_review",
+  "scope": "只读生产代码，新增review目录证据；不构建、不调用设备、不使用鼠标、不删除文件",
+  "adopted_user_requirement": "经过预焊点沿原接缝连续走向跨过凸起；不要求在预焊点处强找准确折线交点。",
+  "conclusion": "两条观测链方向成立；移除单点门槛必须同时补齐表面证据验收、可观测性、后验和位姿版本，不能只将requireIndependentObservation置false。",
+  "findings": [
+    {
+      "id": "R1",
+      "kind": "required_implementation_boundary",
+      "claim": "焊点耦合贯穿coordinator门控、worker输入/逐帧收益验收、写回关键点、后验与历史晋升，只放开入口会继续卡住或绕过现有验收。",
+      "evidence": ["UI/src/RuntimeLocalRegistration.cpp:401", "UI/src/RuntimeLocalRegistration.cpp:456", "UI/src/OnlineLocalRegistrationWorker.cpp:238", "UI/src/OnlineLocalRegistrationWorker.cpp:495", "UI/src/OnlineLocalRegistrationWorker.cpp:523", "UI/src/RuntimeLocalRegistration.cpp:740", "UI/src/RuntimeLocalRegistration.cpp:579"],
+      "required_action": "使用显式证据模式：焊点可用则交叉检查；焊点缺失但表面可用时使用表面专属验收和后验；无新真实证据则不得产生测量驱动更新。保持事务身份、代次、时效、回读和累计限幅。"
+    },
+    {
+      "id": "R2",
+      "kind": "self_validation_risk",
+      "claim": "仿真可参与原图候选筛选，但筛选结果和拟合/留出可能共享同一先验选择偏差。模型估计接缝不能回流为模型位姿正确的独立证据。",
+      "evidence": ["UI/src/RuntimeWorkerAdapters.cpp:1626", "UI/src/RuntimeWorkerAdapters.cpp:1632", "UI/src/RuntimeWorkerAdapters.cpp:1484"],
+      "required_action": "记录原图支撑、竞争候选及歧义程度、候选生成位姿版本、模型依赖程度。用未参与求解的区域/新帧作交叉检查并检查原图，不将其称物理真值或统计独立证明。"
+    },
+    {
+      "id": "R3",
+      "kind": "geometric_counterexample",
+      "claim": "固定激光平面与移动模型的交点不是固定材料点。变换旧扫描线或逆变换新焊点不等价于另一个模型位姿重新求交。",
+      "evidence": ["UI/include/OnlineLocalRegistrationVerification.h:44", "UI/src/OnlineLocalRegistrationWorker.cpp:500", "review_math_results.json:laser_intersection_is_not_material_point"],
+      "required_action": "冻结候选变换云的结果仅作近似诊断。写回后用实际新帧和当前仿真重算参考验证；需要旧位姿反事实时真正重算，或将旧位姿比较明确降为近似，不能冒充重渲染。"
+    },
+    {
+      "id": "R4",
+      "kind": "observability_counterexample",
+      "claim": "PCA排近共线、双向覆盖和低残差不能证明XYZ+Rz全可观测。平面仅法向可约束，沿缝拉伸的双V面仍可能缺少沿缝平移约束。",
+      "evidence": ["UI/src/OnlineLocalRegistrationWorker.cpp:52", "UI/src/OnlineLocalRegistrationWorker.cpp:427", "UI/src/OnlineLocalRegistrationWorker.cpp:475", "review_math_results.json:surface_observability"],
+      "required_action": "按当前几何检查优化自由度的敏感度/秩；只释放被真实表面支持的方向，弱方向保持。不得把有限采样边界的最近邻误差当作真实接缝方向身份。"
+    },
+    {
+      "id": "R5",
+      "kind": "state_and_coordinate_boundary",
+      "claim": "当前continuity保存像素偏差且接口没有工件位姿版本。位姿修正后可能继续累加已被位姿吸收的偏差。当前仅在参考跳变大于25px时复位。",
+      "evidence": ["Vision/src/track/OnlineSeamContinuity.cpp:42", "Vision/src/track/OnlineSeamContinuity.cpp:43", "Vision/src/track/OnlineSeamContinuity.cpp:92", "Vision/include/track/OnlineSeamContinuity.h:33", "review_math_results.json:global_and_local_compensation"],
+      "required_action": "工件位姿版本与局部补偿版本绑定。全局位姿晋升后转换或重估局部残差；跨预焊点补偿保持在同一材料/路径语义，不能长期固定屏幕像素偏移。"
+    },
+    {
+      "id": "R6",
+      "kind": "availability_vs_correctness",
+      "claim": "当前预测输出仅检查在图内，无退化时长/跨越距离上限。此前测试维持400帧输出只证明连续性。",
+      "evidence": ["Vision/src/track/OnlineSeamContinuity.cpp:65", "Vision/src/track/OnlineSeamContinuity.cpp:79", "Vision/src/track/OnlineSeamContinuity.cpp:94", "tests/test_online_seam_continuity.cpp:25"],
+      "required_action": "预焊点估计/纯预测显式区分；记录最后真实证据年龄、可见母材支持、跨越距离与不确定度。完全失去实测时停止新位姿求解。控制端到期动作属于Control负责人协作事项，不能默认改为自动停机或无限预测。"
+    },
+    {
+      "id": "R7",
+      "kind": "model_identity_limit",
+      "claim": "当前DTO通常seamIndex=-1，只有局部仿真激光折线和单个焊缝交点，不能据此证明任意多焊缝分岔的材料对应。",
+      "evidence": ["DigitalTwin/include/DigitalTwinVisionTypes.h:25", "DigitalTwin/include/DigitalTwinVisionTypes.h:60", "DigitalTwin/src/RobotSimDigitalTwinService.cpp:281", "DigitalTwin/src/RobotSimDigitalTwinService.cpp:305"],
+      "required_action": "首版限制为已选工件/当前接缝局部邻域。未识别的分岔输出歧义，不虚构ID，不自动更改RobotSim协议。"
+    }
+  ],
+  "additional_reference_gate": {
+    "claim": "DigitalTwinVisionTypes.makeVisionLaserObservation当前valid同时要求至少2个仿真激光图像点和仿真焊缝图像点；表面入口仍使用这一共用valid。",
+    "evidence": ["DigitalTwin/include/DigitalTwinVisionTypes.h:120", "DigitalTwin/include/DigitalTwinVisionTypes.h:127", "UI/include/RuntimeTrackingTypes.h:165", "UI/src/OnlineLocalRegistrationWorker.cpp:233"],
+    "required_boundary": "区分surfaceReferenceValid和seamReferenceValid；本次场景仿真焊点有值，首版可以明确依赖该前提，但不能宣称表面支路已完全不依赖仿真焊点。"
+  },
+  "minimum_complete_scope": {
+    "Vision_owner_collaboration": "候选及原图支撑/多折线适配，输出接缝测量或模型估计的来源；不承载定位求解。",
+    "Localization": "表面配准、异常区权重、可观测性、留出评估，公开值对象不暴露PCL。",
+    "DigitalTwin": "同帧参考与位姿版本，保持现有安全事务和读回；不要求改RobotSim。",
+    "UI_runtime_boundary": "分别调度接缝与表面观测，保持有界worker、状态快照和归档，不在UI线程求解。",
+    "Control_owner_collaboration_if_needed": "预测预算耗尽时的控制行为及来源消费；当前离线阶段不改。"
+  },
+  "required_counterexamples": [
+    "强反光比真实条纹更亮且接近仿真；错误仿真先验把另一条纹排为首选",
+    "预焊凸起遮住交点但两侧母材可见；目标保持名义接缝，不跟凸起",
+    "多折点含真实接缝和额外反光折点；两个候选得分相近保持歧义",
+    "完全遮挡时不得增加真实观测数或生成表面更新",
+    "单平面与双V拉伸表面分别保持不可观测方向",
+    "候选拟合改善而留出区域恶化；不许仅以拟合残差写回",
+    "工件位姿更新后局部偏差重新基准化，不能重复补偿",
+    "激光平面移动/工件移动导致交点材料位置改变，不沿用固定材料身份",
+    "相同frame但旧位姿版本或旧session结果必须拒绝；短时缺焊点不应销毁仍有效表面证据",
+    "写回后曝光的新帧无焊点但有可信母材时表面后验可完成；无可信表面时不得伪造Verified"
+  ],
+  "validation_status": "解析合成反例8个断言通过；等待两路离线原型输出，尚未完成原型独立审查。"
+}

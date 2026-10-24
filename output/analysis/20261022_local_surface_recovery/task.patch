@@ -1,0 +1,863 @@
+--- before/docs/online_local_registration.md
++++ after/docs/online_local_registration.md
+@@ -146,7 +146,7 @@
+ 
+ 成功 SET_POSE 回读只进入待验证状态，保持写入代次并暂停追加局部修正。仅使用写回完成后曝光的不同新帧，按同帧真实原始焊点与仿真三维焊点检查：当前误差应在独立上限内，且不比将本次修正取逆得到的旧位姿同帧对照恶化超过容差。该对照不是重新渲染旧场景的真值重放；不同场景下仿真激光交点可能变化，因此仍需现场效果复核。
+ 
+-连续3份合格新帧后，worker重新读取场景位姿，确认仍等于本次目标后晋升为已验证位姿，再清窗升代继续。连续3份失效/恶化观测或5秒未能确认时，只在会话、代次、活动机器人状态、场景修订、工件/父级/参考对象以及当前相对位姿仍匹配本次目标的条件下，尝试恢复上次可信位姿并回读。恢复成功后仍暂停本会话自动更新，避免重复错误匹配；恢复结果未知禁止重复恢复。
++连续3份合格新帧后，worker重新读取场景位姿，确认仍等于本次目标后晋升为已验证位姿，再清窗升代继续。连续3份失效/恶化观测或5秒未能确认时，只在会话、代次、活动机器人状态、场景修订、工件/父级/参考对象以及当前相对位姿仍匹配本次目标的条件下，尝试恢复上次可信位姿并回读。2026-10-22 起，恢复指令、回读和事务归档均成功后，保留上一已验证位姿、清空旧窗口/历史并升代；经过冻结的 minimum_match_interval_ms 冷却后，仅恢复完成之后的新曝光及递增帧号可重新建立完整窗口。恢复结果未知、仍有 pending 或归档失败继续暂停，禁止重复恢复。会话累计预算及初始基线不重置；恢复到尚未通过新帧几何验证的初始位姿时，仍需独立焊点重新建立首次可信基准。
+ 
+ 停止、保持、断连、会话替换及验证期间热调会撤销代次并暂停自动更新，不触发恢复设备操作。已发送指令不能被撤销；若写回过程中发生撤销，保留故障保护，不能将旧结果作为新代次继续追加。外部修改工件位姿时拒绝恢复覆盖；现有协议无法区分“同ID、同位姿但外部替换模型”，仍需操作者通过显式场景重配置维护身份。
+ 
+@@ -304,12 +304,18 @@
+ 
+ ### 写回后的新帧表面验收
+ 
+-表面支路写回前冻结候选留出基线与验收配置，且须确认该基线满足绝对残差及双向覆盖门槛。`COnlineLocalSurfaceVerification` 每方向分别比较完整最近邻均值，不允许一向改善掩盖另一向恶化，也不允许用稳健双向残差基线与完整均值新帧混用。
+-
+-只有曝光晚于写回完成、同一活动会话、同一实际工件位姿版本的新帧可以提交后验。真实表面与写回后重新查询的当前虚拟激光线共同生成指标；原图接缝缺失不再自动判作坏焊点后验。连续三份合格表面新帧可晋升位姿，连续三份无效/超限表面或五秒未确认继续沿用原受保护恢复与暂停机制，不改变未知 SET_POSE 结果禁止重试等事务边界。
++表面支路写回前冻结候选留出基线与验收配置，且须确认该基线满足绝对残差及双向覆盖门槛。2026-10-22 修正后，留出基线仅作写前准入；新帧真实表面与重新求交的当前仿真切片仍须分别满足两向完整最近邻均值的绝对上限及覆盖率，但不再将这些移动切片的均值直接与旧留出均值作0.1 mm恶化比较。
++
++相对恶化改由 `compareFreshSurface` 使用同一新帧原图实测点、冻结训练虚拟云和本次最终修正共同计算。只从写前训练虚拟云的12点近邻估计局部面；留出、新实测及估计焊点不拟合面。邻域必须有二维展开且满足既有平面性/法向支持要求；同一个局部面在原位和应用候选后均须处于既有 coverage_distance_mm 有界邻域内。相同新实测点与相同局部面身份分别计算修正前/后的平均绝对点到面距离，至少24点及既有覆盖比例通过，再检查当前误差不超过绝对残差上限、也不比同帧原位误差恶化超过 maximum_independent_worsening_mm。不会以已接受的新帧抬升门限或重新拟合候选。
++
++这是有界局部平面近似，不是 CAD 反事实重新求交，也不证明全工件精度；新切片离开冻结几何支持范围、法向退化或原图提取失败时仍不予晋升。真实现场效果需要新一轮在线复测；旧归档没有后验真实点云，不能为旧三帧补造配对指标。
++
++只有曝光晚于写回完成、同一活动会话、同一实际工件位姿版本的新帧可以提交后验。真实表面与写回后重新查询的当前虚拟激光线共同生成指标；原图接缝缺失不再自动判作坏焊点后验。连续三份合格表面新帧可晋升位姿，连续三份无效/超限表面或五秒未确认仍触发受保护恢复；恢复确认后按前述冷却/新曝光边界重建窗口，未知 SET_POSE 结果禁止重试等事务边界不变。后验归档追加 comparison_kind、配对前后误差、支持点数/比例及新帧真实/当前虚拟点云；冻结参考对应同一尝试归档中的 solve_virtual_parent_mm。
+ 
+ ### 证据与当前验证边界
+ 
++2026-10-22 本次回滚恢复及同帧表面对照修复已在用户授权的 VS2022 x64 Developer 命令行、既有 qt-debug 目录完成 MSVC 主程序构建。5项必要专项全部通过：局部面几何、表面后验/恢复冷却与曝光门禁、受保护写回、生产表面窗及在线同帧同步，总耗时9.50秒。构建、测试、源文件备份差异及当前 Notion 指南读取记录位于 `output/analysis/20261022_local_surface_recovery/`。没有启动真实相机、机器人或现场 RobotSim 闭环；旧三张后验截图缺少配对点云，未将合成对照结果冒充旧运行位姿正确的证明。
++
+ 局部尝试的schema4记录区分独立焊点与表面辅助来源，保存实际位姿版本、至多一份原图及其SHA256、逐帧原始/虚拟激光线与提取支撑、训练与留出完整帧号、候选投影模式和两向指标；新帧后验记录其曝光、位姿版本及指标。达到配准尝试阶段的拒绝候选保留来源和原因；提取失败、未达到窗口门槛的帧并不保证各有单独JSON或原图。归档预算和不删除旧文件的约束保持不变。
+ 
+ 历史重放工具兼容schema2/3/4。schema4中的独立焊点通道候选沿用焊点收益诊断；`surface_only=true`仅计数并标明未执行焊点历史重放，不填充虚构独立焊点，也不据此声称已重放表面配准或后验闭环。
+--- before/tests/test_localization_surface_validation.cpp
++++ after/tests/test_localization_surface_validation.cpp
+@@ -175,12 +175,46 @@
+     return ok;
+ }
+ 
++bool freshSurfaceUsesSamePointsAndBoundedPatches()
++{
++    auto reference = plane();
++    std::vector<Point> fresh;
++    // 新切片横跨训练网格之间；采样密度和位置不同，但解析母材面未改变。
++    for (int index = -25; index <= 25; ++index) {
++        fresh.push_back({100.0 + 0.4 * index, -69.1, 10.6});
++    }
++    surface::Options options;
++    const auto truth = correction(0.0, 0.0, 0.6, 0.0);
++    const auto good = surface::compareFreshSurface(fresh, reference, truth, options);
++    bool ok = expect(good.valid && good.supportedRatio > 0.99
++        && std::abs(good.previousResidualMm - 0.6) < 1e-6
++        && good.currentResidualMm < 1e-6,
++        "moving and resampled new slice compares identical points against the same local planes");
++    const auto wrong = surface::compareFreshSurface(fresh, reference,
++        correction(0.0, 0.0, -0.6, 0.0), options);
++    ok &= expect(wrong.valid && wrong.currentResidualMm > wrong.previousResidualMm + 0.5,
++        "same-frame local surfaces expose a genuinely worsening pose");
++    for (auto &point : fresh) { point.y_mm += 100.0; }
++    ok &= expect(!surface::compareFreshSurface(fresh, reference, truth, options).valid,
++        "new slice outside frozen local support cannot extrapolate a plane as proof");
++    fresh.clear();
++    reference.clear();
++    for (int index = 0; index < 60; ++index) {
++        reference.push_back({index * 0.1, 0.0, 10.0});
++        fresh.push_back({index * 0.1, 0.0, 10.6});
++    }
++    ok &= expect(!surface::compareFreshSurface(fresh, reference, truth, options).valid,
++        "a single frozen line cannot manufacture two-dimensional surface support");
++    return ok;
++}
++
+ } // namespace
+ 
+ int main()
+ {
+     const bool ok = planeFreezesTangentialAndYaw() && vShapeFreezesAlongSeamAtCenter()
+-        && fullGeometryAndBump() && heldoutWorseningAndMissingEvidence();
++        && fullGeometryAndBump() && heldoutWorseningAndMissingEvidence()
++        && freshSurfaceUsesSamePointsAndBoundedPatches();
+     if (ok) { std::printf("PASS: surface subspace projection and heldout validation\n"); }
+     return ok ? 0 : 1;
+ }
+--- before/tests/test_local_registration_writeback_safety.cpp
++++ after/tests/test_local_registration_writeback_safety.cpp
+@@ -197,6 +197,22 @@
+         && fixture.scene->writes == 3, "rollback must restore last verified pose rather than session origin");
+     ok &= expect(!fixture.worker.rollbackLocalRegistrationCorrection(7).succeeded
+         && fixture.scene->writes == 3, "successful rollback cannot be repeated");
++    fixture.worker.setLocalRegistrationEpoch(8);
++    fixture.refreshDeadline();
++    loc::RigidTransform next;
++    next.rowMajor[3] = 1.0;
++    ok &= expect(!fixture.worker.applyLocalRegistrationCorrection(7, next).succeeded,
++        "old candidate epoch remains rejected after confirmed rollback");
++    ok &= expect(fixture.worker.applyLocalRegistrationCorrection(8, next).succeeded
++        && fixture.scene->writes == 4
++        && std::abs(fixture.scene->pose.at(0).toDouble() - 26.0) < 1e-6,
++        "new evidence epoch may write from restored trusted pose without resetting session budgets");
++    ok &= expect(fixture.worker.markLocalRegistrationVerified(8).succeeded,
++        "post-rollback candidate can complete a new verified transaction");
++    next.rowMajor[3] = 30.0;
++    ok &= expect(!fixture.worker.applyLocalRegistrationCorrection(8, next).succeeded
++        && fixture.scene->writes == 4,
++        "recovery does not reset cumulative session translation budget");
+     return ok;
+ }
+ 
+--- before/tests/test_online_local_registration_surface.cpp
++++ after/tests/test_online_local_registration_surface.cpp
+@@ -115,6 +115,18 @@
+     ok &= expect(file.open(QIODevice::ReadOnly), "surface archive readable");
+     if (!file.isOpen()) { return false; }
+     const auto record = QJsonDocument::fromJson(file.readAll()).object();
++    const auto frozen = record.value(QStringLiteral("solve_virtual_parent_mm")).toArray();
++    ok &= expect(!result.surfaceVerificationReference_mm.empty()
++        && frozen.size() == static_cast<int>(result.surfaceVerificationReference_mm.size()),
++        "fresh-frame local surface reference is the archived training virtual cloud");
++    for (int index = 0; index < frozen.size(); ++index) {
++        const auto point = frozen[index].toArray();
++        const auto &actual = result.surfaceVerificationReference_mm[static_cast<std::size_t>(index)];
++        ok &= expect(std::abs(point[0].toDouble() - actual.x_mm) < 1e-8
++            && std::abs(point[1].toDouble() - actual.y_mm) < 1e-8
++            && std::abs(point[2].toDouble() - actual.z_mm) < 1e-8,
++            "comparison reference cannot silently include heldout or fresh real samples");
++    }
+     const auto seed = record.value(QStringLiteral("training_real_to_virtual_initial_guess_row_major")).toArray();
+     ok &= expect(seed.size() == 16 && std::abs(seed[11].toDouble() + 0.25) < 1e-6,
+         "training-only real-to-virtual seed preserves direction and is recorded separately from correction");
+--- before/tests/test_online_local_surface_verification.cpp
++++ after/tests/test_online_local_surface_verification.cpp
+@@ -7,6 +7,7 @@
+ #include <limits>
+ 
+ #include "OnlineLocalSurfaceVerification.h"
++#include "OnlineLocalRegistrationRecovery.h"
+ 
+ namespace {
+ using Verification = i2r_rlc::ui::COnlineLocalSurfaceVerification;
+@@ -24,26 +25,32 @@
+     return {1.0, 1.2, 0.90, 0.85};
+ }
+ 
++// 帧计数、绝对门禁及配置专项使用固定合格的合成配对证据。
++Decision observe(Verification &verification, qint64 frameId, bool valid, const Metrics &metrics)
++{
++    return verification.observe(frameId, valid, metrics, {true, 0.8, 0.6, 1.0});
++}
++
+ bool testNewFrameStreakAndTerminalState()
+ {
+     Verification verification(baseline(), Verification::Options{});
+     const Metrics clear{0.8, 0.9, 0.95, 0.90};
+     bool ok = expect(verification.baselineUsable(), "valid holdout baseline accepted");
+-    ok &= expect(verification.observe(10, true, clear) == Decision::Waiting
++    ok &= expect(observe(verification, 10, true, clear) == Decision::Waiting
+         && verification.lastObservationGood() && verification.goodFrameCount() == 1,
+         "first surface-only new frame must wait");
+-    ok &= expect(verification.observe(10, false, {}) == Decision::Waiting
++    ok &= expect(observe(verification, 10, false, {}) == Decision::Waiting
+         && !verification.lastObservationGood() && verification.goodFrameCount() == 1
+         && verification.badFrameCount() == 0,
+         "duplicate invalid frame must not reset or advance evidence");
+-    ok &= expect(verification.observe(9, true, clear) == Decision::Waiting
++    ok &= expect(observe(verification, 9, true, clear) == Decision::Waiting
+         && !verification.lastObservationGood() && verification.goodFrameCount() == 1,
+         "older good frame cannot supply an extra sample");
+-    verification.observe(11, true, clear);
+-    ok &= expect(verification.observe(12, true, clear) == Decision::Verified
++    observe(verification, 11, true, clear);
++    ok &= expect(observe(verification, 12, true, clear) == Decision::Verified
+         && verification.goodFrameCount() == 3,
+         "three distinct consecutive surface frames verify without a weld point");
+-    ok &= expect(verification.observe(13, false, {}) == Decision::Verified
++    ok &= expect(observe(verification, 13, false, {}) == Decision::Verified
+         && !verification.lastObservationGood()
+         && verification.currentMetrics().realToVirtualResidualMm == clear.realToVirtualResidualMm,
+         "verified decision is terminal and cannot add historical evidence");
+@@ -54,25 +61,25 @@
+ {
+     Verification verification(baseline(), Verification::Options{});
+     const Metrics clear{0.8, 0.9, 0.95, 0.90};
+-    verification.observe(1, true, clear);
+-    verification.observe(2, true, clear);
+-    bool ok = expect(verification.observe(3, false, clear) == Decision::Waiting
++    observe(verification, 1, true, clear);
++    observe(verification, 2, true, clear);
++    bool ok = expect(observe(verification, 3, false, clear) == Decision::Waiting
+         && verification.goodFrameCount() == 0 && verification.badFrameCount() == 1,
+         "missing real surface breaks a consecutive good streak");
+-    verification.observe(4, true, clear);
++    observe(verification, 4, true, clear);
+     ok &= expect(verification.badFrameCount() == 0 && verification.goodFrameCount() == 1,
+         "a new good surface resets consecutive bad evidence");
+     const Metrics poorRealCoverage{0.8, 0.9, 0.69, 0.90};
+     const Metrics poorVirtualCoverage{0.8, 0.9, 0.95, 0.69};
+-    verification.observe(5, true, poorRealCoverage);
+-    verification.observe(6, true, poorVirtualCoverage);
+-    ok &= expect(verification.observe(6, false, {}) == Decision::Waiting
++    observe(verification, 5, true, poorRealCoverage);
++    observe(verification, 6, true, poorVirtualCoverage);
++    ok &= expect(observe(verification, 6, false, {}) == Decision::Waiting
+         && verification.badFrameCount() == 2,
+         "duplicate bad frame cannot cause rollback");
+-    ok &= expect(verification.observe(7, false, clear) == Decision::Rollback
++    ok &= expect(observe(verification, 7, false, clear) == Decision::Rollback
+         && verification.badFrameCount() == 3,
+         "three bad distinct frames request rollback");
+-    ok &= expect(verification.observe(8, true, clear) == Decision::Rollback,
++    ok &= expect(observe(verification, 8, true, clear) == Decision::Rollback,
+         "rollback remains terminal after later clear surfaces");
+     return ok;
+ }
+@@ -83,26 +90,26 @@
+     options.requiredGoodFrames = 1;
+     options.maximumBadFrames = 1;
+     Verification tolerated(baseline(), options);
+-    bool ok = expect(tolerated.observe(1, true, {1.05, 1.25, 0.7, 0.7})
++    bool ok = expect(tolerated.observe(1, true, {1.8, 1.9, 0.7, 0.7}, {true, 0.8, 0.85, 1.0})
+         == Decision::Verified,
+-        "each direction may worsen only within the frozen tolerance");
++        "paired worsening within tolerance passes regardless of old slice sampling");
+     Verification asymmetric(baseline(), options);
+-    ok &= expect(asymmetric.observe(1, true, {0.1, 1.31, 1.0, 1.0})
++    ok &= expect(observe(asymmetric, 1, true, {0.1, 5.51, 1.0, 1.0})
+         == Decision::Rollback,
+-        "improvement in one direction cannot hide worsening in the other");
++        "one direction cannot hide the other direction exceeding absolute limits");
+     Verification::Options streakOptions;
+     Verification creeping(baseline(), streakOptions);
+-    creeping.observe(1, true, {1.05, 1.25, 0.9, 0.9});
+-    creeping.observe(2, true, {1.09, 1.29, 0.9, 0.9});
+-    ok &= expect(creeping.observe(3, true, {1.15, 1.35, 0.9, 0.9})
++    creeping.observe(1, true, baseline(), {true, 0.8, 0.85, 1.0});
++    creeping.observe(2, true, baseline(), {true, 0.8, 0.89, 1.0});
++    ok &= expect(creeping.observe(3, true, baseline(), {true, 0.8, 0.95, 1.0})
+         == Decision::Waiting && !creeping.lastObservationGood()
+         && creeping.goodFrameCount() == 0,
+-        "baseline cannot creep upward with previously tolerated observations");
++        "previously tolerated new-frame errors cannot relax paired worsening tolerance");
+     ok &= expect(creeping.baselineMetrics().realToVirtualResidualMm == 1.0
+         && creeping.baselineMetrics().virtualToRealResidualMm == 1.2,
+         "frozen holdout baseline remains immutable");
+     Verification absolute(baseline(), options);
+-    ok &= expect(absolute.observe(1, true, {5.6, 1.0, 1.0, 1.0})
++    ok &= expect(observe(absolute, 1, true, {5.6, 1.0, 1.0, 1.0})
+         == Decision::Rollback, "absolute residual cap still applies");
+     return ok;
+ }
+@@ -122,7 +129,7 @@
+     };
+     for (const auto &metrics : invalidMetrics) {
+         Verification invalid(baseline(), options);
+-        ok &= expect(invalid.observe(1, true, metrics) == Decision::Rollback,
++        ok &= expect(observe(invalid, 1, true, metrics) == Decision::Rollback,
+             "invalid or nonfinite metrics cannot be verified by a valid flag");
+     }
+     Verification missingBaseline({}, Verification::Options{});
+@@ -131,7 +138,7 @@
+         "default metrics do not manufacture a valid pre-write holdout baseline");
+     Verification badBaseline({nan, 1.0, 0.9, 0.9}, Verification::Options{});
+     ok &= expect(!badBaseline.baselineUsable()
+-        && badBaseline.observe(1, true, baseline()) == Decision::Rollback,
++        && observe(badBaseline, 1, true, baseline()) == Decision::Rollback,
+         "new frames cannot repair an invalid frozen transaction baseline");
+     options.requiredGoodFrames = 0;
+     Verification zeroFrames(baseline(), options);
+@@ -149,6 +156,68 @@
+         "nonfinite threshold cannot verify surfaces");
+     return ok;
+ }
++bool testMovingSliceAndSameFrameCounterfactual()
++{
++    const Metrics frozen{1.3061662919, 0.4767739274, 0.9449, 1.0};
++    Verification moving(frozen, Verification::Options{});
++    const Metrics fresh[] = {
++        {1.4962744289, 0.4475627589, 0.8928, 1.0},
++        {1.9867825967, 0.6365605719, 0.8384, 0.9534},
++        {1.7706495806, 0.6137708139, 0.8482, 0.9534}
++    };
++    // 现场切片指标只复现旧误拒触发；配对指标为合成，不能声称现场位姿正确。
++    for (int index = 0; index < 3; ++index) {
++        moving.observe(2980 + index, true, fresh[index], {true, 0.8, 0.6, 0.9});
++    }
++    bool ok = expect(moving.decision() == Decision::Verified,
++        "new slice statistics may change while same-frame paired surfaces improve");
++    Verification wrong(frozen, Verification::Options{});
++    for (int index = 0; index < 3; ++index) {
++        wrong.observe(10 + index, true, fresh[index], {true, 0.4, 0.6, 0.9});
++    }
++    ok &= expect(wrong.decision() == Decision::Rollback,
++        "genuine same-frame worsening still rolls back despite absolute slice limits passing");
++    Verification unsupported(frozen, Verification::Options{});
++    for (int index = 0; index < 3; ++index) {
++        unsupported.observe(20 + index, true, fresh[index], {false, 0.8, 0.6, 0.9});
++    }
++    ok &= expect(unsupported.decision() == Decision::Rollback,
++        "no frozen local support cannot be accepted by absolute slice metrics alone");
++    return ok;
++}
++
++bool testRecoveryRequiresConfirmationCooldownAndNewExposure()
++{
++    using Recovery = i2r_rlc::ui::COnlineLocalRegistrationRecovery;
++    Recovery recovery;
++    const Recovery::Outcome confirmed{true, true, true, true, false, false};
++    bool ok = expect(recovery.complete(confirmed, 1000, 50000, 3008, 2000),
++        "readback and archived rollback may recover sampling without a new session");
++    ok &= expect(!recovery.allowsSample(2999, 50001, 3013),
++        "new exposure cannot skip recovery cooldown");
++    ok &= expect(!recovery.allowsSample(3000, 50000, 3013)
++        && !recovery.allowsSample(3000, 50001, 3008),
++        "buffered pre-restore exposure or old frame cannot rebuild a new window");
++    ok &= expect(recovery.allowsSample(3000, 50001, 3013),
++        "cooldown plus fresh exposure and newer frame permit rebuilding evidence");
++    auto failed = confirmed;
++    failed.commandSucceeded = false;
++    ok &= expect(!recovery.complete(failed, 4000, 60000, 3100, 2000)
++        && !recovery.allowsSample(100000, 99999, 99999),
++        "unknown rollback must remain paused even after unlimited cooldown");
++    failed = confirmed;
++    failed.archived = false;
++    ok &= expect(!recovery.complete(failed, 4000, 60000, 3100, 2000),
++        "unarchived recovery cannot reopen automatic updates");
++    failed = confirmed;
++    failed.hasPendingPose = true;
++    ok &= expect(!recovery.complete(failed, 4000, 60000, 3100, 2000),
++        "pending worker transaction cannot be treated as confirmed recovery");
++    recovery.reset();
++    ok &= expect(recovery.allowsSample(0, 0, 1), "explicit new session resets prior recovery boundary");
++    return ok;
++}
++
+ } // namespace
+ 
+ int main()
+@@ -157,6 +226,8 @@
+     ok &= testBadStreakAndCoverage();
+     ok &= testFrozenDirectionalBaseline();
+     ok &= testInvalidEvidenceAndConfiguration();
++    ok &= testMovingSliceAndSameFrameCounterfactual();
++    ok &= testRecoveryRequiresConfirmationCooldownAndNewExposure();
+     if (ok) { std::puts("PASS: online local surface verification tests"); }
+     return ok ? 0 : 1;
+ }
+--- before/UI/CMakeLists.txt
++++ after/UI/CMakeLists.txt
+@@ -37,6 +37,7 @@
+     include/RuntimeCoordinator.h
+     include/OnlineLocalRegistrationStability.h
+     include/OnlineLocalRegistrationWorker.h
++    include/OnlineLocalRegistrationRecovery.h
+     include/OnlineLocalSurfaceVerification.h
+     include/RuntimeTrackingTypes.h
+     include/TrackingFramePresentation.h
+--- before/Localization/include/LocalizationSurfaceValidation.h
++++ after/Localization/include/LocalizationSurfaceValidation.h
+@@ -42,6 +42,30 @@
+     double realCoverageRatio = 0.0;
+     double virtualCoverageRatio = 0.0;
+ };
++
++/**
++ * @brief 同一新帧真实点对冻结局部面的配对误差，长度单位 mm。
++ * @details 面仅从写回前训练虚拟云估计；同一局部面分别保持原位和应用候选，
++ * 两个误差使用完全相同的新帧点及面身份，不比较不同时间的切片最近邻均值。
++ * 这是有界局部平面近似，不是 CAD 重新求交；支持不足必须拒绝，不能外推整件。
++ */
++struct PairedSurfaceMetrics {
++    bool valid = false;
++    int supportedPointCount = 0;
++    double supportedRatio = 0.0;
++    double previousResidualMm = 0.0;
++    double currentResidualMm = 0.0;
++};
++
++/**
++ * @brief 在后台线程比较同帧新实测与修正前后同一冻结局部面，不重新求解位姿。
++ * @details 局部面须有二维展开、平面性和有限近邻支持；只累计原位及候选下均在
++ * coverageDistanceMm 邻域内的配对点，至少 minimumPointCount 点及覆盖比例通过。
++ * 新实测云不能用于拟合面、调整候选或扩张支持范围；非法输入返回 valid=false。
++ */
++PairedSurfaceMetrics compareFreshSurface(const std::vector<Point3D_mm> &freshReal,
++    const std::vector<Point3D_mm> &frozenVirtual, const RigidTransform &correction,
++    const Options &options);
+ 
+ /**
+  * @brief 时序训练与留出点云及生产 ICP 已求得的虚拟到真实候选。
+--- before/Localization/src/LocalizationSurfaceValidation.cpp
++++ after/Localization/src/LocalizationSurfaceValidation.cpp
+@@ -316,6 +316,83 @@
+ 
+ } // namespace
+ 
++PairedSurfaceMetrics compareFreshSurface(const std::vector<Point3D_mm> &freshReal,
++    const std::vector<Point3D_mm> &frozenVirtual, const RigidTransform &correction,
++    const Options &options)
++{
++    PairedSurfaceMetrics result;
++    Eigen::Matrix3d rotation;
++    Eigen::Vector3d translation;
++    double yaw = 0.0;
++    if (!validOptions(options) || !validCloud(freshReal, options)
++        || !validCloud(frozenVirtual, options)
++        || !readCandidate(correction, rotation, translation, yaw)) { return result; }
++    struct Patch {
++        Eigen::Vector3d center;
++        Eigen::Vector3d normal;
++    };
++    std::vector<Patch> patches;
++    const auto count = static_cast<std::size_t>(options.normalNeighborCount);
++    for (const auto &point : frozenVirtual) {
++        std::vector<std::pair<double, std::size_t>> nearest;
++        for (std::size_t index = 0; index < frozenVirtual.size(); ++index) {
++            nearest.emplace_back((vector(point) - vector(frozenVirtual[index])).squaredNorm(), index);
++        }
++        if (nearest.size() > count) {
++            std::nth_element(nearest.begin(), nearest.begin() + count, nearest.end());
++            nearest.resize(count);
++        }
++        Eigen::Vector3d center = Eigen::Vector3d::Zero();
++        for (const auto &item : nearest) { center += vector(frozenVirtual[item.second]); }
++        center /= static_cast<double>(nearest.size());
++        Eigen::Matrix3d covariance = Eigen::Matrix3d::Zero();
++        for (const auto &item : nearest) {
++            const Eigen::Vector3d delta = vector(frozenVirtual[item.second]) - center;
++            covariance += delta * delta.transpose();
++        }
++        covariance /= static_cast<double>(nearest.size());
++        const Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> solver(covariance);
++        if (solver.info() != Eigen::Success || !solver.eigenvalues().allFinite()
++            || solver.eigenvalues()[1] < options.minimumNeighborhoodSecondVarianceMm2
++            || solver.eigenvalues()[0] > solver.eigenvalues()[1]
++                * options.maximumNormalPlanarityRatio) { continue; }
++        patches.push_back({center, solver.eigenvectors().col(0)});
++    }
++    if (patches.size() < static_cast<std::size_t>(options.minimumPointCount)
++        || static_cast<double>(patches.size()) / frozenVirtual.size()
++            < options.minimumNormalSupportRatio) { return result; }
++    const double radiusSquared = options.coverageDistanceMm * options.coverageDistanceMm;
++    for (const auto &point : freshReal) {
++        const Eigen::Vector3d real = vector(point);
++        const Patch *selected = nullptr;
++        double nearest = std::numeric_limits<double>::max();
++        // 同一个冻结面身份同时支持原位和候选，禁止两侧各自选择有利的不同面。
++        for (const auto &patch : patches) {
++            const double beforeDistance = (real - patch.center).squaredNorm();
++            const double afterDistance = (real - (rotation * patch.center + translation)).squaredNorm();
++            if (beforeDistance <= radiusSquared && afterDistance <= radiusSquared
++                && afterDistance < nearest) {
++                nearest = afterDistance;
++                selected = &patch;
++            }
++        }
++        if (selected == nullptr) { continue; }
++        result.previousResidualMm += std::abs(selected->normal.dot(real - selected->center));
++        result.currentResidualMm += std::abs((rotation * selected->normal).dot(
++            real - (rotation * selected->center + translation)));
++        ++result.supportedPointCount;
++    }
++    result.supportedRatio = static_cast<double>(result.supportedPointCount) / freshReal.size();
++    if (result.supportedPointCount > 0) {
++        result.previousResidualMm /= result.supportedPointCount;
++        result.currentResidualMm /= result.supportedPointCount;
++    }
++    result.valid = result.supportedPointCount >= options.minimumPointCount
++        && result.supportedRatio >= options.minimumBidirectionalCoverage
++        && std::isfinite(result.previousResidualMm) && std::isfinite(result.currentResidualMm);
++    return result;
++}
++
+ Metrics measure(const std::vector<Point3D_mm> &real,
+     const std::vector<Point3D_mm> &reference, const Options &options)
+ {
+--- before/UI/include/OnlineLocalRegistrationWorker.h
++++ after/UI/include/OnlineLocalRegistrationWorker.h
+@@ -124,6 +124,8 @@
+         /// @brief 表面候选投影前的PCL矩阵，供归档复核，不可直接写回。
+         localization::RigidTransform originalSurfaceCorrection;
+         std::vector<localization::Point3D_mm> safetyKeypointsInParent_mm;
++        /// @brief 写回前训练虚拟云，冻结为新帧配对局部面的来源；不含留出或新实测。
++        std::vector<localization::Point3D_mm> surfaceVerificationReference_mm;
+         QString message;
+         double beforeResidualMm = 0.0;
+         double afterResidualMm = 0.0;
+@@ -157,11 +159,16 @@
+         std::vector<localization::Point3D_mm> realPoints_mm;
+         std::vector<localization::Point3D_mm> virtualPoints_mm;
+         localization::surface_validation::Metrics metrics;
++        localization::surface_validation::PairedSurfaceMetrics comparison;
+         QString message;
+         QJsonObject evidenceContext;
+     };
+     /** @brief 仅在本worker所属线程调用，供写回后新帧表面后验复用。 */
+     SurfaceFrameResult measureSurface(const Input &input) const;
++    /** @brief 新帧绝对切片检查及同帧局部面对照；冻结参考与候选只能来自本次事务。 */
++    SurfaceFrameResult measureSurfaceForVerification(const Input &input,
++        const std::vector<localization::Point3D_mm> &frozenVirtual,
++        const localization::RigidTransform &correction) const;
+     /**
+      * @brief 累计同一工件父级参考系下的同帧点云，供生产提取和离线验证共用。
+      * @details 生产输入均为变位机 TCP 系，不再叠加末节到 TCP 的偏移；
+--- before/UI/include/OnlineLocalSurfaceVerification.h
++++ after/UI/include/OnlineLocalSurfaceVerification.h
+@@ -14,7 +14,7 @@
+ 
+ /**
+  * @brief coordinator 线程独占的单次表面写回后验检查器。
+- * @details 基线来自写入前已验收且未参与求解的留出表面，不能取拟合残差。
++ * @details 写入前留出基线仅作事务准入；新帧恶化使用同帧真实点的配对局部面误差。
+  * 调用方须先确认会话、帧号关联、曝光晚于写回完成及当前工件位姿版本。
+  * 本类只检查指标及连续新帧，不负责曝光/位姿身份，也不负责五秒事务超时。
+  * 新帧指标必须使用真实表面与当前仿真重新求交的参考，禁止把变换后的旧激光
+@@ -27,7 +27,7 @@
+     /**
+      * @brief 同一评估口径下的双向表面指标；长度单位 mm，覆盖比例为 [0,1]。
+      * @details 原图支撑、最少点数、区域身份及距离口径由表面评估器校核。
+-     * 当前接线使用两向完整均值，不能将稳健双向均值基线与完整均值混用。
++     * 两向完整均值仅用于各自绝对上限；跨时刻的切片均值不作恶化对照。
+      * 两个残差分别保留，避免方向均值掩盖一侧变坏。
+      */
+     struct Metrics {
+@@ -35,6 +35,14 @@
+         double virtualToRealResidualMm = 0.0;
+         double realCoverageRatio = 0.0;
+         double virtualCoverageRatio = 0.0;
++    };
++
++    /** @brief 同一新实测点集对原位及候选局部面的误差；不使用跨帧切片均值。 */
++    struct Comparison {
++        bool valid = false;
++        double previousResidualMm = 0.0;
++        double currentResidualMm = 0.0;
++        double supportedRatio = 0.0;
+     };
+ 
+     /** @brief 单次事务冻结阈值；不随观测或后续参数热调抬升。 */
+@@ -65,9 +73,10 @@
+     /**
+      * @brief 接收已完成曝光/位姿版本门控的新帧，重复旧帧不产生新证据。
+      * @details valid=false 表示原图表面、关联或投影无效；有效新帧也须同时
+-     * 满足双向残差、双向覆盖及相对冻结基线的恶化上限。终态不再采样。
++     * 满足新切片双向绝对残差/覆盖，以及同帧配对局部面恶化上限。终态不再采样。
+      */
+-    Decision observe(qint64 frameId, bool valid, const Metrics &metrics)
++    Decision observe(qint64 frameId, bool valid, const Metrics &metrics,
++        const Comparison &comparison)
+     {
+         m_lastObservationGood = false;
+         if (m_decision != Decision::Waiting || frameId <= m_lastFrameId) {
+@@ -76,12 +85,14 @@
+         m_lastFrameId = frameId;
+         m_currentMetrics = metrics;
+         const bool good = valid && withinAbsoluteLimits(metrics, m_options)
+-            && metrics.realToVirtualResidualMm
+-                <= m_baselineMetrics.realToVirtualResidualMm
+-                    + m_options.maximumWorseningMm
+-            && metrics.virtualToRealResidualMm
+-                <= m_baselineMetrics.virtualToRealResidualMm
+-                    + m_options.maximumWorseningMm;
++            && comparison.valid && validRatio(comparison.supportedRatio)
++            && comparison.supportedRatio >= m_options.minimumBidirectionalCoverage
++            && std::isfinite(comparison.previousResidualMm)
++            && std::isfinite(comparison.currentResidualMm)
++            && comparison.previousResidualMm >= 0.0 && comparison.currentResidualMm >= 0.0
++            && comparison.currentResidualMm <= m_options.maximumResidualMm
++            && comparison.currentResidualMm
++                <= comparison.previousResidualMm + m_options.maximumWorseningMm;
+         m_lastObservationGood = good;
+         if (good) {
+             ++m_goodFrames;
+--- before/UI/include/RuntimeCoordinator.h
++++ after/UI/include/RuntimeCoordinator.h
+@@ -39,6 +39,7 @@
+ #include <QThread>
+ 
+ #include "OnlineLocalRegistrationWorker.h"
++#include "OnlineLocalRegistrationRecovery.h"
+ #include "OnlineLocalRegistrationVerification.h"
+ #include "OnlineLocalSurfaceVerification.h"
+ #include "RuntimeWorkerAdapters.h"
+@@ -525,7 +526,7 @@
+     void startLocalRegistrationWorker();
+     /// @brief 撤销旧窗口、候选修正及网络写回代次；不停止机器人运动。
+     void resetOnlineLocalRegistration();
+-    /// @brief 仅成功后验晋升可保留材料点历史；其余撤销边界清空近似对应。
++    /// @brief 成功晋升或已确认回滚可保留可信位姿；回滚另行清空材料点历史。
+     void resetOnlineLocalRegistration(bool preserveStabilityHistory);
+     /// @brief 从已完成的同帧上下文低频投递表面采样，繁忙时跳过且不排队。
+     void submitOnlineLocalRegistration(const FrozenVisionFrameContext &context,
+@@ -556,6 +557,8 @@
+     qint64 m_lastLocalHistorySampleMs = -1;
+     /// @brief 跨模型写回代次保留的配准冷却，防止清窗重置 worker 时钟后过频求解。
+     qint64 m_lastLocalRegistrationAttemptMs = -1;
++    /// @brief 已确认回滚后的冷却及曝光下界，不能被普通清窗缩短。
++    COnlineLocalRegistrationRecovery m_localRegistrationRecovery;
+     qint64 m_localRegistrationInputMs = -1;
+     quint64 m_localRegistrationGeneration = 0;
+     quint64 m_localRegistrationRequestId = 0;
+@@ -580,6 +583,7 @@
+         QString archivePath;
+         QJsonArray samples;
+         localization::RigidTransform correction;
++        std::vector<localization::Point3D_mm> surfaceVerificationReference_mm;
+         bool stabilityProtectionEnabled = false;
+         qint64 lastObservedFrameId = -1;
+         std::vector<COnlineLocalRegistrationStability::Observation> verifiedGoodFrames;
+--- before/UI/src/OnlineLocalRegistrationWorker.cpp
++++ after/UI/src/OnlineLocalRegistrationWorker.cpp
+@@ -457,6 +457,19 @@
+             : QStringLiteral("母材表面不足，不使用估计焊点替代。");
+     } catch (const std::exception &error) {
+         result.message = QStringLiteral("母材表面提取异常：%1").arg(QString::fromUtf8(error.what()));
++    }
++    return result;
++}
++
++COnlineLocalRegistrationWorker::SurfaceFrameResult
++COnlineLocalRegistrationWorker::measureSurfaceForVerification(const Input &input,
++    const std::vector<Point> &frozenVirtual,
++    const localization::RigidTransform &correction) const
++{
++    auto result = measureSurface(input);
++    if (result.valid) {
++        result.comparison = localization::surface_validation::compareFreshSurface(
++            result.realPoints_mm, frozenVirtual, correction, surfaceOptions(m_options));
+     }
+     return result;
+ }
+@@ -854,6 +867,7 @@
+             && result.solveElapsedMs <= m_options.maximumSolveTimeMs;
+         // 仅作当前冻结模型参考的位移预算，不宣称这些激光交点具有固定材料身份。
+         result.safetyKeypointsInParent_mm = request.virtualWindowPoints_mm;
++        result.surfaceVerificationReference_mm = request.virtualWindowPoints_mm;
+         result.safetyKeypointsInParent_mm.insert(result.safetyKeypointsInParent_mm.end(),
+             surfaceRequest.holdoutVirtual_mm.begin(), surfaceRequest.holdoutVirtual_mm.end());
+         result.message = result.accepted
+--- before/UI/src/RuntimeCoordinator.cpp
++++ after/UI/src/RuntimeCoordinator.cpp
+@@ -2310,6 +2310,7 @@
+     m_correctionSession.purpose = purpose;
+     m_correctionSession.active = true;
+     m_localRegistrationFaulted = false;
++    m_localRegistrationRecovery.reset();
+     resetOnlineLocalRegistration();
+     m_localRegistrationArchiveDirectory = AppPaths::fromDefaultLocation().outputDir().filePath(
+         QStringLiteral("online_local_registration/%1_session_%2")
+--- before/UI/src/RuntimeLocalRegistration.cpp
++++ after/UI/src/RuntimeLocalRegistration.cpp
+@@ -498,6 +498,11 @@
+         || context.workpiecePoseRevision != m_localWorkpiecePoseRevision
+         || !context.synchronizedObservation.has_value()
+         || !m_onlinePositionerCalibration.has_value() || !m_onlinePositionerCalibration->valid) {
++        return;
++    }
++    if (!m_localRegistrationRecovery.allowsSample(m_localRegistrationClock.elapsed(),
++            context.frame.timestamp.isValid() ? context.frame.timestamp.toMSecsSinceEpoch() : -1,
++            context.frame.frameId)) {
+         return;
+     }
+     const auto &observation = *context.synchronizedObservation;
+@@ -731,14 +736,17 @@
+     m_localRegistrationBusy = true;
+     const quint64 requestId = ++m_localRegistrationRequestId;
+     const qint64 captureTimeMs = context.frame.timestamp.toMSecsSinceEpoch();
++    const auto frozenReference = verification.surfaceVerificationReference_mm;
++    const auto correction = verification.correction;
+     const QPointer<CRuntimeCoordinator> coordinator(this);
+     QMetaObject::invokeMethod(m_localRegistrationWorker,
+-        [coordinator, worker = m_localRegistrationWorker, input, requestId, captureTimeMs]() {
++        [coordinator, worker = m_localRegistrationWorker, input, requestId, captureTimeMs,
++            frozenReference, correction]() {
+             COnlineLocalRegistrationWorker::SurfaceFrameResult result;
+             result.frameId = input.frame.frameId;
+             result.workpiecePoseRevision = input.workpiecePoseRevision;
+             try {
+-                result = worker->measureSurface(input);
++                result = worker->measureSurfaceForVerification(input, frozenReference, correction);
+             } catch (const std::exception &error) {
+                 result.message = QStringLiteral("表面后验异常：%1").arg(QString::fromUtf8(error.what()));
+             } catch (...) {
+@@ -761,8 +769,17 @@
+                             || result.workpiecePoseRevision != current.workpiecePoseRevision
+                             || result.workpiecePoseRevision != coordinator->m_localWorkpiecePoseRevision) { return; }
+                         current.surfaceCheck->observe(result.frameId, result.valid,
+-                            surfaceVerificationMetrics(result.metrics));
++                            surfaceVerificationMetrics(result.metrics),
++                            {result.comparison.valid, result.comparison.previousResidualMm,
++                                result.comparison.currentResidualMm, result.comparison.supportedRatio});
+                         if (current.samples.size() < 64) {
++                            const auto pointsJson = [](const std::vector<localization::Point3D_mm> &points) {
++                                QJsonArray values;
++                                for (const auto &point : points) {
++                                    values.append(QJsonArray{point.x_mm, point.y_mm, point.z_mm});
++                                }
++                                return values;
++                            };
+                             current.samples.append(QJsonObject{
+                                 {QStringLiteral("frame_id"), QString::number(result.frameId)},
+                                 {QStringLiteral("capture_time_ms"), QString::number(captureTimeMs)},
+@@ -772,6 +789,14 @@
+                                 {QStringLiteral("accepted_observation"), current.surfaceCheck->lastObservationGood()},
+                                 {QStringLiteral("real_to_virtual_mean_mm"), result.metrics.realToVirtualMeanMm},
+                                 {QStringLiteral("virtual_to_real_mean_mm"), result.metrics.virtualToRealMeanMm},
++                                {QStringLiteral("comparison_kind"), QStringLiteral("same_frame_frozen_local_surface")},
++                                {QStringLiteral("comparison_valid"), result.comparison.valid},
++                                {QStringLiteral("paired_previous_residual_mm"), result.comparison.previousResidualMm},
++                                {QStringLiteral("paired_current_residual_mm"), result.comparison.currentResidualMm},
++                                {QStringLiteral("paired_support_ratio"), result.comparison.supportedRatio},
++                                {QStringLiteral("paired_support_count"), result.comparison.supportedPointCount},
++                                {QStringLiteral("fresh_real_parent_mm"), pointsJson(result.realPoints_mm)},
++                                {QStringLiteral("fresh_virtual_parent_mm"), pointsJson(result.virtualPoints_mm)},
+                                 {QStringLiteral("real_coverage_ratio"), result.metrics.realCoverageRatio},
+                                 {QStringLiteral("virtual_coverage_ratio"), result.metrics.virtualCoverageRatio},
+                                 {QStringLiteral("real_point_count"), static_cast<int>(result.realPoints_mm.size())},
+@@ -844,13 +869,24 @@
+                             // 恢复回读失败也不能携带旧像素锚；未知写入仍保持故障暂停。
+                             ++coordinator->m_localWorkpiecePoseRevision;
+                         }
+-                        // 恢复成功也保持暂停，防止重复进入同一个错误匹配区域。
+-                        if (rollback || !command.succeeded || !archived) {
++                        const bool recovered = rollback && coordinator->m_localRegistrationRecovery.complete(
++                            {command.succeeded, archived, snapshot.rollbackAttempted,
++                                snapshot.hasVerifiedPose, snapshot.hasPendingPose, snapshot.pendingPoseConfirmed},
++                            coordinator->m_localRegistrationClock.elapsed(), QDateTime::currentMSecsSinceEpoch(),
++                            std::max(verification.sourceFrameId, verification.lastObservedFrameId),
++                            coordinator->m_localRegistrationOptions.minimumMatchIntervalMs);
++                        // 只有恢复及归档都确认才允许冷却后重建窗口；未知写入仍锁住。
++                        if ((rollback && !recovered) || !command.succeeded || !archived) {
+                             coordinator->m_localRegistrationFaulted = true;
+                         }
+                         if (!coordinator->m_localRegistrationFaulted) {
+-                            coordinator->m_lastVerifiedLocalWorkpiecePose = snapshot.verifiedParentFromWorkpiece;
+-                            if (verification.surfaceCheck.has_value()) {
++                            if (snapshot.verifiedByIndependentObservation) {
++                                coordinator->m_lastVerifiedLocalWorkpiecePose = snapshot.verifiedParentFromWorkpiece;
++                            } else {
++                                // 初始基线不是新帧验证位姿，恢复后仍需独立焊点建立首锚。
++                                coordinator->m_lastVerifiedLocalWorkpiecePose.reset();
++                            }
++                            if (recovered || verification.surfaceCheck.has_value()) {
+                                 // 表面更新未产生材料焊点对应，不能刚体推进历史激光交点。
+                                 coordinator->m_localRegistrationStability.clear();
+                             } else if (verification.stabilityProtectionEnabled
+@@ -861,6 +897,9 @@
+                                 emit coordinator->statusMessage(QStringLiteral("历史监测坐标推进失效，已清空待校核观测；原验收继续生效。"));
+                             }
+                         }
++                        if (recovered) {
++                            coordinator->m_lastLocalRegistrationAttemptMs = coordinator->m_localRegistrationClock.elapsed();
++                        }
+                         coordinator->resetOnlineLocalRegistration(!coordinator->m_localRegistrationFaulted);
+                         coordinator->m_pendingVisionFrame.reset();
+                         const QString message = QStringLiteral("[在线局部定位] %1：%2；事务归档%3。%4")
+@@ -869,7 +908,9 @@
+                             .arg(archived ? QStringLiteral("成功") : QStringLiteral("失败"))
+                             .arg(coordinator->m_localRegistrationFaulted
+                                 ? QStringLiteral("本会话自动更新暂停，纠偏继续。")
+-                                : QStringLiteral("已通过连续新帧独立检查，重新采样。"));
++                                : (recovered
++                                    ? QStringLiteral("恢复已确认；冷却后仅用恢复完成后的新曝光重新采样。")
++                                    : QStringLiteral("已通过连续新帧独立检查，重新采样。")));
+                         qInfo().noquote() << message;
+                         emit coordinator->statusMessage(message);
+                         coordinator->dispatchPendingVisionFrame();
+@@ -913,7 +954,8 @@
+             surfaceVerificationMetrics(result.surfaceValidation.holdoutAfter),
+             surfaceVerificationOptions(m_localRegistrationOptions));
+         if (!m_lastVerifiedLocalWorkpiecePose.has_value() || !result.surfaceValidation.accepted
+-            || !check.baselineUsable() || result.safetyKeypointsInParent_mm.empty()) {
++            || !check.baselineUsable() || result.safetyKeypointsInParent_mm.empty()
++            || result.surfaceVerificationReference_mm.size() < 24U) {
+             m_pendingLocalCorrection.reset();
+             emit statusMessage(QStringLiteral("表面候选缺少有效留出基线或可信位姿，取消写回。"));
+             return false;
+@@ -970,6 +1012,7 @@
+                         verification.sourceFrameId = result.frameId;
+                         verification.archivePath = result.archivePath;
+                         verification.correction = result.correction;
++                        verification.surfaceVerificationReference_mm = result.surfaceVerificationReference_mm;
+                         verification.workpiecePoseRevision = coordinator->m_localWorkpiecePoseRevision;
+                         verification.stabilityProtectionEnabled =
+                             coordinator->m_localRegistrationOptions.stabilityProtectionEnabled;
+--- before/UI/src/RuntimeWorkerAdapters.cpp
++++ after/UI/src/RuntimeWorkerAdapters.cpp
+@@ -1980,7 +1980,7 @@
+     }
+     transaction.hasPendingPose = false;
+     transaction.pendingPoseConfirmed = false;
+-    transaction.message = QStringLiteral("已恢复并回读确认上一可信工件位姿，自动更新仍应暂停。");
++    transaction.message = QStringLiteral("已恢复并回读确认上一可信工件位姿，待上层冷却并重建新采样窗口。");
+     return {true, transaction.message};
+ }
+ 
+--- before/UI/include/OnlineLocalRegistrationRecovery.h
++++ after/UI/include/OnlineLocalRegistrationRecovery.h
+@@ -0,0 +1,66 @@
++/**
++ * @file OnlineLocalRegistrationRecovery.h
++ * @brief 已确认回滚后的冷却及新曝光边界；仅 coordinator 线程持有。
++ */
++#ifndef I2R_RLC_UI_ONLINE_LOCAL_REGISTRATION_RECOVERY_H
++#define I2R_RLC_UI_ONLINE_LOCAL_REGISTRATION_RECOVERY_H
++
++#include <QtGlobal>
++
++namespace i2r_rlc::ui {
++
++/** @brief 只管理恢复后采样资格，不清除会话累计预算、不访问设备或晋升位姿。 */
++class COnlineLocalRegistrationRecovery final {
++public:
++    /** @brief 回滚命令、归档和 worker 事务快照共同证明恢复已确认。 */
++    struct Outcome {
++        bool commandSucceeded = false;
++        bool archived = false;
++        bool rollbackAttempted = false;
++        bool hasVerifiedPose = false;
++        bool hasPendingPose = true;
++        bool pendingPoseConfirmed = false;
++    };
++
++    /** @brief 新会话显式清除旧边界；普通清窗和热调不能缩短恢复冷却。 */
++    void reset() { *this = COnlineLocalRegistrationRecovery{}; }
++
++    /**
++     * @brief 回滚结束时冻结单调冷却截止与曝光/帧号下界；未知结果保持禁止采样。
++     * @details nowMs 是会话单调时钟，captureAfterMs 是恢复完成的曝光时间域；
++     * 两者不可混用。只有恢复及事务归档均成功，且 worker 不再有待确认位姿才返回 true。
++     */
++    bool complete(const Outcome &outcome, qint64 nowMs, qint64 captureAfterMs,
++        qint64 frameAfter, int cooldownMs)
++    {
++        m_active = true;
++        m_confirmed = outcome.commandSucceeded && outcome.archived
++            && outcome.rollbackAttempted && outcome.hasVerifiedPose
++            && !outcome.hasPendingPose && !outcome.pendingPoseConfirmed
++            && nowMs >= 0 && captureAfterMs >= 0 && frameAfter >= 0 && cooldownMs >= 0;
++        m_startedAtMs = nowMs;
++        m_cooldownMs = cooldownMs;
++        m_captureAfterMs = captureAfterMs;
++        m_frameAfter = frameAfter;
++        return m_confirmed;
++    }
++
++    /** @brief 冷却后仍须新曝光及递增帧号；参数为调用方已校核的当前会话时间。 */
++    bool allowsSample(qint64 nowMs, qint64 captureTimeMs, qint64 frameId) const
++    {
++        return !m_active || (m_confirmed && nowMs >= m_startedAtMs
++            && nowMs - m_startedAtMs >= m_cooldownMs
++            && captureTimeMs > m_captureAfterMs && frameId > m_frameAfter);
++    }
++
++private:
++    bool m_active = false;
++    bool m_confirmed = false;
++    qint64 m_startedAtMs = -1;
++    int m_cooldownMs = 0;
++    qint64 m_captureAfterMs = -1;
++    qint64 m_frameAfter = -1;
++};
++
++} // namespace i2r_rlc::ui
++#endif // I2R_RLC_UI_ONLINE_LOCAL_REGISTRATION_RECOVERY_H

@@ -1,0 +1,57 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+      Start 18: i2r_rlc_online_local_registration_tests
+ 1/17 Test #18: i2r_rlc_online_local_registration_tests ..................   Passed    4.67 sec
+      Start 19: i2r_rlc_online_local_registration_surface_tests
+ 2/17 Test #15: i2r_rlc_runtime_tracking_flow_tests ......................   Passed    4.92 sec
+      Start 27: i2r_rlc_correction_robot_sim_offline_frame_sync_tests
+ 3/17 Test #19: i2r_rlc_online_local_registration_surface_tests ..........   Passed    5.63 sec
+      Start 35: i2r_rlc_localization_surface_validation_tests
+ 4/17 Test #35: i2r_rlc_localization_surface_validation_tests ............   Passed    6.68 sec
+      Start 81: i2r_rlc_simulation_guided_seam_tests
+ 5/17 Test #81: i2r_rlc_simulation_guided_seam_tests .....................   Passed    0.38 sec
+      Start 20: i2r_rlc_online_local_registration_safety_tests
+ 6/17 Test #20: i2r_rlc_online_local_registration_safety_tests ...........   Passed    0.99 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 7/17 Test  #8: i2r_rlc_online_correction_run_recorder_tests .............   Passed    0.28 sec
+      Start 82: i2r_rlc_online_seam_refiner_tests
+ 8/17 Test #82: i2r_rlc_online_seam_refiner_tests ........................   Passed    0.31 sec
+      Start 22: i2r_rlc_online_local_registration_history_replay_tests
+ 9/17 Test #22: i2r_rlc_online_local_registration_history_replay_tests ...   Passed    0.07 sec
+      Start 24: i2r_rlc_online_local_surface_verification_tests
+10/17 Test #24: i2r_rlc_online_local_surface_verification_tests ..........   Passed    0.03 sec
+      Start 25: i2r_rlc_local_registration_writeback_safety_tests
+11/17 Test #25: i2r_rlc_local_registration_writeback_safety_tests ........   Passed    0.19 sec
+      Start 21: i2r_rlc_online_local_registration_stability_tests
+12/17 Test #21: i2r_rlc_online_local_registration_stability_tests ........   Passed    0.06 sec
+      Start 80: i2r_rlc_online_seam_continuity_tests
+13/17 Test #80: i2r_rlc_online_seam_continuity_tests .....................   Passed    0.03 sec
+      Start 23: i2r_rlc_online_local_registration_verification_tests
+14/17 Test #23: i2r_rlc_online_local_registration_verification_tests .....   Passed    0.05 sec
+      Start 34: i2r_rlc_localization_tests
+15/17 Test #34: i2r_rlc_localization_tests ...............................   Passed    0.14 sec
+16/17 Test #27: i2r_rlc_correction_robot_sim_offline_frame_sync_tests ....***Failed   55.51 sec
+FAIL: missing RobotState should emit an explicit failure
+FAIL: frame 100 RobotSim query should enter the deterministic block
+FAIL: blocked current and latest pending frames should both reach Vision
+FAIL: while frame 100 is current, frames 101..105 must collapse to frame 105
+FAIL: only current and latest-pending frames should issue per-frame queries
+FAIL: a valid observation after one/two failures must clear the counter before Vision
+FAIL: transport failure should produce one explicit synchronization failure
+FAIL: transport failure should consume exactly the current frame query
+FAIL: old-session query should be blocked before stop
+FAIL: restarted session should route its own frame after old query returns
+FAIL: old-session Vision should enter the deterministic synchronization hook
+FAIL: new session should route after the blocked old Vision call returns
+FAIL: active correction must pause ordinary realtime RobotSim queries
+
+      Start 28: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+17/17 Test #28: i2r_rlc_correction_robot_sim_online_frame_sync_tests .....   Passed    2.14 sec
+
+94% tests passed, 1 tests failed out of 17
+
+Total Test time (real) =  62.60 sec
+
+The following tests FAILED:
+	 27 - i2r_rlc_correction_robot_sim_offline_frame_sync_tests (Failed)
+Errors while running CTest

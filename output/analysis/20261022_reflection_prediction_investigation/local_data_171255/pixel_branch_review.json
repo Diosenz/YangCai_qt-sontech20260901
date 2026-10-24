@@ -1,0 +1,19 @@
+{
+  "scope": "Independent read-only branch math, not native estimator/robot replay",
+  "anchor_left": {
+    "count": 55,
+    "ambiguous_columns": 1,
+    "valid": true,
+    "slope": 0.3559921864318158,
+    "intercept": 613.2641339242347,
+    "rms": 0.3067877269093759
+  },
+  "anchor_right": {
+    "count": 42,
+    "ambiguous_columns": 14,
+    "valid": false,
+    "slope": -0.451153243702537,
+    "intercept": 602.1593754688677,
+    "rms": 3.7729942981516262
+  }
+}

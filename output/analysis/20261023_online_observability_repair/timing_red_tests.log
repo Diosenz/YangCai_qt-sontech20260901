@@ -1,0 +1,19 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 80: i2r_rlc_online_seam_continuity_tests
+1/2 Test #80: i2r_rlc_online_seam_continuity_tests ...***Failed    0.05 sec
+FAIL: nonpositive and nonfinite exposure intervals cannot advance recovery or import raw and CAD motion
+FAIL: nonpositive and nonfinite exposure intervals cannot advance recovery or import raw and CAD motion
+FAIL: nonpositive and nonfinite exposure intervals cannot advance recovery or import raw and CAD motion
+FAIL: nonpositive and nonfinite exposure intervals cannot advance recovery or import raw and CAD motion
+FAIL: the next valid exposure uses only motion since the newly accepted local raw baseline
+
+    Start 82: i2r_rlc_simulation_guided_seam_tests
+2/2 Test #82: i2r_rlc_simulation_guided_seam_tests ...   Passed   15.69 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =  15.74 sec
+
+The following tests FAILED:
+	 80 - i2r_rlc_online_seam_continuity_tests (Failed)
+Errors while running CTest

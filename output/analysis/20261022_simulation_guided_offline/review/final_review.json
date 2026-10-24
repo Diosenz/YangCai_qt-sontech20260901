@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-22",
+  "status": "offline_phase_review_complete_not_ready_for_production",
+  "conclusion": "两条观测链解耦和预焊点沿原缝跨越的设计方向有明确依据；本轮固定形状视觉原型和简化点面求解器不具备直接接入生产的证据。负面结果必须与通过结果并列保留。",
+  "reviewed_artifacts": [
+    "vision/validate_candidates.py",
+    "vision/experiment_v4_review/summary.json",
+    "vision/experiment_v4_review/synthetic_cases.json",
+    "vision/validate_height_semantics.py",
+    "vision/height_v3/height_cases.json",
+    "vision/height_v3/frame7891_comparison.json",
+    "surface/validate_surface.py",
+    "surface/summary.json",
+    "surface/field_cases.json",
+    "surface/synthetic_cases.json",
+    "surface/wiring_review.json",
+    "review/ReviewGeometryCounterexamples.py",
+    "review/review_math_results.json",
+    "review/ReviewVisionAdversarial.py",
+    "review/vision_adversarial_red.json"
+  ],
+  "independent_checks": {
+    "analytic_geometry_assertions_passed": 8,
+    "surface_archive_count_checked": 52,
+    "surface_train_holdout_frame_id_disjoint": true,
+    "surface_all_archives_have_valid_weld_points": true,
+    "surface_no_archived_window_has_verified_material_identity": true,
+    "surface_temporal_holdout_improved_count_recomputed": 10,
+    "surface_rank3_at_5percent_count_recomputed": 25,
+    "vision_synthetic_count_checked": 14,
+    "vision_expectation_pass_count_checked": 12,
+    "vision_false_accept_count_checked": 2,
+    "height_unit_case_count_checked": 5,
+    "height_unit_pass_count_checked": 5,
+    "independent_vision_adversarial_red_reproduced": true,
+    "red_script_exit_code": 1,
+    "red_is_expected_evidence_not_environment_failure": true
+  },
+  "material_findings": [
+    {
+      "id": "F1",
+      "severity": "blocks_production_adoption_of_visual_prototype",
+      "finding": "固定形状匹配的竞争差距并不能排除反光。较弱反光若比真实条纹更符合仿真形状，会得到很大的第一/第二名差距、满支撑覆盖和错误接受。",
+      "evidence": "review/vision_adversarial_red.json；真实峰215、反光峰180，真实顶点(138,134)，输出反光顶点(120,160)，误差31.6228px，margin1.85896，左右与中心覆盖均1。vision/experiment_v4_review另保留18px的唯一模型相似反光反例。",
+      "implication": "不得把12/14转写成现场准确率，也不能把无绝对距离奖励解释为没有先验选择偏差。后续需要允许形状误差、保留原图竞争分支，并结合额外空间/时间证据；信息不足时保留歧义。"
+    },
+    {
+      "id": "F2",
+      "severity": "limits_surface_experiment_inference",
+      "finding": "52个现场窗口全部在已有焊点门禁通过后采集，缺少512帧无有效焊点区间的连续真实表面窗口。",
+      "evidence": "surface/field_cases.json与summary.json；全部all_independent_weld_points_valid=true，全部model_identity_verified=false。",
+      "implication": "10/52留出改善只说明该简化求解器在这些冻结窗口表现不足，不能估计缺焊点阶段能否继续定位，也不能说明两链架构失败。记录生产候选用过全部8帧，其后2帧评分不属于真正留出验证。"
+    },
+    {
+      "id": "F3",
+      "severity": "limits_synthetic_surface_claims",
+      "finding": "表面合成实验直接提供真实对应与解析法向；低姿态误差证明的是这些已知条件下的求解和稳健权重效果。",
+      "evidence": "surface/validate_surface.py:synthetic_scene、synthetic_solve；平面rank1、单侧rank2、双V拉伸rank3、三非平行面才rank4。",
+      "implication": "不能把已知对应下的精确恢复写成反光/预焊点实际图像的定位精度。简化现场求解器只有正则化与步长限制，未实现显式不可观测子空间冻结。"
+    },
+    {
+      "id": "F4",
+      "severity": "limits_height_experiment_claims",
+      "finding": "高度实验5例验证给定焊缝X时的GapCenter高度语义和标量残差位姿版本失效，没有验证焊缝X身份、多帧三维连续性和位姿晋升后的可用目标恢复。",
+      "evidence": "vision/validate_height_semantics.py、vision/height_v3/summary.json。",
+      "implication": "5/5不能关闭F1。真实7891与旧geometry约(+0.148,+0.533)px只是算法间差异，双方都没有独立物理真值。"
+    },
+    {
+      "id": "F5",
+      "severity": "required_complete_implementation_boundary",
+      "finding": "后续解耦必须覆盖入口、原图表面证据、求解自由度、候选验收、关键点预算、后验和位姿版本。只取消焊点门禁会绕过原验收且产生自证循环。",
+      "evidence": "review/design_review_initial.json R1-R7及additional_reference_gate；surface/wiring_review.json。",
+      "implication": "先建立有原图支撑和版本身份的表面观测接口及prospective新帧验证，保留单步/累计限幅和事务回读。当前DTO.valid仍需仿真焊点；首版若不拆reference有效性必须明确这个前提。"
+    },
+    {
+      "id": "F6",
+      "severity": "geometric_validation_limit",
+      "finding": "刚体变换旧虚拟扫描线、逆变换新激光交点，均不等价于同一激光平面与不同位姿模型重新求交。",
+      "evidence": "review/review_math_results.json：解析例旧场景实际差异1mm，逆变换对照差异4.1231mm。",
+      "implication": "当前冻结云留出只作近似几何一致性诊断；生产写回后应使用新曝光原图与实际当前仿真参考，不能以近似变换对照伪装完整反事实重渲染。"
+    }
+  ],
+  "supported_design_conclusions": [
+    "焊点不可见与母材表面不可用是不同条件；现有固定两段形状和单焊点强耦合需要分别建模。",
+    "仿真可提供候选方向/结构和遮挡处接缝估计，但模型估计不得成为模型位姿验收的独立真实点。",
+    "预焊凸起应作为局部形状异常处理，用户目标仍为原接缝；合成可见肩部实验支持这一条件性可行性。",
+    "必须按几何可观测性限制更新方向，不能仅凭PCA覆盖、点数和残差释放XYZ+Rz。",
+    "全局位姿和局部接缝残差要绑定版本，位姿已吸收的误差不得再次补偿。"
+  ],
+  "minimal_next_path": [
+    "保留当前离线负例为固定基线，先改进候选证据与竞争分支表达，验证真实形状不等于仿真的反光反例；不以事后单纯调阈值关闭反例。",
+    "定义surfaceReference与seamReference、表面原图支撑、工件位姿版本与测量/估计来源；当前阶段只提出接口，未改生产。",
+    "补足几何焊点失效时的同帧原图、完整仿真折线与可重放真实表面证据，再评估是否实际可更新及可更新自由度。不能由目前52窗代替。",
+    "在离线框架完成可观测子空间、局部凸起排除、候选拟合与留出退化、多解和位姿更新重基准化验证，再讨论生产接线。",
+    "生产阶段仍需Vision/Control负责人边界协作、VS2022/MSVC与真实新帧链路验证；当前结果不授权自动操作机器人或场景。"
+  ],
+  "reviewer_changes": "仅新增review目录脚本和JSON证据；未改生产文件、未运行构建、未调用设备或鼠标，未删除文件。"
+}

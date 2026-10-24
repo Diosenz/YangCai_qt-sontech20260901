@@ -1,0 +1,12 @@
+{
+  "trace_count": 6,
+  "source_counts": {
+    "TCP": 5848,
+    "raw_KCF": 7522
+  },
+  "axis_residual_norm_matches_3d_error": true,
+  "coordinate_frame": "positioner last-link/material frame",
+  "measurement_smoothing": false,
+  "mouse_used": false,
+  "actual_browser_interaction": "not performed"
+}

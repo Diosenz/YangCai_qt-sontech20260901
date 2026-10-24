@@ -1,0 +1,31 @@
+{
+  "synthetic_case_count": 14,
+  "synthetic_pass_count": 12,
+  "known_counterexamples": [
+    "sole_model_like_reflection",
+    "weaker_model_like_reflection_with_real_shape_mismatch"
+  ],
+  "original_saved_images": 28,
+  "exact_frame_prior_pairs": 1,
+  "calibration_hash_matches_prior_run": true,
+  "claims": [
+    "bounded shape matching can estimate a hidden nominal seam from visible shoulders in synthetic scenes",
+    "no absolute distance-to-simulation reward, competing full profiles must remain ambiguous"
+  ],
+  "limitations": [
+    "not a production algorithm; fixed translation, no 3-D registration",
+    "central exclusion is specified experimental design, not automatic tack detection",
+    "only one exact-frame real image/reference pair, no physical seam ground truth",
+    "sole model-like reflection is indistinguishable in static images and yields a false accept",
+    "weaker reflection matching the model beats brighter real seam with different flank slopes; false accept about 31.62px",
+    "exact-frame shoulder alignment differs from existing GapCenter height by about 3.88px; neither is independent truth",
+    "remaining 27 saved images cannot be replayed with full same-frame model profile",
+    "no continuous image recording or closed-loop accuracy validation"
+  ],
+  "files": [
+    "synthetic_metrics.csv",
+    "synthetic_cases.json",
+    "exact_frame_reference.json",
+    "input_hashes.json"
+  ]
+}

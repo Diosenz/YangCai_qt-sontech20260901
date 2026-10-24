@@ -1,0 +1,73 @@
+{
+  "files": [
+    "docs/online_local_registration.md",
+    "tests/test_localization_surface_validation.cpp",
+    "tests/test_local_registration_writeback_safety.cpp",
+    "tests/test_online_local_registration_surface.cpp",
+    "tests/test_online_local_surface_verification.cpp",
+    "UI/CMakeLists.txt",
+    "Localization/include/LocalizationSurfaceValidation.h",
+    "Localization/src/LocalizationSurfaceValidation.cpp",
+    "UI/include/OnlineLocalRegistrationWorker.h",
+    "UI/include/OnlineLocalSurfaceVerification.h",
+    "UI/include/RuntimeCoordinator.h",
+    "UI/src/OnlineLocalRegistrationWorker.cpp",
+    "UI/src/RuntimeCoordinator.cpp",
+    "UI/src/RuntimeLocalRegistration.cpp",
+    "UI/src/RuntimeWorkerAdapters.cpp",
+    "UI/include/OnlineLocalRegistrationRecovery.h"
+  ],
+  "before_sha256": {
+    "docs/online_local_registration.md": "80b97187f7e2b834ca3ec5b57c13ae329f4c9d2c68538f29c2cc616594d93f31",
+    "tests/test_localization_surface_validation.cpp": "fcd4b19cefaf6c9d2779e1b50afec0fe047ea0e7c8b98b9a825d924f666d6981",
+    "tests/test_local_registration_writeback_safety.cpp": "8e0c47cd969c37632c1d866e5ef874b4ff23f16c1b35040b40fa05416d62375a",
+    "tests/test_online_local_registration_surface.cpp": "81edccb862972286e726a00b17f69354add896c39f17440e3eee122b97ebce98",
+    "tests/test_online_local_surface_verification.cpp": "73d99a4fe23b412690a8a2699d938e22684ed7d90287a5e89201093a10edcac5",
+    "UI/CMakeLists.txt": "69ab33326fc756ff84127a6161f9a17b01d0e89084ff6ef5f642696420a7919b",
+    "Localization/include/LocalizationSurfaceValidation.h": "6ce459cf39d88ff8be3a3f049e8bb9f7b8113be45bb0893fc310237ba5374e90",
+    "Localization/src/LocalizationSurfaceValidation.cpp": "2f5fa9db96593e73d7edda316278670c97b7062d145a2c970c207d9d409742ca",
+    "UI/include/OnlineLocalRegistrationWorker.h": "3e64996b51f374bb3f25c44f6524d8fc7440496d540cd5238b4eac2dc07908c1",
+    "UI/include/OnlineLocalSurfaceVerification.h": "a5908d847c2890f93fdb1b154b2df500644204382931b79f7a8a93fe0d29df6a",
+    "UI/include/RuntimeCoordinator.h": "d4f31245cf2e7e683735979ffbdd9d78c211968b8493387da764161ee864e95e",
+    "UI/src/OnlineLocalRegistrationWorker.cpp": "0c95386cb48f2758485aa228c6baffa9b5b32f48c1b2f6f2c9d040877a4df22f",
+    "UI/src/RuntimeCoordinator.cpp": "e4b165ab65fafc0f1a098296badbefe8229c3c2f827dd1063c7c63dd86634e67",
+    "UI/src/RuntimeLocalRegistration.cpp": "7eeea67e9c3d410968fcda5146e603774ed290ff1ea8392b8595243126c7af00",
+    "UI/src/RuntimeWorkerAdapters.cpp": "bd20b9075a2587024c888efb41e3df7fe52a457c28dfc4d1cea6b37b96cde44c"
+  },
+  "after_sha256": {
+    "docs/online_local_registration.md": "08cb27a81495c09577785a5dcbf8206e833cbd1a1e3ac00ca3c0abb152dc1278",
+    "tests/test_localization_surface_validation.cpp": "790c2a51bd189cea67fdfda4b30ee7145a9c7d6f754b80a5f7e3bd68229cf373",
+    "tests/test_local_registration_writeback_safety.cpp": "05d60e6f39206bf36ce28c5b2e146d6eaa20eb424f60fded52bd3773affa8d87",
+    "tests/test_online_local_registration_surface.cpp": "48bad891e296a00bd86b9222894213a9595e42e6d0c8e6ca66809e5ed90aa72e",
+    "tests/test_online_local_surface_verification.cpp": "bea39d1f235be6c8effd7d1516cc0c0dcdb08adc4c10db71dda952c8b39fd208",
+    "UI/CMakeLists.txt": "81bd7cbf52c1610eac7e043f7c24a971fd1a045ce4554193c87b5e1f5303e179",
+    "Localization/include/LocalizationSurfaceValidation.h": "c795574be8f04ecccb39a86b1d874471323e9bdab3128f1b5fc01cebe557019d",
+    "Localization/src/LocalizationSurfaceValidation.cpp": "61fd066c24ab02d9be21d86d2cd9b4d9e9ec78bab2f5ddf0fbe9cd02821ca1b2",
+    "UI/include/OnlineLocalRegistrationWorker.h": "3e12fd5ae8a37f36368f63d39b6c138896d68b5d41d48370ed0ef396afb21533",
+    "UI/include/OnlineLocalSurfaceVerification.h": "2e3a7d9166d6b522dd6e6e6bfb7b92a9ede813fc43f2a7018d75c667dea7262c",
+    "UI/include/RuntimeCoordinator.h": "3d74335cc8a12b582c191dfbefe110170fd78a809da58e317d4ea0e4d04ebfd0",
+    "UI/src/OnlineLocalRegistrationWorker.cpp": "5e2e57941164d8a58335f278b448bfdc23630204ce0f4cbe52d3d4b3e8a27752",
+    "UI/src/RuntimeCoordinator.cpp": "c1166cbe57008843170567f4451a3a7bc11521c4a7f550fd44b832bdea1c1f90",
+    "UI/src/RuntimeLocalRegistration.cpp": "09b30a5308cff75035759eecfe132f32a8274d020b4e1af9d6db0847ae14b18a",
+    "UI/src/RuntimeWorkerAdapters.cpp": "0ccb241049a29d2b665908326a9a5a175050f7a7c0aa1bbbcaaf2607d2cee91e",
+    "UI/include/OnlineLocalRegistrationRecovery.h": "0914e20cc9c9e33db1b87784bf1eb16c2da21bad77354c5e764c348fed08d138"
+  },
+  "notion_current_access": "read current public root, collaboration workflow, bug-fix workflow and general preferences via public loadPageChunk endpoint; no Computer Use",
+  "notion_snapshot": "output/analysis/20261021_kcf_right_bias_investigation/notion_workflow_snapshot.json",
+  "baseline_tests": {
+    "localization_surface_validation": "passed",
+    "online_local_surface_verification": "passed",
+    "local_registration_writeback_safety": "passed"
+  },
+  "live_devices_started": false,
+  "computer_use_before_user_prohibition": "initialized skill and enumerated windows only; no input actions",
+  "computer_use_after_user_prohibition": false,
+  "notion_current_response_files": [
+    "output\\analysis\\20261022_local_surface_recovery\\notion_3faaa04f-a8a9-81d1-b419-d2fc27a13cb4.json",
+    "output\\analysis\\20261022_local_surface_recovery\\notion_3fdaa04f-a8a9-812d-9c96-eca7b6a4c071.json",
+    "output\\analysis\\20261022_local_surface_recovery\\notion_3fdaa04f-a8a9-8191-95d2-dc0eb65ce630.json",
+    "output\\analysis\\20261022_local_surface_recovery\\notion_root_response.json"
+  ],
+  "encoding_errors": [],
+  "missing_source_files": []
+}

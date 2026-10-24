@@ -1,0 +1,204 @@
+{
+  "reference": {
+    "center": [
+      -0.5005363925343285,
+      -1.5765225706770094,
+      253.51815368823745
+    ],
+    "normal": [
+      -0.0025789982665820744,
+      -9.090431129310517e-05,
+      0.9999966702466297
+    ],
+    "radius_mm": 142.03533963525268
+  },
+  "reference_refitted": false,
+  "definitions": [
+    {
+      "key": "all",
+      "label": "全量有效记录",
+      "removed_visual_count": 0,
+      "start": null,
+      "end": null,
+      "start_frame": null,
+      "end_frame": null,
+      "contiguous": true
+    },
+    {
+      "key": "screenshot_prediction_segment",
+      "label": "剔除截图所在连续仿真预测段",
+      "removed_visual_count": 187,
+      "start": "10-22 00:00:28.310",
+      "end": "10-22 00:00:40.652",
+      "start_frame": 17558,
+      "end_frame": 17932,
+      "contiguous": true
+    },
+    {
+      "key": "screenshot_geometry_outage",
+      "label": "剔除截图所在整段精定位失效",
+      "removed_visual_count": 512,
+      "start": "10-22 00:00:06.728",
+      "end": "10-22 00:00:40.652",
+      "start_frame": 16904,
+      "end_frame": 17932,
+      "contiguous": true
+    },
+    {
+      "key": "all_prediction_sources",
+      "label": "剔除全程所有仿真预测来源帧",
+      "removed_visual_count": 993,
+      "start": "10-21 23:53:10.173",
+      "end": "10-22 00:01:22.759",
+      "start_frame": 4281,
+      "end_frame": 19208,
+      "contiguous": false
+    }
+  ],
+  "metrics": [
+    {
+      "scenario": "all",
+      "label": "全量有效记录",
+      "trajectory": "raw_KCF",
+      "removed": 0,
+      "n": 7056,
+      "mean_mm": 0.8260796244380165,
+      "rmse_mm": 1.0562008530630957,
+      "max_mm": 12.483734561446692,
+      "p95_mm": 1.6017660146548174,
+      "above_3mm_count": 63,
+      "max_time": "10-21 23:53:57.032"
+    },
+    {
+      "scenario": "all",
+      "label": "全量有效记录",
+      "trajectory": "final_vision",
+      "removed": 0,
+      "n": 7056,
+      "mean_mm": 0.7811264676908946,
+      "rmse_mm": 1.1928609749503598,
+      "max_mm": 4.767200742670352,
+      "p95_mm": 3.196623933433852,
+      "above_3mm_count": 389,
+      "max_time": "10-22 00:00:56.822"
+    },
+    {
+      "scenario": "all",
+      "label": "全量有效记录",
+      "trajectory": "TCP",
+      "removed": 0,
+      "n": 5854,
+      "mean_mm": 0.8441636765690702,
+      "rmse_mm": 1.2316777847727638,
+      "max_mm": 4.812449599407069,
+      "p95_mm": 3.0665789804368777,
+      "above_3mm_count": 304,
+      "max_time": "10-22 00:01:24.093"
+    },
+    {
+      "scenario": "screenshot_prediction_segment",
+      "label": "剔除截图所在连续仿真预测段",
+      "trajectory": "raw_KCF",
+      "removed": 187,
+      "n": 6869,
+      "mean_mm": 0.8198265563425818,
+      "rmse_mm": 1.055419920764153,
+      "max_mm": 12.483734561446692,
+      "p95_mm": 1.614770746505214,
+      "above_3mm_count": 63,
+      "max_time": "10-21 23:53:57.032"
+    },
+    {
+      "scenario": "screenshot_prediction_segment",
+      "label": "剔除截图所在连续仿真预测段",
+      "trajectory": "final_vision",
+      "removed": 187,
+      "n": 6869,
+      "mean_mm": 0.7417799049485561,
+      "rmse_mm": 1.150354587961692,
+      "max_mm": 4.767200742670352,
+      "p95_mm": 3.2820690348685355,
+      "above_3mm_count": 389,
+      "max_time": "10-22 00:00:56.822"
+    },
+    {
+      "scenario": "screenshot_prediction_segment",
+      "label": "剔除截图所在连续仿真预测段",
+      "trajectory": "TCP",
+      "removed": 140,
+      "n": 5714,
+      "mean_mm": 0.8491284134792413,
+      "rmse_mm": 1.2409659532751374,
+      "max_mm": 4.812449599407069,
+      "p95_mm": 3.098891484926167,
+      "above_3mm_count": 304,
+      "max_time": "10-22 00:01:24.093"
+    },
+    {
+      "scenario": "screenshot_geometry_outage",
+      "label": "剔除截图所在整段精定位失效",
+      "trajectory": "raw_KCF",
+      "removed": 512,
+      "n": 6544,
+      "mean_mm": 0.8129571157913027,
+      "rmse_mm": 1.0569954217647661,
+      "max_mm": 12.483734561446692,
+      "p95_mm": 1.6182512404952223,
+      "above_3mm_count": 63,
+      "max_time": "10-21 23:53:57.032"
+    },
+    {
+      "scenario": "screenshot_geometry_outage",
+      "label": "剔除截图所在整段精定位失效",
+      "trajectory": "final_vision",
+      "removed": 512,
+      "n": 6544,
+      "mean_mm": 0.7234625528211449,
+      "rmse_mm": 1.1485683470711836,
+      "max_mm": 4.767200742670352,
+      "p95_mm": 3.378155328544251,
+      "above_3mm_count": 389,
+      "max_time": "10-22 00:00:56.822"
+    },
+    {
+      "scenario": "screenshot_geometry_outage",
+      "label": "剔除截图所在整段精定位失效",
+      "trajectory": "TCP",
+      "removed": 384,
+      "n": 5470,
+      "mean_mm": 0.8561108644571455,
+      "rmse_mm": 1.2566302083857677,
+      "max_mm": 4.812449599407069,
+      "p95_mm": 3.159825992669144,
+      "above_3mm_count": 304,
+      "max_time": "10-22 00:01:24.093"
+    },
+    {
+      "scenario": "all_prediction_sources",
+      "label": "剔除全程所有仿真预测来源帧",
+      "trajectory": "raw_KCF",
+      "removed": 993,
+      "n": 6063,
+      "mean_mm": 0.7661603998939327,
+      "rmse_mm": 0.8919679954134063,
+      "max_mm": 6.03930007314117,
+      "p95_mm": 1.4461793308413005,
+      "above_3mm_count": 16,
+      "max_time": "10-21 23:55:38.605"
+    },
+    {
+      "scenario": "all_prediction_sources",
+      "label": "剔除全程所有仿真预测来源帧",
+      "trajectory": "final_vision",
+      "removed": 993,
+      "n": 6063,
+      "mean_mm": 0.5198944119862886,
+      "rmse_mm": 0.6561929401415462,
+      "max_mm": 4.581139554994519,
+      "p95_mm": 1.3157579963124366,
+      "above_3mm_count": 23,
+      "max_time": "10-22 00:00:56.887"
+    }
+  ],
+  "note": "事后剔除敏感性分析，不替代全量性能。仅剔除KCF点时TCP和最终输出的原统计保持不变；同窗剔除三轨迹另列。"
+}

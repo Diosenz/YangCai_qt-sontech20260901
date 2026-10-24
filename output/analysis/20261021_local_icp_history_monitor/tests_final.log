@@ -1,0 +1,45 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  3: i2r_rlc_online_correction_tests
+ 1/14 Test  #3: i2r_rlc_online_correction_tests ..........................   Passed    0.14 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 2/14 Test  #8: i2r_rlc_online_correction_run_recorder_tests .............   Passed    1.02 sec
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 3/14 Test #15: i2r_rlc_runtime_tracking_flow_tests ......................***Failed    5.50 sec
+FAIL: closed loop should send every O teach point in index order
+FAIL: closed loop should send a normal P and a final P
+FAIL: segment finish should send P with Online_endflag=1
+FAIL: offline==5 should enter OnlineRunning
+FAIL: final P acknowledgement should complete the worker closed loop
+FAIL: stop and restart should create a newer nonzero correction session
+FAIL: new current frame should retain the restarted session correlation
+
+      Start 16: i2r_rlc_online_fusion_controls_tests
+ 4/14 Test #16: i2r_rlc_online_fusion_controls_tests .....................   Passed    0.24 sec
+      Start 17: i2r_rlc_online_local_registration_tests
+ 5/14 Test #17: i2r_rlc_online_local_registration_tests ..................   Passed    3.04 sec
+      Start 18: i2r_rlc_online_local_registration_safety_tests
+ 6/14 Test #18: i2r_rlc_online_local_registration_safety_tests ...........   Passed    1.00 sec
+      Start 19: i2r_rlc_online_local_registration_stability_tests
+ 7/14 Test #19: i2r_rlc_online_local_registration_stability_tests ........   Passed    0.06 sec
+      Start 20: i2r_rlc_online_local_registration_history_replay_tests
+ 8/14 Test #20: i2r_rlc_online_local_registration_history_replay_tests ...   Passed    0.08 sec
+      Start 21: i2r_rlc_online_local_registration_verification_tests
+ 9/14 Test #21: i2r_rlc_online_local_registration_verification_tests .....   Passed    0.10 sec
+      Start 22: i2r_rlc_local_registration_writeback_safety_tests
+10/14 Test #22: i2r_rlc_local_registration_writeback_safety_tests ........   Passed    0.23 sec
+      Start 26: i2r_rlc_main_widget_panel_tests
+11/14 Test #26: i2r_rlc_main_widget_panel_tests ..........................   Passed    2.59 sec
+      Start 28: i2r_rlc_offline_correction_tests
+12/14 Test #28: i2r_rlc_offline_correction_tests .........................   Passed    0.07 sec
+      Start 31: i2r_rlc_localization_tests
+13/14 Test #31: i2r_rlc_localization_tests ...............................   Passed    0.13 sec
+      Start 95: i2r_rlc_digital_twin_tests
+14/14 Test #95: i2r_rlc_digital_twin_tests ...............................   Passed    0.08 sec
+
+93% tests passed, 1 tests failed out of 14
+
+Total Test time (real) =  14.54 sec
+
+The following tests FAILED:
+	 15 - i2r_rlc_runtime_tracking_flow_tests (Failed)
+Errors while running CTest

@@ -1,0 +1,36 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start  3: i2r_rlc_online_correction_tests
+1/9 Test  #3: i2r_rlc_online_correction_tests ........................   Passed    0.25 sec
+    Start  6: i2r_rlc_online_calibration_contract_tests
+2/9 Test  #6: i2r_rlc_online_calibration_contract_tests ..............   Passed    1.03 sec
+    Start 15: i2r_rlc_runtime_tracking_flow_tests
+3/9 Test #15: i2r_rlc_runtime_tracking_flow_tests ....................***Failed    6.05 sec
+FAIL: raw KCF deviation fixture must trigger the first immediate anomaly
+FAIL: camera clock forward jump must not release the worker monotonic anomaly cooldown
+FAIL: camera clock reset must not reset the worker anomaly cooldown
+FAIL: same-session configure must preserve the monotonic origin and anomaly cooldown
+FAIL: actual session change must release the new session first-anomaly sample
+
+    Start 17: i2r_rlc_online_fusion_controls_tests
+4/9 Test #17: i2r_rlc_online_fusion_controls_tests ...................   Passed    0.31 sec
+    Start 25: i2r_rlc_local_registration_writeback_safety_tests
+5/9 Test #25: i2r_rlc_local_registration_writeback_safety_tests ......   Passed    0.22 sec
+    Start 28: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+6/9 Test #28: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...***Failed    2.61 sec
+FAIL: online obscured frame keeps a synchronized estimated target without inventing an independent measurement
+
+    Start 82: i2r_rlc_online_image_geometry_tests
+7/9 Test #82: i2r_rlc_online_image_geometry_tests ....................   Passed   17.67 sec
+    Start 84: i2r_rlc_online_seam_refiner_tests
+8/9 Test #84: i2r_rlc_online_seam_refiner_tests ......................   Passed    0.48 sec
+    Start 86: i2r_rlc_vision_kcf_tracker_tests
+9/9 Test #86: i2r_rlc_vision_kcf_tracker_tests .......................   Passed    0.58 sec
+
+78% tests passed, 2 tests failed out of 9
+
+Total Test time (real) =  29.23 sec
+
+The following tests FAILED:
+	 15 - i2r_rlc_runtime_tracking_flow_tests (Failed)
+	 28 - i2r_rlc_correction_robot_sim_online_frame_sync_tests (Failed)
+Errors while running CTest

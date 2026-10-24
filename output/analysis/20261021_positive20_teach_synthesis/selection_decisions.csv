@@ -1,0 +1,26 @@
+﻿name,path,included,reason,radius_mm,coverage_deg
+20230608CHUFENGKOU_W.txt,E:\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20230608CHUFENGKOU_W.txt,True,明确正20mm映射；按几何去重后纳入,140.64765469148105,359.74148003355566
+20230529CHUFENGKOUFLIP_W.txt,E:\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20230529CHUFENGKOUFLIP_W.txt,False,反面/FLIP；排除,140.09049264153043,359.7613554730918
+20211127chufengkou_W.txt,E:\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20211127chufengkou_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,155.4512251040977,119.7511084344745
+20211127chufengkouoffline_W.txt,E:\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20211127chufengkouoffline_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,159.63000035218712,134.14012339543683
+20211127chufengkouoffline1_W.txt,E:\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20211127chufengkouoffline1_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,159.63596559590778,53.25221141533183
+20211118chufengkou_W.txt,E:\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20211118chufengkou_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,157.5082466303548,116.93564680923976
+20231028CHUFENGKOUFLIPOFF_W.txt,E:\SontechWorks -20230615\SWv1\data\Robotleadingdata\WorkPiece\20231028CHUFENGKOUFLIPOFF_W.txt,False,反面/FLIP；排除,138.02479728964013,359.721817911415
+20260610CHUFENGKOUFLIP_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20260610CHUFENGKOUFLIP_W.txt,True,明确正20mm映射；按几何去重后纳入,143.71704466934042,359.671236737589
+20260405CHUFENGKOUTRUEVALUE_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20260405CHUFENGKOUTRUEVALUE_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,143.4912279737853,359.6720998882132
+20260309CHUFENGKOU_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20260309CHUFENGKOU_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,141.9645297866943,359.6685812849071
+20260308CHUFENGKOU_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20260308CHUFENGKOU_W.txt,True,明确正20mm映射；按几何去重后纳入,142.08463931235414,359.6577402044418
+20251125CHUFENGKOUFLIP_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20251125CHUFENGKOUFLIP_W.txt,False,反面/FLIP；排除,133.30555167279957,359.4771672000451
+20250606CHUFENGKOU_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20250606CHUFENGKOU_W.txt,True,明确正20mm映射；按几何去重后纳入,141.69201986783509,359.7259956914804
+20250325CHUFENGKOUFLIP_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20250325CHUFENGKOUFLIP_W.txt,False,反面/FLIP；排除,133.88752767629003,359.74093855904994
+20250324CHUFENGKOUFLIP_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20250324CHUFENGKOUFLIP_W.txt,False,反面/FLIP；排除,133.72773011204413,359.7246440302628
+20240523CHUFENGKOUFLIP_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20240523CHUFENGKOUFLIP_W.txt,False,反面/FLIP；排除,145.30099691679183,359.70569018747324
+20240124ChuFengKouTrueValue_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20240124ChuFengKouTrueValue_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,136.0128674352319,359.73581225250746
+20240123ChuFengKouTrueValue_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20240123ChuFengKouTrueValue_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,134.39040517484094,359.68956482682205
+20231028CHUFENGKOUFLIPOFFP3P5_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20231028CHUFENGKOUFLIPOFFP3P5_W.txt,False,反面/FLIP；排除,138.35615723123374,171.08287382532944
+20231028CHUFENGKOUFLIPOFFP2P4_W.txt,E:\SontechWorks-new\SontechWorks_Weld_Merge\SWv1\data\Robotleadingdata\WorkPiece\20231028CHUFENGKOUFLIPOFFP2P4_W.txt,False,反面/FLIP；排除,137.93236728360318,193.4498983964515
+20260610CHUFENGKOUFLIP_W.txt,E:\SontechWorks-new\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20260610CHUFENGKOUFLIP_W.txt,False,反面/FLIP；排除,,
+20260328CHUFENGKOUTRUEVALUE_W.txt,E:\SontechWorks-new\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20260328CHUFENGKOUTRUEVALUE_W.txt,False,无明确正20mm映射或仅不完整圆弧；仅保留检索结果，不进入主综合,143.06918303241002,359.6699196404608
+20260327CHUFENGKOUFLIP_W.txt,E:\SontechWorks-new\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20260327CHUFENGKOUFLIP_W.txt,False,反面/FLIP；排除,133.0097721617773,359.63797706982865
+20260327CHUFENGKOUFLIPTRUEVALUE_W.txt,E:\SontechWorks-new\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20260327CHUFENGKOUFLIPTRUEVALUE_W.txt,False,反面/FLIP；排除,131.43507986289683,359.61167102960087
+20260319CHUFENGKOUFLIP_W.txt,E:\SontechWorks-new\SontechWorks\SWv1\data\Robotleadingdata\WorkPiece\20260319CHUFENGKOUFLIP_W.txt,False,反面/FLIP；排除,133.49930660864683,359.6199319677022

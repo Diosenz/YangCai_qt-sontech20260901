@@ -1,0 +1,124 @@
+{
+  "build": {
+    "status": "passed",
+    "compiler": "VS2022 MSVC 14.44.35207",
+    "configuration": "existing qt-debug Debug Ninja",
+    "developer_environment_explicitly_authorized": true,
+    "log": "build_final.log",
+    "main_binary": "out/build/qt-debug/UI/i2r_rlc.exe"
+  },
+  "tests": {
+    "selected": 17,
+    "passed": 16,
+    "failed": [
+      "i2r_rlc_correction_robot_sim_offline_frame_sync_tests"
+    ],
+    "all_four_new_targets_passed": true,
+    "junit": "tests_final.xml",
+    "log": "tests_final.log",
+    "offline_failure_matches_prior_log": true,
+    "offline_failure_count": 13,
+    "prior_log": "output/analysis/kcf_seam_refinement_20261021/verification_final.log",
+    "details": [
+      {
+        "name": "i2r_rlc_online_correction_run_recorder_tests",
+        "time": "0.279856",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_runtime_tracking_flow_tests",
+        "time": "4.92463",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_local_registration_tests",
+        "time": "4.66584",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_local_registration_surface_tests",
+        "time": "5.63382",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_local_registration_safety_tests",
+        "time": "0.986025",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_local_registration_stability_tests",
+        "time": "0.0631662",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_local_registration_history_replay_tests",
+        "time": "0.0688365",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_local_registration_verification_tests",
+        "time": "0.0527047",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_local_surface_verification_tests",
+        "time": "0.0263914",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_local_registration_writeback_safety_tests",
+        "time": "0.185385",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_correction_robot_sim_offline_frame_sync_tests",
+        "time": "55.5141",
+        "passed": false
+      },
+      {
+        "name": "i2r_rlc_correction_robot_sim_online_frame_sync_tests",
+        "time": "2.13574",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_localization_tests",
+        "time": "0.141665",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_localization_surface_validation_tests",
+        "time": "6.6774",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_seam_continuity_tests",
+        "time": "0.0314576",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_simulation_guided_seam_tests",
+        "time": "0.38474",
+        "passed": true
+      },
+      {
+        "name": "i2r_rlc_online_seam_refiner_tests",
+        "time": "0.311266",
+        "passed": true
+      }
+    ]
+  },
+  "limits": [
+    "Existing offline synchronization prerequisite remains failing; full shared online/offline acceptance is incomplete.",
+    "Localization service reports two optional captured point-cloud/replay fixture groups unavailable; synthetic coverage passed.",
+    "Surface post-write checker, worker measurement and transaction protections are tested separately; no live RobotSim/hardware or complete new captured-image welding loop was run.",
+    "Model/temporal estimates are not independent measurements; raw exposure evidence is limited to the configured archive budget."
+  ],
+  "delegation": {
+    "vision": "raw continuity gate, bounded simulation guidance, source4 provenance and tests",
+    "surface": "observable subspace, disjoint holdout, worker extraction/validation and tests",
+    "independent_review": "thread/version/writeback boundaries, CMake/INI/docs and archive reader",
+    "primary": "runtime assembly, optional training-only ICP initialization, compilation, failure analysis and final verification"
+  },
+  "computer_use_after_prohibition": false,
+  "live_devices_started": false
+}

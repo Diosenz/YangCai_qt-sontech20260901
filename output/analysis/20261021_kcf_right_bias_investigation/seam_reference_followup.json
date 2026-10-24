@@ -1,0 +1,630 @@
+{
+  "human_reference": {
+    "frame": 6469,
+    "meaning": "actual joint, roughly below the red simulated point; not an extrapolated intersection",
+    "exact_pixel_annotation": false,
+    "scope": "this frame only; other frames have geometric estimates without user labels"
+  },
+  "decomposition": [
+    {
+      "frame": 6469,
+      "user_reference_available": true,
+      "stable_break": false,
+      "sim_x": 500.0,
+      "visible_break_x": 499.0,
+      "raw_x": 510.686096,
+      "total_raw_minus_sim_px": 10.68609600000002,
+      "visible_break_minus_sim_px": -1.0,
+      "raw_minus_visible_break_px": 11.68609600000002,
+      "raw_y": 588.744385,
+      "visible_left_endpoint_y": 595.6821273964131,
+      "visible_right_endpoint_y": 587.5056056184692,
+      "peak": 0.838665723801,
+      "since_init": 37
+    },
+    {
+      "frame": 7257,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 459.0,
+      "visible_break_x": 466.0,
+      "raw_x": 483.916595,
+      "total_raw_minus_sim_px": 24.916594999999973,
+      "visible_break_minus_sim_px": 7.0,
+      "raw_minus_visible_break_px": 17.916594999999973,
+      "raw_y": 594.781586,
+      "visible_left_endpoint_y": 602.3233747107091,
+      "visible_right_endpoint_y": 596.2851571083978,
+      "peak": 0.749959409237,
+      "since_init": 4
+    },
+    {
+      "frame": 7570,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 441.0,
+      "visible_break_x": 453.5,
+      "raw_x": 463.65329,
+      "total_raw_minus_sim_px": 22.653290000000027,
+      "visible_break_minus_sim_px": 12.5,
+      "raw_minus_visible_break_px": 10.153290000000027,
+      "raw_y": 600.971008,
+      "visible_left_endpoint_y": 606.7542149292151,
+      "visible_right_endpoint_y": 599.2878509034551,
+      "peak": 0.789196789265,
+      "since_init": 2
+    },
+    {
+      "frame": 8350,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 447.0,
+      "visible_break_x": 453.0,
+      "raw_x": 460.027008,
+      "total_raw_minus_sim_px": 13.027008000000023,
+      "visible_break_minus_sim_px": 6.0,
+      "raw_minus_visible_break_px": 7.0270080000000235,
+      "raw_y": 601.335236,
+      "visible_left_endpoint_y": 607.9638814016173,
+      "visible_right_endpoint_y": 598.7203947368417,
+      "peak": 0.838538765907,
+      "since_init": 34
+    },
+    {
+      "frame": 9391,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 426.0,
+      "visible_break_x": 455.0,
+      "raw_x": 455.782227,
+      "total_raw_minus_sim_px": 29.782226999999978,
+      "visible_break_minus_sim_px": 29.0,
+      "raw_minus_visible_break_px": 0.7822269999999776,
+      "raw_y": 606.485901,
+      "visible_left_endpoint_y": 606.994160376015,
+      "visible_right_endpoint_y": 602.5517503805179,
+      "peak": 0.774763226509,
+      "since_init": 3
+    },
+    {
+      "frame": 9411,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 425.0,
+      "visible_break_x": 455.0,
+      "raw_x": 450.963135,
+      "total_raw_minus_sim_px": 25.963135000000023,
+      "visible_break_minus_sim_px": 30.0,
+      "raw_minus_visible_break_px": -4.0368649999999775,
+      "raw_y": 605.77063,
+      "visible_left_endpoint_y": 605.9771708683475,
+      "visible_right_endpoint_y": 601.3180751173709,
+      "peak": 0.796034097672,
+      "since_init": 13
+    },
+    {
+      "frame": 10878,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 431.0,
+      "visible_break_x": 453.0,
+      "raw_x": 466.999481,
+      "total_raw_minus_sim_px": 35.999481,
+      "visible_break_minus_sim_px": 22.0,
+      "raw_minus_visible_break_px": 13.999481000000003,
+      "raw_y": 602.257721,
+      "visible_left_endpoint_y": 601.7682972367439,
+      "visible_right_endpoint_y": 601.6260954235732,
+      "peak": 0.797512114048,
+      "since_init": 34
+    },
+    {
+      "frame": 12363,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 447.0,
+      "visible_break_x": 480.5,
+      "raw_x": 475.698273,
+      "total_raw_minus_sim_px": 28.698272999999972,
+      "visible_break_minus_sim_px": 33.5,
+      "raw_minus_visible_break_px": -4.801727000000028,
+      "raw_y": 604.206451,
+      "visible_left_endpoint_y": 606.3453188617026,
+      "visible_right_endpoint_y": 602.5663592987817,
+      "peak": 0.782460868359,
+      "since_init": 4
+    },
+    {
+      "frame": 13028,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 445.0,
+      "visible_break_x": 481.0,
+      "raw_x": 491.001495,
+      "total_raw_minus_sim_px": 46.00149499999998,
+      "visible_break_minus_sim_px": 36.0,
+      "raw_minus_visible_break_px": 10.001494999999977,
+      "raw_y": 593.902008,
+      "visible_left_endpoint_y": 600.8582210242587,
+      "visible_right_endpoint_y": 595.0864819360025,
+      "peak": 0.791191101074,
+      "since_init": 29
+    },
+    {
+      "frame": 14277,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 468.0,
+      "visible_break_x": 464.5,
+      "raw_x": 475.568726,
+      "total_raw_minus_sim_px": 7.5687260000000265,
+      "visible_break_minus_sim_px": -3.5,
+      "raw_minus_visible_break_px": 11.068726000000026,
+      "raw_y": 599.274139,
+      "visible_left_endpoint_y": 607.3583591941932,
+      "visible_right_endpoint_y": 596.8675530779901,
+      "peak": 0.80065882206,
+      "since_init": 46
+    },
+    {
+      "frame": 14847,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 461.0,
+      "visible_break_x": 470.0,
+      "raw_x": 485.218658,
+      "total_raw_minus_sim_px": 24.218658000000005,
+      "visible_break_minus_sim_px": 9.0,
+      "raw_minus_visible_break_px": 15.218658000000005,
+      "raw_y": 596.820831,
+      "visible_left_endpoint_y": 605.2964959568733,
+      "visible_right_endpoint_y": 594.4796633941094,
+      "peak": 0.784804522991,
+      "since_init": 16
+    },
+    {
+      "frame": 16227,
+      "user_reference_available": false,
+      "stable_break": true,
+      "sim_x": 460.0,
+      "visible_break_x": 482.5,
+      "raw_x": 488.517456,
+      "total_raw_minus_sim_px": 28.51745599999998,
+      "visible_break_minus_sim_px": 22.5,
+      "raw_minus_visible_break_px": 6.0174559999999815,
+      "raw_y": 597.895081,
+      "visible_left_endpoint_y": 603.3295039252613,
+      "visible_right_endpoint_y": 590.7813389142501,
+      "peak": 0.81949532032,
+      "since_init": 37
+    }
+  ],
+  "controlled_matches": [
+    {
+      "frame": 6469,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 499.0,
+      "production_raw_x": 510.686096,
+      "source": {
+        "continuous_v": {
+          "x": 494.3330268156453,
+          "y_left_endpoint_anchor": 585.884385082519,
+          "peak": 0.8214991542497775
+        },
+        "step": {
+          "x": 503.5837463357305,
+          "y_left_endpoint_anchor": 589.6884489629863,
+          "peak": 0.7849665709325672
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 490.15458364446306,
+          "y_left_endpoint_anchor": 595.229709589574,
+          "peak": 0.699584708080992
+        },
+        "step": {
+          "x": 499.2182039942226,
+          "y_left_endpoint_anchor": 598.8474682940015,
+          "peak": 0.6823120565872145
+        }
+      }
+    },
+    {
+      "frame": 7257,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 466.0,
+      "production_raw_x": 483.916595,
+      "source": {
+        "continuous_v": {
+          "x": 454.1602749981718,
+          "y_left_endpoint_anchor": 597.8359550067157,
+          "peak": 0.8651369590349971
+        },
+        "step": {
+          "x": 460.2887769442084,
+          "y_left_endpoint_anchor": 599.5397154591151,
+          "peak": 0.8349962784650931
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 459.26067297313,
+          "y_left_endpoint_anchor": 602.1681635020859,
+          "peak": 0.8556893748663755
+        },
+        "step": {
+          "x": 465.8912721231125,
+          "y_left_endpoint_anchor": 606.0344688424559,
+          "peak": 0.7583473744009556
+        }
+      }
+    },
+    {
+      "frame": 7570,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 453.5,
+      "production_raw_x": 463.65329,
+      "source": {
+        "continuous_v": {
+          "x": 447.62413984466434,
+          "y_left_endpoint_anchor": 602.1282681516042,
+          "peak": 0.7613810726058836
+        },
+        "step": {
+          "x": 455.2138672575979,
+          "y_left_endpoint_anchor": 606.8423164261818,
+          "peak": 0.7507078148681007
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 444.61722419830846,
+          "y_left_endpoint_anchor": 606.2744074993052,
+          "peak": 0.7916741371021392
+        },
+        "step": {
+          "x": 452.6601076011582,
+          "y_left_endpoint_anchor": 609.4272887057485,
+          "peak": 0.7731793182894506
+        }
+      }
+    },
+    {
+      "frame": 8350,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 453.0,
+      "production_raw_x": 460.027008,
+      "source": {
+        "continuous_v": {
+          "x": 446.44636025797377,
+          "y_left_endpoint_anchor": 603.3424571325808,
+          "peak": 0.7159669239647584
+        },
+        "step": {
+          "x": 454.5352350968661,
+          "y_left_endpoint_anchor": 610.05283747016,
+          "peak": 0.657396483713575
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 446.28795954080425,
+          "y_left_endpoint_anchor": 606.2509458932635,
+          "peak": 0.7568778177142149
+        },
+        "step": {
+          "x": 452.56675016068755,
+          "y_left_endpoint_anchor": 610.5351056463378,
+          "peak": 0.7104322869675226
+        }
+      }
+    },
+    {
+      "frame": 9391,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 455.0,
+      "production_raw_x": 455.782227,
+      "source": {
+        "continuous_v": {
+          "x": 440.84429025432195,
+          "y_left_endpoint_anchor": 601.5858745653313,
+          "peak": 0.6331534440144664
+        },
+        "step": {
+          "x": 445.93929171231184,
+          "y_left_endpoint_anchor": 604.5836642774941,
+          "peak": 0.6156782084666941
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 448.10309119845215,
+          "y_left_endpoint_anchor": 607.9453780135952,
+          "peak": 0.7120257632029965
+        },
+        "step": {
+          "x": 451.3061823273559,
+          "y_left_endpoint_anchor": 609.8423348859982,
+          "peak": 0.7460915309316435
+        }
+      }
+    },
+    {
+      "frame": 9411,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 455.0,
+      "production_raw_x": 450.963135,
+      "source": {
+        "continuous_v": {
+          "x": 440.0939879447979,
+          "y_left_endpoint_anchor": 598.9467128764717,
+          "peak": 0.6894681489897488
+        },
+        "step": {
+          "x": 442.5048933018904,
+          "y_left_endpoint_anchor": 600.9425584798234,
+          "peak": 0.6226627099991782
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 445.82349300717283,
+          "y_left_endpoint_anchor": 606.0237028953738,
+          "peak": 0.6806533882918456
+        },
+        "step": {
+          "x": 448.15828467260826,
+          "y_left_endpoint_anchor": 608.3882827782751,
+          "peak": 0.67431206110147
+        }
+      }
+    },
+    {
+      "frame": 10878,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 453.0,
+      "production_raw_x": 466.999481,
+      "source": {
+        "continuous_v": {
+          "x": 440.9923712333098,
+          "y_left_endpoint_anchor": 607.14329004707,
+          "peak": 0.6834612965523661
+        },
+        "step": {
+          "x": 442.1360023463241,
+          "y_left_endpoint_anchor": 606.8689824311083,
+          "peak": 0.6703432685253488
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 451.9331099640986,
+          "y_left_endpoint_anchor": 604.5382108862748,
+          "peak": 0.7291856812952862
+        },
+        "step": {
+          "x": 453.02618076132444,
+          "y_left_endpoint_anchor": 605.2129607709425,
+          "peak": 0.7205494428079312
+        }
+      }
+    },
+    {
+      "frame": 12363,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 480.5,
+      "production_raw_x": 475.698273,
+      "source": {
+        "continuous_v": {
+          "x": 461.992207847701,
+          "y_left_endpoint_anchor": 599.9710300211221,
+          "peak": 0.6280318395185813
+        },
+        "step": {
+          "x": 461.82217687298413,
+          "y_left_endpoint_anchor": 602.6257819254121,
+          "peak": 0.5927650701754137
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 466.9382624318275,
+          "y_left_endpoint_anchor": 605.1558950342719,
+          "peak": 0.6301687313767922
+        },
+        "step": {
+          "x": 467.93652503351154,
+          "y_left_endpoint_anchor": 606.8060172965382,
+          "peak": 0.6256084943239436
+        }
+      }
+    },
+    {
+      "frame": 13028,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 481.0,
+      "production_raw_x": 491.001495,
+      "source": {
+        "continuous_v": {
+          "x": 472.2304803365414,
+          "y_left_endpoint_anchor": 594.0226657284808,
+          "peak": 0.682814999007573
+        },
+        "step": {
+          "x": 473.74450590078857,
+          "y_left_endpoint_anchor": 595.0075216097177,
+          "peak": 0.657566022049837
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 470.2863867233501,
+          "y_left_endpoint_anchor": 600.753969830126,
+          "peak": 0.6790004882228202
+        },
+        "step": {
+          "x": 473.1743589241866,
+          "y_left_endpoint_anchor": 602.7757648786927,
+          "peak": 0.6512638283676406
+        }
+      }
+    },
+    {
+      "frame": 14277,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 464.5,
+      "production_raw_x": 475.568726,
+      "source": {
+        "continuous_v": {
+          "x": 460.9839786388921,
+          "y_left_endpoint_anchor": 602.9368207867451,
+          "peak": 0.8315818721063789
+        },
+        "step": {
+          "x": 467.93004599554763,
+          "y_left_endpoint_anchor": 608.5821591049069,
+          "peak": 0.8754057519435527
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 457.0477621511004,
+          "y_left_endpoint_anchor": 605.196336320217,
+          "peak": 0.7021521573062345
+        },
+        "step": {
+          "x": 466.8947685850238,
+          "y_left_endpoint_anchor": 610.1183057925945,
+          "peak": 0.6704156043370185
+        }
+      }
+    },
+    {
+      "frame": 14847,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 470.0,
+      "production_raw_x": 485.218658,
+      "source": {
+        "continuous_v": {
+          "x": 462.5650076071981,
+          "y_left_endpoint_anchor": 600.0114591248906,
+          "peak": 0.8377534767021244
+        },
+        "step": {
+          "x": 471.10389526007873,
+          "y_left_endpoint_anchor": 605.4367450106223,
+          "peak": 0.7994883350694918
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 468.09891228632466,
+          "y_left_endpoint_anchor": 603.5465186052882,
+          "peak": 0.6934379211437047
+        },
+        "step": {
+          "x": 472.93463729939185,
+          "y_left_endpoint_anchor": 609.1997827723341,
+          "peak": 0.7424211846272111
+        }
+      }
+    },
+    {
+      "frame": 16227,
+      "input_status": "independent single-frame reset control, not native history replay",
+      "visible_break_x": 482.5,
+      "production_raw_x": 488.517456,
+      "source": {
+        "continuous_v": {
+          "x": 467.9260963738465,
+          "y_left_endpoint_anchor": 597.329391459003,
+          "peak": 0.716325645058757
+        },
+        "step": {
+          "x": 469.6837521649797,
+          "y_left_endpoint_anchor": 600.875242825202,
+          "peak": 0.6577122068948813
+        }
+      },
+      "enhanced": {
+        "continuous_v": {
+          "x": 478.8901774362798,
+          "y_left_endpoint_anchor": 601.0581774694987,
+          "peak": 0.6491687712410975
+        },
+        "step": {
+          "x": 486.546505834327,
+          "y_left_endpoint_anchor": 607.6157778324084,
+          "peak": 0.6405339076429218
+        }
+      }
+    }
+  ],
+  "local_projection_sensitivity": {
+    "evaluation_pixel": [
+      499,
+      591.5
+    ],
+    "evaluation_note": "Convenient local evaluation location, not an accepted seam point.",
+    "one_x_pixel_mm": 0.0732689212145828,
+    "one_y_pixel_mm": 0.2262522333325105
+  },
+  "frame6469_fusion": {
+    "response_peak": "0.838665723801",
+    "normalized_peak": "0.698655654685",
+    "kcf_weight_x": "0.990038377614",
+    "before_fusion_x_px": "510.686096",
+    "final_x_px": "510.579651"
+  },
+  "frame6469_endpoint_envelope_sensitivity": {
+    "note": "Testing envelope of visible stripe endpoints, not human annotation uncertainty, not actual robot error.",
+    "x_px": [
+      498.5,
+      499
+    ],
+    "y_px": [
+      587.5056056184692,
+      595.6821273964131
+    ],
+    "distances": {
+      "raw": {
+        "min_mm": 0.8501991607922013,
+        "max_mm": 1.874539714227561
+      },
+      "final": {
+        "min_mm": 0.8424383825220546,
+        "max_mm": 1.875682206242124
+      },
+      "sim": {
+        "min_mm": 0.35158293700344145,
+        "max_mm": 2.1986969029233694
+      }
+    }
+  },
+  "reinitialization_jumps": {
+    "reinitialized": {
+      "n": 151,
+      "median_delta_raw_minus_sim_x": 0.45297299999998586,
+      "p10_p90": [
+        -4.747588999999948,
+        5.59170499999999
+      ]
+    },
+    "other": {
+      "n": 7594,
+      "median_delta_raw_minus_sim_x": 0.02230799999998112,
+      "p10_p90": [
+        -2.4384035999999862,
+        2.542438000000027
+      ]
+    }
+  },
+  "findings": [
+    "KCF horizontal deviation remains in the user-confirmed example.",
+    "Red-green distance mixes virtual-model displacement and KCF localization displacement.",
+    "Response peak is not a calibrated measure of seam-position accuracy.",
+    "Fresh geometry-aware templates improve some frames but fail on others; no validated production fix.",
+    "Y must preserve actual seam semantics, not default to intersection/midpoint/constant offset."
+  ]
+}

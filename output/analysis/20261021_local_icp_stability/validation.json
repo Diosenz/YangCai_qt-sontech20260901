@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-21",
+  "source": "VS2022 MSVC qt-debug existing build tree",
+  "build_succeeded": true,
+  "tests_passed": 11,
+  "tests_failed": 0,
+  "actual_device_run": false,
+  "historical_protection_replayed_from_old_logs": false,
+  "changed_files_sha256": {
+    "UI/CMakeLists.txt": "4717415390b4c4d2fe6db848a0fe3464bc8de9fdd16cfbeee167cd11a27cf019",
+    "UI/include/MainWidget.h": "5e9973cf6272717c61b09c9d07f674fe6391597633c4b58b24230de1472391e9",
+    "UI/include/OnlineLocalRegistrationVerification.h": "6ea40f67fac96e19a4895ba4e13b034d100b5fba608738cc7b7d22d5cf342728",
+    "UI/include/OnlineLocalRegistrationWorker.h": "b299eb33adc14f393d125b0eb7f99b99e916a1af96ff7366ceab3a321bbabbe8",
+    "UI/include/RuntimeCoordinator.h": "2a41ff406cdbde486f47346df871b8f85f07494c9c60fc0af670213d02313e45",
+    "UI/src/MainWidget.cpp": "9c4a1a90a8c5fde10f6f796a2c82e5ee4c0a774cc7c53a4f4883f777285b01fa",
+    "UI/src/OnlineLocalRegistrationWorker.cpp": "1fa8f99a6830e7595e696a92f418f131eca8a69bec5314532ab66d547e3cacfc",
+    "UI/src/RuntimeLocalRegistration.cpp": "00816d8e55b469a85f4cbf5314118b86a492fb10c9ba79b585eadf0e1997cbab",
+    "UI/src/UiController.cpp": "1c7276b46bb0bc72a366aae37b40d113336b7d5e33793876e5da03b7c91db913",
+    "config/digital_twin/online_local_registration.ini": "e780fc38eb5a1f2ac34e8c2332efa31d443ee34a6f203f482bc1565fef495bbb",
+    "docs/online_local_registration.md": "9ba4ff8b279b88b5e15c49656996ae10b6fdda14b93dace2542401e3b9179e8c",
+    "tests/CMakeLists.txt": "e2b9b2614338fb8e905705eb584533366970ba3967ad16f18014ecee282737d5",
+    "tests/test_main_widget_panels.cpp": "8e1bdec726875105573875a2073e87e6118d5114a2c06417123a3a60dffdb37e",
+    "tests/test_online_local_registration.cpp": "8d9f90851e25b8ed368ee943906eace98d8408ef1c15b74f4dcd0a7b124304b4",
+    "tests/test_online_local_registration_safety.cpp": "ac2aa8cb52707c74fbe01b370a726f96cfad88a2e7191025bbcc8dafe37b32d7",
+    "tests/test_online_local_registration_verification.cpp": "5260e159d195d8b88188889217de525cd08202aace3970517549420ba98d3aac",
+    "UI/include/OnlineLocalRegistrationStability.h": "726436c4474b97c63ce81d6bf3c5bdd82911623c7614c54583451896e1c5f215",
+    "tests/test_online_local_registration_stability.cpp": "43faf60c328d4c27a370a9d132734d00f2f59b01b9c0aa3762a515316cc3c469"
+  }
+}

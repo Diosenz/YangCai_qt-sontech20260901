@@ -1,0 +1,134 @@
+[0/1] Re-running CMake...
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+CMake Warning (dev) at C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    H:/YangCai_Code/YangCai_qt-sontech20260901/vcpkg_installed/x64-windows
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  vcpkg_installed/x64-windows/share/pcl/Modules/FindFLANN.cmake:45 (find_package)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:261 (find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:306 (find_flann)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:578 (find_external_library)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  Localization/CMakeLists.txt:30 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Found Qhull version 8.0.2
+-- looking for PCL_COMMON
+-- looking for PCL_IO_PLY
+-- looking for PCL_IO
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_FILTERS
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_2D
+-- looking for PCL_FEATURES
+-- looking for PCL_REGISTRATION
+-- looking for PCL_GEOMETRY
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_SURFACE
+-- looking for PCL_KEYPOINTS
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+CMake Warning (dev) at C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    H:/YangCai_Code/YangCai_qt-sontech20260901/vcpkg_installed/x64-windows
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  vcpkg_installed/x64-windows/share/pcl/Modules/FindFLANN.cmake:45 (find_package)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:261 (find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:306 (find_flann)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:578 (find_external_library)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  Vision/CMakeLists.txt:5 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Found Qhull version 8.0.2
+-- looking for PCL_COMMON
+-- looking for PCL_IO_PLY
+-- looking for PCL_IO
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_FILTERS
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_2D
+-- looking for PCL_FEATURES
+-- looking for PCL_REGISTRATION
+-- looking for PCL_GEOMETRY
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_SURFACE
+-- looking for PCL_KEYPOINTS
+-- Vision OpenCV enabled: 3.4.5
+-- Vision OpenCV_DIR: E:/Libs/OPENCV3/opencv/build/x64/vc15/lib
+-- IBVS OpenCV enabled: 3.4.5
+-- IBVS OpenCV_DIR: E:/Libs/OPENCV3/opencv/build/x64/vc15/lib
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+CMake Warning (dev) at C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    H:/YangCai_Code/YangCai_qt-sontech20260901/vcpkg_installed/x64-windows
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  vcpkg_installed/x64-windows/share/pcl/Modules/FindFLANN.cmake:45 (find_package)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:261 (find_package)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:306 (find_flann)
+  vcpkg_installed/x64-windows/share/pcl/PCLConfig.cmake:578 (find_external_library)
+  C:/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  tests/CMakeLists.txt:4 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Found Qhull version 8.0.2
+-- looking for PCL_COMMON
+-- looking for PCL_IO_PLY
+-- looking for PCL_IO
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_FILTERS
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_2D
+-- looking for PCL_FEATURES
+-- looking for PCL_REGISTRATION
+-- looking for PCL_GEOMETRY
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_SURFACE
+-- looking for PCL_KEYPOINTS
+-- Configuring done (10.5s)
+-- Generating done (1.9s)
+-- Build files have been written to: H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+[1/5] Building CXX object tests\CMakeFiles\i2r_rlc_online_seam_candidate_geometry_tests.dir\test_online_seam_candidate_geometry.cpp.obj
+FAILED: tests/CMakeFiles/i2r_rlc_online_seam_candidate_geometry_tests.dir/test_online_seam_candidate_geometry.cpp.obj 
+D:\cmake\bin\cmake.exe -E env VSLANG=1033 D:\vs2022\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cl.exe  /nologo /TP -DI2R_RLC_ENABLE_OPENCV=1 -DQT_CORE_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 -IH:\YangCai_Code\YangCai_qt-sontech20260901\DigitalTwin\include -IH:\YangCai_Code\YangCai_qt-sontech20260901\Localization\include -IE:\Libs\OPENCV3\opencv\build\include -IE:\Libs\OPENCV3\opencv\build\include\opencv -external:ID:\QT\6.7.3\msvc2022_64\include\QtCore -external:ID:\QT\6.7.3\msvc2022_64\include -external:ID:\QT\6.7.3\msvc2022_64\mkspecs\win32-msvc -external:IH:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\include\eigen3 -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd /EHsc /utf-8 /bigobj /external:anglebrackets /external:W0 /analyze:external- -Zc:__cplusplus -permissive- -utf-8 /showIncludes /Fotests\CMakeFiles\i2r_rlc_online_seam_candidate_geometry_tests.dir\test_online_seam_candidate_geometry.cpp.obj /Fdtests\CMakeFiles\i2r_rlc_online_seam_candidate_geometry_tests.dir\ /FS -c H:\YangCai_Code\YangCai_qt-sontech20260901\tests\test_online_seam_candidate_geometry.cpp
+H:\YangCai_Code\YangCai_qt-sontech20260901\tests\test_online_seam_candidate_geometry.cpp(10): fatal error C1083: Cannot open include file: 'BRepBuilderAPI_MakeEdge.hxx': No such file or directory
+[2/5] Building CXX object DigitalTwin\CMakeFiles\i2r_rlc_digital_twin.dir\src\OnlineSeamCandidateGeometry.cpp.obj
+ninja: build stopped: subcommand failed.

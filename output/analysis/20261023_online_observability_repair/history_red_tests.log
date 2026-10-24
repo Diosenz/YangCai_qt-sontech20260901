@@ -1,0 +1,14 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 21: i2r_rlc_online_local_registration_stability_tests
+1/1 Test #21: i2r_rlc_online_local_registration_stability_tests ...***Failed    0.04 sec
+FAIL: standalone sampling must discard transient candidate geometry
+FAIL: promotion must discard transient candidate geometry on newly inserted anchors
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.05 sec
+
+The following tests FAILED:
+	 21 - i2r_rlc_online_local_registration_stability_tests (Failed)
+Errors while running CTest

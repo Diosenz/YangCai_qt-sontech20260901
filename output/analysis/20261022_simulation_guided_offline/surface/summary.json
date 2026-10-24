@@ -1,0 +1,63 @@
+{
+  "scope": "Offline prototype only; no production source edits, PCL/MSVC build, runtime, robot or scene commands.",
+  "field_candidate_count": 52,
+  "temporal_split": "First N-2 raw frames fit; final 2 frames evaluate. Spatial density is bounded, no random point split.",
+  "all_archived_windows_have_valid_weld_points": true,
+  "any_verified_material_correspondence": false,
+  "rank_counts_at_1percent": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 52
+  },
+  "rank_counts_at_5percent": {
+    "1": 0,
+    "2": 0,
+    "3": 25,
+    "4": 27
+  },
+  "prototype_completed": 52,
+  "temporal_holdout_improved_count": 10,
+  "training_symmetric_improved_count": 17,
+  "training_improved_but_holdout_worsened_count": 7,
+  "training_gain_mm_quantiles": [
+    -6.001490915571351,
+    -0.9408122013868916,
+    -0.09372291562310192,
+    0.1164544023018857,
+    1.820317531970327
+  ],
+  "recorded_all_frames_candidate_block_improved_count": 42,
+  "recorded_block_score_is_not_holdout": true,
+  "symmetric_gain_mm_quantiles": [
+    -7.153645161501583,
+    -1.5238846683928515,
+    -0.500729107282059,
+    -0.202229177205512,
+    1.6675456962739617
+  ],
+  "synthetic_assertions": {
+    "full_geometry_known_transform": true,
+    "plane_has_nullspace": true,
+    "two_sides_still_has_tangential_nullspace": true,
+    "robust_local_bump_reduces_pose_bias": true
+  },
+  "decision": "Do not connect this exploratory solver or bypass weld-point gates in production. Establish surface extraction/identity, observable-subspace updates and prospective surface validation first.",
+  "limitations": [
+    "Field archives were collected only after seam observation passed; no claim that missing-seam frames provide usable surfaces.",
+    "Point-to-plane local normals and threshold ranks are diagnostic; clutter or a narrow scan strip can create spurious apparent rank.",
+    "Neighbor frame holdout tests short-range consistency and is temporally correlated; not physical weld truth or long-horizon closed loop.",
+    "Both train and heldout virtual laser slices are rigidly transformed as an approximation, not re-intersected/rendered for each candidate pose.",
+    "Finite stride sampling caps each split at 800 points. The simplified solver uses local PCA normals, trim/Huber regularization and per-step limits, with no explicit unobservable-mode freezing or line-search guarantee.",
+    "Recorded production transforms used all frames; their final-two-frame score is explicitly not a holdout test.",
+    "Synthetic normals and correspondence identities are supplied; image extraction, branch selection and correspondence ambiguity remain unvalidated.",
+    "No fixed physical acceptance thresholds are approved by these experiments."
+  ],
+  "reproduction": {
+    "command": "python validate_surface.py --output-dir <new-directory>",
+    "output_directory": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\output\\analysis\\20261022_simulation_guided_offline\\surface",
+    "existing_directory_policy": "Explicit --output-dir must not exist; omitted argument preserves default script-directory behavior.",
+    "script_sha256": "d0049340ad4cc5e95ee428ca141b54065ca8c4eae069989c1bde7688c40bcb97",
+    "verification": "AST parse passed; existing output directory rejected with exit code 2; 52-window algorithm not rerun."
+  }
+}

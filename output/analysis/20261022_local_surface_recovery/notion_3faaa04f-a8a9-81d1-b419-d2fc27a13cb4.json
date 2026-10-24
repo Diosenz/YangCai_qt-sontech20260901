@@ -1,0 +1,3359 @@
+{
+  "cursor": {
+    "stack": []
+  },
+  "recordMap": {
+    "__version__": 3,
+    "block": {
+      "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "value": {
+            "id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "version": 26,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "AI 协助修 bug｜从实际现象到根因与验收"
+                ]
+              ]
+            },
+            "content": [
+              "0e3ad3f3-105e-47e5-804e-132bc42670e4",
+              "6ff5935e-003e-4b38-96c4-8309d0181b70",
+              "c35a5872-ab12-4d37-b078-d25831041719",
+              "f0606fbd-715f-486d-920e-55becf95bd9f",
+              "ddc824ed-52f1-4138-8f00-057b7e8b9a16",
+              "561f488b-0784-4b1e-a5e2-b10b65957cec",
+              "64e9cdf7-bfca-43cd-b5e5-a4bcb2ae6e28",
+              "3ce0c9ab-8a86-4b3e-b13b-56e5ca3e4651",
+              "4d3c1815-2dd5-4483-b208-251bf3906f25",
+              "5dc91dc4-fc70-4870-944d-352221217536",
+              "be16a9ee-3baf-40bd-bb3c-c3cd998aefab",
+              "3cf67124-c372-4c4b-8d66-bf216d963e57",
+              "bd339ee0-d706-4539-8282-848aaee42617",
+              "afab5cd8-c82f-4ddb-a902-e51b589684e7",
+              "9b42ab78-8eb0-478b-ad29-6175d3598561",
+              "c2f9417c-fe03-4154-8640-c8790d0905cf",
+              "24f05645-60cd-4119-9017-35cd49d16b1b",
+              "9a8ca569-8ffa-4d18-8506-578d2c3a46af",
+              "4d43a686-581d-45a7-a7f3-c606292fdb12",
+              "c9ae03f3-f0c6-4333-af44-0a84521c1f2e",
+              "a70a1ff3-d81d-47f9-a90c-64fc60bd8832",
+              "0ba87a08-9192-41d5-8c01-ccc303cca927",
+              "0c0e83b5-e5c6-4294-ad03-d934dadb1cfe",
+              "c197cd30-3202-4d65-8b18-e9f267c37649",
+              "c96c7170-acdb-471a-9be0-cf464fe46698"
+            ],
+            "format": {
+              "page_icon": "🔎",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991653,
+            "last_edited_time": 1792289670090,
+            "parent_id": "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+            "crdt_data": {
+              "title": {
+                "r": "prrewNIc_nrp4EjnQxXctQ,\"start\",\"end\"",
+                "n": {
+                  "prrewNIc_nrp4EjnQxXctQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "prrewNIc_nrp4EjnQxXctQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "RFsR6Duu0ed1",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 22,
+                          "c": "AI 协助修 bug｜从实际现象到根因与验收"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "value": {
+            "id": "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+            "version": 17,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "AI 协作工作流｜持续优化"
+                ]
+              ]
+            },
+            "content": [
+              "95e87bb4-f7fc-494a-93f8-93e5801f51ad",
+              "885b26fe-cbf5-4fe3-a746-88929fdba564",
+              "8a2be07a-41f3-47b3-b585-fa46c6f98fb0",
+              "298cd4a4-d695-4a56-bed4-0e4d106f9f31",
+              "fe3da384-33cc-4178-b9cd-f97032cadc16",
+              "61368066-10df-4562-8cc1-d9ed8e8d3d00",
+              "f71d59a0-b7f1-4aee-ab3d-da2c1e0cff55",
+              "9d9d3d37-d8c9-434d-bb83-3fb65fff492b",
+              "9c45e1ef-d61b-41b9-a4ea-2e6296b79627",
+              "f57b8966-bbcb-459c-a777-33169d23ba8a",
+              "14898f1c-a0ac-4dc6-84e8-05bc31ba8835",
+              "6b5d45c1-69e9-470e-b557-a69660b0e8d4",
+              "3449549d-9fc3-42af-b5be-8206c838f285",
+              "3318c53c-d8d1-4cd4-9fbf-7ada0eeda4e0",
+              "70d27fab-e824-4902-b024-9c3746135f87",
+              "d7446ae3-5c08-4cc0-8344-52dd0033942c",
+              "94e50296-ed30-44aa-b33c-828cb2bc3e7c",
+              "8e5369b7-b7f3-4c6a-958d-ea8f98892cea",
+              "3db90720-72fb-4c8d-9fb8-da30f1734bf7",
+              "8bbd87ca-a916-42c1-8cc2-0f65709d89bf",
+              "de5a4180-5024-4283-9f3c-fc15013c68a7",
+              "1b2e2391-26b1-4ba7-9632-e64f8b55adc8",
+              "28b0faf4-a3ce-4079-bf15-fa23752eca13",
+              "e9ed48ad-67dd-4b82-945c-3ea04b4ea5cd",
+              "b7cad1b4-0e88-4a36-b1f1-ce1ab0277dae",
+              "61c1d846-3dca-4db4-9111-fb6f114229e5",
+              "c5580db1-dc83-489b-b422-43a9b48f09d1",
+              "d2b5ba87-e01e-419d-8429-2614268d30dd",
+              "e9e68438-1431-4649-9cfd-769b8f7ef06c",
+              "1e0e2842-c3e0-4d83-8efc-f066e3e260b1",
+              "bb35a695-cf0e-4637-b560-20765849317e",
+              "af917180-ed21-433a-a093-25741e0b86b3",
+              "cee55252-ba85-4c04-a560-e68c19a66692",
+              "6c2625f3-6cd1-48db-82e3-1be0423563b1",
+              "d7815d91-9352-4ede-8a39-40a2b171ecb6",
+              "e2752753-c155-42e8-bb8b-1e4f04be28a3",
+              "4a89a688-f374-441e-8aac-3b23af18c768",
+              "38bb7def-4c2f-457e-b3af-08077b458be6",
+              "fa8e49a6-e256-4989-aa4b-f968cd71d490",
+              "0f6952c1-c5ed-4bc0-9aa9-1a5879d1f550",
+              "907b8f31-c0e1-4b05-accc-b1c81099c222",
+              "24056e43-b2eb-4819-bc1d-ac74e168a769",
+              "1e57a3e8-ce15-41cc-9d1c-13a0590bd4c2",
+              "95770f81-4c3e-47bc-bb29-bf3ba2275fd9",
+              "7688b90f-3e40-49bc-9c3e-787c30c081a0",
+              "c22a21ce-a583-4966-a680-326e272c28a8",
+              "317db124-7ae3-461e-9686-a35679120367",
+              "26176d12-ae09-4112-8cc9-efd24196ebcc",
+              "29556df8-f4b2-4877-b379-c32af408e97c",
+              "72dd30c1-ea17-40d4-8c23-8f7601a1e833",
+              "0d468f52-8cad-4650-ac78-29e7985106ca",
+              "c3de22b4-2a2e-4016-b179-5b56da478320",
+              "5284d385-66e3-4093-94bb-659ebda49caf",
+              "10b3edc7-61ac-4bba-ba25-4688329a4dc7",
+              "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+              "3faaa04f-a8a9-815f-b8aa-db92a77f8b13",
+              "3faaa04f-a8a9-81ae-93ef-fcad1a7b8230"
+            ],
+            "format": {
+              "page_icon": "🔄",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792289581930,
+            "last_edited_time": 1792290590972,
+            "parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "crdt_data": {
+              "title": {
+                "r": "kQ7UXZr2mkHl2PmwJBMRYg,\"start\",\"end\"",
+                "n": {
+                  "kQ7UXZr2mkHl2PmwJBMRYg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "kQ7UXZr2mkHl2PmwJBMRYg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "VZnBk2aUO1tJ",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 13,
+                          "c": "AI 协作工作流｜持续优化"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3f7aa04f-a8a9-8179-8bda-eec496f904f1": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "value": {
+            "id": "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+            "version": 361,
+            "type": "page",
+            "properties": {
+              "title": [
+                [
+                  "个人工作偏好｜AI 协作指南"
+                ]
+              ]
+            },
+            "content": [
+              "061735d1-b9f5-40b8-ad8a-8b52602dae50",
+              "935b2669-bbb9-4140-a40c-2fd7ab1b92ae",
+              "c5ff5f36-25e3-42ab-8731-ef1a739f8d20",
+              "3fdaa04f-a8a9-8148-9d0e-d533e2bbff85",
+              "3fdaa04f-a8a9-81c5-bc2a-dd7bc7b81b4f",
+              "3fdaa04f-a8a9-81c0-bffc-c614cbc03b4c",
+              "2ef58ef6-1cfc-4ccd-99e1-2edc0bc4f674",
+              "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+              "3fdaa04f-a8a9-8110-83ad-fac2b8baf115",
+              "3fdaa04f-a8a9-812d-9c96-eca7b6a4c071",
+              "fabab840-7931-4f04-a0fd-66c8aca9caf1",
+              "3fdaa04f-a8a9-809e-8041-f842d3bcb132",
+              "3feaa04f-a8a9-816c-9f51-c32fad802a46",
+              "401aa04f-a8a9-8007-98bc-ef9f31373d7c"
+            ],
+            "format": {
+              "site_id": "3ffaa04f-a8a9-8088-9570-00794615076c",
+              "page_icon": "🧭",
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "permissions": [
+              {
+                "role": "reader",
+                "type": "public_permission",
+                "is_site": true,
+                "added_timestamp": 1792495174512
+              }
+            ],
+            "created_time": 1791774323584,
+            "last_edited_time": 1792651380266,
+            "parent_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "parent_table": "space",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "space",
+            "nav_parent_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_data": {
+              "title": {
+                "r": "aWV8XI3kRJ8qOYbUzF7zwg,\"start\",\"end\"",
+                "n": {
+                  "aWV8XI3kRJ8qOYbUzF7zwg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "aWV8XI3kRJ8qOYbUzF7zwg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "P8yd4S0ulZ3U",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 14,
+                          "c": "个人工作偏好｜AI 协作指南"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "0e3ad3f3-105e-47e5-804e-132bc42670e4": {
+        "value": {
+          "value": {
+            "id": "0e3ad3f3-105e-47e5-804e-132bc42670e4",
+            "version": 6,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "本页是 "
+                ],
+                [
+                  "‣",
+                  [
+                    [
+                      "p",
+                      "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+                      "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                    ]
+                  ]
+                ],
+                [
+                  " 的专项执行流程，与共用方法一起使用，并按实际协作持续修订。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792289670090,
+            "last_edited_time": 1792289670090,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "cbgfo9gDK-XApoCIlhYicA,\"start\",\"end\"",
+                "n": {
+                  "cbgfo9gDK-XApoCIlhYicA,\"start\",\"end\"": {
+                    "s": {
+                      "x": "cbgfo9gDK-XApoCIlhYicA",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "FfZqZaICESAx",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 4,
+                          "c": "本页是 "
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "FfZqZaICESAx",
+                            5
+                          ],
+                          "o": [
+                            "FfZqZaICESAx",
+                            4
+                          ],
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "cbgfo9gDK-XApoCIlhYicA",
+                              "l": "",
+                              "i": [
+                                "FfZqZaICESAx",
+                                36
+                              ],
+                              "s": {
+                                "i": [
+                                  "FfZqZaICESAx",
+                                  5
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "FfZqZaICESAx",
+                                  5
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "p",
+                                "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+                                "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "FfZqZaICESAx",
+                            6
+                          ],
+                          "o": [
+                            "FfZqZaICESAx",
+                            5
+                          ],
+                          "l": 30,
+                          "c": " 的专项执行流程，与共用方法一起使用，并按实际协作持续修订。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "6ff5935e-003e-4b38-96c4-8309d0181b70": {
+        "value": {
+          "value": {
+            "id": "6ff5935e-003e-4b38-96c4-8309d0181b70",
+            "version": 5,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "用于实际报错、卡住、结果错误或部分步骤无法完成。只要求诊断时先完成诊断；已授权修复时按完整流程推进。原始方法见 "
+                ],
+                [
+                  "‣",
+                  [
+                    [
+                      "p",
+                      "3e0aa04f-a8a9-8088-a75d-d2d1ade6357a",
+                      "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                    ]
+                  ]
+                ],
+                [
+                  "；此页整理可直接执行的步骤。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991688,
+            "last_edited_time": 1792050991688,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "pDNvYtaqdhCmlPslipnAkw,\"start\",\"end\"",
+                "n": {
+                  "pDNvYtaqdhCmlPslipnAkw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "pDNvYtaqdhCmlPslipnAkw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "tRIBG6qRxqIq",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 56,
+                          "c": "用于实际报错、卡住、结果错误或部分步骤无法完成。只要求诊断时先完成诊断；已授权修复时按完整流程推进。原始方法见 "
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "tRIBG6qRxqIq",
+                            57
+                          ],
+                          "o": [
+                            "tRIBG6qRxqIq",
+                            56
+                          ],
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "pDNvYtaqdhCmlPslipnAkw",
+                              "l": "",
+                              "i": [
+                                "tRIBG6qRxqIq",
+                                72
+                              ],
+                              "s": {
+                                "i": [
+                                  "tRIBG6qRxqIq",
+                                  57
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "tRIBG6qRxqIq",
+                                  57
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "p",
+                                "3e0aa04f-a8a9-8088-a75d-d2d1ade6357a",
+                                "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "tRIBG6qRxqIq",
+                            58
+                          ],
+                          "o": [
+                            "tRIBG6qRxqIq",
+                            57
+                          ],
+                          "l": 14,
+                          "c": "；此页整理可直接执行的步骤。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "c35a5872-ab12-4d37-b078-d25831041719": {
+        "value": {
+          "value": {
+            "id": "c35a5872-ab12-4d37-b078-d25831041719",
+            "version": 4,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "1. 固定实际现象"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991691,
+            "last_edited_time": 1792050991691,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "AYGMnIaUCZ5JnwXDYuVNZQ,\"start\",\"end\"",
+                "n": {
+                  "AYGMnIaUCZ5JnwXDYuVNZQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "AYGMnIaUCZ5JnwXDYuVNZQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "Qbn3t2XMo7wM",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 9,
+                          "c": "1. 固定实际现象"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "f0606fbd-715f-486d-920e-55becf95bd9f": {
+        "value": {
+          "value": {
+            "id": "f0606fbd-715f-486d-920e-55becf95bd9f",
+            "version": 4,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "记录触发动作、输入、实际结果、期望结果及运行版本。先跑相关现有测试，区分原有失败与新增问题。不能用猜测代替复现。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991691,
+            "last_edited_time": 1792050991691,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "9XNEOY22fl1Ob2BMCiM_Uw,\"start\",\"end\"",
+                "n": {
+                  "9XNEOY22fl1Ob2BMCiM_Uw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "9XNEOY22fl1Ob2BMCiM_Uw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "TgCpBbwcOdwD",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 56,
+                          "c": "记录触发动作、输入、实际结果、期望结果及运行版本。先跑相关现有测试，区分原有失败与新增问题。不能用猜测代替复现。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "ddc824ed-52f1-4138-8f00-057b7e8b9a16": {
+        "value": {
+          "value": {
+            "id": "ddc824ed-52f1-4138-8f00-057b7e8b9a16",
+            "version": 6,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "若期望结果、触发条件或修复范围尚未明确，先区分已知事实与待澄清问题，并向用户问清。期间可以继续独立排障和验证现有行为；不得把猜测写成验收标准或据此实施修复。候选根因属于待验证判断，不等于已确认需求。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792116230639,
+            "last_edited_time": 1792116230639,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "y8HjP7G7OP0HI2uG6Q9_XQ,\"start\",\"end\"",
+                "n": {
+                  "y8HjP7G7OP0HI2uG6Q9_XQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "y8HjP7G7OP0HI2uG6Q9_XQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "MNkOqgXtJkNs",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 99,
+                          "c": "若期望结果、触发条件或修复范围尚未明确，先区分已知事实与待澄清问题，并向用户问清。期间可以继续独立排障和验证现有行为；不得把猜测写成验收标准或据此实施修复。候选根因属于待验证判断，不等于已确认需求。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "561f488b-0784-4b1e-a5e2-b10b65957cec": {
+        "value": {
+          "value": {
+            "id": "561f488b-0784-4b1e-a5e2-b10b65957cec",
+            "version": 4,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "2. 追踪完整生命周期"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991691,
+            "last_edited_time": 1792050991691,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "ZL0rrnHJVFSCoAhJmJ_sJw,\"start\",\"end\"",
+                "n": {
+                  "ZL0rrnHJVFSCoAhJmJ_sJw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "ZL0rrnHJVFSCoAhJmJ_sJw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "zcbZ82mVdqkS",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 11,
+                          "c": "2. 追踪完整生命周期"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "64e9cdf7-bfca-43cd-b5e5-a4bcb2ae6e28": {
+        "value": {
+          "value": {
+            "id": "64e9cdf7-bfca-43cd-b5e5-a4bcb2ae6e28",
+            "version": 4,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "从触发条件，经状态变化、数据产生与传递，直到最终结果。说明每个边界的输入、输出及成功条件；给出当前代码、日志、请求和响应的证据。分清首次观察到异常的位置与造成异常的源头。若 A 失败后 B、C 一直等待，追踪整条链，不只消除 A 的报错。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991692,
+            "last_edited_time": 1792050991692,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "Eh3bVVWPPZfKLDZI67ZjWQ,\"start\",\"end\"",
+                "n": {
+                  "Eh3bVVWPPZfKLDZI67ZjWQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "Eh3bVVWPPZfKLDZI67ZjWQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "BbS8KqlchtNT",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 119,
+                          "c": "从触发条件，经状态变化、数据产生与传递，直到最终结果。说明每个边界的输入、输出及成功条件；给出当前代码、日志、请求和响应的证据。分清首次观察到异常的位置与造成异常的源头。若 A 失败后 B、C 一直等待，追踪整条链，不只消除 A 的报错。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3ce0c9ab-8a86-4b3e-b13b-56e5ca3e4651": {
+        "value": {
+          "value": {
+            "id": "3ce0c9ab-8a86-4b3e-b13b-56e5ca3e4651",
+            "version": 4,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "列出能解释现象的候选边界，分别标明已证实、已排除及缺证据的判断。先确认根因范围，再动业务实现。证据不足时先增加最小观测。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991692,
+            "last_edited_time": 1792050991692,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "zyWGY-IhOM6rEKRQZV2vlg,\"start\",\"end\"",
+                "n": {
+                  "zyWGY-IhOM6rEKRQZV2vlg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "zyWGY-IhOM6rEKRQZV2vlg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "h428KyCTrytN",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 60,
+                          "c": "列出能解释现象的候选边界，分别标明已证实、已排除及缺证据的判断。先确认根因范围，再动业务实现。证据不足时先增加最小观测。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "4d3c1815-2dd5-4483-b208-251bf3906f25": {
+        "value": {
+          "value": {
+            "id": "4d3c1815-2dd5-4483-b208-251bf3906f25",
+            "version": 4,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "3. 明确行为边界"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991692,
+            "last_edited_time": 1792050991692,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "6mwSYSw2LqOreyXYYpxMNg,\"start\",\"end\"",
+                "n": {
+                  "6mwSYSw2LqOreyXYYpxMNg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "6mwSYSw2LqOreyXYYpxMNg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "Y3e6HysIDwpv",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 9,
+                          "c": "3. 明确行为边界"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "5dc91dc4-fc70-4870-944d-352221217536": {
+        "value": {
+          "value": {
+            "id": "5dc91dc4-fc70-4870-944d-352221217536",
+            "version": 4,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "写清 Source of Truth、修复后 Observable Behavior、允许修改的模块、必须保持的行为、边界条件及失效条件。数据与界面同时异常时先检查数据来源与规则，不能仅把错误文字藏起来。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991693,
+            "last_edited_time": 1792050991693,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "nUPY3p5gdIoDjlG5DemNAg,\"start\",\"end\"",
+                "n": {
+                  "nUPY3p5gdIoDjlG5DemNAg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "nUPY3p5gdIoDjlG5DemNAg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "qsSO21Wo6ey8",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 102,
+                          "c": "写清 Source of Truth、修复后 Observable Behavior、允许修改的模块、必须保持的行为、边界条件及失效条件。数据与界面同时异常时先检查数据来源与规则，不能仅把错误文字藏起来。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "be16a9ee-3baf-40bd-bb3c-c3cd998aefab": {
+        "value": {
+          "value": {
+            "id": "be16a9ee-3baf-40bd-bb3c-c3cd998aefab",
+            "version": 4,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "4. 最小测试与 RED"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991693,
+            "last_edited_time": 1792050991693,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "cgoo_7dJn6eb4Ea7nNiHtw,\"start\",\"end\"",
+                "n": {
+                  "cgoo_7dJn6eb4Ea7nNiHtw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "cgoo_7dJn6eb4Ea7nNiHtw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "gciY7skUfWHZ",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 12,
+                          "c": "4. 最小测试与 RED"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3cf67124-c372-4c4b-8d66-bf216d963e57": {
+        "value": {
+          "value": {
+            "id": "3cf67124-c372-4c4b-8d66-bf216d963e57",
+            "version": 9,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "选择能够证明目标行为的最小有效验证；可自动验证的缺陷优先补充行为测试，并确认它因当前问题失败。测试不要只复刻实现。外部模型先用固定响应证明控制链，真实响应另做回放。不适合自动测试或环境受阻时，记录实际复现、前后对照及证据限制，不制造无关失败充当 RED。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991694,
+            "last_edited_time": 1792288904996,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "viuHYGB7QD-ZAGfdmv21fQ,\"start\",\"end\"",
+                "n": {
+                  "viuHYGB7QD-ZAGfdmv21fQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "viuHYGB7QD-ZAGfdmv21fQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "APlazzmzMxlg",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 13,
+                          "c": "选择能够证明目标行为的最小"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "XLmTlioPpL79",
+                            66
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            13
+                          ],
+                          "l": 19,
+                          "c": "有效验证；可自动验证的缺陷优先补充行为"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "APlazzmzMxlg",
+                            14
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            13
+                          ],
+                          "l": 2,
+                          "c": "测试"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "XLmTlioPpL79",
+                            85
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            15
+                          ],
+                          "l": 2,
+                          "c": "，并"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "APlazzmzMxlg",
+                            16
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            15
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "APlazzmzMxlg",
+                            17
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            16
+                          ],
+                          "l": 2,
+                          "c": "确认"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "XLmTlioPpL79",
+                            87
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            18
+                          ],
+                          "l": 1,
+                          "c": "它"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "APlazzmzMxlg",
+                            19
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            18
+                          ],
+                          "l": -4
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "APlazzmzMxlg",
+                            23
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            22
+                          ],
+                          "l": 43,
+                          "c": "因当前问题失败。测试不要只复刻实现。外部模型先用固定响应证明控制链，真实响应另做回放。"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "XLmTlioPpL79",
+                            88
+                          ],
+                          "o": [
+                            "APlazzmzMxlg",
+                            65
+                          ],
+                          "l": 45,
+                          "c": "不适合自动测试或环境受阻时，记录实际复现、前后对照及证据限制，不制造无关失败充当 RED。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "bd339ee0-d706-4539-8282-848aaee42617": {
+        "value": {
+          "value": {
+            "id": "bd339ee0-d706-4539-8282-848aaee42617",
+            "version": 11,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "计划、子 Agent、偏差处理及审查复核按父页 "
+                ],
+                [
+                  "‣",
+                  [
+                    [
+                      "p",
+                      "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+                      "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                    ]
+                  ]
+                ],
+                [
+                  " 的现行方法执行。本页维护排障特有的复现、根因边界和修复验收；后续实际问题直接修订相应步骤。已有授权内连续推进。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792288904996,
+            "last_edited_time": 1792289644190,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "Rl1g4GQmLn35SYbC6iXXDA,\"start\",\"end\"",
+                "n": {
+                  "Rl1g4GQmLn35SYbC6iXXDA,\"start\",\"end\"": {
+                    "s": {
+                      "x": "Rl1g4GQmLn35SYbC6iXXDA",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            1
+                          ],
+                          "o": "start",
+                          "l": -7
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            8
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            7
+                          ],
+                          "l": 3,
+                          "c": "计划、"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "rdNgbcFRTw2E",
+                            82
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            10
+                          ],
+                          "l": 8,
+                          "c": "子 Agent、"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            11
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            10
+                          ],
+                          "l": 4,
+                          "c": "偏差处理"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "rdNgbcFRTw2E",
+                            90
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            14
+                          ],
+                          "l": 1,
+                          "c": "及"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            15
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            14
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            16
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            15
+                          ],
+                          "l": 4,
+                          "c": "审查复核"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "rdNgbcFRTw2E",
+                            91
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            19
+                          ],
+                          "l": 1,
+                          "c": "按"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            20
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            19
+                          ],
+                          "l": -8
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            28
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            27
+                          ],
+                          "l": 2,
+                          "c": "父页"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            30
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            29
+                          ],
+                          "l": -6
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            36
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            35
+                          ],
+                          "l": 1,
+                          "c": " "
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "rdNgbcFRTw2E",
+                            92
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            36
+                          ],
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "Rl1g4GQmLn35SYbC6iXXDA",
+                              "l": "",
+                              "i": [
+                                "rdNgbcFRTw2E",
+                                136
+                              ],
+                              "s": {
+                                "i": [
+                                  "rdNgbcFRTw2E",
+                                  92
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "rdNgbcFRTw2E",
+                                  92
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "p",
+                                "3fdaa04f-a8a9-8191-95d2-dc0eb65ce630",
+                                "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            37
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            36
+                          ],
+                          "l": -1
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            38
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            37
+                          ],
+                          "l": 1,
+                          "c": " "
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            39
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            38
+                          ],
+                          "l": -14
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            53
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            52
+                          ],
+                          "l": 1,
+                          "c": "的"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "rdNgbcFRTw2E",
+                            93
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            53
+                          ],
+                          "l": 28,
+                          "c": "现行方法执行。本页维护排障特有的复现、根因边界和修复验收"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            54
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            53
+                          ],
+                          "l": -9
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            63
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            62
+                          ],
+                          "l": 1,
+                          "c": "；"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "rdNgbcFRTw2E",
+                            121
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            63
+                          ],
+                          "l": 15,
+                          "c": "后续实际问题直接修订相应步骤。"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            64
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            63
+                          ],
+                          "l": 9,
+                          "c": "已有授权内连续推进"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            73
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            72
+                          ],
+                          "l": -8
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "D774DbUarf16",
+                            81
+                          ],
+                          "o": [
+                            "D774DbUarf16",
+                            80
+                          ],
+                          "l": 1,
+                          "c": "。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "afab5cd8-c82f-4ddb-a902-e51b589684e7": {
+        "value": {
+          "value": {
+            "id": "afab5cd8-c82f-4ddb-a902-e51b589684e7",
+            "version": 4,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "5. 最小修复与 GREEN"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991694,
+            "last_edited_time": 1792050991694,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "nsQE6V1KiCxl-B1wHbpSxg,\"start\",\"end\"",
+                "n": {
+                  "nsQE6V1KiCxl-B1wHbpSxg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "nsQE6V1KiCxl-B1wHbpSxg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "P0HpYkLbI3Hy",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 14,
+                          "c": "5. 最小修复与 GREEN"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "9b42ab78-8eb0-478b-ad29-6175d3598561": {
+        "value": {
+          "value": {
+            "id": "9b42ab78-8eb0-478b-ad29-6175d3598561",
+            "version": 4,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "只改已定位边界。测试失败或工具报错后，把新结果作为观察，缩小假设再调整，不机械重试。确认 GREEN 后运行相关回归。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991694,
+            "last_edited_time": 1792050991694,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "qaVoy32AYFkVGNZDPEx6Fw,\"start\",\"end\"",
+                "n": {
+                  "qaVoy32AYFkVGNZDPEx6Fw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "qaVoy32AYFkVGNZDPEx6Fw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "Fi1dsUPcW8Ev",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 59,
+                          "c": "只改已定位边界。测试失败或工具报错后，把新结果作为观察，缩小假设再调整，不机械重试。确认 GREEN 后运行相关回归。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "c2f9417c-fe03-4154-8640-c8790d0905cf": {
+        "value": {
+          "value": {
+            "id": "c2f9417c-fe03-4154-8640-c8790d0905cf",
+            "version": 4,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "6. 真实使用验收"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991694,
+            "last_edited_time": 1792050991694,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "7veep1gdK48ns2qon8lAHg,\"start\",\"end\"",
+                "n": {
+                  "7veep1gdK48ns2qon8lAHg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "7veep1gdK48ns2qon8lAHg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "Tu1nzTxxCTrn",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 9,
+                          "c": "6. 真实使用验收"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "24f05645-60cd-4119-9017-35cd49d16b1b": {
+        "value": {
+          "value": {
+            "id": "24f05645-60cd-4119-9017-35cd49d16b1b",
+            "version": 4,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "按原触发路径实际执行，核对后续状态、缓存回读、保存与最终展示。网页要真实打开查看；保留可核对的日志、截图、前后差异。测试全绿不能替代真实运行。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991694,
+            "last_edited_time": 1792050991694,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "W7YyozoBXbBhQuL1RA0Mrg,\"start\",\"end\"",
+                "n": {
+                  "W7YyozoBXbBhQuL1RA0Mrg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "W7YyozoBXbBhQuL1RA0Mrg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "XK8-vwN_PlRL",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 71,
+                          "c": "按原触发路径实际执行，核对后续状态、缓存回读、保存与最终展示。网页要真实打开查看；保留可核对的日志、截图、前后差异。测试全绿不能替代真实运行。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "9a8ca569-8ffa-4d18-8506-578d2c3a46af": {
+        "value": {
+          "value": {
+            "id": "9a8ca569-8ffa-4d18-8506-578d2c3a46af",
+            "version": 4,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "7. 反证与交付"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991694,
+            "last_edited_time": 1792050991694,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "AACdHqwN6gfxRjzuxyD2Xw,\"start\",\"end\"",
+                "n": {
+                  "AACdHqwN6gfxRjzuxyD2Xw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "AACdHqwN6gfxRjzuxyD2Xw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "cUQlaPWD-Izo",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 8,
+                          "c": "7. 反证与交付"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "4d43a686-581d-45a7-a7f3-c606292fdb12": {
+        "value": {
+          "value": {
+            "id": "4d43a686-581d-45a7-a7f3-c606292fdb12",
+            "version": 4,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "回答：为什么必须改这里；为什么不是其他位置；去掉修改后哪个测试或行为会失败。简洁交付结果、修改文件、测试证据及实质限制。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991695,
+            "last_edited_time": 1792050991695,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "qlA3OJxo7NGhTiG9CWA07A,\"start\",\"end\"",
+                "n": {
+                  "qlA3OJxo7NGhTiG9CWA07A,\"start\",\"end\"": {
+                    "s": {
+                      "x": "qlA3OJxo7NGhTiG9CWA07A",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "XTRku_z_crnp",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 60,
+                          "c": "回答：为什么必须改这里；为什么不是其他位置；去掉修改后哪个测试或行为会失败。简洁交付结果、修改文件、测试证据及实质限制。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "c9ae03f3-f0c6-4333-af44-0a84521c1f2e": {
+        "value": {
+          "value": {
+            "id": "c9ae03f3-f0c6-4333-af44-0a84521c1f2e",
+            "version": 4,
+            "type": "sub_header",
+            "properties": {
+              "title": [
+                [
+                  "协作约定"
+                ]
+              ]
+            },
+            "format": {
+              "toggleable": false,
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991695,
+            "last_edited_time": 1792050991695,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "ewyomKOsnfKhUOzWF2gwKQ,\"start\",\"end\"",
+                "n": {
+                  "ewyomKOsnfKhUOzWF2gwKQ,\"start\",\"end\"": {
+                    "s": {
+                      "x": "ewyomKOsnfKhUOzWF2gwKQ",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "bVXPrcSEuZPT",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 4,
+                          "c": "协作约定"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "a70a1ff3-d81d-47f9-a90c-64fc60bd8832": {
+        "value": {
+          "value": {
+            "id": "a70a1ff3-d81d-47f9-a90c-64fc60bd8832",
+            "version": 4,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "未经允许不删除文件；修改源文件前保存备份。已有授权内持续推进，不在每一步重复要许可。确需关键输入时早问，同时推进独立工作。新增现象重新核对根因范围，不把偶然成功当成修复。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991695,
+            "last_edited_time": 1792050991695,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "ms5oaIx1OVpZtj_YOpPFkg,\"start\",\"end\"",
+                "n": {
+                  "ms5oaIx1OVpZtj_YOpPFkg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "ms5oaIx1OVpZtj_YOpPFkg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "aBYAPPcqVDTb",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 85,
+                          "c": "未经允许不删除文件；修改源文件前保存备份。已有授权内持续推进，不在每一步重复要许可。确需关键输入时早问，同时推进独立工作。新增现象重新核对根因范围，不把偶然成功当成修复。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "0ba87a08-9192-41d5-8c01-ccc303cca927": {
+        "value": {
+          "value": {
+            "id": "0ba87a08-9192-41d5-8c01-ccc303cca927",
+            "version": 5,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "来源与版本："
+                ],
+                [
+                  "‣",
+                  [
+                    [
+                      "d",
+                      {
+                        "type": "date",
+                        "start_date": "2026-10-15",
+                        "date_format": "relative"
+                      }
+                    ]
+                  ]
+                ],
+                [
+                  "，依据原 AI 工作流及本地网站实际排障整理。用户后续认可或纠正的方法按适用范围追加修订，保留历史。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792050991695,
+            "last_edited_time": 1792050991695,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "7s4GOmfjld-JQhYoRagjxw,\"start\",\"end\"",
+                "n": {
+                  "7s4GOmfjld-JQhYoRagjxw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "7s4GOmfjld-JQhYoRagjxw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "LyMW3wwevlgv",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 6,
+                          "c": "来源与版本："
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "LyMW3wwevlgv",
+                            7
+                          ],
+                          "o": [
+                            "LyMW3wwevlgv",
+                            6
+                          ],
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "7s4GOmfjld-JQhYoRagjxw",
+                              "l": "",
+                              "i": [
+                                "LyMW3wwevlgv",
+                                58
+                              ],
+                              "s": {
+                                "i": [
+                                  "LyMW3wwevlgv",
+                                  7
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "LyMW3wwevlgv",
+                                  7
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "d",
+                                {
+                                  "type": "date",
+                                  "start_date": "2026-10-15",
+                                  "date_format": "relative"
+                                }
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "LyMW3wwevlgv",
+                            8
+                          ],
+                          "o": [
+                            "LyMW3wwevlgv",
+                            7
+                          ],
+                          "l": 50,
+                          "c": "，依据原 AI 工作流及本地网站实际排障整理。用户后续认可或纠正的方法按适用范围追加修订，保留历史。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "0c0e83b5-e5c6-4294-ad03-d934dadb1cfe": {
+        "value": {
+          "value": {
+            "id": "0c0e83b5-e5c6-4294-ad03-d934dadb1cfe",
+            "version": 6,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "更新："
+                ],
+                [
+                  "‣",
+                  [
+                    [
+                      "d",
+                      {
+                        "type": "date",
+                        "start_date": "2026-10-16",
+                        "date_format": "relative"
+                      }
+                    ]
+                  ]
+                ],
+                [
+                  "，根据用户明确反馈及补充授权，增加“预期行为未明时先澄清，不按自设假设实施”的前置要求；详细规则与反例见 "
+                ],
+                [
+                  "‣",
+                  [
+                    [
+                      "p",
+                      "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+                      "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                    ]
+                  ]
+                ],
+                [
+                  "。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792116230639,
+            "last_edited_time": 1792116230639,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "MvTo8moE0mva8MSu-r-dTw,\"start\",\"end\"",
+                "n": {
+                  "MvTo8moE0mva8MSu-r-dTw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "MvTo8moE0mva8MSu-r-dTw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZirAXnp5Zg0n",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 3,
+                          "c": "更新："
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZirAXnp5Zg0n",
+                            4
+                          ],
+                          "o": [
+                            "ZirAXnp5Zg0n",
+                            3
+                          ],
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "MvTo8moE0mva8MSu-r-dTw",
+                              "l": "",
+                              "i": [
+                                "ZirAXnp5Zg0n",
+                                60
+                              ],
+                              "s": {
+                                "i": [
+                                  "ZirAXnp5Zg0n",
+                                  4
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "ZirAXnp5Zg0n",
+                                  4
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "d",
+                                {
+                                  "type": "date",
+                                  "start_date": "2026-10-16",
+                                  "date_format": "relative"
+                                }
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZirAXnp5Zg0n",
+                            5
+                          ],
+                          "o": [
+                            "ZirAXnp5Zg0n",
+                            4
+                          ],
+                          "l": 53,
+                          "c": "，根据用户明确反馈及补充授权，增加“预期行为未明时先澄清，不按自设假设实施”的前置要求；详细规则与反例见 "
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZirAXnp5Zg0n",
+                            58
+                          ],
+                          "o": [
+                            "ZirAXnp5Zg0n",
+                            57
+                          ],
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "MvTo8moE0mva8MSu-r-dTw",
+                              "l": "",
+                              "i": [
+                                "ZirAXnp5Zg0n",
+                                61
+                              ],
+                              "s": {
+                                "i": [
+                                  "ZirAXnp5Zg0n",
+                                  58
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "ZirAXnp5Zg0n",
+                                  58
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "p",
+                                "3f7aa04f-a8a9-8179-8bda-eec496f904f1",
+                                "78f168cc-8a5d-4f46-9e91-14acafa8d36e"
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "ZirAXnp5Zg0n",
+                            59
+                          ],
+                          "o": [
+                            "ZirAXnp5Zg0n",
+                            58
+                          ],
+                          "l": 1,
+                          "c": "。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "c197cd30-3202-4d65-8b18-e9f267c37649": {
+        "value": {
+          "value": {
+            "id": "c197cd30-3202-4d65-8b18-e9f267c37649",
+            "version": 6,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "更新："
+                ],
+                [
+                  "‣",
+                  [
+                    [
+                      "d",
+                      {
+                        "type": "date",
+                        "start_date": "2026-10-18",
+                        "date_format": "relative"
+                      }
+                    ]
+                  ]
+                ],
+                [
+                  "，随父页 Simon × Praxis 初步整合同步限定测试流程的适用范围，并引用父页的计划偏差、审查复核与按需委派原则；其余原流程与历史保留。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792288904996,
+            "last_edited_time": 1792288904996,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "LihlGJ7cvGnfV3JjHV5fgg,\"start\",\"end\"",
+                "n": {
+                  "LihlGJ7cvGnfV3JjHV5fgg,\"start\",\"end\"": {
+                    "s": {
+                      "x": "LihlGJ7cvGnfV3JjHV5fgg",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "3U9ERTrOS9Xb",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 3,
+                          "c": "更新："
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "3U9ERTrOS9Xb",
+                            4
+                          ],
+                          "o": [
+                            "3U9ERTrOS9Xb",
+                            3
+                          ],
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "LihlGJ7cvGnfV3JjHV5fgg",
+                              "l": "",
+                              "i": [
+                                "3U9ERTrOS9Xb",
+                                77
+                              ],
+                              "s": {
+                                "i": [
+                                  "3U9ERTrOS9Xb",
+                                  4
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "3U9ERTrOS9Xb",
+                                  4
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "d",
+                                {
+                                  "type": "date",
+                                  "start_date": "2026-10-18",
+                                  "date_format": "relative"
+                                }
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "3U9ERTrOS9Xb",
+                            5
+                          ],
+                          "o": [
+                            "3U9ERTrOS9Xb",
+                            4
+                          ],
+                          "l": 72,
+                          "c": "，随父页 Simon × Praxis 初步整合同步限定测试流程的适用范围，并引用父页的计划偏差、审查复核与按需委派原则；其余原流程与历史保留。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "c96c7170-acdb-471a-9be0-cf464fe46698": {
+        "value": {
+          "value": {
+            "id": "c96c7170-acdb-471a-9be0-cf464fe46698",
+            "version": 6,
+            "type": "text",
+            "properties": {
+              "title": [
+                [
+                  "更新："
+                ],
+                [
+                  "‣",
+                  [
+                    [
+                      "d",
+                      {
+                        "type": "date",
+                        "start_date": "2026-10-18",
+                        "date_format": "relative"
+                      }
+                    ]
+                  ]
+                ],
+                [
+                  "：按用户要求纳入统一的持续优化工作流，保留原页面与任务特有步骤；后续修订原条目，并将共用规则统一回父页维护。"
+                ]
+              ]
+            },
+            "format": {
+              "created_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              },
+              "last_edited_attribution": {
+                "source": {
+                  "kind": "mcp",
+                  "mcpClientType": "chatgpt"
+                },
+                "triggeredBy": {
+                  "id": "7451c943-fa02-4c71-a069-cfd5d12b5a75",
+                  "table": "notion_user"
+                }
+              }
+            },
+            "created_time": 1792289644190,
+            "last_edited_time": 1792289644190,
+            "parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "parent_table": "block",
+            "alive": true,
+            "space_id": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+            "crdt_format_version": 1,
+            "nav_parent_table": "block",
+            "nav_parent_id": "3faaa04f-a8a9-81d1-b419-d2fc27a13cb4",
+            "crdt_data": {
+              "title": {
+                "r": "Mpi6WaV7La23EJz1vqpShw,\"start\",\"end\"",
+                "n": {
+                  "Mpi6WaV7La23EJz1vqpShw,\"start\",\"end\"": {
+                    "s": {
+                      "x": "Mpi6WaV7La23EJz1vqpShw",
+                      "i": [
+                        {
+                          "t": "s"
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "roLayzGjSFYZ",
+                            1
+                          ],
+                          "o": "start",
+                          "l": 3,
+                          "c": "更新："
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "roLayzGjSFYZ",
+                            4
+                          ],
+                          "o": [
+                            "roLayzGjSFYZ",
+                            3
+                          ],
+                          "l": 1,
+                          "c": "‣",
+                          "b": [
+                            {
+                              "t": "a",
+                              "x": "Mpi6WaV7La23EJz1vqpShw",
+                              "l": "",
+                              "i": [
+                                "roLayzGjSFYZ",
+                                59
+                              ],
+                              "s": {
+                                "i": [
+                                  "roLayzGjSFYZ",
+                                  4
+                                ],
+                                "a": "b"
+                              },
+                              "e": {
+                                "i": [
+                                  "roLayzGjSFYZ",
+                                  4
+                                ],
+                                "a": "a"
+                              },
+                              "a": [
+                                "d",
+                                {
+                                  "type": "date",
+                                  "start_date": "2026-10-18",
+                                  "date_format": "relative"
+                                }
+                              ]
+                            }
+                          ],
+                          "a": []
+                        },
+                        {
+                          "t": "t",
+                          "i": [
+                            "roLayzGjSFYZ",
+                            5
+                          ],
+                          "o": [
+                            "roLayzGjSFYZ",
+                            4
+                          ],
+                          "l": 54,
+                          "c": "：按用户要求纳入统一的持续优化工作流，保留原页面与任务特有步骤；后续修订原条目，并将共用规则统一回父页维护。"
+                        },
+                        {
+                          "t": "e"
+                        }
+                      ],
+                      "l": ""
+                    },
+                    "c": []
+                  }
+                }
+              }
+            }
+          },
+          "role": "reader"
+        }
+      },
+      "3e0aa04f-a8a9-8088-a75d-d2d1ade6357a": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "role": "none"
+        }
+      },
+      "275aa04f-a8a9-802a-b5cc-c71596de564a": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "role": "none"
+        }
+      },
+      "243aa04f-a8a9-804c-b04c-c2643207e6f7": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "role": "none"
+        }
+      },
+      "243aa04f-a8a9-80e3-ba60-f0067d028a2a": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "role": "none"
+        }
+      },
+      "242aa04f-a8a9-8059-b2cf-c56f34d0d488": {
+        "spaceId": "78f168cc-8a5d-4f46-9e91-14acafa8d36e",
+        "value": {
+          "role": "none"
+        }
+      }
+    }
+  }
+}

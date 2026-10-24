@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="17"
+	failures="1"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="62"
+	timestamp="2026-10-22T09:34:23"
+	>
+	<testcase name="i2r_rlc_online_correction_run_recorder_tests" classname="i2r_rlc_online_correction_run_recorder_tests" time="0.279856" status="run">
+		<properties/>
+		<system-out>PASS: online ICP result recording; files=C:/Users/admin/AppData/Local/Temp/i2r_icp_records_bc4ca3dd-27b8-4059-8fa6-bb50d6999305
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_runtime_tracking_flow_tests" classname="i2r_rlc_runtime_tracking_flow_tests" time="4.92463" status="run">
+		<properties/>
+		<system-out>PASS: runtime tracking flow tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_tests" classname="i2r_rlc_online_local_registration_tests" time="4.66584" status="run">
+		<properties/>
+		<system-out>RUN: testRuntimeStartupConfiguration
+RUN: testRuntimeHotProcessingOptions
+RUN: testRuntimeStabilityTransactionIsolation
+RUN: testHistoryCollectionIndependentOfSolve
+RUN: testWorkerHotEnableIsolation
+RUN: testWriteDirectionAndReadback
+RUN: testWriteRejection
+RUN: testCancelDuringRead
+RUN: testWriteAttemptOutcomeReset
+RUN: testSmallCloudCorrection
+PERF: synthetic surface points=165 solve_ms=14 total_ms=28
+RUN: testWindowAndSampleBounds
+RUN: testGenerationIsolationAndDegeneracy
+RUN: testCorrectionLimit
+RUN: testImageExtractionInParentTcpFrame
+image local registration: 独立焊点误差恶化或超限，拒绝更新：frame=2，前=0.25 mm，后=1.00006 mm。
+PERF: synthetic image extraction_ms=66 extraction_and_match_ms=116 solve_ms=11 before_mm=1.04804 after_mm=0.0263292
+RUN: testImageExtractionWithDifferentTcpOffsets
+TCP fixture offset=0 0 0 before_mm=1.04804 after_mm=0.0263292 accepted=0
+TCP fixture offset= 12  -7 231 before_mm=1.04804 after_mm=0.026594 accepted=0
+TCP fixture offset=  0   0 150 before_mm=1.0...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_surface_tests" classname="i2r_rlc_online_local_registration_surface_tests" time="5.63382" status="run">
+		<properties/>
+		<system-out>PASS: production surface-only training/holdout and schema4 evidence
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_safety_tests" classname="i2r_rlc_online_local_registration_safety_tests" time="0.986025" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_stability_tests" classname="i2r_rlc_online_local_registration_stability_tests" time="0.0631662" status="run">
+		<properties/>
+		<system-out>PASS: online local registration stability tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_history_replay_tests" classname="i2r_rlc_online_local_registration_history_replay_tests" time="0.0688365" status="run">
+		<properties/>
+		<system-out>PASS: online local registration history replay tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_registration_verification_tests" classname="i2r_rlc_online_local_registration_verification_tests" time="0.0527047" status="run">
+		<properties/>
+		<system-out>PASS: online local registration verification tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_local_surface_verification_tests" classname="i2r_rlc_online_local_surface_verification_tests" time="0.0263914" status="run">
+		<properties/>
+		<system-out>PASS: online local surface verification tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_local_registration_writeback_safety_tests" classname="i2r_rlc_local_registration_writeback_safety_tests" time="0.185385" status="run">
+		<properties/>
+		<system-out>PASS: local registration writeback safety tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_correction_robot_sim_offline_frame_sync_tests" classname="i2r_rlc_correction_robot_sim_offline_frame_sync_tests" time="55.5141" status="fail">
+		<failure message="Failed"/>
+		<properties/>
+		<system-out>FAIL: missing RobotState should emit an explicit failure
+FAIL: frame 100 RobotSim query should enter the deterministic block
+FAIL: blocked current and latest pending frames should both reach Vision
+FAIL: while frame 100 is current, frames 101..105 must collapse to frame 105
+FAIL: only current and latest-pending frames should issue per-frame queries
+FAIL: a valid observation after one/two failures must clear the counter before Vision
+FAIL: transport failure should produce one explicit synchronization failure
+FAIL: transport failure should consume exactly the current frame query
+FAIL: old-session query should be blocked before stop
+FAIL: restarted session should route its own frame after old query returns
+FAIL: old-session Vision should enter the deterministic synchronization hook
+FAIL: new session should route after the blocked old Vision call returns
+FAIL: active correction must pause ordinary realtime RobotSim queries
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_correction_robot_sim_online_frame_sync_tests" classname="i2r_rlc_correction_robot_sim_online_frame_sync_tests" time="2.13574" status="run">
+		<properties/>
+		<system-out>PASS: online correction RobotSim frame sync tests; frame mismatch=0, max current=1, max pending=1, post-stop query=0, old-session route=0, stale observation reuse=0
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_localization_tests" classname="i2r_rlc_localization_tests" time="0.141665" status="run">
+		<properties/>
+		<system-out>SKIP: localization local ICP pointcloud fixtures not found
+SKIP: localization application replay fixtures not found
+PASS: localization service tests
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_localization_surface_validation_tests" classname="i2r_rlc_localization_surface_validation_tests" time="6.6774" status="run">
+		<properties/>
+		<system-out>PASS: surface subspace projection and heldout validation
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_seam_continuity_tests" classname="i2r_rlc_online_seam_continuity_tests" time="0.0314576" status="run">
+		<properties/>
+		<system-out>PASS: continuous targets, 400-frame occlusion, glare, bounded drift, recovery, reset
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_simulation_guided_seam_tests" classname="i2r_rlc_simulation_guided_seam_tests" time="0.38474" status="run">
+		<properties/>
+		<system-out>PASS: temporal anchor, valid-looking reflection, tack GapCenter, pose version, motion compensation, drift and budgets
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_online_seam_refiner_tests" classname="i2r_rlc_online_seam_refiner_tests" time="0.311266" status="run">
+		<properties/>
+		<system-out>right-biased coarse point valid=1 point=[150.5, 109.989] confidence=0.654288
+left-biased coarse point valid=1 point=[149.5, 109.751] confidence=0.654412
+translated physical seam valid=1 point=[167.5, 120.989] confidence=0.654512
+dominant true stripe with weak parallel reflection valid=1 point=[150.5, 109.989] confidence=0.654288
+frame6469 horizontalValid=1 valid=0 x=498.5
+</system-out>
+	</testcase>
+</testsuite>

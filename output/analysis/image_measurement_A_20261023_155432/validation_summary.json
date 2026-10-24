@@ -1,0 +1,108 @@
+{
+  "status": "implemented_and_selected_msvc_validation_passed",
+  "build_log": "final_build.log",
+  "application": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe",
+  "application_last_write_time": "2026-10-23T16:36:29.9047070+08:00",
+  "application_sha256": "C4B2C246A7E2F46B0A2254C216D67C2EE4EB0C07F5FFBB13AB390089BBC13C76",
+  "distinct_passed_tests": 12,
+  "tests": [
+    {
+      "name": "i2r_rlc_correction_robot_sim_online_frame_sync_tests",
+      "result": "passed",
+      "seconds": 2.59,
+      "log": "regression_fix_tests.log"
+    },
+    {
+      "name": "i2r_rlc_local_registration_writeback_safety_tests",
+      "result": "passed",
+      "seconds": 0.22,
+      "log": "final_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_calibration_contract_tests",
+      "result": "passed",
+      "seconds": 1.03,
+      "log": "final_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_correction_run_recorder_tests",
+      "result": "passed",
+      "seconds": 0.35,
+      "log": "green_tests2.log"
+    },
+    {
+      "name": "i2r_rlc_online_correction_tests",
+      "result": "passed",
+      "seconds": 0.25,
+      "log": "final_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_fusion_controls_tests",
+      "result": "passed",
+      "seconds": 0.31,
+      "log": "final_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_image_geometry_tests",
+      "result": "passed",
+      "seconds": 17.67,
+      "log": "final_tests.log"
+    },
+    {
+      "name": "i2r_rlc_online_image_measurement_tests",
+      "result": "passed",
+      "seconds": 16.73,
+      "log": "green_tests2.log"
+    },
+    {
+      "name": "i2r_rlc_online_seam_refinement_contract_tests",
+      "result": "passed",
+      "seconds": 3.3,
+      "log": "green_tests2.log"
+    },
+    {
+      "name": "i2r_rlc_online_seam_refiner_tests",
+      "result": "passed",
+      "seconds": 0.48,
+      "log": "final_tests.log"
+    },
+    {
+      "name": "i2r_rlc_runtime_tracking_flow_tests",
+      "result": "passed",
+      "seconds": 6.41,
+      "log": "regression_fix_tests.log"
+    },
+    {
+      "name": "i2r_rlc_vision_kcf_tracker_tests",
+      "result": "passed",
+      "seconds": 0.58,
+      "log": "final_tests.log"
+    }
+  ],
+  "red_logs": [
+    "red_tests.log",
+    "recorder_red_tests.log",
+    "sequence_red_tests.log",
+    "far_competition_red_tests.log"
+  ],
+  "intermediate_failures_retained": [
+    "green_tests1.log",
+    "final_tests.log"
+  ],
+  "review": "Independent agent reviewed actual baseline diff, far-competitor fix, and final two regression fixture changes; no confirmed blocking issue.",
+  "runtime_field_validation": "not_run",
+  "limits": [
+    "Cold and warm frame2148 have no accepted image measurement; original ambiguity gate preserved.",
+    "Debug field expanded search measured approximately 334-531ms.",
+    "Initial reverse-scan tail images1171-1560 absent; stale-start policy undecided.",
+    "No cross-phase template carry; existing stop/configure reset remains.",
+    "No automatic hold/stop; previously queued follow commands are not canceled."
+  ],
+  "constraints": [
+    "No Computer Use or mouse.",
+    "No file deletion.",
+    "No RobotSim/oldproject/Control production edits.",
+    "Existing qt-debug tree and authorized VS2022 Developer environment."
+  ],
+  "notion_evidence": "notion_workflows.json"
+}

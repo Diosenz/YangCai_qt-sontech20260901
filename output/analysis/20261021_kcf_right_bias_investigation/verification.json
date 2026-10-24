@@ -1,0 +1,20 @@
+{
+  "input_hashes_unchanged": 66,
+  "viewer_frames": [
+    6469,
+    7570,
+    9411,
+    10878,
+    12363,
+    14847,
+    16227
+  ],
+  "stable_breaks": 11,
+  "production_code_modified": false,
+  "native_kcf_test": "passed existing executable",
+  "legacy_service_replay": "exit 1; required penzui fixture absent",
+  "browser_visual_verification": "passed: 7 frames, source/enhanced toggle, model toggle via keyboard, zero console errors",
+  "browser_checks_file": "browser_checks.json",
+  "mouse_used": false,
+  "source_recordings_modified": false
+}

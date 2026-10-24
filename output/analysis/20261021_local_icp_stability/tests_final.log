@@ -1,0 +1,27 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  3: i2r_rlc_online_correction_tests
+ 1/11 Test  #3: i2r_rlc_online_correction_tests ........................   Passed    0.21 sec
+      Start 16: i2r_rlc_online_fusion_controls_tests
+ 2/11 Test #16: i2r_rlc_online_fusion_controls_tests ...................   Passed    0.26 sec
+      Start 17: i2r_rlc_online_local_registration_tests
+ 3/11 Test #17: i2r_rlc_online_local_registration_tests ................   Passed    5.33 sec
+      Start 18: i2r_rlc_online_local_registration_safety_tests
+ 4/11 Test #18: i2r_rlc_online_local_registration_safety_tests .........   Passed    1.02 sec
+      Start 19: i2r_rlc_online_local_registration_stability_tests
+ 5/11 Test #19: i2r_rlc_online_local_registration_stability_tests ......   Passed    0.07 sec
+      Start 20: i2r_rlc_online_local_registration_verification_tests
+ 6/11 Test #20: i2r_rlc_online_local_registration_verification_tests ...   Passed    0.05 sec
+      Start 21: i2r_rlc_local_registration_writeback_safety_tests
+ 7/11 Test #21: i2r_rlc_local_registration_writeback_safety_tests ......   Passed    0.13 sec
+      Start 25: i2r_rlc_main_widget_panel_tests
+ 8/11 Test #25: i2r_rlc_main_widget_panel_tests ........................   Passed    2.26 sec
+      Start 27: i2r_rlc_offline_correction_tests
+ 9/11 Test #27: i2r_rlc_offline_correction_tests .......................   Passed    0.10 sec
+      Start 30: i2r_rlc_localization_tests
+10/11 Test #30: i2r_rlc_localization_tests .............................   Passed    0.16 sec
+      Start 94: i2r_rlc_digital_twin_tests
+11/11 Test #94: i2r_rlc_digital_twin_tests .............................   Passed    0.07 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Total Test time (real) =   9.71 sec

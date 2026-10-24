@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="(empty)"
+	tests="3"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname=""
+	time="6"
+	timestamp="2026-10-22T14:46:59"
+	>
+	<testcase name="i2r_rlc_online_seam_refinement_contract_tests" classname="i2r_rlc_online_seam_refinement_contract_tests" time="2.36778" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="i2r_rlc_correction_robot_sim_online_frame_sync_tests" classname="i2r_rlc_correction_robot_sim_online_frame_sync_tests" time="2.17271" status="run">
+		<properties/>
+		<system-out>PASS: online correction RobotSim frame sync tests; frame mismatch=0, max current=1, max pending=1, post-stop query=0, old-session route=0, stale observation reuse=0
+</system-out>
+	</testcase>
+	<testcase name="i2r_rlc_simulation_guided_seam_tests" classname="i2r_rlc_simulation_guided_seam_tests" time="2.32549" status="run">
+		<properties/>
+		<system-out>PASS: temporal anchor, valid-looking reflection, tack GapCenter, pose version, motion compensation, drift and budgets
+</system-out>
+	</testcase>
+</testsuite>

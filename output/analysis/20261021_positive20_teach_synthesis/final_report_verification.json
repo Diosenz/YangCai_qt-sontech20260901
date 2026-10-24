@@ -1,0 +1,15 @@
+{
+  "report_local_links_verified": 62,
+  "embedded_views": [
+    "3D four trajectories",
+    "XYZ residual fluctuations"
+  ],
+  "same_measurements_and_reference": true,
+  "axis_trace_coordinates": "passed",
+  "event_counts_and_sector_counts": "passed",
+  "report_input_hashes": "passed",
+  "old_report_entry_updated": true,
+  "old_report_preserved": true,
+  "actual_browser_interaction": "not performed",
+  "mouse_used": false
+}

@@ -1,0 +1,4 @@
+﻿trajectory,peak_time,peak_timestamp_ms,peak_error_mm,image_time,time_offset_ms,frame_id,stem,camera_timestamp_ms,phase,bucket
+TCP,10-22 00:01:24.093,1792598484093,4.812449599407069,10-22 00:01:11.078,-13015,18854,sample_6869_session_1_frame_18854,1792598471078,online_running,4
+raw_KCF,10-21 23:53:57.032,1792598037032,12.483734561446692,10-21 23:53:55.713,-1319,5661,sample_923_session_1_frame_5661,1792598035713,online_running,2
+final_vision,10-22 00:00:56.822,1792598456822,4.767200742670352,10-22 00:01:11.078,14256,18854,sample_6869_session_1_frame_18854,1792598471078,online_running,4

@@ -1,0 +1,672 @@
+--- before/Vision/include/feature/SimulationGuidedSeamEstimator.h
++++ Vision/include/feature/SimulationGuidedSeamEstimator.h
+@@ -112,7 +112,14 @@
+     bool m_hasImagePosition = false;
+     cv::Point2d m_imagePoint;
+     cv::Point2d m_imageVelocity;
++    /// @brief 仅完整原图精定位刷新；肩部估计不能移动独立实测基准。
+     cv::Point2d m_lastImageSupportedPoint;
++    /// @brief 最近有图像支撑的显示点，仅限制随后纯外推，不具备实测身份。
++    cv::Point2d m_predictionStartPoint;
++    double m_imageAnchorLeftSlope = 0.0;
++    double m_imageAnchorRightSlope = 0.0;
++    double m_imageAnchorLeftHeightOffset = 0.0;
++    double m_imageAnchorRightHeightOffset = 0.0;
+     bool m_hasAnchor = false;
+     bool m_hasDirections = false;
+     cv::Size m_imageSize;
+@@ -129,6 +136,9 @@
+     double m_rightHeightOffset = 0.0;
+     int m_degradedFrames = 0;
+     cv::Point2d m_reacquisitionOffset;
++    cv::Point2d m_reacquisitionVelocity;
++    double m_reacquisitionLeftSlope = 0.0;
++    double m_reacquisitionRightSlope = 0.0;
+     double m_reacquisitionGapHeight = 0.0;
+     int m_reacquisitionFrames = 0;
+ };
+--- before/Vision/src/feature/SimulationGuidedSeamEstimator.cpp
++++ Vision/src/feature/SimulationGuidedSeamEstimator.cpp
+@@ -252,11 +252,13 @@
+         || raw.xUncertaintyPixel > 3.0 || raw.ambiguousColumnRatio > 0.05
+         || raw.confidence < 0.35 || raw.leftSupportColumns < 25
+         || raw.rightSupportColumns < 25) { return false; }
++    const bool hasRawDirections = raw.hasBranchDirections
++        && std::isfinite(raw.leftSlope) && std::isfinite(raw.rightSlope);
+     const auto left = fitBranch(gray8, raw.point, -1, 25, 70,
+-        referenceSlope(polyline, simulated, -1, 0.3),
++        hasRawDirections ? raw.leftSlope : referenceSlope(polyline, simulated, -1, 0.3),
+         raw.leftEndpoint.y - raw.point.y, 20.0, 25);
+     const auto right = fitBranch(gray8, raw.point, 1, 25, 70,
+-        referenceSlope(polyline, simulated, 1, -0.3),
++        hasRawDirections ? raw.rightSlope : referenceSlope(polyline, simulated, 1, -0.3),
+         raw.rightEndpoint.y - raw.point.y, 20.0, 25);
+     return left.valid && right.valid && left.rms <= 1.0 && right.rms <= 1.0
+         && left.ambiguousColumns == 0 && right.ambiguousColumns == 0
+@@ -270,7 +272,8 @@
+  * 历史预测只用于识别竞争证据，不据此生成新的实测点或放宽候选准入。
+  */
+ bool historicalBranchPresent(const cv::Mat &gray8, const cv::Point2d &prediction,
+-    int side, double slope, double heightOffset, double searchRadius, int minimumColumns)
++    int side, double slope, double heightOffset, double searchRadius, int minimumColumns,
++    const OnlineSeamRefinementResult *currentRaw)
+ {
+     std::vector<cv::Point2d> samples;
+     for (int offset = 25; offset <= 70; ++offset) {
+@@ -278,7 +281,20 @@
+         if (x < 0 || x >= gray8.cols) { continue; }
+         const double dx = x - prediction.x;
+         const double expected = prediction.y + heightOffset + slope * dx;
+-        const auto peaks = findPeaks(gray8, x, expected, searchRadius);
++        auto peaks = findPeaks(gray8, x, expected, searchRadius);
++        if (currentRaw != nullptr && currentRaw->hasBranchDirections
++            && std::isfinite(currentRaw->leftSlope) && std::isfinite(currentRaw->rightSlope)) {
++            const double rawDx = x - currentRaw->point.x;
++            const double currentY = rawDx < 0.0
++                ? currentRaw->leftEndpoint.y + currentRaw->leftSlope * rawDx
++                : currentRaw->rightEndpoint.y + currentRaw->rightSlope * rawDx;
++            // 旧窗口落在平移/形变后的同一条纹上，不代表另有旧支幸存。
++            // 只有当前原图拟合无法在既有3px残差内解释的独立窄峰，
++            // 才可作为竞争证据；可分辨的旧弱峰不会被新亮峰覆盖。
++            peaks.erase(std::remove_if(peaks.begin(), peaks.end(),
++                [currentY](const Peak &peak) { return std::abs(peak.y - currentY) <= 3.0; }),
++                peaks.end());
++        }
+         if (peaks.empty()) { continue; }
+         const auto nearest = std::min_element(peaks.begin(), peaks.end(),
+             [expected](const Peak &left, const Peak &right) {
+@@ -314,6 +330,14 @@
+         && std::sqrt(errorSquared / count) <= 1.8;
+ }
+ 
++/** @brief 未启用在线原图重捕获的入口保持原来的历史分支判定。 */
++bool historicalBranchPresent(const cv::Mat &gray8, const cv::Point2d &prediction,
++    int side, double slope, double heightOffset, double searchRadius, int minimumColumns)
++{
++    return historicalBranchPresent(gray8, prediction, side, slope, heightOffset,
++        searchRadius, minimumColumns, nullptr);
++}
++
+ } // namespace
+ 
+ void CSimulationGuidedSeamEstimator::reset()
+@@ -323,6 +347,11 @@
+     m_imagePoint = {};
+     m_imageVelocity = {};
+     m_lastImageSupportedPoint = {};
++    m_predictionStartPoint = {};
++    m_imageAnchorLeftSlope = 0.0;
++    m_imageAnchorRightSlope = 0.0;
++    m_imageAnchorLeftHeightOffset = 0.0;
++    m_imageAnchorRightHeightOffset = 0.0;
+     m_hasAnchor = false;
+     m_hasDirections = false;
+     m_referenceOffset = {};
+@@ -330,6 +359,9 @@
+     m_anchorSimulation = {};
+     m_degradedFrames = 0;
+     m_reacquisitionOffset = {};
++    m_reacquisitionVelocity = {};
++    m_reacquisitionLeftSlope = 0.0;
++    m_reacquisitionRightSlope = 0.0;
+     m_reacquisitionGapHeight = 0.0;
+     m_reacquisitionFrames = 0;
+ }
+@@ -570,6 +602,7 @@
+     if (!m_hasImagePosition) {
+         m_imagePoint = inside(transitionTarget, gray8.size()) ? transitionTarget : simulatedSeam;
+         m_lastImageSupportedPoint = m_imagePoint;
++        m_predictionStartPoint = m_imagePoint;
+         m_hasImagePosition = true;
+         m_anchorTime = now;
+         m_anchorSimulation = simulatedSeam;
+@@ -640,22 +673,51 @@
+                     - rawRefinement.rightEndpoint.y) > 3.0
+             : cv::norm(rawRefinement.point - result.prediction)
+                 > options.maximumLocalCorrectionPixel;
+-        // 新的清晰接缝必须连续自证；旧分支还在时，更亮的反光不能替换它。
+-        if (result.rawJumpRejected && options.enableRawReacquisition
+-            && cv::norm(rawRefinement.point - result.prediction)
+-                <= options.maximumAnchorInnovationPixel * 2.0) {
+-            result.reacquisitionBlockedByPreviousBranch = historicalBranchPresent(gray8,
++        // 旧估计的位置误差不能成为新原图永远无法挑战的搜索半径。
++        // 两套历史仅用于检查竞争：近期跟随分支，以及未被肩部重写的实测分支。
++        if (result.rawJumpRejected && options.enableRawReacquisition) {
++            const bool currentRawSupported = reacquisitionSupported(
++                gray8, rawRefinement, simulatedPolyline, simulatedSeam);
++            const auto *currentRaw = currentRawSupported ? &rawRefinement : nullptr;
++            const bool currentBranchPresent = historicalBranchPresent(gray8,
+                 result.prediction, -1, m_leftSlope, m_leftHeightOffset,
+-                options.maximumBranchDistancePixel, options.minimumShoulderColumns)
++                options.maximumBranchDistancePixel, options.minimumShoulderColumns, currentRaw)
+                 && historicalBranchPresent(gray8, result.prediction, 1, m_rightSlope,
+                     m_rightHeightOffset, options.maximumBranchDistancePixel,
+-                    options.minimumShoulderColumns);
+-            if (!result.reacquisitionBlockedByPreviousBranch
+-                && reacquisitionSupported(gray8, rawRefinement, simulatedPolyline, simulatedSeam)) {
++                    options.minimumShoulderColumns, currentRaw);
++            const bool measuredBranchPresent = historicalBranchPresent(gray8,
++                m_lastImageSupportedPoint, -1, m_imageAnchorLeftSlope,
++                m_imageAnchorLeftHeightOffset, options.maximumBranchDistancePixel,
++                options.minimumShoulderColumns, currentRaw)
++                && historicalBranchPresent(gray8, m_lastImageSupportedPoint, 1,
++                    m_imageAnchorRightSlope, m_imageAnchorRightHeightOffset,
++                    options.maximumBranchDistancePixel, options.minimumShoulderColumns, currentRaw);
++            result.reacquisitionBlockedByPreviousBranch = m_hasDirections
++                && (currentBranchPresent || measuredBranchPresent);
++            if (!result.reacquisitionBlockedByPreviousBranch && currentRawSupported) {
++                const auto motion = rawRefinement.point - m_reacquisitionOffset;
++                const double gap = rawRefinement.rightEndpoint.y - rawRefinement.leftEndpoint.y;
++                const bool hasRawDirections = rawRefinement.hasBranchDirections
++                    && std::isfinite(rawRefinement.leftSlope)
++                    && std::isfinite(rawRefinement.rightSlope);
++                // 连续性检查运动创新，而非要求候选静止；直行、斜行、
++                // 平滑转向均可累积大位移，跨支跳变和间隙突变则重新计数。
+                 const bool consecutive = m_reacquisitionFrames > 0
+-                    && cv::norm(rawRefinement.point - m_reacquisitionOffset) <= 2.0;
++                    && cv::norm(motion) <= options.maximumAnchorInnovationPixel
++                    && (m_reacquisitionFrames < 2
++                        || cv::norm(motion - m_reacquisitionVelocity)
++                            <= options.maximumLocalCorrectionPixel)
++                    && std::abs(gap - m_reacquisitionGapHeight)
++                        <= options.maximumLocalCorrectionPixel
++                    && (!hasRawDirections
++                        || (std::abs(rawRefinement.leftSlope - m_reacquisitionLeftSlope) <= 0.12
++                            && std::abs(rawRefinement.rightSlope - m_reacquisitionRightSlope) <= 0.12));
+                 m_reacquisitionFrames = consecutive ? m_reacquisitionFrames + 1 : 1;
++                m_reacquisitionVelocity = consecutive ? motion : cv::Point2d();
+                 m_reacquisitionOffset = rawRefinement.point;
++                m_reacquisitionGapHeight = gap;
++                m_reacquisitionLeftSlope = rawRefinement.leftSlope;
++                m_reacquisitionRightSlope = rawRefinement.rightSlope;
+                 result.reacquisitionFrames = m_reacquisitionFrames;
+                 result.reacquisitionPending = m_reacquisitionFrames < 3;
+                 if (!result.reacquisitionPending) {
+@@ -690,6 +752,11 @@
+         m_hasAnchor = true;
+         m_anchorSimulation = simulatedSeam;
+         m_anchorTime = now;
++        m_lastImageSupportedPoint = rawRefinement.point;
++        m_imageAnchorLeftSlope = m_leftSlope;
++        m_imageAnchorRightSlope = m_rightSlope;
++        m_imageAnchorLeftHeightOffset = m_leftHeightOffset;
++        m_imageAnchorRightHeightOffset = m_rightHeightOffset;
+         m_degradedFrames = 0;
+         result.point = rawRefinement.point;
+         result.imageObservationQuality = 1.0;
+@@ -714,20 +781,25 @@
+             m_rightSlope += 0.2 * (right.slope - m_rightSlope);
+         }
+     }
+-    if ((rawUsable && !result.rawJumpRejected) || result.hasRawShoulderSupport) {
++    if ((rawUsable && !result.rawJumpRejected) || result.localGapCenterSupported) {
+         const auto motion = result.point - m_imagePoint;
+         const double length = cv::norm(motion);
+         const auto limitedMotion = length > 2.0 ? motion * (2.0 / length) : motion;
+         m_imageVelocity = !hadImageAnchor || result.reacquired ? cv::Point2d()
+             : 0.5 * m_imageVelocity + 0.5 * limitedMotion;
+-        m_lastImageSupportedPoint = result.point;
++        m_predictionStartPoint = result.point;
++    } else if (result.hasRawShoulderSupport) {
++        // 双肩可继续提供当前显示位置，但中心不可见时不能用解算位置
++        // 训练速度或移动独立实测基准，否则遮挡模型会逐帧自我强化。
++        m_imageVelocity *= 0.7;
++        m_predictionStartPoint = result.point;
+     } else {
+         m_imageVelocity *= result.predictionBudgetValid ? 0.7 : 0.0;
+         result.point = m_imagePoint + m_imageVelocity;
+-        const auto travel = result.point - m_lastImageSupportedPoint;
++        const auto travel = result.point - m_predictionStartPoint;
+         const double distance = cv::norm(travel);
+         if (distance > options.maximumLocalCorrectionPixel * 2.0) {
+-            result.point = m_lastImageSupportedPoint
++            result.point = m_predictionStartPoint
+                 + travel * (options.maximumLocalCorrectionPixel * 2.0 / distance);
+             m_imageVelocity = {};
+         }
+--- before/tests/test_simulation_guided_seam.cpp
++++ tests/test_simulation_guided_seam.cpp
+@@ -70,6 +70,32 @@
+     raw.confidence = 0.9;
+     raw.leftSupportColumns = raw.rightSupportColumns = 60;
+     return raw;
++}
++
++/** @brief 局部截面方向可变；不编码工件轮廓或焊缝路径类型。 */
++cv::Mat makeLocalStripe(const cv::Point2d &center, double leftSlope,
++    double rightSlope, double gap)
++{
++    cv::Mat image(480, 640, CV_8UC1);
++    for (int y = 0; y < image.rows; ++y) {
++        for (int x = 0; x < image.cols; ++x) {
++            const double dx = x - center.x;
++            const double stripe = center.y + (dx < 0.0 ? leftSlope : rightSlope) * dx
++                + (dx < 0.0 ? -gap * 0.5 : gap * 0.5);
++            const double distance = y - stripe;
++            image.at<unsigned char>(y, x) = cv::saturate_cast<unsigned char>(14.0
++                + 215.0 * std::exp(-distance * distance / 3.38));
++        }
++    }
++    return image;
++}
++
++v::OnlineSeamRefinementResult independentlyRefine(const cv::Mat &image,
++    const cv::Point2d &center)
++{
++    v::OnlineSeamRefinementOptions options;
++    options.heightPolicy = v::OnlineSeamHeightPolicy::GapCenter;
++    return v::COnlineSeamRefiner::refine(image, center, options);
+ }
+ 
+ } // namespace
+@@ -270,6 +296,111 @@
+         check(result.rawJumpRejected && !result.reacquired && !result.reacquisitionPending,
+             "default guided entry preserves the original rejection behavior");
+     }
++    // 远距原图恢复必须由独立原图证据决定，不能被旧显示点的24px半径永久锁死。
++    auto imageOptions = options;
++    imageOptions.enableImageContinuity = true;
++    imageOptions.enableRawReacquisition = true;
++    const auto independentAnchor = independentlyRefine(clear, actual);
++    check(independentAnchor.valid && independentAnchor.hasBranchDirections,
++        "image-continuity anchor is measured by the production raw refiner");
++    for (const double displacement : {40.0, 80.0}) {
++        estimator.reset();
++        estimator.update(clear, reference(simulated), simulated, independentAnchor, 100, imageOptions);
++        for (int frame = 0; frame < 8; ++frame) {
++            estimator.update(blank, reference(simulated), simulated, missing, 101, imageOptions);
++        }
++        cv::Point2d recovered;
++        for (int frame = 0; frame < 3; ++frame) {
++            // 每帧超过2px，且局部斜率和间隙缓慢变化，不能假定新证据静止或沿旧CAD。
++            recovered = actual + cv::Point2d(displacement + 3.5 * frame, 8.0 + frame);
++            const auto image = makeLocalStripe(recovered, 0.62 + 0.01 * frame,
++                -0.28 - 0.01 * frame, -5.0 + 0.2 * frame);
++            const auto raw = independentlyRefine(image, recovered);
++            check(raw.valid && raw.hasBranchDirections,
++                "far moving recovery uses independently visible current local geometry");
++            result = estimator.update(image, reference(simulated), simulated, raw,
++                102 + frame, imageOptions);
++            check(result.reacquisitionFrames == frame + 1
++                && result.reacquisitionPending == (frame < 2)
++                && result.rawJumpRejected == (frame < 2)
++                && result.reacquired == (frame == 2),
++                "three coherent raw frames recover beyond stale forty/eighty-pixel history while moving");
++            if (frame == 2) {
++                check(cv::norm(result.point - raw.point) < 0.01
++                    && result.degradedFrames == 0 && result.predictionBudgetValid,
++                    "only accepted independent recovery resets the measured anchor budget");
++            }
++        }
++        result = estimator.update(blank, reference(simulated), simulated, missing, 106, imageOptions);
++        check(cv::norm(result.point - recovered) < 2.0,
++            "recovery removes stale velocity before the next missing frame");
++    }
++    estimator.reset();
++    estimator.update(clear, reference(simulated), simulated, independentAnchor, 110, imageOptions);
++    const auto farPoint = actual + cv::Point2d(80.0, 10.0);
++    const auto farImage = makeLocalStripe(farPoint, 0.62, -0.28, -5.0);
++    const auto farRaw = independentlyRefine(farImage, farPoint);
++    estimator.update(farImage, reference(simulated), simulated, farRaw, 110, imageOptions);
++    estimator.update(blank, reference(simulated), simulated, missing, 110, imageOptions);
++    result = estimator.update(farImage, reference(simulated), simulated, farRaw, 110, imageOptions);
++    check(result.reacquisitionFrames == 1 && result.rawJumpRejected,
++        "missing raw support breaks a far-recovery evidence sequence");
++    // 即使候选很远且更亮，原来的弱条纹仍可见也不得被候选连续性覆盖。
++    cv::Mat farCompeting = farImage.clone();
++    for (int y = 0; y < clear.rows; ++y) {
++        for (int x = 0; x < clear.cols; ++x) {
++            farCompeting.at<unsigned char>(y, x) = std::max(
++                farCompeting.at<unsigned char>(y, x),
++                cv::saturate_cast<unsigned char>(14.0
++                    + (clear.at<unsigned char>(y, x) - 14.0) * 0.55));
++        }
++    }
++    estimator.reset();
++    estimator.update(clear, reference(simulated), simulated, independentAnchor, 111, imageOptions);
++    for (int frame = 0; frame < 6; ++frame) {
++        result = estimator.update(farCompeting, reference(simulated), simulated, farRaw, 111, imageOptions);
++        check(result.rawJumpRejected && result.reacquisitionBlockedByPreviousBranch
++            && !result.reacquired,
++            "visible old measured branches block a persistent brighter far candidate");
++    }
++    // 任意形状均可能遇到近乎平行截面；不可通过除小斜率差制造横向漂移。
++    estimator.reset();
++    auto shallowRaw = supportedRawPoint(actual, -8.0);
++    shallowRaw.hasBranchDirections = true;
++    shallowRaw.leftSlope = 0.07;
++    shallowRaw.rightSlope = -0.07;
++    const auto shallowImage = makeLocalStripe(actual, 0.07, -0.07, -8.0);
++    estimator.update(shallowImage, reference(simulated), simulated, shallowRaw, 112, imageOptions);
++    for (int frame = 0; frame < 20; ++frame) {
++        result = estimator.update(shallowImage, reference(simulated), simulated, missing, 112, imageOptions);
++        check(result.valid && !result.hasRawShoulderSupport
++            && cv::norm(result.point - actual) < 0.01 && result.degradedFrames == frame + 1,
++            "ill-conditioned shoulders never synthesize motion or renew the independent anchor");
++    }
++    // 同一条浅截面整体平移时，旧肩窗口仍可能落在新条纹上；
++    // 这不是第二条竞争反光，不能用旧线3px容差永久否决清晰的新折点。
++    for (const auto &shape : std::vector<cv::Point2d>{{0.10, 28.0}, {0.08, 30.0}}) {
++        estimator.reset();
++        const auto oldImage = makeLocalStripe(actual, shape.x, -shape.x, -8.0);
++        const auto oldRaw = independentlyRefine(oldImage, actual);
++        const auto movedPoint = actual + cv::Point2d(shape.y, 0.0);
++        const auto movedImage = makeLocalStripe(movedPoint, shape.x, -shape.x, -8.0);
++        const auto movedRaw = independentlyRefine(movedImage, movedPoint);
++        check(oldRaw.valid && movedRaw.valid && movedRaw.supportRatio >= 0.85
++            && movedRaw.fitRmsPixel <= 1.0 && movedRaw.xUncertaintyPixel <= 3.0,
++            "translated shallow cross-section has independent high-quality production raw evidence");
++        estimator.update(oldImage, reference(simulated), simulated, oldRaw, 113, imageOptions);
++        for (int frame = 0; frame < 3; ++frame) {
++            result = estimator.update(movedImage, reference(simulated), simulated,
++                movedRaw, 113, imageOptions);
++            check(!result.reacquisitionBlockedByPreviousBranch
++                && result.reacquisitionFrames == frame + 1
++                && result.reacquired == (frame == 2),
++                "one translated stripe is never counted as an independently surviving historical branch");
++        }
++        check(!result.rawJumpRejected && cv::norm(result.point - movedRaw.point) < 0.01,
++            "three visible shallow-stripe raw frames recover without a slope or displacement special case");
++    }
+     // 验证生产接线：空图可提供显式仿真估计，但不能产生原图实测。
+     v::CLegacyOnlineKcfDetector detector;
+     i2r_rlc::digital_twin::DigitalTwinVisionLaserObservation observation;
+@@ -329,6 +460,55 @@
+         && !occluded.diagnostic.refinement.valid
+         && occluded.diagnostic.continuity.source == v::OnlineSeamPointSource::SimulationPrediction,
+         "fully occluded production frame predicts visibly without using fake KCF evidence");
++    // 实际detector链：旧图像搜索/Kalman不可在原图已恢复后把点拉回旧支系。
++    v::CLegacyOnlineKcfDetector recoveringDetector;
++    auto recoveryOptions = detectorOptions;
++    recoveryOptions.seamRefinement.heightPolicy = v::OnlineSeamHeightPolicy::GapCenter;
++    recoveryOptions.referenceRevision = 200;
++    v::LegacyOnlineKcfResult previousRecovery;
++    for (int frame = 0; frame < 6; ++frame) {
++        previousRecovery = recoveringDetector.process(clear, observation,
++            projectionContext, recoveryOptions);
++    }
++    check(previousRecovery.valid && previousRecovery.diagnostic.refinement.valid,
++        "integrated recovery starts from an independently measured production detector anchor");
++    const auto detectorRecoveryPoint = actual + cv::Point2d(40.0, 6.0);
++    const auto detectorRecoveryImage = makeImage(detectorRecoveryPoint, -8.0, false, true, false);
++    bool detectorReacquired = false;
++    bool kalmanReseeded = false;
++    for (int frame = 0; frame < 32; ++frame) {
++        recoveryOptions.referenceRevision = 201 + frame / 4;
++        const auto current = recoveringDetector.process(detectorRecoveryImage, observation,
++            projectionContext, recoveryOptions);
++        check(current.valid && current.diagnostic.attempted && current.diagnostic.tracker.completed
++            && !current.diagnostic.templateReinitialized,
++            "KCF keeps detecting each recovery frame without reinitializing its image template");
++        check(cv::norm(current.weldPointPixel - previousRecovery.weldPointPixel) <= 2.000001,
++            "independent raw recovery preserves the existing two-pixel business transition");
++        if (detectorReacquired) {
++            kalmanReseeded = kalmanReseeded || current.diagnostic.tracker.kalmanSeeded;
++            check(current.diagnostic.refinement.valid
++                && !current.diagnostic.guided.rawJumpRejected
++                && current.diagnostic.continuity.source == v::OnlineSeamPointSource::Geometry
++                && cv::norm(current.diagnostic.refinement.point - detectorRecoveryPoint) < 2.0,
++                "confirmed raw geometry remains on the recovered branch while the business point catches up");
++        }
++        if (current.diagnostic.guided.reacquired) {
++            detectorReacquired = true;
++            check(current.diagnostic.rawRefinement.valid && current.diagnostic.refinement.valid
++                && cv::norm(current.diagnostic.rawRefinement.point
++                    - current.diagnostic.refinement.point) < 0.01
++                && current.diagnostic.continuity.source == v::OnlineSeamPointSource::Geometry
++                && !current.diagnostic.tracker.trainingCommitted
++                && current.diagnostic.coarseObservationQuality == 0.0
++                && !current.diagnostic.coarseObservationUsed,
++                "confirmed raw recovery survives the full detector handoff without training the old ROI");
++        }
++        previousRecovery = current;
++    }
++    check(detectorReacquired && kalmanReseeded
++        && cv::norm(previousRecovery.weldPointPixel - detectorRecoveryPoint) < 2.0,
++        "far recovery reseeds Kalman and converges continuously to the independently recovered branch");
+     if (passed) {
+         std::cout << "PASS: temporal anchor, valid-looking reflection, tack GapCenter, pose version, motion compensation, drift and budgets\n";
+     }
+--- before/Vision/include/track/LegacyOnlineKcfDetector.h
++++ Vision/include/track/LegacyOnlineKcfDetector.h
+@@ -132,6 +132,8 @@
+     bool m_onlineObservationActive = false;
+     bool m_hasImageSearchPoint = false;
+     cv::Point2d m_lastImageSearchPoint{-1.0, -1.0};
++    /// @brief 新原图支系已确认而粗 KCF 尚未同位验收；期间保留检测但不融合旧粗点。
++    bool m_coarseRecoveryPending = false;
+ };
+ 
+ } // namespace i2r_rlc::vision
+--- before/Vision/src/track/LegacyOnlineKcfDetector.cpp
++++ Vision/src/track/LegacyOnlineKcfDetector.cpp
+@@ -217,6 +217,7 @@
+     m_onlineObservationActive = false;
+     m_hasImageSearchPoint = false;
+     m_lastImageSearchPoint = {-1.0, -1.0};
++    m_coarseRecoveryPending = false;
+ }
+ 
+ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
+@@ -271,6 +272,7 @@
+             - m_tracker->m_roi.height * m_templateWeldAnchor.y);
+     }
+     m_onlineObservationActive = options.enableOnlineObservationFusion;
++    if (!options.enableOnlineObservationFusion) { m_coarseRecoveryPending = false; }
+ 
+     const std::vector<MyLaserImagePoint> simulatedLaserPoints =
+         toMyLaserImagePoints(observation.laserLineImagePoints_px);
+@@ -291,6 +293,7 @@
+         m_guidedEstimator.reset();
+         m_continuitySeamIndex = observation.seamIndex;
+         m_hasImageSearchPoint = false;
++        m_coarseRecoveryPending = false;
+     }
+     if (options.enableSimulationGuidance
+         && (!m_guidanceRevisionKnown
+@@ -323,6 +326,7 @@
+         m_templateImageSize = gray8.size();
+         m_initialized = true;
+         m_framesSinceInitialize = 0;
++        m_coarseRecoveryPending = false;
+         if (wasInitialized) {
+             // 重建后锚点可能改变，保留上次焊缝位置而非旧窗口左上角。
+             m_tracker->m_roi.x = static_cast<float>(previousWeldPoint.x
+@@ -406,9 +410,9 @@
+             result.diagnostic.refinementAttempted = true;
+             result.diagnostic.refinementElapsedMs += std::chrono::duration<double, std::milli>(
+                 std::chrono::steady_clock::now() - started).count();
+-            if (historical.valid && (!result.diagnostic.refinement.valid
+-                    || cv::norm(historical.point - m_lastImageSearchPoint) + 3.0
+-                        < cv::norm(result.diagnostic.refinement.point - m_lastImageSearchPoint))) {
++            // 有效的新原图证据由辅助器统一做跨帧及旧分支竞争校核，
++            // 不能仅因历史更近而在进入验收前抹去它。备用只补足本帧缺测。
++            if (historical.valid && !result.diagnostic.refinement.valid) {
+                 result.diagnostic.refinement = historical;
+                 result.diagnostic.realSearchFallbackUsed = true;
+             }
+@@ -447,6 +451,16 @@
+             result.diagnostic.coarseObservationQuality = std::max(
+                 result.diagnostic.coarseObservationQuality,
+                 responseQuality * result.diagnostic.guided.imageObservationQuality);
++        }
++        if (options.enableOnlineObservationFusion && result.diagnostic.guided.reacquired
++            && result.diagnostic.refinement.valid) {
++            m_coarseRecoveryPending = true;
++            m_continuity.clearCoarseObservationBias();
++        }
++        if (options.enableOnlineObservationFusion && m_coarseRecoveryPending) {
++            // 恢复帧的粗 ROI 仍可能在旧支系；新图像点与 KCF 同位验收前，
++            // 不重学刚清掉的大偏差，也不让旧模板响应参与退化业务融合。
++            result.diagnostic.coarseObservationQuality = 0.0;
+         }
+         result.diagnostic.continuity = options.enableOnlineObservationFusion
+             ? m_continuity.updateOnline(gray8.size(), simulatedPoint,
+@@ -600,9 +614,16 @@
+             && cv::norm(result.diagnostic.beforeFusionPoint
+                 - result.diagnostic.refinement.point) <= 8.0
+             && !result.diagnostic.guided.rawJumpRejected
++            && !result.diagnostic.guided.reacquired
+             && tracking.completed && tracking.hasResponse && !tracking.correlationJumpRejected
+             && result.diagnostic.rawRefinement.ambiguousColumnRatio <= 0.05;
+         m_tracker->commitOnlineObservationTraining(trainAccepted);
++        if (trainAccepted) { m_coarseRecoveryPending = false; }
++        if (result.diagnostic.guided.reacquired) {
++            // 新原图支系已连续自证；旧相关 ROI 的特征不可回灌，
++            // 下一帧在真实点重新搜索并验收训练，避免旧滤波历史把恢复点拉回。
++            m_tracker->initKF();
++        }
+         result.diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
+         if (m_hasImageSearchPoint && (!trainAccepted || result.diagnostic.realSearchFallbackUsed)) {
+             // 拒绝反光帧不训练；下一帧搜索接续真实激光/肩部，不能追着仿真或坏峰走。
+--- before/Vision/include/track/OnlineSeamContinuity.h
++++ Vision/include/track/OnlineSeamContinuity.h
+@@ -33,6 +33,8 @@
+ class COnlineSeamContinuity final {
+ public:
+     void reset();
++    /** @brief 新原图支系确认后清除旧粗点偏差；保留业务位置与恢复限幅状态。 */
++    void clearCoarseObservationBias();
+     /** @brief 同步最终辅助输出供恢复限幅使用；不刷新实测偏移或粗点偏差。 */
+     void synchronizeEstimate(const cv::Point2d &point,
+         const cv::Point2d &simulated, int degradedFrames);
+--- before/Vision/src/track/OnlineSeamContinuity.cpp
++++ Vision/src/track/OnlineSeamContinuity.cpp
+@@ -25,6 +25,11 @@
+     m_previousSimulation = {};
+     m_degradedFrames = 0;
+     m_recoveryFrames = 0;
++}
++void COnlineSeamContinuity::clearCoarseObservationBias()
++{
++    m_biasValid = false;
++    m_bias = {};
+ }
+ void COnlineSeamContinuity::synchronizeEstimate(const cv::Point2d &point,
+     const cv::Point2d &simulated, int degradedFrames)
+--- before/tests/test_online_seam_continuity.cpp
++++ tests/test_online_seam_continuity.cpp
+@@ -104,6 +104,39 @@
+     check(revisedPoint.valid && revisedPoint.transitionLimited
+         && cv::norm(revisedPoint.point - cv::Point2d(260,120)) <= 2.000001,
+         "revision reprojects the last business target and limits the first recovered raw frame");
++    // 新原图支系确认只能清粗点偏差，不能清业务位置来绕过恢复限幅。
++    v::COnlineSeamContinuity newBranch;
++    v::CKcfUpdateDiagnostic rawTracker;
++    v::KcfFusionOptions rawFusion;
++    rawFusion.mode = v::KcfFusionMode::KcfOnly;
++    geometry.valid = true;
++    geometry.point = {250, 120};
++    newBranch.updateOnline(size, {250,120}, {238,120}, 1.0,
++        rawTracker, geometry, rawFusion);
++    geometry.valid = false;
++    newBranch.updateOnline(size, {250,120}, {238,120}, 1.0,
++        rawTracker, geometry, rawFusion);
++    newBranch.clearCoarseObservationBias();
++    geometry.valid = true;
++    geometry.point = {300,120};
++    auto newTarget = cv::Point2d(250,120);
++    for (int frame = 0; frame < 30; ++frame) {
++        const auto step = newBranch.updateOnline(size, {250,120}, {238,120}, 0.0,
++            rawTracker, geometry, rawFusion);
++        check(step.valid && step.source == v::OnlineSeamPointSource::Geometry
++            && cv::norm(step.point - newTarget) <= 2.000001,
++            "clearing old coarse bias preserves bounded business recovery");
++        newTarget = step.point;
++    }
++    check(cv::norm(newTarget - geometry.point) < 1e-7,
++        "business recovery reaches the newly confirmed image branch");
++    geometry.valid = false;
++    const auto newCoarse = newBranch.updateOnline(size, {250,120}, {300,120}, 1.0,
++        rawTracker, geometry, rawFusion);
++    check(newCoarse.valid && newCoarse.source == v::OnlineSeamPointSource::CorrectedKcf
++        && cv::norm(newCoarse.correctedCoarsePoint - cv::Point2d(300,120)) < 1e-7
++        && cv::norm(newCoarse.point - newTarget) < 1e-7,
++        "newly verified KCF does not inherit or relearn old branch bias");
+     if(ok) std::cout<<"PASS: continuous targets, 400-frame occlusion, glare, bounded drift, recovery, reset\n";
+     return ok?0:1;
+ }
+--- before/tests/test_online_image_geometry.cpp
++++ tests/test_online_image_geometry.cpp
+@@ -87,12 +87,41 @@
+     }
+     estimator.reset();
+     estimator.update(clear, model(simulated), simulated, raw, 30, options);
+-    for (int frame = 1; frame <= 40; ++frame) {
++    for (int frame = 1; frame <= 160; ++frame) {
+         const auto moved = actual + cv::Point2d(0.3 * frame, -0.1 * frame);
+         const auto image = scene(moved, -8.0, true, false);
+         const auto result = estimator.update(image, model(simulated), simulated, missing, 30, options);
+         check(result.hasRawShoulderSupport && cv::norm(result.point - moved) < 2.0,
+             "two shoulders measure real image motion in both axes despite stationary CAD and hidden center");
++    }
++    // 真实肩部运动可超过旧 16/24 px 门槛；缺肩后不能跳回很久以前的实测点。
++    const auto lastVisible = actual + cv::Point2d(48.0, -16.0);
++    for (int frame = 0; frame < 180; ++frame) {
++        const auto result = estimator.update(blank, model(simulated), simulated,
++            missing, 30, options);
++        check(result.valid && !result.hasRawShoulderSupport
++            && cv::norm(result.point - lastVisible) <= 8.5,
++            "loss of shoulders extrapolates locally without returning to stale independent anchor");
++    }
++    // 路径形状仅在测试中生成；生产算法不接收直线/圆弧类别或半径。
++    for (int trajectory = 0; trajectory < 3; ++trajectory) {
++        estimator.reset();
++        estimator.update(clear, model(simulated), simulated, raw, 35, options);
++        for (int frame = 1; frame <= 160; ++frame) {
++            const double step = static_cast<double>(frame);
++            const cv::Point2d displacement = trajectory == 0
++                ? cv::Point2d(0.32 * step, 0.0)
++                : (trajectory == 1 ? cv::Point2d(-0.23 * step, 0.18 * step)
++                    : cv::Point2d(0.28 * step, 9.0 * std::sin(step / 42.0)));
++            const auto moved = actual + displacement;
++            const auto image = scene(moved, -8.0, true, false);
++            const auto result = estimator.update(image, model(simulated), simulated,
++                missing, 35 + frame / 30, options);
++            check(result.valid && result.hasRawShoulderSupport
++                && result.estimated && (frame <= 3 || !result.predictionBudgetValid)
++                && cv::norm(result.point - moved) < 2.0,
++                "straight diagonal and curved image paths remain trackable beyond old anchor gates");
++        }
+     }
+     estimator.reset();
+     estimator.update(clear, model(simulated), simulated, raw, 40, options);
+--- before/docs/online_local_registration.md
++++ docs/online_local_registration.md
+@@ -447,3 +447,36 @@
+ 本轮未接入自动 Hold、停止或降速，也未修改 Control 的轨迹跟随/通信策略。estimated 点仍可引导 TCP。固定旧像素在变化的机器人/外轴投影下仍会生成不同三维估计，因此“像素不随 CAD 漂移”不能解释为完全失测下已防碰撞。未启动相机或机器人；现场精度及持续完全遮挡时的控制策略仍需独立验证。
+ 
+ 最终验证：VS2022 x64 Developer 环境使用既有 `out/build/qt-debug` 生成主程序成功；10 项直接相关 CTest 全部通过，耗时 11.90 秒，包括在线控制、记录器、精定位/独立投影合同、KCF 默认与延迟训练、局部表面后验、写回保留、在线帧同步、连续器、现场图像几何及仿真辅助旧入口。没有据此声称共享离线完整门禁或现场闭环已通过。最终 EXE 为 `out/build/qt-debug/UI/i2r_rlc.exe`，构建时间 2026-10-22 18:17:08；未启动程序或设备。
++
++
++## 2026-10-23 预焊点后恢复自锁与历史污染修复
++
++本节补充并取代前文关于肩部可刷新图像运动基准、正式在线重捕获距旧预测不超过24px的说明。范围仅为正式在线纠偏的enableOnlineObservationFusion / enableImageContinuity路径。工件位姿保留、后续ICP继续、每帧KCF及连续绿色业务点保持；没有加入自动Hold、停止、降速或位姿回退。
++
++### 故障与修复边界
++
++最新分析会话20261022_212930_287中，11061帧最后接受完整原图焊点；之后肩部估计写回图像位置、速度及基准，真实原图再出现又被旧位置门控拒绝。11890帧原始候选约(459.50,604.53)、业务点约(504.28,594.56)，最后实测之后449份有效原图候选均未获接受。修改未重写旧归档。
++
++现在分开完整原图的独立位置/两侧形状、肩部估计的当前业务位置、失测外推起点。肩部-only可跟随条件良好的双侧原图，但不能覆盖独立原图基准或训练速度。失肩后从最近有图像支撑的显示位置有限外推，沿用8px上限，不跳回久远独立原图位置。只有完整原图被接受才重置独立预算年龄，肩部仍为estimated。
++
++在线高质原图不再因距旧估计超过24px而失去三帧重捕获资格；改用自身双侧方向、支撑、残差、歧义、端部及相邻帧运动创新/间隙/方向连续性。旧分支保护同时核对近期位置和未被肩部重写的独立原图基准。浅角度条纹平移时，旧窗口可能看到同一新位置条纹；只有通过严格原图质量检查的候选可解释的同列峰，才在既有3px拟合容差内排除出竞争集合。其余旧弱峰仍须通过原支撑列数、方向、端部及RMS判定。没有圆心、半径、路径类别或固定运动方向特判。
++
++### KCF恢复交接
++
++有效当前原图候选不再被更接近旧点的备用候选覆盖；备用只填当前原图无效帧。确认reacquired后清旧coarse bias并隔离粗融合/偏差学习，避免同帧又学回旧偏差；KCF仍每帧执行，原图/肩部正常工作，后续通过原同位训练条件才恢复粗观测。
++
++恢复帧丢弃旧ROI待训练特征、清Kalman历史，用已接受原图点回灌下一帧搜索；模板和业务位置保留。clearCoarseObservationBias仅清粗点偏差，不清业务位置、退化计数或每帧2px恢复限幅。默认非在线入口保持原历史门控。
++
++### 通用性验证与限制
++
++真实RED→GREEN：浅截面平移的生产refiner高质原图被误认旧竞争支，新增测试产生8条失败，修复后同一测试通过。另覆盖40/80px恢复、3.5px/帧候选运动、局部方向/间隙缓变、断帧、旧弱纹与亮反光竞争、病态肩部、160帧直线/斜线/平滑曲线路径、失肩不跳旧锚及detector/KCF/Kalman/训练/业务点40px恢复交接。
++
++轨迹直/斜/曲不等于任意激光截面。原refiner仍要求可辨识局部折点，本次不新增全图搜索，恢复需要局部搜索先产生候选。仅双肩且中心遮挡时，真实平移与某些肩部形变可能同构，本次切断速度/独立基准污染并恢复原图重锚，不声称消除所有肩部位置误差。3px几何分辨容差内重叠的条纹不能保证物理身份。
++
++业务仍保留2px/帧限幅；3.5px/帧测试验证估计器重锚，不代表最终业务点能追上持续超过该限幅的目标。estimated仍可引导TCP，修改不构成防碰撞保证。未启动主程序、相机、机器人或现场RobotSim；稀疏原图专项不能替代最新故障连续帧闭环重放。
++
++### 实际验证与证据
++
++沿用此前用户明确授权的VS2022 x64 Developer命令行和现有out/build/qt-debug。收到本轮禁止Computer Use要求后未再使用，未操作鼠标。最终MSVC主程序构建成功，11项相关CTest全部通过，33.46秒，覆盖在线控制、记录器、runtime跟踪、融合、写回保留、表面后验、在线帧同步、连续器、图像几何、仿真辅助、原图精定位。独立agent复核实际diff未发现新增确定性阻断，不据此声称全量离线门禁或现场通过。
++
++精确修改、SHA256及RED/GREEN原始日志位于output/analysis/20261022_raw_reacquisition_repair/。源文件备份位于.codex_backups/estimator_recovery_20261023_010539/、.codex_backups/detector_recovery_20261023_010345/、output/backups/raw_reacquisition_repair_20261022/main_baseline/。工作流依据已有Notion快照及历史对话；本次公开页面未获取可用正文，不声称已核对Notion最新版本。未删除原始文件或归档。

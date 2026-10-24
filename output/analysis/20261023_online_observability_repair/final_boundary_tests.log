@@ -1,0 +1,15 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start   6: i2r_rlc_online_calibration_contract_tests
+1/5 Test   #6: i2r_rlc_online_calibration_contract_tests .......   Passed    0.74 sec
+    Start  15: i2r_rlc_runtime_tracking_flow_tests
+2/5 Test  #15: i2r_rlc_runtime_tracking_flow_tests .............   Passed    7.05 sec
+    Start  16: i2r_rlc_online_seam_refinement_contract_tests
+3/5 Test  #16: i2r_rlc_online_seam_refinement_contract_tests ...   Passed    4.34 sec
+    Start 106: i2r_rlc_online_seam_candidate_geometry_tests
+4/5 Test #106: i2r_rlc_online_seam_candidate_geometry_tests ....   Passed    0.24 sec
+    Start 107: i2r_rlc_online_seam_geometry_worker_tests
+5/5 Test #107: i2r_rlc_online_seam_geometry_worker_tests .......   Passed   19.01 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  31.38 sec

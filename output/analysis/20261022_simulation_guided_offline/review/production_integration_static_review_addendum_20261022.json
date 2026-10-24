@@ -1,0 +1,8 @@
+{
+  "supplements": "production_integration_static_review_20261022.json",
+  "pending_cross_review_resolved_by_inspection": [
+    "LegacyOnlineKcfDetector now tracks m_guidanceRevisionKnown and m_guidanceReferenceRevision; a changed referenceRevision resets both OnlineSeamContinuity and guided estimator before use.",
+    "Worker surface path now checks trainingAfter and holdoutAfter full directional means against absolute maximumResidualMm, in addition to helper robust metrics and coordinator pre-write checker."
+  ],
+  "remaining_pending": "MSVC build, test execution and authorized new-frame runtime validation remain unperformed."
+}
