@@ -5,10 +5,10 @@
  *          分数仅为外观证据；走廊外高分候选不能取得同目标身份。
  */
 #include <cmath>
-#include <iostream>
-#include <iterator>
+#include <cstdio>
 #include <stdexcept>
 #include <QByteArray>
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -33,8 +33,11 @@ bool inside(const cv::Rect &rect, const cv::Mat &image)
 int main()
 {
     try {
-        const std::string text((std::istreambuf_iterator<char>(std::cin)), std::istreambuf_iterator<char>());
-        const auto input = QJsonDocument::fromJson(QByteArray::fromStdString(text)).object();
+        QFile standardInput;
+        if (!standardInput.open(stdin, QIODevice::ReadOnly)) {
+            throw std::runtime_error("identity standard input unavailable");
+        }
+        const auto input = QJsonDocument::fromJson(standardInput.readAll()).object();
         const auto historical = image(input, "historical_image");
         const auto current = image(input, "current_image");
         const auto p = input.value("historical_pixel").toArray();
@@ -91,9 +94,11 @@ int main()
                 }
             }
         }
-        std::cout << QJsonDocument(result).toJson(QJsonDocument::Compact).constData() << '\n';
+        const auto encoded = QJsonDocument(result).toJson(QJsonDocument::Compact);
+        std::fwrite(encoded.constData(), 1, static_cast<std::size_t>(encoded.size()), stdout);
+        std::fputc('\n', stdout);
     } catch (const std::exception &error) {
-        std::cerr << error.what() << '\n';
+        std::fprintf(stderr, "%s\n", error.what());
         return 2;
     }
     return 0;

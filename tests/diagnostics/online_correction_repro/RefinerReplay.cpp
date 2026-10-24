@@ -3,8 +3,7 @@
  * @brief 归档原图的生产精定位代码回放；像素范围是图像地标，不是物理真值。
  */
 #include <cstdlib>
-#include <iomanip>
-#include <iostream>
+#include <cstdio>
 #include <string>
 
 #include <opencv2/imgcodecs.hpp>
@@ -15,12 +14,12 @@
 int main(int argc, char **argv)
 {
     if (argc < 4) {
-        std::cerr << "usage: RefinerReplay image x y [--crop] [--ambiguity-limit n] [--half-height n]\n";
+        std::fprintf(stderr, "usage: RefinerReplay image x y [--crop] [--ambiguity-limit n] [--half-height n]\n");
         return 2;
     }
     cv::Mat image = cv::imread(argv[1], cv::IMREAD_GRAYSCALE);
     if (image.empty()) {
-        std::cerr << "fixture image unavailable\n";
+        std::fprintf(stderr, "fixture image unavailable\n");
         return 2;
     }
     cv::Point2d hint(std::strtod(argv[2], nullptr), std::strtod(argv[3], nullptr));
@@ -50,14 +49,9 @@ int main(int argc, char **argv)
     }
     const auto result = i2r_rlc::vision::COnlineSeamRefiner::refine(image, hint, options);
     const bool accepted = result.valid && cv::norm(result.point - hint) <= 12.0;
-    std::cout << std::fixed << std::setprecision(6)
-              << (accepted ? "GREEN" : "RED") << " visible_fold_measurement"
-              << " valid=" << result.valid
-              << " status=" << static_cast<int>(result.status)
-              << " ambiguous_ratio=" << result.ambiguousColumnRatio
-              << " limit=" << options.maxAmbiguousColumnRatio
-              << " half_height=" << options.searchHalfHeightPixel
-              << " input=" << image.cols << "x" << image.rows
-              << " point=(" << result.point.x << "," << result.point.y << ")\n";
+    std::fprintf(stdout, "%s visible_fold_measurement valid=%d status=%d ambiguous_ratio=%.6f limit=%.6f half_height=%d input=%dx%d point=(%.6f,%.6f)\n",
+        accepted ? "GREEN" : "RED", result.valid ? 1 : 0, static_cast<int>(result.status),
+        result.ambiguousColumnRatio, options.maxAmbiguousColumnRatio, options.searchHalfHeightPixel,
+        image.cols, image.rows, result.point.x, result.point.y);
     return accepted ? 0 : 1;
 }

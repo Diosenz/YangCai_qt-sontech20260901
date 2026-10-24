@@ -6,11 +6,11 @@
  */
 #include <algorithm>
 #include <cmath>
-#include <iostream>
-#include <iterator>
+#include <cstdio>
 #include <stdexcept>
 #include <vector>
 #include <QByteArray>
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -271,12 +271,17 @@ QJsonObject observe(const QJsonObject &request)
 int main()
 {
     try {
-        const std::string input((std::istreambuf_iterator<char>(std::cin)), std::istreambuf_iterator<char>());
-        const auto document = QJsonDocument::fromJson(QByteArray::fromStdString(input));
+        QFile standardInput;
+        if (!standardInput.open(stdin, QIODevice::ReadOnly)) {
+            throw std::runtime_error("mother standard input unavailable");
+        }
+        const auto document = QJsonDocument::fromJson(standardInput.readAll());
         if (!document.isObject()) { throw std::runtime_error("invalid mother request"); }
-        std::cout << QJsonDocument(observe(document.object())).toJson(QJsonDocument::Compact).constData() << '\n';
+        const auto encoded = QJsonDocument(observe(document.object())).toJson(QJsonDocument::Compact);
+        std::fwrite(encoded.constData(), 1, static_cast<std::size_t>(encoded.size()), stdout);
+        std::fputc('\n', stdout);
     } catch (const std::exception &error) {
-        std::cerr << error.what() << '\n';
+        std::fprintf(stderr, "%s\n", error.what());
         return 2;
     }
     return 0;

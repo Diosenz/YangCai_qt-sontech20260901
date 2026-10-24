@@ -6,7 +6,7 @@
 #include <cmath>
 #include <exception>
 #include <Eigen/Geometry>
-#include <iostream>
+#include <cstdio>
 #include <stdexcept>
 #include <QDir>
 #include <QFile>
@@ -220,10 +220,12 @@ int main(int argc, char **argv)
                     reinterpret_cast<const char *>(png.data()),
                     static_cast<qsizetype>(png.size())).toBase64());
             }
-            std::cout << QJsonDocument(row).toJson(QJsonDocument::Compact).constData() << '\n';
+            const auto encoded = QJsonDocument(row).toJson(QJsonDocument::Compact);
+            std::fwrite(encoded.constData(), 1, static_cast<std::size_t>(encoded.size()), stdout);
+            std::fputc('\n', stdout);
         }
     } catch (const std::exception &error) {
-        std::cerr << error.what() << '\n';
+        std::fprintf(stderr, "%s\n", error.what());
         return 2;
     }
     return 0;
