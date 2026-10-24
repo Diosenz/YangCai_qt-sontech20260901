@@ -1,0 +1,19 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 83: i2r_rlc_online_image_measurement_tests
+1/1 Test #83: i2r_rlc_online_image_measurement_tests ...***Failed   21.13 sec
+FAIL: one rejected candidate keeps untested proposal progress instead of restarting full-image search
+field local geometry status=6 valid=1 support=0.985075 rms=0.547072 uncertainty=0.000 ambiguity=0.039801
+field frame_1120_source.png valid=1 point=[494.500,671.845] refinement_ms=527.306 message=原图接缝精定位测量；仿真仅辅助搜索。
+field local geometry status=2 valid=0 support=0.000000 rms=0.000000 uncertainty=0.000 ambiguity=0.326531
+field frame_2148_source.png valid=0 point=[-1.000,-1.000] refinement_ms=334.771 message=同帧原图未通过接缝或 KCF 身份验收，不生成点。
+field warm replay valid=0 geometry=0 kcf=0 point=[-1.000,-1.000] quality=0.000000 response=0.423441 refinement_ms=334.939
+FAIL: online image measurement
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =  21.14 sec
+
+The following tests FAILED:
+	 83 - i2r_rlc_online_image_measurement_tests (Failed)
+Errors while running CTest

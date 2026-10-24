@@ -1,0 +1,37 @@
+{
+  "names": [
+    "i2r_rlc_online_correction_tests",
+    "i2r_rlc_online_local_registration_frame_lifecycle_tests",
+    "i2r_rlc_online_control_target_presentation_tests",
+    "i2r_rlc_online_image_measurement_tests",
+    "i2r_rlc_online_correction_p001_contract_tests",
+    "i2r_rlc_online_correction_coordinate_contract_tests",
+    "i2r_rlc_online_correction_run_recorder_tests",
+    "i2r_rlc_online_correction_initialization_tests",
+    "i2r_rlc_online_correction_regression_tests",
+    "i2r_rlc_runtime_tracking_flow_tests",
+    "i2r_rlc_online_seam_refinement_contract_tests",
+    "i2r_rlc_online_fusion_controls_tests",
+    "i2r_rlc_online_local_registration_tests",
+    "i2r_rlc_online_local_registration_surface_tests",
+    "i2r_rlc_online_local_registration_safety_tests",
+    "i2r_rlc_online_local_registration_stability_tests",
+    "i2r_rlc_online_local_registration_verification_tests",
+    "i2r_rlc_online_local_surface_verification_tests",
+    "i2r_rlc_local_registration_writeback_safety_tests",
+    "i2r_rlc_correction_robot_sim_online_frame_sync_tests",
+    "i2r_rlc_correction_robot_sim_offline_frame_sync_tests",
+    "i2r_rlc_main_widget_panel_tests",
+    "i2r_rlc_vision_image_to_space_tests",
+    "i2r_rlc_online_seam_continuity_tests",
+    "i2r_rlc_online_image_geometry_tests",
+    "i2r_rlc_online_seam_refiner_tests",
+    "i2r_rlc_vision_kcf_tracker_tests"
+  ],
+  "excluded": [
+    {
+      "name": "i2r_rlc_vision_penzui_station_projection_tests",
+      "reason": "data/replay/penzui fixture absent; initial run hung and task-owned test process stopped, no test data or production code changed"
+    }
+  ]
+}

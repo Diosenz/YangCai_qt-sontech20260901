@@ -1,0 +1,34 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  6: i2r_rlc_online_calibration_contract_tests
+ 1/11 Test  #6: i2r_rlc_online_calibration_contract_tests ..............   Passed    2.44 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 2/11 Test  #8: i2r_rlc_online_correction_run_recorder_tests ...........   Passed    0.42 sec
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 3/11 Test #15: i2r_rlc_runtime_tracking_flow_tests ....................   Passed    3.20 sec
+      Start 16: i2r_rlc_online_seam_refinement_contract_tests
+ 4/11 Test #16: i2r_rlc_online_seam_refinement_contract_tests ..........   Passed    0.47 sec
+      Start 17: i2r_rlc_online_fusion_controls_tests
+ 5/11 Test #17: i2r_rlc_online_fusion_controls_tests ...................   Passed    0.29 sec
+      Start 18: i2r_rlc_online_local_registration_tests
+ 6/11 Test #18: i2r_rlc_online_local_registration_tests ................   Passed    3.07 sec
+      Start 19: i2r_rlc_online_local_registration_safety_tests
+ 7/11 Test #19: i2r_rlc_online_local_registration_safety_tests .........   Passed    1.07 sec
+      Start 22: i2r_rlc_online_local_registration_verification_tests
+ 8/11 Test #22: i2r_rlc_online_local_registration_verification_tests ...   Passed    0.09 sec
+      Start 26: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+ 9/11 Test #26: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...***Failed    9.66 sec
+FAIL: online no-target must consume a synchronized frame without counting a failure
+FAIL: online O acknowledgement should resume Vision in the same run
+
+      Start 27: i2r_rlc_main_widget_panel_tests
+10/11 Test #27: i2r_rlc_main_widget_panel_tests ........................   Passed    2.31 sec
+      Start 76: i2r_rlc_online_seam_refiner_tests
+11/11 Test #76: i2r_rlc_online_seam_refiner_tests ......................   Passed    0.29 sec
+
+91% tests passed, 1 tests failed out of 11
+
+Total Test time (real) =  23.34 sec
+
+The following tests FAILED:
+	 26 - i2r_rlc_correction_robot_sim_online_frame_sync_tests (Failed)
+Errors while running CTest

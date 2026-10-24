@@ -1,0 +1,236 @@
+[
+  {
+    "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/Vision/include/track/LegacyOnlineKcfDetector.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "e0053117b7638a4265f141d82d398e2dcb843db31004a76b489d966e2e39d2e9"
+  },
+  {
+    "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/Vision/src/track/LegacyOnlineKcfDetector.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "6bd9c04f9f73adc9ed5e5968f47129b6c5fe32ee1fe2c2e29bdd7606b68bbf91"
+  },
+  {
+    "path": "tests/test_online_image_measurement.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/tests/test_online_image_measurement.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "8b0ea93d5e449d243dab2b5c21cccc0193b2c05a86868f1f118e37d7ff43b081"
+  },
+  {
+    "path": "UI/src/RuntimeLocalRegistration.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/src/RuntimeLocalRegistration.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "789c3703c06983f0aa99ca059a4ee4ef9c3151752c03ee1518a2ea82bc510e67"
+  },
+  {
+    "path": "UI/src/RuntimeCoordinator.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/src/RuntimeCoordinator.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "b94a466b80df898eff65f504ec0710e91d97953e5b4e0e38164db8ab7f26b7c2"
+  },
+  {
+    "path": "UI/include/RuntimeWorkerAdapters.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/include/RuntimeWorkerAdapters.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "48d10ca3b52be9648e0c4e47822c878994ad04aa447f10b88f36c3329a9582b9"
+  },
+  {
+    "path": "UI/src/RuntimeWorkerAdapters.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/src/RuntimeWorkerAdapters.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "fd389f185644aaca1b34eeddc9624182fa9ca2d0e9c1ff41cdcd2dc0c36ae8e6"
+  },
+  {
+    "path": "UI/include/RuntimeTrackingTypes.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/include/RuntimeTrackingTypes.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "ab2ec83157f76a47068183f648f4802c905e4e6a985f87ee999a6d707fad5993"
+  },
+  {
+    "path": "UI/include/UiController.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/include/UiController.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "8cfe1f7b2a7c5130bb1c2932bb563035cabfe52c849fc5e393af337458abd5cb"
+  },
+  {
+    "path": "UI/src/UiController.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/src/UiController.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "5a11399dd68a2b7930d6b4b1f3a570555dc7c79d2c0f8684d0f964baa8fab7f4"
+  },
+  {
+    "path": "UI/include/MainWidget.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/include/MainWidget.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "ea9307a796733d06afcc95ff92a103f12423e1f0e407b422c44e0b236169fa22"
+  },
+  {
+    "path": "Control/include/OnlineCorrectionController.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/Control/include/OnlineCorrectionController.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "b5d5895be31bda1c0ea6a5bcb296af2c96f9ce53ca57bf357e7dcd385886e0a8"
+  },
+  {
+    "path": "Control/src/OnlineCorrectionController.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/Control/src/OnlineCorrectionController.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "c3fbb986f2c71e4579a124c1e3855e344b56e774ad027b80440bcb62ad47cb7e"
+  },
+  {
+    "path": "Control/include/OnlineCorrectionTypes.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/Control/include/OnlineCorrectionTypes.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "f2fc285723865a095d3f7a49a4f7f21100e1577ad431fe03df7fd2afbfbe7731"
+  },
+  {
+    "path": "Control/include/OnlineCorrectionPathFollower.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/Control/include/OnlineCorrectionPathFollower.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "1d64c6b64b6ee1626c90f6530d3d68eff6de294fb290be13ae98a15560acd394"
+  },
+  {
+    "path": "Control/src/OnlineCorrectionPathFollower.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/Control/src/OnlineCorrectionPathFollower.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "903ec1a632a2b1d7b3f78f51e4450f9cc2407b2160bc8adca61b3e1cd0a5f5e6"
+  },
+  {
+    "path": "tests/test_online_correction_controller.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/tests/test_online_correction_controller.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "0ed1a3edcaf60f8fe87608650f457c04e4ec627af4ad915c9b6e5cae7fa20f76"
+  },
+  {
+    "path": "tests/test_runtime_tracking_flow.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/tests/test_runtime_tracking_flow.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "932efa0747284082c494dfa12118d63a1126e650b05a200ec8dc6392b3d877fc"
+  },
+  {
+    "path": "tests/CMakeLists.txt",
+    "backup": ".codex_backups/online_step4_20261023_172339/tests/CMakeLists.txt",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "5f9e9beacda0f052f51b6fc661537e3f2843cd5656213142eeec999927541ea4"
+  },
+  {
+    "path": "docs/online_local_registration.md",
+    "backup": ".codex_backups/online_step4_20261023_172339/docs/online_local_registration.md",
+    "created": false,
+    "bom": false,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "70e7693557f5cfb5b8fc42fbfdd0266b53bee39f5cc65a9bf438c3b8fc3b08d3"
+  },
+  {
+    "path": "UI/include/OnlineLocalRegistrationVerification.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/include/OnlineLocalRegistrationVerification.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "d281dd4a46aedc8882684eb56e19326fe0ef9e873e8080147de139551c984c4b"
+  },
+  {
+    "path": "UI/include/OnlineLocalSurfaceVerification.h",
+    "backup": ".codex_backups/online_step4_20261023_172339/UI/include/OnlineLocalSurfaceVerification.h",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "c8d5446e303cea628499b892a29e204eb4cdc04ef756e07221923c20a0d8ce2a"
+  },
+  {
+    "path": "tests/test_online_correction_coordinate_contract.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/tests__test_online_correction_coordinate_contract.cpp.before_final_review",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "5c84b0b801013c49741717ead6aa360ec7d0fd34cd3a71dacd4f5b42f8a4b08f"
+  },
+  {
+    "path": "tests/test_correction_robot_sim_frame_sync.cpp",
+    "backup": ".codex_backups/online_step4_20261023_172339/tests/test_correction_robot_sim_frame_sync.before_offline_fixture.cpp",
+    "created": false,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "c10f418d483d08e03cfad1403c198d0a341e4da787fd5ffdf8e9b15e20bc3f4e"
+  },
+  {
+    "path": "tests/test_online_control_target_presentation.cpp",
+    "backup": null,
+    "created": true,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "d684b122b218653278ee15a7745b383c63f0ef4f42063fd14834c2068512b53b"
+  },
+  {
+    "path": "tests/test_online_local_registration_frame_lifecycle.cpp",
+    "backup": null,
+    "created": true,
+    "bom": true,
+    "crlf": true,
+    "bareLF": false,
+    "sha256": "3014fb1d68dd3ed316f4c63021a5a99d23495930593a8959f83970c2e3e590ba"
+  }
+]

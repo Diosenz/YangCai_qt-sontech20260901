@@ -1,0 +1,40 @@
+{
+  "sourceRun": "output/online_correction/20261023_152507_499",
+  "diagnosticRows": 593,
+  "initialRows": 288,
+  "onlineRows": 297,
+  "selectedStart": {
+    "frameId": "1171",
+    "captureMs": "1792740326872",
+    "lastScanFrame": "1560",
+    "ageAtLastScanSeconds": 12.835,
+    "startLogMatchesSelectedFrame": true,
+    "subsequentInitialResults": 226,
+    "subsequentRawGeometryValid": 188,
+    "importantLimit": "raw_geometry_valid is preliminary image refinement, not proof every candidate is physically correct or should pass temporal gates."
+  },
+  "frozenOnline": {
+    "firstFrame": "2148",
+    "lastFrame": "2488",
+    "count": 128,
+    "exposureSeconds": 11.22,
+    "x": 319,
+    "y": 615,
+    "hasTrustedAnchorAtFirst": "0",
+    "rawGeometryAtFirst": "0",
+    "firstRawVsFrozenFinalDistancePx": 92.6218854721514,
+    "workpieceRevisions": [
+      "1"
+    ]
+  },
+  "userConfirmed": [
+    "CAD may assist search but final output must come from image evidence",
+    "Use last trusted image point, no averaging requested",
+    "Quality-accepted KCF allowed; do not add points when fully lost"
+  ],
+  "pending": [
+    "If no fresh point at reverse-scan end: forbid stale start, allow with explicit age, or inspect more end images?",
+    "User must choose proposed repair plan before implementation"
+  ],
+  "newRepairImplemented": false
+}

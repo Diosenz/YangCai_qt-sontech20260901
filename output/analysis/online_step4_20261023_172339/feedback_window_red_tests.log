@@ -1,0 +1,14 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 3: i2r_rlc_online_correction_tests
+1/1 Test #3: i2r_rlc_online_correction_tests ...***Failed    0.22 sec
+FAIL: feedback outside STARTCOR cannot continue ordinary measured commands or retain an active target
+FAIL: a temporary closed control window can resume on a fresh STARTCOR state
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.23 sec
+
+The following tests FAILED:
+	  3 - i2r_rlc_online_correction_tests (Failed)
+Errors while running CTest

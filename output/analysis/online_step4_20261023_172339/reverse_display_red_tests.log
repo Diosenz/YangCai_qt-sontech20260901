@@ -1,0 +1,14 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 20: i2r_rlc_online_control_target_presentation_tests
+1/1 Test #20: i2r_rlc_online_control_target_presentation_tests ...***Failed    0.47 sec
+FAIL: next reverse scan keeps showing its own accepted image point after the previous online segment exits
+FAIL: online control target presentation
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.48 sec
+
+The following tests FAILED:
+	 20 - i2r_rlc_online_control_target_presentation_tests (Failed)
+Errors while running CTest

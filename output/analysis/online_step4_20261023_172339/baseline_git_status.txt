@@ -1,0 +1,218 @@
+ M Control/include/OnlineCorrectionTypes.h
+ M Control/src/OnlineCorrectionController.cpp
+ M Control/src/OnlineCorrectionExceptionProcessor.cpp
+ M Localization/CMakeLists.txt
+ M Localization/include/LocalizationTypes.h
+ M Localization/src/LocalizationLocalCorrectionPipeline.cpp
+ M Localization/src/LocalizationService.cpp
+ M UI/CMakeLists.txt
+ M UI/include/MainWidget.h
+ M UI/include/OnlineCorrectionRunRecorder.h
+ M UI/include/OnlineLocalRegistrationVerification.h
+ M UI/include/OnlineLocalRegistrationWorker.h
+ M UI/include/OnlineVisionDiagnosticOptions.h
+ M UI/include/RuntimeCoordinator.h
+ M UI/include/RuntimeTrackingTypes.h
+ M UI/include/RuntimeWorkerAdapters.h
+ M UI/include/TrackingDiagnosticImageWriter.h
+ M UI/src/MainWidget.cpp
+ M UI/src/OnlineCorrectionRunRecorder.cpp
+ M UI/src/OnlineLocalRegistrationWorker.cpp
+ M UI/src/RuntimeCoordinator.cpp
+ M UI/src/RuntimeLocalRegistration.cpp
+ M UI/src/RuntimeWorkerAdapters.cpp
+ M UI/src/TrackingDiagnosticImageWriter.cpp
+ M UI/src/UiController.cpp
+ M Vision/CMakeLists.txt
+ M Vision/include/geometry/WeldImageToSpaceProjector.h
+ M Vision/include/track/KcfTracker.h
+ M Vision/include/track/LegacyOnlineKcfDetector.h
+ M Vision/src/geometry/WeldImageToSpaceProjector.cpp
+ M Vision/src/track/KcfTracker.cpp
+ M Vision/src/track/LegacyOnlineKcfDetector.cpp
+ M config/digital_twin/online_local_registration.ini
+ M docs/online_local_registration.md
+ D output/online_correction/20261021_152328_050/actual_robot_path.txt
+ D output/online_correction/20261021_152328_050/initial_correction.txt
+ D output/online_correction/20261021_152328_050/online_follow_targets.txt
+ D output/online_correction/20261021_152328_050/online_icp_batches.txt
+ D output/online_correction/20261021_152328_050/online_icp_points.txt
+ D output/online_correction/20261021_152328_050/realtime_correction.txt
+ D output/online_correction/20261021_152328_050/session_summary.txt
+ D output/online_correction/20261021_152328_050/vision_diagnostics.tsv
+ D output/online_correction/20261021_152328_050/vision_images/image_manifest.tsv
+ D output/online_correction/20261021_152328_050/vision_images/sample_106_session_1_frame_2027_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_106_session_1_frame_2027_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_121_session_1_frame_2053_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_121_session_1_frame_2053_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_136_session_1_frame_2078_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_136_session_1_frame_2078_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_151_session_1_frame_2105_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_151_session_1_frame_2105_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_166_session_1_frame_2127_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_166_session_1_frame_2127_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_16_session_1_frame_1882_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_16_session_1_frame_1882_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_181_session_1_frame_2152_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_181_session_1_frame_2152_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_196_session_1_frame_2179_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_196_session_1_frame_2179_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_1_session_1_frame_1862_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_1_session_1_frame_1862_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_211_session_1_frame_2205_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_211_session_1_frame_2205_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_226_session_1_frame_2228_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_226_session_1_frame_2228_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_241_session_1_frame_2253_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_241_session_1_frame_2253_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_256_session_1_frame_2278_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_256_session_1_frame_2278_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_271_session_1_frame_2302_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_271_session_1_frame_2302_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_286_session_1_frame_2326_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_286_session_1_frame_2326_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_301_session_1_frame_2350_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_301_session_1_frame_2350_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_316_session_1_frame_2373_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_316_session_1_frame_2373_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_319_session_1_frame_2714_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_319_session_1_frame_2714_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_31_session_1_frame_1902_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_31_session_1_frame_1902_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_334_session_1_frame_2743_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_334_session_1_frame_2743_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_349_session_1_frame_2771_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_349_session_1_frame_2771_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_364_session_1_frame_2805_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_364_session_1_frame_2805_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_379_session_1_frame_2840_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_379_session_1_frame_2840_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_394_session_1_frame_2870_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_394_session_1_frame_2870_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_409_session_1_frame_2904_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_409_session_1_frame_2904_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_424_session_1_frame_2940_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_424_session_1_frame_2940_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_46_session_1_frame_1922_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_46_session_1_frame_1922_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_61_session_1_frame_1946_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_61_session_1_frame_1946_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_76_session_1_frame_1974_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_76_session_1_frame_1974_source.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_91_session_1_frame_2000_enhanced.png
+ D output/online_correction/20261021_152328_050/vision_images/sample_91_session_1_frame_2000_source.png
+ M tests/CMakeLists.txt
+ M tests/test_correction_robot_sim_frame_sync.cpp
+ M tests/test_local_registration_writeback_safety.cpp
+ M tests/test_main_widget_panels.cpp
+ M tests/test_online_correction_controller.cpp
+ M tests/test_online_correction_run_recorder.cpp
+ M tests/test_online_fusion_controls.cpp
+ M tests/test_online_local_registration.cpp
+ M tests/test_online_local_registration_safety.cpp
+ M tests/test_online_local_registration_verification.cpp
+ M tests/test_runtime_tracking_flow.cpp
+?? .codex_backups/detector_recovery_20261023_010345/
+?? .codex_backups/detector_sequence_boundary_20261023_131413/
+?? .codex_backups/detector_time_boundary_20261023_130837/
+?? .codex_backups/detector_timed_recovery_20261023_120642/
+?? .codex_backups/estimator_observability_20261023_120542/
+?? .codex_backups/estimator_recovery_20261023_010539/
+?? .codex_backups/image_measurement_A_20261023_155432/
+?? .codex_backups/online_observability_main_20261023/
+?? .codex_backups/online_step4_20261023_172339/
+?? .codex_backups/runtime_exposure_boundary_20261023_1320/
+?? .codex_backups/stability_safety_agent_20261021/
+?? DigitalTwin/include/OnlineSeamCandidateGeometry.h
+?? DigitalTwin/src/OnlineSeamCandidateGeometry.cpp
+?? Localization/include/LocalizationSurfaceValidation.h
+?? Localization/src/LocalizationSurfaceValidation.cpp
+?? UI/include/OnlineLocalRegistrationRecovery.h
+?? UI/include/OnlineLocalRegistrationStability.h
+?? UI/include/OnlineLocalSurfaceVerification.h
+?? Vision/include/feature/OnlineSeamRefiner.h
+?? Vision/include/feature/SimulationGuidedSeamEstimator.h
+?? Vision/include/track/OnlineSeamContinuity.h
+?? Vision/src/feature/OnlineSeamRefiner.cpp
+?? Vision/src/feature/SimulationGuidedSeamEstimator.cpp
+?? Vision/src/track/OnlineSeamContinuity.cpp
+?? output/analysis/20261019_211208_five_p_composite_teach/
+?? output/analysis/20261020_202202_auto_kalman_composite_teach/
+?? output/analysis/20261020_204102_kcf_only_composite_teach/
+?? output/analysis/20261020_evening_comparison/assets/__pycache__/
+?? output/analysis/20261021_152328_050_retest/
+?? output/analysis/20261021_163204_sim01_kcf09_composite_teach/
+?? output/analysis/20261021_185548_stability_auto_kalman_composite_teach/
+?? output/analysis/20261021_201400_stability10_auto_kalman_composite_teach/
+?? output/analysis/20261021_235225_seam_refinement_composite_teach/
+?? output/analysis/20261021_kcf_right_bias_investigation/
+?? output/analysis/20261021_local_icp_history_monitor/
+?? output/analysis/20261021_local_icp_stability/
+?? output/analysis/20261021_positive20_teach_synthesis/
+?? output/analysis/20261021_stability_pair_comparison/
+?? output/analysis/20261022_continuous_target_fix/
+?? output/analysis/20261022_local_surface_recovery/
+?? output/analysis/20261022_online_correction_repair/
+?? output/analysis/20261022_online_no_rollback/
+?? output/analysis/20261022_raw_reacquisition_repair/
+?? output/analysis/20261022_reflection_prediction_investigation/
+?? output/analysis/20261022_reflection_prediction_repair/
+?? output/analysis/20261022_simulation_guided_integration/
+?? output/analysis/20261022_simulation_guided_offline/
+?? output/analysis/20261023_101547_online_correction_composite_teach/
+?? output/analysis/20261023_estimator_same_stripe_probe/
+?? output/analysis/20261023_online_observability_repair/
+?? output/analysis/image_measurement_A_20261023_155432/
+?? output/analysis/kcf_seam_continuity_20261021/
+?? output/analysis/kcf_seam_refinement_20261021/
+?? output/analysis/online_retest_chain_20261023_164218/
+?? output/analysis/scheme_two_rollback_20261023_153545/
+?? "output/online_correction/20261021_152328_050_\345\220\257\345\212\250\345\234\250\347\272\277ICP\357\274\214\346\225\210\346\236\234\345\245\275\344\270\200\344\272\233_\350\207\252\345\212\250\345\215\241\345\260\224\346\233\274\346\273\244\346\263\242/"
+?? "output/online_correction/20261021_163204_243_\345\220\257\345\212\250\345\234\250\347\272\277ICP\357\274\214\344\273\277\347\234\2370.1\357\274\214KCF0.9/"
+?? "output/online_correction/20261021_185548_548_\345\220\257\345\212\250\345\234\250\347\272\277ICP\357\274\210\347\250\263\345\256\232\344\277\235\346\212\244\357\274\211+ \350\207\252\345\212\250\345\215\241\345\260\224\346\233\274/"
+?? "output/online_correction/20261021_201400_950_\345\220\257\345\212\250\345\234\250\347\272\277ICP\357\274\210\347\250\263\345\256\232\344\277\235\346\212\2441.0\357\274\211+ \350\207\252\345\212\250\345\215\241\345\260\224\346\233\274/"
+?? "output/online_correction/20261021_224020_914\357\274\210KCF\344\274\230\345\214\226\357\274\214\344\275\206\346\234\211\351\227\256\351\242\230\357\274\211/"
+?? output/online_correction/20261021_235225_324/
+?? output/online_correction/20261022_141440_045/
+?? output/online_correction/20261022_144940_567/
+?? output/online_correction/20261022_153051_570/
+?? output/online_correction/20261022_164042_961/
+?? output/online_correction/20261022_171255_974/
+?? output/online_correction/20261022_212930_287/
+?? output/online_correction/20261023_101547_678/
+?? output/online_correction/20261023_152507_499/
+?? output/online_correction/20261023_164218_138/
+?? output/online_local_registration/20261021_083204_186_session_3/
+?? output/online_local_registration/20261021_105548_492_session_1/
+?? output/online_local_registration/20261021_121400_904_session_1/
+?? output/online_local_registration/20261021_144020_871_session_1/
+?? output/online_local_registration/20261021_155225_278_session_1/
+?? output/online_local_registration/20261022_053120_403_session_1/
+?? output/online_local_registration/20261022_061440_000_session_1/
+?? output/online_local_registration/20261022_064940_522_session_1/
+?? output/online_local_registration/20261022_073051_527_session_1/
+?? output/online_local_registration/20261022_084042_917_session_1/
+?? output/online_local_registration/20261022_091255_931_session_1/
+?? output/online_local_registration/20261022_132930_245_session_1/
+?? output/online_local_registration/20261023_021547_636_session_1/
+?? output/online_local_registration/20261023_072507_455_session_1/
+?? output/online_local_registration/20261023_084218_096_session_1/
+?? pixel_branch_review_actual_anchor_polyline.json
+?? tests/fixtures/online_image_geometry/
+?? tests/fixtures/online_image_measurement/
+?? tests/fixtures/online_seam_refiner/
+?? tests/test_localization_surface_validation.cpp
+?? tests/test_online_image_geometry.cpp
+?? tests/test_online_image_measurement.cpp
+?? tests/test_online_local_registration_history_collection.cpp
+?? tests/test_online_local_registration_history_replay.cpp
+?? tests/test_online_local_registration_stability.cpp
+?? tests/test_online_local_registration_surface.cpp
+?? tests/test_online_local_surface_verification.cpp
+?? tests/test_online_seam_candidate_geometry.cpp
+?? tests/test_online_seam_continuity.cpp
+?? tests/test_online_seam_continuity_replay.cpp
+?? tests/test_online_seam_geometry_worker.cpp
+?? tests/test_online_seam_refiner.cpp
+?? tests/test_online_seam_refiner_replay.cpp
+?? tests/test_simulation_guided_seam.cpp

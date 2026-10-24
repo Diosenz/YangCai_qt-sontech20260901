@@ -1,0 +1,13 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start  3: i2r_rlc_online_correction_tests
+1/4 Test  #3: i2r_rlc_online_correction_tests ...........................   Passed    0.83 sec
+    Start 19: i2r_rlc_online_local_registration_frame_lifecycle_tests
+2/4 Test #19: i2r_rlc_online_local_registration_frame_lifecycle_tests ...   Passed   14.54 sec
+    Start 20: i2r_rlc_online_control_target_presentation_tests
+3/4 Test #20: i2r_rlc_online_control_target_presentation_tests ..........   Passed    0.83 sec
+    Start 83: i2r_rlc_online_image_measurement_tests
+4/4 Test #83: i2r_rlc_online_image_measurement_tests ....................   Passed   21.01 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  37.31 sec

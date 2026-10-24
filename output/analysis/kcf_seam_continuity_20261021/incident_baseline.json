@@ -1,0 +1,128 @@
+{
+  "total": 7464,
+  "bad": 2397,
+  "longest": [
+    {
+      "start_frame": "14911",
+      "end_frame": "15510",
+      "frames": 357,
+      "seconds": 19.838,
+      "statuses": {
+        "2": 357
+      },
+      "events": {
+        "vision_sample": 356,
+        "command_receipt": 1
+      }
+    },
+    {
+      "start_frame": "16014",
+      "end_frame": "16495",
+      "frames": 288,
+      "seconds": 15.859,
+      "statuses": {
+        "2": 286,
+        "1": 2
+      },
+      "events": {
+        "online_icp": 1,
+        "command_generated": 1,
+        "vision_sample": 287,
+        "command_receipt": 1
+      }
+    },
+    {
+      "start_frame": "15661",
+      "end_frame": "16001",
+      "frames": 199,
+      "seconds": 11.237,
+      "statuses": {
+        "2": 199
+      },
+      "events": {
+        "vision_sample": 198,
+        "command_receipt": 1
+      }
+    },
+    {
+      "start_frame": "11327",
+      "end_frame": "11606",
+      "frames": 171,
+      "seconds": 9.232,
+      "statuses": {
+        "2": 169,
+        "3": 2
+      },
+      "events": {
+        "vision_sample": 170,
+        "command_receipt": 1
+      }
+    },
+    {
+      "start_frame": "2694",
+      "end_frame": "2970",
+      "frames": 164,
+      "seconds": 9.095,
+      "statuses": {
+        "2": 164
+      },
+      "events": {
+        "vision_sample": 163,
+        "command_receipt": 1
+      }
+    },
+    {
+      "start_frame": "10539",
+      "end_frame": "10719",
+      "frames": 111,
+      "seconds": 5.955,
+      "statuses": {
+        "2": 111
+      },
+      "events": {
+        "vision_sample": 110,
+        "command_receipt": 1
+      }
+    },
+    {
+      "start_frame": "16520",
+      "end_frame": "16682",
+      "frames": 101,
+      "seconds": 5.332,
+      "statuses": {
+        "2": 101
+      },
+      "events": {
+        "vision_sample": 100,
+        "command_receipt": 1
+      }
+    },
+    {
+      "start_frame": "3319",
+      "end_frame": "3437",
+      "frames": 69,
+      "seconds": 3.889,
+      "statuses": {
+        "4": 2,
+        "3": 45,
+        "2": 7,
+        "1": 15
+      },
+      "events": {
+        "vision_sample": 68,
+        "command_receipt": 1
+      }
+    }
+  ],
+  "coarse_flags": [
+    [
+      "('1', '1', '0', '0')",
+      2397
+    ]
+  ],
+  "bad_peak_range": [
+    0.504636526108,
+    0.812841653824,
+    0.949658215046
+  ]
+}

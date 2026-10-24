@@ -1,0 +1,43 @@
+{
+  "scope": "Step4: T1 transaction lifecycle; T2 bounded formal image search; T3 continued predicted control reference; T4 UI uses same control target",
+  "requirements": [
+    "Preserve reverse-scan start selection and image measurement acceptance.",
+    "User explicitly authorized predicted targets continuing motion during image loss.",
+    "Predictions never become measured samples, independent weld points or ICP evidence.",
+    "No circular seam special cases."
+  ],
+  "red": {
+    "status": "executed_4_of_4_failed_for_existing_behaviors",
+    "log": "red_tests.log",
+    "seconds": 31.11
+  },
+  "green": {
+    "status": "passed",
+    "log": "final_tests.log",
+    "selectedCTestEntries": 27,
+    "seconds": 88.79
+  },
+  "regression": {
+    "status": "passed_selected_with_one_fixture_unavailable",
+    "unavailable": "i2r_rlc_vision_penzui_station_projection_tests",
+    "reason": "data/replay/penzui absent; initial hung test stopped, original log preserved",
+    "selection": "final_test_selection.json"
+  },
+  "backup": ".codex_backups/online_step4_20261023_172339/manifest.json",
+  "workflow": "Reused fetched Notion workflow snapshot from output/analysis/image_measurement_A_20261023_155432/notion_workflows.json",
+  "constraints": [
+    "No Computer Use/mouse/devices/deletion",
+    "Use existing qt-debug and authorized VS2022 Developer environment",
+    "No RobotSim/oldproject/Localization/RobotComm production changes"
+  ],
+  "build": {
+    "status": "succeeded_msvc_vs2022_developer_existing_qt_debug",
+    "log": "final_validation_build.log",
+    "exe": "out/build/qt-debug/UI/i2r_rlc.exe",
+    "exeSha256": "fa33481c11f2509fcfe0b9eef040773f8d5218b9ed27f650a6830caec9a12553",
+    "started": false
+  },
+  "independentReview": "completed; no remaining deterministic blocker within current boundary; field validation pending",
+  "status": "complete_implementation_and_available_automated_validation",
+  "report": "step4_report.md"
+}

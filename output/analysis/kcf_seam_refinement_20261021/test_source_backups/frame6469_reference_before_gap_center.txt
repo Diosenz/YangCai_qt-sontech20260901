@@ -1,0 +1,7 @@
+﻿Source: output/online_correction/20261021_201400_950_启动在线ICP（稳定保护1.0）+ 自动卡尔曼/vision_images/sample_1612_session_1_frame_6469_source.png
+Lossless crop: original rectangle [380,510,640,670), no resize or contrast changes.
+Recorded original KCF: (510.686096,588.744385).
+Recorded original simulated point: (500,586).
+Human reference: actual joint approximately below the simulated point; qualitative screenshot only.
+No precise human Y annotation exists. Do not treat extrapolated intersection, endpoint midpoint or old fit as truth.
+The test uses broad original X interval [495,503] as a support check and requires rejection of ambiguous height.

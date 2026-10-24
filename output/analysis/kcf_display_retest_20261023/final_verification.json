@@ -1,0 +1,45 @@
+{
+  "result": "27/27 selected CTests passed",
+  "seconds": 92.98,
+  "exe": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe",
+  "exe_sha256": "09692A18E5572C25C00405A35387E70AF3C930A93F8E3CA21E62CF822906662E",
+  "changed_files": [
+    {
+      "path": "UI/src/UiController.cpp",
+      "utf8_bom": true,
+      "bare_lf": 0,
+      "sha256": "406AB2C03F59F4C6942437FD1565956C3C3F790B397B5C476907F167337DCE23"
+    },
+    {
+      "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+      "utf8_bom": true,
+      "bare_lf": 0,
+      "sha256": "85A3ACC49B6D1CA97A76EDB518E0A9E1D2B5270979E65A791B953F6613B8EBC6"
+    },
+    {
+      "path": "tests/test_online_control_target_presentation.cpp",
+      "utf8_bom": true,
+      "bare_lf": 0,
+      "sha256": "35034090BC74B68F44BF89551FECCA7AF0F71D251BDA7D4D3C80D63655A68450"
+    },
+    {
+      "path": "tests/test_online_image_measurement.cpp",
+      "utf8_bom": true,
+      "bare_lf": 0,
+      "sha256": "BA7B9C4FDDE73FF67337E2BBB69F469E45ADE71EDB285A7CDDFBEDA3C6F2B799"
+    },
+    {
+      "path": "docs/online_local_registration.md",
+      "utf8_bom": false,
+      "bare_lf": 0,
+      "sha256": "6CDECC8EEA8C9D6C88CC93301139D5B3D6B7D5BD32C665EA30B44E8F0A3EB4A6"
+    }
+  ],
+  "limitations": [
+    "No hardware motion validation performed",
+    "First cold reacquisition remains multi-frame",
+    "penzui projection fixture absent; test excluded"
+  ],
+  "no_mouse": true,
+  "no_files_deleted": true
+}

@@ -1,0 +1,59 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  3: i2r_rlc_online_correction_tests
+ 1/27 Test  #3: i2r_rlc_online_correction_tests ...........................   Passed    0.18 sec
+      Start  4: i2r_rlc_online_correction_p001_contract_tests
+ 2/27 Test  #4: i2r_rlc_online_correction_p001_contract_tests .............   Passed    0.02 sec
+      Start  5: i2r_rlc_online_correction_coordinate_contract_tests
+ 3/27 Test  #5: i2r_rlc_online_correction_coordinate_contract_tests .......   Passed    0.41 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 4/27 Test  #8: i2r_rlc_online_correction_run_recorder_tests ..............   Passed    0.24 sec
+      Start  9: i2r_rlc_online_correction_initialization_tests
+ 5/27 Test  #9: i2r_rlc_online_correction_initialization_tests ............   Passed    0.16 sec
+      Start 10: i2r_rlc_online_correction_regression_tests
+ 6/27 Test #10: i2r_rlc_online_correction_regression_tests ................   Passed    0.31 sec
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 7/27 Test #15: i2r_rlc_runtime_tracking_flow_tests .......................   Passed    8.10 sec
+      Start 16: i2r_rlc_online_seam_refinement_contract_tests
+ 8/27 Test #16: i2r_rlc_online_seam_refinement_contract_tests .............   Passed    4.46 sec
+      Start 17: i2r_rlc_online_fusion_controls_tests
+ 9/27 Test #17: i2r_rlc_online_fusion_controls_tests ......................   Passed    0.23 sec
+      Start 18: i2r_rlc_online_local_registration_tests
+10/27 Test #18: i2r_rlc_online_local_registration_tests ...................   Passed    3.34 sec
+      Start 19: i2r_rlc_online_local_registration_frame_lifecycle_tests
+11/27 Test #19: i2r_rlc_online_local_registration_frame_lifecycle_tests ...   Passed   12.15 sec
+      Start 20: i2r_rlc_online_control_target_presentation_tests
+12/27 Test #20: i2r_rlc_online_control_target_presentation_tests ..........   Passed    0.46 sec
+      Start 21: i2r_rlc_online_local_registration_surface_tests
+13/27 Test #21: i2r_rlc_online_local_registration_surface_tests ...........   Passed   12.15 sec
+      Start 22: i2r_rlc_online_local_registration_safety_tests
+14/27 Test #22: i2r_rlc_online_local_registration_safety_tests ............   Passed    1.04 sec
+      Start 23: i2r_rlc_online_local_registration_stability_tests
+15/27 Test #23: i2r_rlc_online_local_registration_stability_tests .........   Passed    0.05 sec
+      Start 25: i2r_rlc_online_local_registration_verification_tests
+16/27 Test #25: i2r_rlc_online_local_registration_verification_tests ......   Passed    0.07 sec
+      Start 26: i2r_rlc_online_local_surface_verification_tests
+17/27 Test #26: i2r_rlc_online_local_surface_verification_tests ...........   Passed    0.03 sec
+      Start 27: i2r_rlc_local_registration_writeback_safety_tests
+18/27 Test #27: i2r_rlc_local_registration_writeback_safety_tests .........   Passed    0.23 sec
+      Start 29: i2r_rlc_correction_robot_sim_offline_frame_sync_tests
+19/27 Test #29: i2r_rlc_correction_robot_sim_offline_frame_sync_tests .....   Passed    1.56 sec
+      Start 30: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+20/27 Test #30: i2r_rlc_correction_robot_sim_online_frame_sync_tests ......   Passed    2.70 sec
+      Start 31: i2r_rlc_main_widget_panel_tests
+21/27 Test #31: i2r_rlc_main_widget_panel_tests ...........................   Passed    1.90 sec
+      Start 77: i2r_rlc_vision_image_to_space_tests
+22/27 Test #77: i2r_rlc_vision_image_to_space_tests .......................   Passed    0.05 sec
+      Start 82: i2r_rlc_online_seam_continuity_tests
+23/27 Test #82: i2r_rlc_online_seam_continuity_tests ......................   Passed    0.03 sec
+      Start 83: i2r_rlc_online_image_measurement_tests
+24/27 Test #83: i2r_rlc_online_image_measurement_tests ....................   Passed   20.87 sec
+      Start 84: i2r_rlc_online_image_geometry_tests
+25/27 Test #84: i2r_rlc_online_image_geometry_tests .......................   Passed   17.50 sec
+      Start 86: i2r_rlc_online_seam_refiner_tests
+26/27 Test #86: i2r_rlc_online_seam_refiner_tests .........................   Passed    0.28 sec
+      Start 88: i2r_rlc_vision_kcf_tracker_tests
+27/27 Test #88: i2r_rlc_vision_kcf_tracker_tests ..........................   Passed    0.28 sec
+
+100% tests passed, 0 tests failed out of 27
+
+Total Test time (real) =  88.79 sec

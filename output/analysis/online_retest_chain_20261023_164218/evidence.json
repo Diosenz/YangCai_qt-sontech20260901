@@ -1,0 +1,491 @@
+{
+  "scope": "Read-only diagnosis; no production edits, builds, device operations or Computer Use.",
+  "run": "output/online_correction/20261023_164218_138",
+  "local_registration": "output/online_local_registration/20261023_084218_096_session_1",
+  "all_results": 5089,
+  "online_results": 4802,
+  "online_sources": [
+    {
+      "Name": "0",
+      "Count": 91
+    },
+    {
+      "Name": "1",
+      "Count": 4507
+    },
+    {
+      "Name": "2",
+      "Count": 204
+    }
+  ],
+  "timing_all_phases": [
+    {
+      "expanded": "0",
+      "count": 4676,
+      "process_mean_ms": 33.47348160821215,
+      "process_p50_ms": 32,
+      "process_p95_ms": 48,
+      "process_max_ms": 66,
+      "geometry_mean_ms": 15.354449657827194
+    },
+    {
+      "expanded": "1",
+      "count": 413,
+      "process_mean_ms": 462.03389830508473,
+      "process_p50_ms": 454,
+      "process_p95_ms": 561,
+      "process_max_ms": 661,
+      "geometry_mean_ms": 448.69895811138
+    }
+  ],
+  "expanded_frames": 413,
+  "local_frames_over_100ms": 0,
+  "trigger_frame": "9243",
+  "trigger_frozen_state_age_at_capture_ms": 70,
+  "trigger_frozen_state_age_at_finish_ms": 576,
+  "latest_recorded_robot_state_before_cancel": {
+    "timestamp_ms": "1792745206987",
+    "time": "2026-10-23T16:46:46.987",
+    "phase": "online_running",
+    "x_mm": "888.682000",
+    "y_mm": "96.423000",
+    "z_mm": "-257.664000",
+    "rx_deg": "-166.143100",
+    "ry_deg": "40.653600",
+    "rz_deg": "43.216500",
+    "s1_deg": "-0.023500",
+    "s2_deg": "23.108400",
+    "interpolation": "2",
+    "command_speed_x": "1425",
+    "command_speed_y": "-1102",
+    "command_speed_z": "-405",
+    "s_start": "1",
+    "s_hold": "0",
+    "alarm": "0",
+    "traflag": "1",
+    "corflag": "1",
+    "detflag": "1",
+    "offline": "0",
+    "job_line": "15",
+    "step": "10"
+  },
+  "latest_recorded_robot_state_age_ms": 89,
+  "cancellation_timestamp_ms": 1792745207076,
+  "after_cancellation_results": 2404,
+  "after_cancellation_sources": [
+    {
+      "Name": "0",
+      "Count": 65
+    },
+    {
+      "Name": "1",
+      "Count": 2187
+    },
+    {
+      "Name": "2",
+      "Count": 152
+    }
+  ],
+  "candidate_count": 22,
+  "accepted_candidates": 11,
+  "writeback_count": 10,
+  "verified_count": 9,
+  "selected_frames": [
+    {
+      "frame_id": "3246",
+      "phase": "online_running",
+      "result_valid": "1",
+      "point_source": "2",
+      "camera_timestamp_ms": "1792745008667",
+      "robot_state_received_ms": "1792745008586",
+      "processing_started_ms": "1792745008712",
+      "processing_finished_ms": "1792745009123",
+      "record_timestamp_ms": "1792745009125",
+      "geometry_elapsed_ms": "396.324900",
+      "image_search_expanded": "1",
+      "template_reinitialized": "0",
+      "workpiece_pose_revision": "2",
+      "before_fusion_x_px": "496.553131",
+      "before_fusion_y_px": "587.591003",
+      "final_x_px": "496.553131",
+      "final_y_px": "587.591003",
+      "sim_x_px": "486.000000",
+      "sim_y_px": "584.000000"
+    },
+    {
+      "frame_id": "3259",
+      "phase": "online_running",
+      "result_valid": "0",
+      "point_source": "0",
+      "camera_timestamp_ms": "1792745009097",
+      "robot_state_received_ms": "1792745009022",
+      "processing_started_ms": "1792745009136",
+      "processing_finished_ms": "1792745009532",
+      "record_timestamp_ms": "1792745009534",
+      "geometry_elapsed_ms": "385.973500",
+      "image_search_expanded": "1",
+      "template_reinitialized": "0",
+      "workpiece_pose_revision": "2",
+      "before_fusion_x_px": "498.555176",
+      "before_fusion_y_px": "588.467651",
+      "final_x_px": "",
+      "final_y_px": "",
+      "sim_x_px": "490.000000",
+      "sim_y_px": "584.000000"
+    },
+    {
+      "frame_id": "7075",
+      "phase": "online_running",
+      "result_valid": "1",
+      "point_source": "1",
+      "camera_timestamp_ms": "1792745135024",
+      "robot_state_received_ms": "1792745134925",
+      "processing_started_ms": "1792745135098",
+      "processing_finished_ms": "1792745135759",
+      "record_timestamp_ms": "1792745135761",
+      "geometry_elapsed_ms": "636.819000",
+      "image_search_expanded": "1",
+      "template_reinitialized": "1",
+      "workpiece_pose_revision": "6",
+      "before_fusion_x_px": "",
+      "before_fusion_y_px": "",
+      "final_x_px": "516.500000",
+      "final_y_px": "584.570047",
+      "sim_x_px": "460.000000",
+      "sim_y_px": "600.000000"
+    },
+    {
+      "frame_id": "9030",
+      "phase": "online_running",
+      "result_valid": "1",
+      "point_source": "1",
+      "camera_timestamp_ms": "1792745199538",
+      "robot_state_received_ms": "1792745199526",
+      "processing_started_ms": "1792745199597",
+      "processing_finished_ms": "1792745199631",
+      "record_timestamp_ms": "1792745199633",
+      "geometry_elapsed_ms": "15.356500",
+      "image_search_expanded": "0",
+      "template_reinitialized": "0",
+      "workpiece_pose_revision": "10",
+      "before_fusion_x_px": "477.220490",
+      "before_fusion_y_px": "600.141418",
+      "final_x_px": "477.500000",
+      "final_y_px": "600.081194",
+      "sim_x_px": "446.000000",
+      "sim_y_px": "599.000000"
+    },
+    {
+      "frame_id": "9241",
+      "phase": "online_running",
+      "result_valid": "1",
+      "point_source": "1",
+      "camera_timestamp_ms": "1792745206502",
+      "robot_state_received_ms": "1792745206498",
+      "processing_started_ms": "1792745206559",
+      "processing_finished_ms": "1792745206593",
+      "record_timestamp_ms": "1792745206594",
+      "geometry_elapsed_ms": "16.071700",
+      "image_search_expanded": "0",
+      "template_reinitialized": "0",
+      "workpiece_pose_revision": "11",
+      "before_fusion_x_px": "467.807648",
+      "before_fusion_y_px": "600.125150",
+      "final_x_px": "469.500000",
+      "final_y_px": "599.972731",
+      "sim_x_px": "448.000000",
+      "sim_y_px": "603.000000"
+    },
+    {
+      "frame_id": "9243",
+      "phase": "online_running",
+      "result_valid": "1",
+      "point_source": "2",
+      "camera_timestamp_ms": "1792745206568",
+      "robot_state_received_ms": "1792745206498",
+      "processing_started_ms": "1792745206612",
+      "processing_finished_ms": "1792745207074",
+      "record_timestamp_ms": "1792745207076",
+      "geometry_elapsed_ms": "447.396200",
+      "image_search_expanded": "1",
+      "template_reinitialized": "0",
+      "workpiece_pose_revision": "11",
+      "before_fusion_x_px": "468.654633",
+      "before_fusion_y_px": "600.360959",
+      "final_x_px": "468.654633",
+      "final_y_px": "600.360959",
+      "sim_x_px": "448.000000",
+      "sim_y_px": "603.000000"
+    },
+    {
+      "frame_id": "9258",
+      "phase": "online_running",
+      "result_valid": "1",
+      "point_source": "1",
+      "camera_timestamp_ms": "1792745207062",
+      "robot_state_received_ms": "1792745206988",
+      "processing_started_ms": "1792745207092",
+      "processing_finished_ms": "1792745207124",
+      "record_timestamp_ms": "1792745207140",
+      "geometry_elapsed_ms": "13.775600",
+      "image_search_expanded": "0",
+      "template_reinitialized": "1",
+      "workpiece_pose_revision": "11",
+      "before_fusion_x_px": "",
+      "before_fusion_y_px": "",
+      "final_x_px": "466.500000",
+      "final_y_px": "599.509391",
+      "sim_x_px": "446.000000",
+      "sim_y_px": "602.000000"
+    },
+    {
+      "frame_id": "10691",
+      "phase": "online_running",
+      "result_valid": "1",
+      "point_source": "1",
+      "camera_timestamp_ms": "1792745254351",
+      "robot_state_received_ms": "1792745254320",
+      "processing_started_ms": "1792745254383",
+      "processing_finished_ms": "1792745254413",
+      "record_timestamp_ms": "1792745254424",
+      "geometry_elapsed_ms": "14.308500",
+      "image_search_expanded": "0",
+      "template_reinitialized": "0",
+      "workpiece_pose_revision": "11",
+      "before_fusion_x_px": "474.242157",
+      "before_fusion_y_px": "599.427640",
+      "final_x_px": "474.500000",
+      "final_y_px": "600.131663",
+      "sim_x_px": "369.000000",
+      "sim_y_px": "623.000000"
+    },
+    {
+      "frame_id": "15179",
+      "phase": "online_running",
+      "result_valid": "0",
+      "point_source": "0",
+      "camera_timestamp_ms": "1792745402454",
+      "robot_state_received_ms": "1792745402458",
+      "processing_started_ms": "1792745402514",
+      "processing_finished_ms": "1792745402915",
+      "record_timestamp_ms": "1792745402918",
+      "geometry_elapsed_ms": "390.484500",
+      "image_search_expanded": "1",
+      "template_reinitialized": "0",
+      "workpiece_pose_revision": "11",
+      "before_fusion_x_px": "472.061768",
+      "before_fusion_y_px": "603.873944",
+      "final_x_px": "",
+      "final_y_px": "",
+      "sim_x_px": "319.000000",
+      "sim_y_px": "632.000000"
+    },
+    {
+      "frame_id": "16873",
+      "phase": "online_running",
+      "result_valid": "1",
+      "point_source": "2",
+      "camera_timestamp_ms": "1792745458355",
+      "robot_state_received_ms": "1792745457461",
+      "processing_started_ms": "1792745458379",
+      "processing_finished_ms": "1792745458796",
+      "record_timestamp_ms": "1792745458798",
+      "geometry_elapsed_ms": "404.327800",
+      "image_search_expanded": "1",
+      "template_reinitialized": "0",
+      "workpiece_pose_revision": "11",
+      "before_fusion_x_px": "471.329193",
+      "before_fusion_y_px": "599.476136",
+      "final_x_px": "471.329193",
+      "final_y_px": "599.476136",
+      "sim_x_px": "382.000000",
+      "sim_y_px": "614.000000"
+    }
+  ],
+  "candidates": [
+    {
+      "file": "local_icp_1_2689_8cab906a-dd85-4cfb-99c8-b9cecbf0f85e.json",
+      "frame": "2689",
+      "accepted": true,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_2897_43a3607c-b718-4f3a-affa-23616b9245b7.json",
+      "frame": "2897",
+      "accepted": true,
+      "surface_only": true
+    },
+    {
+      "file": "local_icp_1_3697_8656a210-a98f-4966-b246-2806fcbd8035.json",
+      "frame": "3697",
+      "accepted": false,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_4164_f31b0246-03a4-415f-aa5c-519721384cc8.json",
+      "frame": "4164",
+      "accepted": false,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_4502_a653c4a7-301a-43f5-a001-97514a8f18e7.json",
+      "frame": "4502",
+      "accepted": false,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_4916_cc7a807e-5132-4ba0-8f60-638f127c859e.json",
+      "frame": "4916",
+      "accepted": true,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_5160_6b497fa9-7ba4-4056-a06b-924f5534d7a0.json",
+      "frame": "5160",
+      "accepted": false,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_5327_680ef983-86eb-4924-8879-984bd276905a.json",
+      "frame": "5327",
+      "accepted": true,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_5503_2f6adc24-38cb-4f89-b5d3-a0d8d4be32ec.json",
+      "frame": "5503",
+      "accepted": false,
+      "surface_only": true
+    },
+    {
+      "file": "local_icp_1_5769_2ba787d5-1d97-4623-a5d7-ccaecaba9f8e.json",
+      "frame": "5769",
+      "accepted": true,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_5948_d04d0598-7db7-4a97-8804-3ca629ff1a1b.json",
+      "frame": "5948",
+      "accepted": false,
+      "surface_only": true
+    },
+    {
+      "file": "local_icp_1_6144_0dea5042-eb5f-497d-a06b-ad48b8687ea8.json",
+      "frame": "6144",
+      "accepted": false,
+      "surface_only": true
+    },
+    {
+      "file": "local_icp_1_6344_ccc63163-513d-48ee-9947-3defa07d83f3.json",
+      "frame": "6344",
+      "accepted": true,
+      "surface_only": true
+    },
+    {
+      "file": "local_icp_1_6545_9714dd90-779c-486a-9500-29d77aa43256.json",
+      "frame": "6545",
+      "accepted": false,
+      "surface_only": true
+    },
+    {
+      "file": "local_icp_1_6737_738dacc7-4a1d-4488-b68b-4c52f1973cbb.json",
+      "frame": "6737",
+      "accepted": false,
+      "surface_only": true
+    },
+    {
+      "file": "local_icp_1_6929_8f7cd0bd-3210-4eab-9032-5e1013180f8a.json",
+      "frame": "6929",
+      "accepted": false,
+      "surface_only": true
+    },
+    {
+      "file": "local_icp_1_7302_f4627af5-68c0-4c34-8093-67513acbe09b.json",
+      "frame": "7302",
+      "accepted": true,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_7556_54b78022-543d-4579-aee1-22cd228bbfaf.json",
+      "frame": "7556",
+      "accepted": true,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_7827_26c83a92-4453-4ebd-8aca-d0453c86153d.json",
+      "frame": "7827",
+      "accepted": false,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_8012_471e0980-e9ef-4308-be09-caef61316df6.json",
+      "frame": "8012",
+      "accepted": true,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_8851_ea435a9c-0c9b-4e70-b837-4b3b0d319fc3.json",
+      "frame": "8851",
+      "accepted": true,
+      "surface_only": false
+    },
+    {
+      "file": "local_icp_1_9030_16728d60-6ba4-4768-be18-562d012782f6.json",
+      "frame": "9030",
+      "accepted": true,
+      "surface_only": true
+    }
+  ],
+  "current_source_hashes": [
+    {
+      "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+      "sha256": "CC7914FE52BEE89CC498CF03E732E16AB457DF89A1A995E94CE10F95BFB6F9E3"
+    },
+    {
+      "path": "Vision/src/feature/OnlineSeamRefiner.cpp",
+      "sha256": "8BB4701B1E8EAF171C3782C54E9C4E7A424BCA0A0AFB60F5C6A841B22414F200"
+    },
+    {
+      "path": "UI/src/RuntimeLocalRegistration.cpp",
+      "sha256": "26BB64A324AE71904FF9201C390744054D4D242DE2C067ED07BE917195DBFA49"
+    },
+    {
+      "path": "UI/src/RuntimeCoordinator.cpp",
+      "sha256": "C1166CBE57008843170567F4451A3A7BC11521C4A7F550FD44B832BDEA1C1F90"
+    },
+    {
+      "path": "UI/src/RuntimeWorkerAdapters.cpp",
+      "sha256": "9AC0B0EADC5EEF1E200682968BF591B5B3CBD025E9615FE87D26C05455C9AD9F"
+    },
+    {
+      "path": "UI/src/UiController.cpp",
+      "sha256": "7BC39D180C021097F661727AA223EDD99C9E6653C50B21F2E22A139B79151E50"
+    },
+    {
+      "path": "UI/src/MainWidget.cpp",
+      "sha256": "E5E57129289428B7C5A8876B4B9DAE7C5FB7A0DBEDC05414BB4EA4407A7BCCAF"
+    },
+    {
+      "path": "Control/src/OnlineCorrectionController.cpp",
+      "sha256": "C9C961E1569822C0E9CE99AC2CB2E137A9F1A82336C99FD0B905EB3FED953729"
+    },
+    {
+      "path": "Control/src/OnlineCorrectionPathFollower.cpp",
+      "sha256": "0EE0F91411E41E3F10282F41EFA42FD84E19344E2358FA0C30CE1F79ACEBDCDA"
+    }
+  ],
+  "confirmed_boundaries": [
+    "Full expanded image search runs synchronously before KCF fallback identity acceptance.",
+    "Frozen exposure RobotState age is checked against processing wall time; >500ms resets pending verification and sets the session fault latch.",
+    "Fresh later RobotState does not clear that latch.",
+    "UI marker visibility is overwritten with current result.valid, while coordinate panel retains the previous accepted final business point."
+  ],
+  "evidence_gaps": [
+    "No per-proposal/local-search failure timing or local rejection status distinct from final expanded result.",
+    "No UI receive/paint duration timestamps.",
+    "No persisted verification samples/decision for cancelled9030 transaction.",
+    "Five-second timeout callback delivery and retainRequested value are not recorded.",
+    "Not every camera frame has a saved raw image; the optical cause of each local rejection cannot be reconstructed."
+  ],
+  "confirmed_display_requirement": "User selected: always show final business point only; do not add raw KCF response display."
+}

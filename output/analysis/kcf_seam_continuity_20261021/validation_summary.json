@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-21",
+  "build": {
+    "environment": "VS2022 x64 Developer, existing qt-debug",
+    "production_executable": "out/build/qt-debug/UI/i2r_rlc.exe",
+    "log": "build_integrated.log",
+    "result": "success"
+  },
+  "verification": {
+    "initial_integrated": {
+      "total": 19,
+      "passed": 16,
+      "failed": 3,
+      "log": "tests_integrated.log"
+    },
+    "focused_after_fixture_corrections": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "log": "tests_focused.log"
+    },
+    "unique_relevant_tests_final_passed": 19,
+    "failures_explained": [
+      "Runtime fixture enabled positioner calibration without required sensor calibration; completed fixture only.",
+      "Controller fixture advanced target while robot feedback remained stationary; updated moving feedback and retained every-frame command assertions."
+    ],
+    "no_further_tests_requested": true
+  },
+  "replay": {
+    "rows": 7464,
+    "previous_invalid": 2397,
+    "new_invalid": 0,
+    "source_counts": {
+      "1": 5067,
+      "2": 1323,
+      "3": 1074
+    },
+    "transition_limited_frames": 282,
+    "scope": "frozen logged observation policy replay; no raw-image contrast, no rerun of KCF/ICP/robot closed loop"
+  },
+  "behavior": [
+    "Continuous same-frame estimates under visual degradation with valid reference and calibration",
+    "Explicit source provenance and recovery limiting",
+    "Estimated samples excluded from initial O scan and trajectory ICP fitting",
+    "Independent local ICP observations still require raw-image geometry"
+  ],
+  "limitations": [
+    "No physical robot or camera closed-loop validation performed",
+    "Long occlusion prediction does not prove weld accuracy or collision avoidance",
+    "Invalid image/reference/calibration may still yield no valid point",
+    "Mode/seam/reference discontinuities reset history",
+    "Optional gap-width detection failure-to-zero behavior remains unresolved; incident and current verification had gap detection disabled"
+  ],
+  "workflow": "Previously live-read Notion snapshot reused; root integration and continuity_review independent control work/review",
+  "file_deletion_by_this_task": false
+}

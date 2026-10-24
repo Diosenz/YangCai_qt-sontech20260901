@@ -1,0 +1,25 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  3: i2r_rlc_online_correction_tests
+ 1/10 Test  #3: i2r_rlc_online_correction_tests .....................   Passed    0.21 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 2/10 Test  #8: i2r_rlc_online_correction_run_recorder_tests ........   Passed    0.24 sec
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 3/10 Test #15: i2r_rlc_runtime_tracking_flow_tests .................   Passed    7.68 sec
+      Start 16: i2r_rlc_online_seam_refinement_contract_tests
+ 4/10 Test #16: i2r_rlc_online_seam_refinement_contract_tests .......   Passed    2.88 sec
+      Start 19: i2r_rlc_online_local_registration_surface_tests
+ 5/10 Test #19: i2r_rlc_online_local_registration_surface_tests .....   Passed   12.21 sec
+      Start 21: i2r_rlc_online_local_registration_stability_tests
+ 6/10 Test #21: i2r_rlc_online_local_registration_stability_tests ...   Passed    0.07 sec
+      Start 25: i2r_rlc_local_registration_writeback_safety_tests
+ 7/10 Test #25: i2r_rlc_local_registration_writeback_safety_tests ...   Passed    0.18 sec
+      Start 80: i2r_rlc_online_seam_continuity_tests
+ 8/10 Test #80: i2r_rlc_online_seam_continuity_tests ................   Passed    0.04 sec
+      Start 81: i2r_rlc_online_image_geometry_tests
+ 9/10 Test #81: i2r_rlc_online_image_geometry_tests .................   Passed   17.66 sec
+      Start 82: i2r_rlc_simulation_guided_seam_tests
+10/10 Test #82: i2r_rlc_simulation_guided_seam_tests ................   Passed    4.53 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Total Test time (real) =  45.75 sec

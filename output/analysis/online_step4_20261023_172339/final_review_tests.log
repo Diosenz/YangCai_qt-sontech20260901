@@ -1,0 +1,25 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start  5: i2r_rlc_online_correction_coordinate_contract_tests
+1/3 Test  #5: i2r_rlc_online_correction_coordinate_contract_tests ...***Failed    0.38 sec
+FAIL: invalid/NaN/Inf sample cannot enter geometric state or produce ordinary P
+FAIL: invalid/NaN/Inf sample cannot enter geometric state or produce ordinary P
+FAIL: invalid/NaN/Inf sample cannot enter geometric state or produce ordinary P
+coordinate contract RED
+
+    Start 15: i2r_rlc_runtime_tracking_flow_tests
+2/3 Test #15: i2r_rlc_runtime_tracking_flow_tests ...................***Failed    8.16 sec
+FAIL: post-gap far candidate needs three consecutive new image confirmations after search completes
+FAIL: far acceptance is supported by three consecutive independently refined new frames
+FAIL: every formal online frame retains the bounded current-image refinement budget
+
+    Start 20: i2r_rlc_online_control_target_presentation_tests
+3/3 Test #20: i2r_rlc_online_control_target_presentation_tests ......   Passed    0.32 sec
+
+33% tests passed, 2 tests failed out of 3
+
+Total Test time (real) =   8.87 sec
+
+The following tests FAILED:
+	  5 - i2r_rlc_online_correction_coordinate_contract_tests (Failed)
+	 15 - i2r_rlc_runtime_tracking_flow_tests (Failed)
+Errors while running CTest

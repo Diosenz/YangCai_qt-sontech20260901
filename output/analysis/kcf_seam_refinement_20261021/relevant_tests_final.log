@@ -1,0 +1,29 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  6: i2r_rlc_online_calibration_contract_tests
+ 1/12 Test  #6: i2r_rlc_online_calibration_contract_tests ..............   Passed    0.72 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 2/12 Test  #8: i2r_rlc_online_correction_run_recorder_tests ...........   Passed    0.16 sec
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 3/12 Test #15: i2r_rlc_runtime_tracking_flow_tests ....................   Passed    3.20 sec
+      Start 16: i2r_rlc_online_seam_refinement_contract_tests
+ 4/12 Test #16: i2r_rlc_online_seam_refinement_contract_tests ..........   Passed    0.47 sec
+      Start 17: i2r_rlc_online_fusion_controls_tests
+ 5/12 Test #17: i2r_rlc_online_fusion_controls_tests ...................   Passed    0.21 sec
+      Start 18: i2r_rlc_online_local_registration_tests
+ 6/12 Test #18: i2r_rlc_online_local_registration_tests ................   Passed    2.65 sec
+      Start 19: i2r_rlc_online_local_registration_safety_tests
+ 7/12 Test #19: i2r_rlc_online_local_registration_safety_tests .........   Passed    0.98 sec
+      Start 22: i2r_rlc_online_local_registration_verification_tests
+ 8/12 Test #22: i2r_rlc_online_local_registration_verification_tests ...   Passed    0.04 sec
+      Start 26: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+ 9/12 Test #26: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...   Passed    1.97 sec
+      Start 27: i2r_rlc_main_widget_panel_tests
+10/12 Test #27: i2r_rlc_main_widget_panel_tests ........................   Passed    1.87 sec
+      Start 76: i2r_rlc_online_seam_refiner_tests
+11/12 Test #76: i2r_rlc_online_seam_refiner_tests ......................   Passed    0.28 sec
+      Start 77: i2r_rlc_online_seam_refiner_replay_tests
+12/12 Test #77: i2r_rlc_online_seam_refiner_replay_tests ...............   Passed    3.55 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Total Test time (real) =  16.11 sec

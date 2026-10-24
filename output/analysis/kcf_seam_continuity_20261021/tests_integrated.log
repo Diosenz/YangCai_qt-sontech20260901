@@ -1,0 +1,83 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  3: i2r_rlc_online_correction_tests
+ 1/19 Test  #3: i2r_rlc_online_correction_tests ........................***Failed    0.23 sec
+FAIL: continued prediction must generate real correction commands after direction is established
+FAIL: continued prediction must generate real correction commands after direction is established
+FAIL: continued prediction must generate real correction commands after direction is established
+
+      Start  4: i2r_rlc_online_correction_p001_contract_tests
+ 2/19 Test  #4: i2r_rlc_online_correction_p001_contract_tests ..........   Passed    0.02 sec
+      Start  5: i2r_rlc_online_correction_coordinate_contract_tests
+ 3/19 Test  #5: i2r_rlc_online_correction_coordinate_contract_tests ....   Passed    2.86 sec
+      Start  6: i2r_rlc_online_calibration_contract_tests
+ 4/19 Test  #6: i2r_rlc_online_calibration_contract_tests ..............   Passed    0.80 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 5/19 Test  #8: i2r_rlc_online_correction_run_recorder_tests ...........   Passed    0.32 sec
+      Start  9: i2r_rlc_online_correction_initialization_tests
+ 6/19 Test  #9: i2r_rlc_online_correction_initialization_tests .........   Passed    0.14 sec
+      Start 10: i2r_rlc_online_correction_regression_tests
+ 7/19 Test #10: i2r_rlc_online_correction_regression_tests .............   Passed    0.37 sec
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 8/19 Test #15: i2r_rlc_runtime_tracking_flow_tests ....................***Failed    2.80 sec
+refinement integration: projection context rejected: SENSORPARA calibration is invalid
+FAIL: online geometry must project with diagnostics both enabled and disabled
+FAIL: blank frame keeps a marked same-frame prediction without inventing independent geometry
+FAIL: coarse tracking survives invalid geometry and can recover on a new supported frame
+FAIL: real-only mode outputs geometry instead of the biased simulated prior
+FAIL: non-endpoint manual fusion retains a valid independent observation
+FAIL: automatic seeded and second frames preserve valid geometry
+refinement integration: projection context rejected: SENSORPARA calibration is invalid
+FAIL: online geometry must project with diagnostics both enabled and disabled
+FAIL: blank frame keeps a marked same-frame prediction without inventing independent geometry
+FAIL: coarse tracking survives invalid geometry and can recover on a new supported frame
+FAIL: real-only mode outputs geometry instead of the biased simulated prior
+FAIL: non-endpoint manual fusion retains a valid independent observation
+FAIL: automatic seeded and second frames preserve valid geometry
+
+      Start 16: i2r_rlc_online_seam_refinement_contract_tests
+ 9/19 Test #16: i2r_rlc_online_seam_refinement_contract_tests ..........***Failed    0.08 sec
+refinement integration: projection context rejected: SENSORPARA calibration is invalid
+FAIL: online geometry must project with diagnostics both enabled and disabled
+FAIL: blank frame keeps a marked same-frame prediction without inventing independent geometry
+FAIL: coarse tracking survives invalid geometry and can recover on a new supported frame
+FAIL: real-only mode outputs geometry instead of the biased simulated prior
+FAIL: non-endpoint manual fusion retains a valid independent observation
+FAIL: automatic seeded and second frames preserve valid geometry
+refinement integration: projection context rejected: SENSORPARA calibration is invalid
+FAIL: online geometry must project with diagnostics both enabled and disabled
+FAIL: blank frame keeps a marked same-frame prediction without inventing independent geometry
+FAIL: coarse tracking survives invalid geometry and can recover on a new supported frame
+FAIL: real-only mode outputs geometry instead of the biased simulated prior
+FAIL: non-endpoint manual fusion retains a valid independent observation
+FAIL: automatic seeded and second frames preserve valid geometry
+
+      Start 17: i2r_rlc_online_fusion_controls_tests
+10/19 Test #17: i2r_rlc_online_fusion_controls_tests ...................   Passed    0.25 sec
+      Start 18: i2r_rlc_online_local_registration_tests
+11/19 Test #18: i2r_rlc_online_local_registration_tests ................   Passed    3.11 sec
+      Start 19: i2r_rlc_online_local_registration_safety_tests
+12/19 Test #19: i2r_rlc_online_local_registration_safety_tests .........   Passed    1.00 sec
+      Start 22: i2r_rlc_online_local_registration_verification_tests
+13/19 Test #22: i2r_rlc_online_local_registration_verification_tests ...   Passed    0.05 sec
+      Start 26: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+14/19 Test #26: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...   Passed    2.12 sec
+      Start 27: i2r_rlc_main_widget_panel_tests
+15/19 Test #27: i2r_rlc_main_widget_panel_tests ........................   Passed    2.08 sec
+      Start 76: i2r_rlc_online_seam_continuity_replay_tests
+16/19 Test #76: i2r_rlc_online_seam_continuity_replay_tests ............   Passed    2.34 sec
+      Start 77: i2r_rlc_online_seam_continuity_tests
+17/19 Test #77: i2r_rlc_online_seam_continuity_tests ...................   Passed    0.05 sec
+      Start 78: i2r_rlc_online_seam_refiner_tests
+18/19 Test #78: i2r_rlc_online_seam_refiner_tests ......................   Passed    0.32 sec
+      Start 79: i2r_rlc_online_seam_refiner_replay_tests
+19/19 Test #79: i2r_rlc_online_seam_refiner_replay_tests ...............   Passed    3.90 sec
+
+84% tests passed, 3 tests failed out of 19
+
+Total Test time (real) =  22.88 sec
+
+The following tests FAILED:
+	  3 - i2r_rlc_online_correction_tests (Failed)
+	 15 - i2r_rlc_runtime_tracking_flow_tests (Failed)
+	 16 - i2r_rlc_online_seam_refinement_contract_tests (Failed)
+Errors while running CTest

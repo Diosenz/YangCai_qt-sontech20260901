@@ -1,0 +1,3 @@
+[1/2] Building CXX object tests\CMakeFiles\i2r_rlc_online_correction_tests.dir\test_online_correction_controller.cpp.obj
+[2/2] Linking CXX executable tests\i2r_rlc_online_correction_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_online_correction_tests.exe: message: deploying dependencies

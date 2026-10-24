@@ -1,0 +1,213 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  4: i2r_rlc_online_correction_p001_contract_tests
+ 1/24 Test  #4: i2r_rlc_online_correction_p001_contract_tests ...........   Passed    0.02 sec
+      Start  5: i2r_rlc_online_correction_coordinate_contract_tests
+ 2/24 Test  #5: i2r_rlc_online_correction_coordinate_contract_tests .....***Failed    0.29 sec
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: one sample waits for direction
+FAIL: invalid/NaN/Inf sample cannot enter geometric state or produce ordinary P
+FAIL: invalid/NaN/Inf sample cannot enter geometric state or produce ordinary P
+FAIL: invalid/NaN/Inf sample cannot enter geometric state or produce ordinary P
+coordinate contract RED
+
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 3/24 Test  #8: i2r_rlc_online_correction_run_recorder_tests ............   Passed    0.31 sec
+      Start  9: i2r_rlc_online_correction_initialization_tests
+ 4/24 Test  #9: i2r_rlc_online_correction_initialization_tests ..........   Passed    0.30 sec
+      Start 10: i2r_rlc_online_correction_regression_tests
+ 5/24 Test #10: i2r_rlc_online_correction_regression_tests ..............   Passed    0.43 sec
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 6/24 Test #15: i2r_rlc_runtime_tracking_flow_tests .....................***Failed    5.09 sec
+FAIL: online entry retains image measurement while CAD remains misaligned
+FAIL: clear online geometry retains independent ICP identity
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: new CAD revision cannot displace a fresh accepted image measurement
+FAIL: restart with distant CAD must recover from actual image evidence
+FAIL: same-frame transport without CAD image hints still allows original-image recovery
+FAIL: missing CAD image hint cannot contaminate the next image measurement
+FAIL: formal online KCF fallback starts from its own freshly accepted raw-image identity
+FAIL: same image-quality KCF in formal online remains excluded from Control and local independent ICP
+FAIL: original geometry recovers after a quality-KCF interval
+FAIL: third consecutive independent far image can recover after the input gap
+FAIL: online entry retains image measurement while CAD remains misaligned
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: clear online geometry retains independent ICP identity
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: new CAD revision cannot displace a fresh accepted image measurement
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: restart with distant CAD must recover from actual image evidence
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: same-frame transport without CAD image hints still allows original-image recovery
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: missing CAD image hint cannot contaminate the next image measurement
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: formal online KCF fallback starts from its own freshly accepted raw-image identity
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: same image-quality KCF in formal online remains excluded from Control and local independent ICP
+FAIL: original geometry recovers after a quality-KCF interval
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: third consecutive independent far image can recover after the input gap
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: same-session configure must preserve the monotonic origin and anomaly cooldown
+FAIL: actual session change must release the new session first-anomaly sample
+
+      Start 16: i2r_rlc_online_seam_refinement_contract_tests
+ 7/24 Test #16: i2r_rlc_online_seam_refinement_contract_tests ...........***Failed    1.47 sec
+FAIL: online entry retains image measurement while CAD remains misaligned
+FAIL: clear online geometry retains independent ICP identity
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: new CAD revision cannot displace a fresh accepted image measurement
+FAIL: restart with distant CAD must recover from actual image evidence
+FAIL: same-frame transport without CAD image hints still allows original-image recovery
+FAIL: missing CAD image hint cannot contaminate the next image measurement
+FAIL: formal online KCF fallback starts from its own freshly accepted raw-image identity
+FAIL: same image-quality KCF in formal online remains excluded from Control and local independent ICP
+FAIL: original geometry recovers after a quality-KCF interval
+FAIL: third consecutive independent far image can recover after the input gap
+FAIL: online entry retains image measurement while CAD remains misaligned
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: clear online geometry retains independent ICP identity
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: legacy fusion mode controls cannot pull accepted online measurement toward wrong CAD
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: new CAD revision cannot displace a fresh accepted image measurement
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: restart with distant CAD must recover from actual image evidence
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: same-frame transport without CAD image hints still allows original-image recovery
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: missing CAD image hint cannot contaminate the next image measurement
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: formal online KCF fallback starts from its own freshly accepted raw-image identity
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: same image-quality KCF in formal online remains excluded from Control and local independent ICP
+FAIL: original geometry recovers after a quality-KCF interval
+FAIL: diagnostic identity and displayed measurement must agree
+FAIL: third consecutive independent far image can recover after the input gap
+FAIL: diagnostic identity and displayed measurement must agree
+
+      Start 17: i2r_rlc_online_fusion_controls_tests
+ 8/24 Test #17: i2r_rlc_online_fusion_controls_tests ....................   Passed    0.35 sec
+      Start 18: i2r_rlc_online_local_registration_tests
+ 9/24 Test #18: i2r_rlc_online_local_registration_tests .................   Passed    3.71 sec
+      Start 21: i2r_rlc_online_local_registration_surface_tests
+10/24 Test #21: i2r_rlc_online_local_registration_surface_tests .........   Passed   11.37 sec
+      Start 22: i2r_rlc_online_local_registration_safety_tests
+11/24 Test #22: i2r_rlc_online_local_registration_safety_tests ..........   Passed    0.97 sec
+      Start 23: i2r_rlc_online_local_registration_stability_tests
+12/24 Test #23: i2r_rlc_online_local_registration_stability_tests .......   Passed    0.09 sec
+      Start 25: i2r_rlc_online_local_registration_verification_tests
+13/24 Test #25: i2r_rlc_online_local_registration_verification_tests ....   Passed    0.08 sec
+      Start 26: i2r_rlc_online_local_surface_verification_tests
+14/24 Test #26: i2r_rlc_online_local_surface_verification_tests .........   Passed    0.07 sec
+      Start 27: i2r_rlc_local_registration_writeback_safety_tests
+15/24 Test #27: i2r_rlc_local_registration_writeback_safety_tests .......   Passed    0.28 sec
+      Start 29: i2r_rlc_correction_robot_sim_offline_frame_sync_tests
+16/24 Test #29: i2r_rlc_correction_robot_sim_offline_frame_sync_tests ...***Failed   55.31 sec
+FAIL: missing RobotState should emit an explicit failure
+FAIL: frame 100 RobotSim query should enter the deterministic block
+FAIL: blocked current and latest pending frames should both reach Vision
+FAIL: while frame 100 is current, frames 101..105 must collapse to frame 105
+FAIL: only current and latest-pending frames should issue per-frame queries
+FAIL: a valid observation after one/two failures must clear the counter before Vision
+FAIL: transport failure should produce one explicit synchronization failure
+FAIL: transport failure should consume exactly the current frame query
+FAIL: old-session query should be blocked before stop
+FAIL: restarted session should route its own frame after old query returns
+FAIL: old-session Vision should enter the deterministic synchronization hook
+FAIL: new session should route after the blocked old Vision call returns
+FAIL: active correction must pause ordinary realtime RobotSim queries
+
+      Start 30: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+17/24 Test #30: i2r_rlc_correction_robot_sim_online_frame_sync_tests ....   Passed    2.63 sec
+      Start 31: i2r_rlc_main_widget_panel_tests
+18/24 Test #31: i2r_rlc_main_widget_panel_tests .........................   Passed    2.16 sec
+      Start 77: i2r_rlc_vision_image_to_space_tests
+19/24 Test #77: i2r_rlc_vision_image_to_space_tests .....................   Passed    0.12 sec
+      Start 78: i2r_rlc_vision_penzui_station_projection_tests
+20/24 Test #78: i2r_rlc_vision_penzui_station_projection_tests ..........***Failed  208.68 sec
+
+      Start 82: i2r_rlc_online_seam_continuity_tests
+21/24 Test #82: i2r_rlc_online_seam_continuity_tests ....................   Passed    0.11 sec
+      Start 84: i2r_rlc_online_image_geometry_tests
+22/24 Test #84: i2r_rlc_online_image_geometry_tests .....................   Passed   17.85 sec
+      Start 86: i2r_rlc_online_seam_refiner_tests
+23/24 Test #86: i2r_rlc_online_seam_refiner_tests .......................   Passed    0.38 sec
+      Start 88: i2r_rlc_vision_kcf_tracker_tests
+24/24 Test #88: i2r_rlc_vision_kcf_tracker_tests ........................   Passed    0.35 sec
+
+79% tests passed, 5 tests failed out of 24
+
+Total Test time (real) = 312.48 sec
+
+The following tests FAILED:
+	  5 - i2r_rlc_online_correction_coordinate_contract_tests (Failed)
+	 15 - i2r_rlc_runtime_tracking_flow_tests (Failed)
+	 16 - i2r_rlc_online_seam_refinement_contract_tests (Failed)
+	 29 - i2r_rlc_correction_robot_sim_offline_frame_sync_tests (Failed)
+	 78 - i2r_rlc_vision_penzui_station_projection_tests (Failed)
+Errors while running CTest

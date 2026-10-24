@@ -1,0 +1,23 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start 20: i2r_rlc_online_control_target_presentation_tests
+1/1 Test #20: i2r_rlc_online_control_target_presentation_tests ...***Failed    0.50 sec
+FAIL: accepted same-frame measurement stays visible when the TCP control foot is different
+FAIL: missing measurement displays the control line at the laser plane even when its TCP foot is offscreen
+FAIL: display uses this exposure pose rather than reusing the previous target pixel
+FAIL: older target snapshots cannot overwrite a newer target
+FAIL: late old-session target cannot overwrite the active session target
+FAIL: lifecycle case starts with a visible current target
+FAIL: ordinary reverse-scan robot feedback cannot clear an accepted image marker
+FAIL: ordinary reverse-scan robot feedback cannot clear an accepted image marker
+FAIL: ordinary reverse-scan robot feedback cannot clear an accepted image marker
+FAIL: offscreen control foot never suppresses a valid field image measurement
+FAIL: online control target presentation
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.51 sec
+
+The following tests FAILED:
+	 20 - i2r_rlc_online_control_target_presentation_tests (Failed)
+Errors while running CTest

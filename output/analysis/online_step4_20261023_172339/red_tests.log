@@ -1,0 +1,69 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+    Start  3: i2r_rlc_online_correction_tests
+1/4 Test  #3: i2r_rlc_online_correction_tests ...........................***Failed    0.21 sec
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: fresh robot feedback must generate a new predicted target and recomputed P without image events
+FAIL: control target uses initial-corrected last-link coordinates with TCP offset applied exactly once actual=0 expected=234
+FAIL: prediction must recompute correction direction from live feedback rather than resend a cached delta
+FAIL: accepted image recovery must take control ownership back from prediction
+FAIL: exhausted measured queue must switch to anchored reference prediction without adding queue samples
+FAIL: lifecycle boundary must be checked against an active predicted target
+FAIL: lifecycle boundary must be checked against an active predicted target
+FAIL: lifecycle boundary must be checked against an active predicted target
+FAIL: lifecycle boundary must be checked against an active predicted target
+FAIL: lifecycle boundary must be checked against an active predicted target
+FAIL: lifecycle boundary must be checked against an active predicted target
+
+    Start 19: i2r_rlc_online_local_registration_frame_lifecycle_tests
+2/4 Test #19: i2r_rlc_online_local_registration_frame_lifecycle_tests ...***Failed    7.06 sec
+FAIL: one slow frame with live communication must not cancel the ordinary transaction
+FAIL: slow surface frame must preserve pending and allow bounded retention
+FAIL: late old-epoch slow result cannot cancel or replace the current transaction
+
+    Start 20: i2r_rlc_online_control_target_presentation_tests
+3/4 Test #20: i2r_rlc_online_control_target_presentation_tests ..........***Failed    1.66 sec
+FAIL: actual control target replaces the different latest camera measurement using one TCP-offset conversion
+FAIL: invalid image measurement still displays the current predicted control target on the current image
+FAIL: display uses this exposure pose rather than reusing the previous target pixel
+FAIL: older target snapshots cannot overwrite a newer target
+FAIL: late old-session target cannot overwrite the active session target
+FAIL: online control target presentation
+
+    Start 83: i2r_rlc_online_image_measurement_tests
+4/4 Test #83: i2r_rlc_online_image_measurement_tests ....................***Failed   22.11 sec
+FAIL: formal online KCF never waits for a whole unbounded set of raw refinements
+FAIL: lost image identity uses at most two current raw refinements per frame
+FAIL: competition checking cannot restore whole-frame unbounded refinement work
+field local geometry status=6 valid=1 support=0.985075 rms=0.547072 uncertainty=0.000 ambiguity=0.039801
+field frame_1120_source.png valid=1 point=[494.500,671.845] refinement_ms=533.677 message=原图接缝精定位测量；仿真仅辅助搜索。
+field local geometry status=2 valid=0 support=0.000000 rms=0.000000 uncertainty=0.000 ambiguity=0.326531
+field frame_2148_source.png valid=0 point=[-1.000,-1.000] refinement_ms=338.128 message=同帧原图未通过接缝或 KCF 身份验收，不生成点。
+field warm replay valid=0 geometry=0 kcf=0 point=[-1.000,-1.000] quality=0.000000 response=0.423441 refinement_ms=342.865
+FAIL: online image measurement
+
+
+0% tests passed, 4 tests failed out of 4
+
+Total Test time (real) =  31.11 sec
+
+The following tests FAILED:
+	  3 - i2r_rlc_online_correction_tests (Failed)
+	 19 - i2r_rlc_online_local_registration_frame_lifecycle_tests (Failed)
+	 20 - i2r_rlc_online_control_target_presentation_tests (Failed)
+	 83 - i2r_rlc_online_image_measurement_tests (Failed)
+Errors while running CTest

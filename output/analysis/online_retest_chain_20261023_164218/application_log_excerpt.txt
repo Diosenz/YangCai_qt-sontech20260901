@@ -1,0 +1,69 @@
+3986: [2026-10-23T16:46:41.001] [INFO] realtime online correction generated
+3987: [2026-10-23T16:46:41.051] [INFO] realtime online correction generated
+3988: [2026-10-23T16:46:41.059] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,2,2,0,0,0,0,10000,1
+3991: [2026-10-23T16:46:41.063] [INFO] robot request completed
+3992: [2026-10-23T16:46:41.102] [INFO] 视觉跟踪输出：frame=9074, image=(480.50,598.16)
+3993: [2026-10-23T16:46:41.116] [INFO] realtime online correction generated
+3994: [2026-10-23T16:46:41.166] [INFO] realtime online correction generated
+3995: [2026-10-23T16:46:41.225] [INFO] realtime online correction generated
+3996: [2026-10-23T16:46:41.236] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,3,2,0,0,0,0,10000,1
+3999: [2026-10-23T16:46:41.241] [INFO] robot request completed
+4000: [2026-10-23T16:46:41.286] [INFO] RobotComm N/D 摘要 #3104：N 1,1,1,0,0,0,0,1,0 -> D 7,2,0,1,1,0,0,15,10,1,1,0,1,30,0,1,0,889282,96233,-257730,-1661479,406495,432191,-190,271178,2,907,922,-637,5,0,0；sStart=1, sMode=2, sServoPower=1, s_Bsavetraj=1
+4001: [2026-10-23T16:46:41.295] [INFO] realtime online correction generated
+4002: [2026-10-23T16:46:41.348] [INFO] realtime online correction generated
+4003: [2026-10-23T16:46:41.379] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,0,0,1,0,0,0,10000,1
+4006: [2026-10-23T16:46:41.404] [INFO] robot request completed
+4007: [2026-10-23T16:46:41.425] [INFO] realtime online correction generated
+4008: [2026-10-23T16:46:41.484] [INFO] realtime online correction generated
+4009: [2026-10-23T16:46:41.553] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,-2,-1,0,0,0,0,10000,1
+4012: [2026-10-23T16:46:41.625] [INFO] realtime online correction generated
+4013: [2026-10-23T16:46:41.631] [INFO] robot request completed
+4014: [2026-10-23T16:46:41.644] [INFO] realtime online correction generated
+4015: [2026-10-23T16:46:41.701] [INFO] realtime online correction generated
+4016: [2026-10-23T16:46:41.751] [INFO] realtime online correction generated
+4017: [2026-10-23T16:46:41.759] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,-2,-1,0,0,0,0,10000,1
+4020: [2026-10-23T16:46:41.764] [INFO] robot request completed
+4021: [2026-10-23T16:46:41.814] [INFO] realtime online correction generated
+4022: [2026-10-23T16:46:41.855] [INFO] [在线局部定位] frame=9030，窗口=8 帧/512 点，残差 0.9472→0.6684 mm，采集及处理=2203 ms，求解=1154 ms：母材表面可观测投影及完整帧留出通过；不使用估计焊点自证，待新帧表面后验。 有效实测焊点子集收益：稳定更新保护：当前独立焊点收益通过。 历史仅监测：unverified_geometry，有效区域=2，冲突区域=0，无效区域=0，不参与否决。。
+4023: [2026-10-23T16:46:41.888] [INFO] realtime online correction generated
+4024: [2026-10-23T16:46:41.907] [INFO] [在线局部定位] 工件写回指令已回读确认（几何尚未验证），耗时=39 ms：定位矩阵已写回并确认 RobotSim 工件 1068。；等待后续新采样验证。
+4025: [2026-10-23T16:46:41.910] [INFO] 局部工件指令已回读，等待后续新采样验证；验证完成前暂停追加修正。
+4026: [2026-10-23T16:46:41.918] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,-3,-2,0,0,0,0,10000,1
+4029: [2026-10-23T16:46:41.922] [INFO] robot request completed
+4183: [2026-10-23T16:46:46.116] [INFO] realtime online correction generated
+4184: [2026-10-23T16:46:46.163] [INFO] realtime online correction generated
+4185: [2026-10-23T16:46:46.215] [INFO] realtime online correction generated
+4186: [2026-10-23T16:46:46.261] [INFO] realtime online correction generated
+4187: [2026-10-23T16:46:46.269] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,-2,-1,0,0,0,0,10000,1
+4190: [2026-10-23T16:46:46.274] [INFO] robot request completed
+4191: [2026-10-23T16:46:46.332] [INFO] realtime online correction generated
+4192: [2026-10-23T16:46:46.394] [INFO] realtime online correction generated
+4193: [2026-10-23T16:46:46.445] [INFO] realtime online correction generated
+4194: [2026-10-23T16:46:46.454] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,-1,-1,-1,0,0,0,10000,1
+4197: [2026-10-23T16:46:46.458] [INFO] robot request completed
+4198: [2026-10-23T16:46:46.510] [INFO] realtime online correction generated
+4199: [2026-10-23T16:46:46.571] [INFO] realtime online correction generated
+4200: [2026-10-23T16:46:46.608] [INFO] 视觉跟踪输出：frame=9241, image=(469.50,599.97)
+4201: [2026-10-23T16:46:46.639] [INFO] realtime online correction generated
+4202: [2026-10-23T16:46:46.659] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,1,1,-1,0,0,0,10000,1
+4205: [2026-10-23T16:46:46.665] [INFO] robot request completed
+4206: [2026-10-23T16:46:46.697] [INFO] RobotComm N/D 摘要 #3165：N 1,1,1,0,0,0,0,1,0 -> D 7,2,0,1,1,0,0,15,10,1,1,0,1,30,0,1,0,888616,96405,-257553,-1661396,406567,432185,-230,233298,2,0,0,0,5,0,0；sStart=1, sMode=2, sServoPower=1, s_Bsavetraj=1
+4207: [2026-10-23T16:46:46.795] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,0,0,-2,0,0,0,10000,1
+4210: [2026-10-23T16:46:46.823] [INFO] robot request completed
+4211: [2026-10-23T16:46:47.076] [INFO] 局部更新后验验证已撤销，本会话暂停自动更新；工件未自动恢复。
+4212: [2026-10-23T16:46:47.111] [INFO] realtime online correction generated
+4213: [2026-10-23T16:46:47.164] [INFO] realtime online correction generated
+4214: [2026-10-23T16:46:47.243] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,2,1,0,0,0,0,10000,1
+4217: [2026-10-23T16:46:47.261] [INFO] robot request completed
+4218: [2026-10-23T16:46:47.408] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,1,1,-1,0,0,0,10000,1
+4221: [2026-10-23T16:46:47.427] [INFO] robot request completed
+4222: [2026-10-23T16:46:47.642] [INFO] realtime online correction generated
+4223: [2026-10-23T16:46:47.694] [INFO] realtime online correction generated
+4224: [2026-10-23T16:46:47.703] [INFO] RobotComm N/D 摘要 #3175：N 1,1,1,0,0,0,0,1,0 -> D 7,2,0,1,1,0,0,15,10,1,1,0,1,30,0,1,0,888812,96519,-257923,-1661452,406528,432173,-240,226257,2,763,101,-578,5,0,0；sStart=1, sMode=2, sServoPower=1, s_Bsavetraj=1
+4225: [2026-10-23T16:46:47.757] [INFO] realtime online correction generated
+4226: [2026-10-23T16:46:47.820] [INFO] RobotComm 请求：P 1,1,1,0,0,0,0,1,0,1,1,0,0,0,0,10000,1
+4229: [2026-10-23T16:46:47.825] [INFO] realtime online correction generated
+4230: [2026-10-23T16:46:47.828] [INFO] robot request completed
+4231: [2026-10-23T16:46:47.874] [INFO] realtime online correction generated
+4232: [2026-10-23T16:46:47.929] [INFO] realtime online correction generated
+4233: [2026-10-23T16:46:47.988] [INFO] realtime online correction generated

@@ -1,0 +1,173 @@
+{
+  "completedAt": "2026-10-23T15:50:16.7753133+08:00",
+  "restoredFiles": 25,
+  "retainedDetachedFiles": 4,
+  "sourceChecks": [
+    {
+      "path": "UI/include/RuntimeWorkerAdapters.h",
+      "status": "restored_exactly",
+      "sha256": "6781270420701C15630724AB78632D2947AC69E6850B6A8F0CB7C53C6C1A1829"
+    },
+    {
+      "path": "UI/src/RuntimeWorkerAdapters.cpp",
+      "status": "restored_exactly",
+      "sha256": "2A8B25DE46BBE43AFFAB4480DB42E20AE06B6A1C26F1AFC996B621D68A1CB527"
+    },
+    {
+      "path": "UI/include/OnlineLocalRegistrationWorker.h",
+      "status": "restored_exactly",
+      "sha256": "DE27074BB14C5111CE316B3F58D3AE87B61CB94E27E2A33A1B4C1341BC3CF079"
+    },
+    {
+      "path": "UI/src/OnlineLocalRegistrationWorker.cpp",
+      "status": "restored_exactly",
+      "sha256": "47ECB7953C0658FA0CDEF73987285ADECD2FAE81D96D423D98C9A99824A5885B"
+    },
+    {
+      "path": "UI/src/RuntimeLocalRegistration.cpp",
+      "status": "restored_exactly",
+      "sha256": "26BB64A324AE71904FF9201C390744054D4D242DE2C067ED07BE917195DBFA49"
+    },
+    {
+      "path": "UI/include/RuntimeCoordinator.h",
+      "status": "restored_exactly",
+      "sha256": "6D85844AE64D8E19A0F0C4120699AE3432E2BF381E796A28712437CC1365AD97"
+    },
+    {
+      "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+      "status": "restored_exactly",
+      "sha256": "235540DC614D36DD33E2096A076CA9EC2D5DD1BA39B9913AA6EF77B8C69EC8E0"
+    },
+    {
+      "path": "DigitalTwin/CMakeLists.txt",
+      "status": "restored_exactly",
+      "sha256": "102F31C24901072B6F67A63232734F546DBF069EF1C3036BB9F77ABA15DDF15E"
+    },
+    {
+      "path": "config/digital_twin/online_local_registration.ini",
+      "status": "restored_exactly",
+      "sha256": "C801BF9209BBCE00AB67BFFA859F23685E503A7547AFB44F7B69FC4115437642"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "status": "restored_exactly",
+      "sha256": "DFBEACC30BA1F859FFB9FFE233513FD4D30434FAE30EF44D739E83A78215578D"
+    },
+    {
+      "path": "tests/test_runtime_tracking_flow.cpp",
+      "status": "restored_exactly",
+      "sha256": "70AA39E1A6C3C961ADAD87C994B1F74CB8177050D958C3408C05EF10DA5641A8"
+    },
+    {
+      "path": "tests/test_online_local_registration_surface.cpp",
+      "status": "restored_exactly",
+      "sha256": "7C27F4547D1FFB543A183D03F0AC7E3E851A2B548D7D20C196EF3189AABBB200"
+    },
+    {
+      "path": "tests/test_online_correction_run_recorder.cpp",
+      "status": "restored_exactly",
+      "sha256": "1A06E7D2008C0879E8DD133B509ECECB862F0D087C0623EB664A2E0230E096E6"
+    },
+    {
+      "path": "docs/online_local_registration.md",
+      "status": "restored_exactly",
+      "sha256": "D68399B631345022D44105630753ECCB66C68863AC79800A4DC1D7E567D00CA4"
+    },
+    {
+      "path": "Vision/include/feature/SimulationGuidedSeamEstimator.h",
+      "status": "restored_exactly",
+      "sha256": "053156D7CFB2453669D8F15D0C2CFE18F21F159A0BFE3AC48F65CEF749B93621"
+    },
+    {
+      "path": "Vision/src/feature/SimulationGuidedSeamEstimator.cpp",
+      "status": "restored_exactly",
+      "sha256": "66C46DF5F4D084142CD6894EF21B1CE96C69B795647C1188DFF12F5169CFE7FC"
+    },
+    {
+      "path": "tests/test_simulation_guided_seam.cpp",
+      "status": "restored_exactly",
+      "sha256": "09049B3830A77C5242DA8528228AC80D644A7DFBE62BDB0184B3ED7DF1E37B55"
+    },
+    {
+      "path": "Vision/include/track/OnlineSeamContinuity.h",
+      "status": "restored_exactly",
+      "sha256": "CCD298904ADEA82B3C9B3F25455F27B5FE72BA988DE0BFF2651846D38709D61D"
+    },
+    {
+      "path": "Vision/src/track/OnlineSeamContinuity.cpp",
+      "status": "restored_exactly",
+      "sha256": "94B98B65997BB869AA66CE0DCDE428CBC58872C31C02289AFB714DE76CFABB64"
+    },
+    {
+      "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+      "status": "restored_exactly",
+      "sha256": "E3CCC24F8395F529A231B71A9B177858619D6E30D3C7D493C137B7500FFCC6DB"
+    },
+    {
+      "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+      "status": "restored_exactly",
+      "sha256": "D0640750ED3AF5CA4853C0925326D01A02256FC48961206ECF6527D86EC9654F"
+    },
+    {
+      "path": "tests/test_online_seam_continuity.cpp",
+      "status": "restored_exactly",
+      "sha256": "98CE453074AB4F47EC01E70DBABC032F050B7D1144252E1476E32BAA421ED751"
+    },
+    {
+      "path": "UI/include/OnlineLocalRegistrationStability.h",
+      "status": "restored_exactly",
+      "sha256": "9A911BD743A27A78122C1B30544C4566232618D7BAC1994273CFD11AD3F0C474"
+    },
+    {
+      "path": "UI/src/UiController.cpp",
+      "status": "restored_exactly",
+      "sha256": "1E977D31AA98249154DA913D92B9937BE97535E5F8289B823C4435016DA91882"
+    },
+    {
+      "path": "tests/test_online_local_registration_stability.cpp",
+      "status": "restored_exactly",
+      "sha256": "DF2F8D572572E4D1C295EC70CAE39A9BC7D95AA9CA1F5516D731FB87ECB2E315"
+    },
+    {
+      "path": "DigitalTwin/include/OnlineSeamCandidateGeometry.h",
+      "status": "retained_detached",
+      "sha256": "ED4B3F2ABF6171BD0CA6B3EEA25ED406C9115152085C9D52E12888FAD384EF9C"
+    },
+    {
+      "path": "DigitalTwin/src/OnlineSeamCandidateGeometry.cpp",
+      "status": "retained_detached",
+      "sha256": "43E302DA1452BAF19E4A0F07821F01AF83E5727554C28DBCE1BC1E37D0ECDEFA"
+    },
+    {
+      "path": "tests/test_online_seam_candidate_geometry.cpp",
+      "status": "retained_detached",
+      "sha256": "1E59CAB4B98C906B58A0A600C719820647D318D92315F0FA4CC651E696C9BB71"
+    },
+    {
+      "path": "tests/test_online_seam_geometry_worker.cpp",
+      "status": "retained_detached",
+      "sha256": "428B7D928D4891EF818471772A1C4587533E9430622FDAFDD61E6E8F1C825F83"
+    }
+  ],
+  "configuredBuildReferencesRemoved": true,
+  "build": "succeeded after complete dependency rebuild and user exit of locked app",
+  "buildLogs": [
+    "rebuild.log",
+    "rebuild_after_exit.log"
+  ],
+  "testsPassed": 10,
+  "testsFailed": 0,
+  "testLog": "verified_tests.log",
+  "testSeconds": 45.75,
+  "priorFailedVerification": "tests.log used stale pre-rollback objects; retained, superseded by verified_tests.log",
+  "executable": {
+    "path": "H:\\YangCai_Code\\YangCai_qt-sontech20260901\\out\\build\\qt-debug\\UI\\i2r_rlc.exe",
+    "lastWriteTime": "2026-10-23T15:46:41.0313406+08:00",
+    "sha256": "877497C381E14C2C8A6C6BC785871CB81D2745A3519888510FDDBADC9B1C1B22"
+  },
+  "newRepairImplemented": false,
+  "fieldValidation": false,
+  "protectedDirectoriesEdited": false,
+  "processesTerminatedByAssistant": false,
+  "pending": "No original images for final reverse-scan interval; user requires inspecting those before choosing stale-start handling."
+}

@@ -1,0 +1,18 @@
+{
+  "recording": "output\\online_correction\\20261021_201400_950_启动在线ICP（稳定保护1.0）+ 自动卡尔曼",
+  "sparse_source_images": 29,
+  "prior_inputs_verified": 66,
+  "all_prior_hashes_match": true,
+  "mismatches": [],
+  "crop_lossless_pixels_equal": true,
+  "crop_rectangle": [
+    380,
+    510,
+    640,
+    670
+  ],
+  "fixture_sha256": "92fe374312a8adc8cc276483ce30c3c71e7b1da68b7d4d1292814b1cfd6c2dd1",
+  "human_reference": "6469 qualitative joint near simulated X500 and below it; exact Y unlabelled",
+  "ground_truth_policy": "synthetic coordinates independent; real fit not truth; ambiguous height must reject",
+  "cpp_tests_executed_by_this_agent": false
+}

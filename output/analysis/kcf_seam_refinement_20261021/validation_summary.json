@@ -1,0 +1,76 @@
+{
+  "scope": "KCF coarse tracking plus raw-image seam refinement; explicit user GapCenter policy",
+  "build": "MSVC2022 Debug existing qt-debug; main program linked successfully",
+  "native_replay": {
+    "source_frames": 29,
+    "policy_comparisons": 58,
+    "gap_center_accepted": 23,
+    "gap_center_rejected": 6,
+    "rejected": [
+      {
+        "frame": "5718",
+        "status": "2",
+        "ambiguous_column_ratio": "0.232323"
+      },
+      {
+        "frame": "4086",
+        "status": "3",
+        "ambiguous_column_ratio": "0.138462"
+      },
+      {
+        "frame": "4482",
+        "status": "2",
+        "ambiguous_column_ratio": "0.218905"
+      },
+      {
+        "frame": "4751",
+        "status": "2",
+        "ambiguous_column_ratio": "0.230366"
+      },
+      {
+        "frame": "18488",
+        "status": "2",
+        "ambiguous_column_ratio": "0.546012"
+      },
+      {
+        "frame": "18648",
+        "status": "2",
+        "ambiguous_column_ratio": "0.308458"
+      }
+    ],
+    "frame6469": [
+      {
+        "frame": "6469",
+        "height_policy": "1",
+        "coarse_x": "510.686",
+        "coarse_y": "588.744",
+        "horizontal_valid": "1",
+        "valid": "1",
+        "status": "6",
+        "point_x": "498.5",
+        "point_y": "591.39",
+        "left_x": "498.5",
+        "left_y": "595.4",
+        "right_x": "498.5",
+        "right_y": "587.381",
+        "confidence": "0.69685",
+        "support_ratio": "0.970149",
+        "fit_rms": "0.392193",
+        "x_uncertainty": "0",
+        "height_jump": "-8.01833",
+        "ambiguous_column_ratio": "0.130653"
+      }
+    ],
+    "continuous_kcf_replay": false,
+    "physical_ground_truth": false
+  },
+  "current_test_status": "12 relevant native tests passed, zero failed (relevant_tests_final.log). Extra offline frame-sync failed due existing preflight fixture mismatch requiring new Idle D after start; not counted as passed.",
+  "limitations": [
+    "Current geometric model requires a local downward V; competing stripes and inconsistent geometry are rejected.",
+    "Rejected frames produce no new correction point; this is not automatic robot stop.",
+    "Actual closed-loop camera/RobotSim field validation remains necessary."
+  ],
+  "inputs_audit": "66 existing source hashes unchanged; fixture lossless crop verified",
+  "collaboration": "geometry implementation, independent tests, independent review; main agent integration and MSVC validation",
+  "test_harness_abort": "Initial replay Unicode narrow-argv path aborted; replaced with Windows wide entry plus exception reporting; native replay now exit0."
+}

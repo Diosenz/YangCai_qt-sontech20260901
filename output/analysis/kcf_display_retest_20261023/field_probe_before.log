@@ -1,0 +1,16 @@
+refine 507.0 580.0 valid=1 status=6 point=506.500 583.355 ambiguity=0.080 rms=0.438
+refine 439.0 677.0 valid=0 status=1 point=-1.000 -1.000 ambiguity=0.056 rms=0.000
+warm=0 frame=0 valid=0 status=1 calls=0 pending=1 completed=0 point=-1.000 -1.000
+warm=0 frame=1 valid=0 status=1 calls=0 pending=1 completed=0 point=-1.000 -1.000
+warm=0 frame=2 valid=0 status=1 calls=2 pending=1 completed=0 point=-1.000 -1.000
+warm=0 frame=3 valid=0 status=1 calls=2 pending=1 completed=0 point=-1.000 -1.000
+warm=0 frame=20 valid=0 status=4 calls=2 pending=1 completed=0 point=-1.000 -1.000
+warm=0 frame=40 valid=0 status=4 calls=2 pending=1 completed=0 point=-1.000 -1.000
+warm=0 frame=41 valid=1 status=6 calls=2 pending=0 completed=1 point=506.500 583.357
+warm=1 frame=0 valid=0 status=1 calls=1 pending=1 completed=0 point=-1.000 -1.000
+warm=1 frame=1 valid=0 status=1 calls=1 pending=1 completed=0 point=-1.000 -1.000
+warm=1 frame=2 valid=0 status=1 calls=2 pending=1 completed=0 point=-1.000 -1.000
+warm=1 frame=3 valid=0 status=1 calls=2 pending=1 completed=0 point=-1.000 -1.000
+warm=1 frame=20 valid=0 status=1 calls=2 pending=1 completed=0 point=-1.000 -1.000
+warm=1 frame=40 valid=0 status=4 calls=2 pending=1 completed=0 point=-1.000 -1.000
+warm=1 frame=55 valid=1 status=6 calls=1 pending=0 completed=0 point=506.500 583.357

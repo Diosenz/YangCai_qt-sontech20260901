@@ -1,0 +1,55 @@
+Test project H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug
+      Start  6: i2r_rlc_online_calibration_contract_tests
+ 1/13 Test  #6: i2r_rlc_online_calibration_contract_tests ..............   Passed    2.22 sec
+      Start  8: i2r_rlc_online_correction_run_recorder_tests
+ 2/13 Test  #8: i2r_rlc_online_correction_run_recorder_tests ...........   Passed    0.27 sec
+      Start 15: i2r_rlc_runtime_tracking_flow_tests
+ 3/13 Test #15: i2r_rlc_runtime_tracking_flow_tests ....................***Failed    3.23 sec
+FAIL: blank frame keeps a marked same-frame prediction without inventing independent geometry
+FAIL: real-only mode outputs geometry instead of the biased simulated prior
+FAIL: manual 10 percent prior and 90 percent geometry fuse once before projection
+FAIL: blank frame keeps a marked same-frame prediction without inventing independent geometry
+FAIL: real-only mode outputs geometry instead of the biased simulated prior
+FAIL: manual 10 percent prior and 90 percent geometry fuse once before projection
+FAIL: automatic second frame fuses raw geometry once and projects that displayed point
+
+      Start 16: i2r_rlc_online_seam_refinement_contract_tests
+ 4/13 Test #16: i2r_rlc_online_seam_refinement_contract_tests ..........***Failed    0.47 sec
+FAIL: blank frame keeps a marked same-frame prediction without inventing independent geometry
+FAIL: real-only mode outputs geometry instead of the biased simulated prior
+FAIL: manual 10 percent prior and 90 percent geometry fuse once before projection
+FAIL: blank frame keeps a marked same-frame prediction without inventing independent geometry
+FAIL: real-only mode outputs geometry instead of the biased simulated prior
+FAIL: manual 10 percent prior and 90 percent geometry fuse once before projection
+FAIL: automatic second frame fuses raw geometry once and projects that displayed point
+
+      Start 17: i2r_rlc_online_fusion_controls_tests
+ 5/13 Test #17: i2r_rlc_online_fusion_controls_tests ...................   Passed    0.27 sec
+      Start 18: i2r_rlc_online_local_registration_tests
+ 6/13 Test #18: i2r_rlc_online_local_registration_tests ................   Passed    3.12 sec
+      Start 19: i2r_rlc_online_local_registration_safety_tests
+ 7/13 Test #19: i2r_rlc_online_local_registration_safety_tests .........   Passed    1.00 sec
+      Start 22: i2r_rlc_online_local_registration_verification_tests
+ 8/13 Test #22: i2r_rlc_online_local_registration_verification_tests ...   Passed    0.05 sec
+      Start 26: i2r_rlc_correction_robot_sim_online_frame_sync_tests
+ 9/13 Test #26: i2r_rlc_correction_robot_sim_online_frame_sync_tests ...***Failed    2.14 sec
+FAIL: online no-target must remain a Vision business result
+
+      Start 27: i2r_rlc_main_widget_panel_tests
+10/13 Test #27: i2r_rlc_main_widget_panel_tests ........................   Passed    1.95 sec
+      Start 76: i2r_rlc_online_seam_continuity_tests
+11/13 Test #76: i2r_rlc_online_seam_continuity_tests ...................   Passed    0.08 sec
+      Start 77: i2r_rlc_online_seam_refiner_tests
+12/13 Test #77: i2r_rlc_online_seam_refiner_tests ......................   Passed    0.32 sec
+      Start 78: i2r_rlc_online_seam_refiner_replay_tests
+13/13 Test #78: i2r_rlc_online_seam_refiner_replay_tests ...............   Passed    3.96 sec
+
+77% tests passed, 3 tests failed out of 13
+
+Total Test time (real) =  19.10 sec
+
+The following tests FAILED:
+	 15 - i2r_rlc_runtime_tracking_flow_tests (Failed)
+	 16 - i2r_rlc_online_seam_refinement_contract_tests (Failed)
+	 26 - i2r_rlc_correction_robot_sim_online_frame_sync_tests (Failed)
+Errors while running CTest

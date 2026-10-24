@@ -1,0 +1,451 @@
+[1/13] Automatic MOC for target i2r_rlc_control
+[2/12] Building CXX object Control\CMakeFiles\i2r_rlc_control.dir\src\OnlineCorrectionController.cpp.obj
+[3/12] Linking CXX static library Control\i2r_rlc_control.lib
+[4/12] Building CXX object tests\CMakeFiles\i2r_rlc_correction_robot_sim_online_frame_sync_tests.dir\test_correction_robot_sim_frame_sync.cpp.obj
+[5/12] Building CXX object tests\CMakeFiles\i2r_rlc_correction_robot_sim_offline_frame_sync_tests.dir\test_correction_robot_sim_frame_sync.cpp.obj
+[6/12] Linking CXX executable tests\i2r_rlc_online_correction_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_online_correction_tests.exe: message: deploying dependencies
+[7/12] Linking CXX executable UI\i2r_rlc.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI/i2r_rlc.exe: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libzmq-mt-gd-4_3_5.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\libzmq-mt-gd-4_3_5.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\libzmq-mt-gd-4_3_5.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDESTEP.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKDESTEP.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKDESTEP.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDE.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKDE.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKDE.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKernel.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKernel.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKernel.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKXCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKXCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKVCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKVCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKVCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKLCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKLCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKLCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCDF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKCDF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKCDF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBO.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKBO.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKBO.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKPrim.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKPrim.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKPrim.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKTopAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKTopAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKTopAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKGeomAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKGeomAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBRep.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKBRep.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKBRep.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKGeomBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKGeomBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKG3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKG3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKG2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKG2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMath.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKMath.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKMath.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKShHealing.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKShHealing.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKShHealing.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKV3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKV3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKV3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKService.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKService.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKService.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\freetyped.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\freetyped.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\freetyped.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\zd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\zd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\zd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\bz2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\bz2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\bz2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libpng16d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\libpng16d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\libpng16d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlidec.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\brotlidec.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\brotlidec.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlicommon.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\brotlicommon.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\brotlicommon.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMesh.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKMesh.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKMesh.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKHLR.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKHLR.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKHLR.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXSBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\TKXSBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\TKXSBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_registrationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_registrationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_registrationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_filtersd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_filtersd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_filtersd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_sample_consensusd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_sample_consensusd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_sample_consensusd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_commond.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_commond.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_commond.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_searchd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_searchd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_searchd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_octreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_octreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_octreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_kdtreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_kdtreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_kdtreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\lz4d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\lz4d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\lz4d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_segmentationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_segmentationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_segmentationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_mld.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_mld.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_mld.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_featuresd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\pcl_featuresd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\pcl_featuresd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\fmtd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\fmtd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\fmtd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\tinysplinecxx.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\UI\tinysplinecxx.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/UI\tinysplinecxx.dll: message: deploying dependencies
+[8/12] Linking CXX executable tests\i2r_rlc_online_correction_coordinate_contract_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_online_correction_coordinate_contract_tests.exe: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libzmq-mt-gd-4_3_5.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\libzmq-mt-gd-4_3_5.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\libzmq-mt-gd-4_3_5.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDESTEP.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKDESTEP.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKDESTEP.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDE.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKDE.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKDE.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKernel.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKernel.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKernel.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKXCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKXCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKVCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKVCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKVCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKLCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKLCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKLCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCDF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKCDF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKCDF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBO.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKBO.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKBO.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKPrim.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKPrim.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKPrim.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKTopAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKTopAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKTopAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKGeomAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKGeomAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBRep.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKBRep.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKBRep.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKGeomBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKGeomBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKG3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKG3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKG2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKG2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMath.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKMath.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKMath.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKShHealing.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKShHealing.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKShHealing.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKV3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKV3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKV3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKService.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKService.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKService.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\freetyped.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\freetyped.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\freetyped.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\zd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\zd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\zd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\bz2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\bz2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\bz2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libpng16d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\libpng16d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\libpng16d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlidec.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\brotlidec.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\brotlidec.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlicommon.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\brotlicommon.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\brotlicommon.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMesh.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKMesh.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKMesh.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKHLR.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKHLR.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKHLR.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXSBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKXSBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKXSBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_registrationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_registrationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_registrationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_filtersd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_filtersd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_filtersd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_sample_consensusd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_sample_consensusd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_sample_consensusd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_commond.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_commond.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_commond.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_searchd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_searchd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_searchd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_octreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_octreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_octreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_kdtreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_kdtreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_kdtreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\lz4d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\lz4d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\lz4d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_segmentationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_segmentationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_segmentationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_mld.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_mld.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_mld.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_featuresd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_featuresd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_featuresd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\fmtd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\fmtd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\fmtd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\tinysplinecxx.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\tinysplinecxx.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\tinysplinecxx.dll: message: deploying dependencies
+[9/12] Building CXX object tests\CMakeFiles\i2r_rlc_runtime_tracking_flow_tests.dir\test_runtime_tracking_flow.cpp.obj
+H:\YangCai_Code\YangCai_qt-sontech20260901\tests\test_runtime_tracking_flow.cpp(1208) : warning C6262: Function uses '25556' bytes of stack.  Consider moving some data to heap.
+H:\YangCai_Code\YangCai_qt-sontech20260901\tests\test_runtime_tracking_flow.cpp(1346) : warning C6262: Function uses '36804' bytes of stack.  Consider moving some data to heap.
+H:\YangCai_Code\YangCai_qt-sontech20260901\tests\test_runtime_tracking_flow.cpp(1648) : warning C6262: Function uses '16796' bytes of stack.  Consider moving some data to heap.
+[10/12] Linking CXX executable tests\i2r_rlc_runtime_tracking_flow_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_runtime_tracking_flow_tests.exe: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libzmq-mt-gd-4_3_5.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\libzmq-mt-gd-4_3_5.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\libzmq-mt-gd-4_3_5.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDESTEP.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKDESTEP.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKDESTEP.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDE.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKDE.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKDE.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKernel.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKernel.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKernel.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKXCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKXCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKVCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKVCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKVCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKLCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKLCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKLCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCDF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKCDF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKCDF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBO.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKBO.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKBO.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKPrim.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKPrim.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKPrim.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKTopAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKTopAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKTopAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKGeomAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKGeomAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBRep.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKBRep.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKBRep.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKGeomBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKGeomBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKG3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKG3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKG2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKG2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMath.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKMath.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKMath.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKShHealing.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKShHealing.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKShHealing.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKV3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKV3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKV3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKService.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKService.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKService.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\freetyped.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\freetyped.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\freetyped.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\zd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\zd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\zd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\bz2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\bz2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\bz2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libpng16d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\libpng16d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\libpng16d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlidec.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\brotlidec.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\brotlidec.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlicommon.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\brotlicommon.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\brotlicommon.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMesh.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKMesh.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKMesh.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKHLR.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKHLR.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKHLR.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXSBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKXSBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKXSBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_registrationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_registrationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_registrationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_filtersd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_filtersd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_filtersd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_sample_consensusd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_sample_consensusd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_sample_consensusd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_commond.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_commond.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_commond.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_searchd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_searchd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_searchd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_octreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_octreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_octreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_kdtreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_kdtreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_kdtreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\lz4d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\lz4d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\lz4d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_segmentationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_segmentationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_segmentationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_mld.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_mld.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_mld.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_featuresd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_featuresd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_featuresd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\fmtd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\fmtd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\fmtd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\tinysplinecxx.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\tinysplinecxx.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\tinysplinecxx.dll: message: deploying dependencies
+[11/12] Linking CXX executable tests\i2r_rlc_correction_robot_sim_offline_frame_sync_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_correction_robot_sim_offline_frame_sync_tests.exe: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libzmq-mt-gd-4_3_5.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\libzmq-mt-gd-4_3_5.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\libzmq-mt-gd-4_3_5.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDESTEP.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKDESTEP.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKDESTEP.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDE.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKDE.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKDE.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKernel.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKernel.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKernel.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKXCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKXCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKVCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKVCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKVCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKLCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKLCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKLCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCDF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKCDF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKCDF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBO.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKBO.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKBO.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKPrim.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKPrim.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKPrim.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKTopAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKTopAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKTopAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKGeomAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKGeomAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBRep.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKBRep.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKBRep.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKGeomBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKGeomBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKG3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKG3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKG2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKG2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMath.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKMath.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKMath.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKShHealing.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKShHealing.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKShHealing.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKV3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKV3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKV3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKService.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKService.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKService.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\freetyped.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\freetyped.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\freetyped.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\zd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\zd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\zd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\bz2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\bz2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\bz2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libpng16d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\libpng16d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\libpng16d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlidec.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\brotlidec.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\brotlidec.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlicommon.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\brotlicommon.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\brotlicommon.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMesh.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKMesh.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKMesh.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKHLR.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKHLR.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKHLR.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXSBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKXSBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKXSBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_registrationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_registrationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_registrationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_filtersd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_filtersd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_filtersd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_sample_consensusd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_sample_consensusd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_sample_consensusd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_commond.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_commond.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_commond.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_searchd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_searchd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_searchd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_octreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_octreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_octreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_kdtreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_kdtreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_kdtreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\lz4d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\lz4d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\lz4d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_segmentationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_segmentationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_segmentationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_mld.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_mld.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_mld.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_featuresd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_featuresd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_featuresd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\fmtd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\fmtd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\fmtd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\tinysplinecxx.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\tinysplinecxx.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\tinysplinecxx.dll: message: deploying dependencies
+[12/12] Linking CXX executable tests\i2r_rlc_correction_robot_sim_online_frame_sync_tests.exe
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests/i2r_rlc_correction_robot_sim_online_frame_sync_tests.exe: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libzmq-mt-gd-4_3_5.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\libzmq-mt-gd-4_3_5.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\libzmq-mt-gd-4_3_5.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDESTEP.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKDESTEP.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKDESTEP.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKDE.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKDE.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKDE.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKernel.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKernel.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKernel.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKXCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKXCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKVCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKVCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKVCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKLCAF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKLCAF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKLCAF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKCDF.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKCDF.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKCDF.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBO.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKBO.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKBO.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKPrim.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKPrim.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKPrim.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKTopAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKTopAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKTopAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomAlgo.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKGeomAlgo.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKGeomAlgo.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKBRep.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKBRep.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKBRep.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKGeomBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKGeomBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKGeomBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKG3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKG3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKG2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKG2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKG2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMath.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKMath.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKMath.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKShHealing.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKShHealing.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKShHealing.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKV3d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKV3d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKV3d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKService.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKService.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKService.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\freetyped.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\freetyped.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\freetyped.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\zd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\zd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\zd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\bz2d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\bz2d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\bz2d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\libpng16d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\libpng16d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\libpng16d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlidec.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\brotlidec.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\brotlidec.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\brotlicommon.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\brotlicommon.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\brotlicommon.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKMesh.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKMesh.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKMesh.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKHLR.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKHLR.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKHLR.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\TKXSBase.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\TKXSBase.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\TKXSBase.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_registrationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_registrationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_registrationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_filtersd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_filtersd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_filtersd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_sample_consensusd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_sample_consensusd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_sample_consensusd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_commond.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_commond.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_commond.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_searchd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_searchd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_searchd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_octreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_octreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_octreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_kdtreed.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_kdtreed.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_kdtreed.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\lz4d.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\lz4d.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\lz4d.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_segmentationd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_segmentationd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_segmentationd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_mld.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_mld.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_mld.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\pcl_featuresd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\pcl_featuresd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\pcl_featuresd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\fmtd.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\fmtd.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\fmtd.dll: message: deploying dependencies
+H:\YangCai_Code\YangCai_qt-sontech20260901\vcpkg_installed\x64-windows\debug\bin\tinysplinecxx.dll -> H:\YangCai_Code\YangCai_qt-sontech20260901\out\build\qt-debug\tests\tinysplinecxx.dll skipped, up to date
+H:/YangCai_Code/YangCai_qt-sontech20260901/out/build/qt-debug/tests\tinysplinecxx.dll: message: deploying dependencies
