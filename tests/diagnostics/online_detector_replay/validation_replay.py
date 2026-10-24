@@ -10,6 +10,7 @@ import subprocess
 import sys
 
 from evidence_session import finite_point, matching_exposure
+from evidence_qualification import independent_image_geometry, independent_spatial_geometry
 
 HERE=pathlib.Path(__file__).resolve().parent
 ROOT=HERE.parents[2]
@@ -60,21 +61,9 @@ class ValidationReplaySession:
                    and (last_frame is None or frame>last_frame))
             if isinstance(frame,int) and not isinstance(frame,bool):
                 last_frame=max(frame,last_frame if last_frame is not None else frame)
-            image=(fresh and matching_exposure(raw.get('frame_id'),frame) and raw.get('image_observation_accepted') is True
-                   and raw.get('image_source')=='geometry' and finite_point(raw.get('accepted_image_pixel')))
+            image=independent_image_geometry(row,fresh)
             point=row.get('positioner_tcp_mm')
-            provenance=context.get('spatial_provenance') or {}
-            spatial=(image and row.get('available') is True and raw.get('available') is True
-                     and row.get('mode')=='measured' and row.get('source')=='geometry'
-                     and row.get('trust')=='independent_geometry' and raw.get('trust')=='independent_geometry'
-                     and row.get('fresh_exposure') is True and row.get('anchor_refreshed') is True
-                     and row.get('can_independent_validate') is True
-                     and isinstance(row.get('anchor'),dict) and row['anchor'].get('frame_id')==frame
-                     and finite_point(point,3) and finite_point(raw.get('positioner_tcp_mm'),3)
-                     and math.dist(point,raw['positioner_tcp_mm'])<=1e-9
-                     and context.get('coordinate_frame')=='PositionerTcp'
-                     and provenance.get('kind')=='synthetic_fixture'
-                     and frame in provenance.get('frame_ids',[]))
+            spatial=independent_spatial_geometry(row,context,fresh)
             target=context.get('candidate_point_by_frame',{}).get(str(frame))
             residual=math.dist(point,target) if spatial and finite_point(target,3) else None
             used=residual is not None

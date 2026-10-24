@@ -11,6 +11,7 @@ import sys
 import tempfile
 
 from evidence_session import finite_point
+from evidence_qualification import independent_spatial_geometry
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
@@ -96,12 +97,7 @@ class ControlReplaySession:
             if isinstance(frame,int) and not isinstance(frame,bool):
                 last_id = max(frame,last_id if last_id is not None else frame)
             point = row.get('positioner_tcp_mm')
-            qualified = (fresh and frame in provenance['frame_ids'] and row.get('available') is True and row.get('mode')=='measured'
-                         and row.get('source')=='geometry' and row.get('trust')=='independent_geometry'
-                         and row.get('can_independent_validate') is True and row.get('fresh_exposure') is True
-                         and row.get('anchor_refreshed') is True
-                         and isinstance(row.get('anchor'),dict) and row['anchor'].get('frame_id')==frame
-                         and finite_point(point,3))
+            qualified = independent_spatial_geometry(row,context,fresh)
             diagnostic = dict(frame_id=frame, accepted=False, reason='not qualified independent fresh measurement')
             if qualified:
                 result['raw_measured_positioner_tcp_mm'].append(list(point))
