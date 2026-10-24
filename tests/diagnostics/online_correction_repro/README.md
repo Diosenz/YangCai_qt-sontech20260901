@@ -5,8 +5,9 @@
 
 ## 运行
 
-当前脚本使用 macOS 上已安装的 clang++、pkg-config、OpenCV 4、Qt6Core 和 Eigen。
-不安装依赖、不修改共享 CMake preset、不调用 MSVC/Ninja、不访问设备。
+Windows 原生程序及环境变量见 [Windows 说明](../online_detector_replay/WINDOWS_README.md)。
+未显式选择原生程序时，仅 macOS 可使用已安装的 clang++、pkg-config、OpenCV 4、Qt6Core 和 Eigen辅助编译。
+Windows 在 VS 中预先构建；回放脚本不调用 MSVC/Ninja、不访问设备。
 Windows 生产构建、测试与运行仍应通过 VS2022 完成。
 
 从仓库根目录运行：

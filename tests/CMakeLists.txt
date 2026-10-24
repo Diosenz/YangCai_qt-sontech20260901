@@ -1222,3 +1222,7 @@ target_link_libraries(i2r_rlc_robotsim_probe
     PRIVATE
         i2r_rlc_digital_twin
 )
+
+if(I2R_RLC_ENABLE_KCF_DIAGNOSTICS)
+    add_subdirectory(diagnostics)
+endif()

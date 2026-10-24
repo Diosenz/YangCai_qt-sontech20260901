@@ -1,4 +1,4 @@
-"""Pinned production-source replay on macOS; no MSVC/Ninja or device commands."""
+"""Pinned production-source replay; prebuilt native programs or auxiliary macOS compiler."""
 import argparse
 import hashlib
 import json
@@ -7,6 +7,9 @@ import shlex
 import subprocess
 import sys
 import time
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "online_detector_replay"))
+from native_runtime import configured_native
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 REVISION = "430aaa204fd5319dd7f697d3de2b4e1faddbb06f"
@@ -50,8 +53,6 @@ def main():
     parser.add_argument("--half-height", type=int)
     parser.add_argument("--hint-dy", type=float, default=0.0)
     args = parser.parse_args()
-    if sys.platform != "darwin":
-        parser.error("this auxiliary replay uses macOS clang; use VS2022 for production validation")
     OUT.mkdir(parents=True, exist_ok=True)
     hashes = {}
     for source in SOURCES:
@@ -60,19 +61,25 @@ def main():
     y += args.hint_dy
     fixture, hashes[image_path] = materialize(image_path)
     harness = pathlib.Path(__file__).with_name("RefinerReplay.cpp")
-    version = subprocess.check_output(["pkg-config", "--modversion", "opencv4"], text=True).strip()
-    # Only link the exercised modules; the local optional viz/sfm installation is incomplete.
-    flags = shlex.split(subprocess.check_output(["pkg-config", "--cflags", "--libs-only-L", "opencv4"], text=True))
-    flags += ["-lopencv_imgcodecs", "-lopencv_imgproc", "-lopencv_core"]
-    key = hashlib.sha256(harness.read_bytes() + json.dumps(hashes, sort_keys=True).encode()
-                         + version.encode() + repr(flags).encode()).hexdigest()[:16]
-    binary = OUT / f"RefinerReplay-{key}"
-    command = ["clang++", "-std=c++17", "-O2", "-I", str(OUT / "snapshot/Vision/include"),
-               str(harness), str(OUT / "snapshot/Vision/src/feature/OnlineSeamRefiner.cpp"),
-               str(OUT / "snapshot/Vision/src/stripe/SubpixelCenterlineTools.cpp"),
-               "-o", str(binary), *flags]
-    if not binary.exists():
-        subprocess.run(command, cwd=ROOT, check=True)
+    native = configured_native("RefinerReplay", {relative: hashlib.sha256(
+        (OUT / "snapshot" / relative).read_bytes().replace(b"\r\n", b"\n")).hexdigest() for relative in SOURCES})
+    if native:
+        binary, provenance = native
+        version = json.dumps(provenance["dependency_versions"])
+    else:
+        version = subprocess.check_output(["pkg-config", "--modversion", "opencv4"], text=True,encoding="utf-8").strip()
+        # Only link the exercised modules; the local optional viz/sfm installation is incomplete.
+        flags = shlex.split(subprocess.check_output(["pkg-config", "--cflags", "--libs-only-L", "opencv4"], text=True,encoding="utf-8"))
+        flags += ["-lopencv_imgcodecs", "-lopencv_imgproc", "-lopencv_core"]
+        key = hashlib.sha256(harness.read_bytes() + json.dumps(hashes, sort_keys=True).encode()
+                             + version.encode() + repr(flags).encode()).hexdigest()[:16]
+        binary = OUT / f"RefinerReplay-{key}"
+        command = ["clang++", "-std=c++17", "-O2", "-I", str(OUT / "snapshot/Vision/include"),
+                   str(harness), str(OUT / "snapshot/Vision/src/feature/OnlineSeamRefiner.cpp"),
+                   str(OUT / "snapshot/Vision/src/stripe/SubpixelCenterlineTools.cpp"),
+                   "-o", str(binary), *flags]
+        if not binary.exists():
+            subprocess.run(command, cwd=ROOT, check=True)
     started = time.perf_counter()
     run_command = [str(binary), str(fixture), str(x), str(y)]
     if args.minimized:
@@ -82,7 +89,7 @@ def main():
     if args.half_height is not None:
         run_command += ["--half-height", str(args.half_height)]
     result = subprocess.run(run_command,
-                            cwd=ROOT, capture_output=True, text=True)
+                            cwd=ROOT, capture_output=True, text=True,encoding="utf-8")
     elapsed = time.perf_counter() - started
     print(f"revision={REVISION} OpenCV={version} case={args.case}")
     print(result.stdout, end="")

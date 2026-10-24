@@ -12,12 +12,16 @@ import tempfile
 
 from evidence_session import finite_point
 from evidence_qualification import independent_spatial_geometry
+from native_runtime import configured_native
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 
 
 def build(cache):
+    native = configured_native('ControlReplay')
+    if native:
+        return native[0], native[1]['source_sha256']
     if sys.platform != 'darwin':
         raise RuntimeError('Auxiliary clang runner requires macOS; production uses VS2022')
     sources = [HERE/'ControlReplay.cpp', ROOT/'Control/src/OnlineCorrectionPathFollower.cpp',
@@ -28,7 +32,7 @@ def build(cache):
                 ['icp','icpPointToPoint','icpPointToPlane','kdtree','matrix']]
     includes = [ROOT/(p+'/include') for p in ['Control','Vision','RobotComm']] + [ROOT/'Vision/third_party']
     flags = shlex.split(subprocess.check_output(
-        ['pkg-config','--cflags','--libs','Qt6Core','eigen3'],text=True))
+        ['pkg-config','--cflags','--libs','Qt6Core','eigen3'],text=True,encoding="utf-8"))
     files = sources+[p for directory in includes for p in directory.rglob('*.h')]
     hashes = {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     key = hashlib.sha256(json.dumps([hashes,flags],sort_keys=True).encode()).hexdigest()[:16]
@@ -130,7 +134,7 @@ class ControlReplaySession:
             folder = pathlib.Path(tempfile.mkdtemp(prefix='kcf-control-snapshot-'))
             payload = folder/'input.json'
             payload.write_text(json.dumps({'released':result['released_positioner_tcp_mm'],'context':context,'raw_measured':result['raw_measured_positioner_tcp_mm']}),encoding='utf-8')
-            output = subprocess.check_output([str(binary),str(payload)],text=True)
+            output = subprocess.check_output([str(binary),str(payload)],text=True,encoding="utf-8")
             result.update(json.loads(output))
             baseline=result.get('actual_icp_baseline')
             if baseline:
@@ -151,8 +155,8 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError('output exists; preserve previous evidence')
-    rows = [json.loads(line) for line in args.evidence.read_text().splitlines() if line.strip()]
-    context = json.loads(args.context.read_text())
+    rows = [json.loads(line) for line in args.evidence.read_text(encoding="utf-8").splitlines() if line.strip()]
+    context = json.loads(args.context.read_text(encoding="utf-8"))
     result = ControlReplaySession().replay(rows,context)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

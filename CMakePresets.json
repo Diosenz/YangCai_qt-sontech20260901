@@ -46,7 +46,8 @@
         "I2R_RLC_ENABLE_CAMERA_BASLER": "OFF",
         "I2R_RLC_ENABLE_VENDOR_CAMERAS": "OFF",
         "I2R_RLC_ENABLE_ONNX_RUNTIME": "OFF",
-        "I2R_RLC_ENABLE_TESTS": "ON"
+        "I2R_RLC_ENABLE_TESTS": "ON",
+        "I2R_RLC_ENABLE_KCF_DIAGNOSTICS": "ON"
       }
     },
     {

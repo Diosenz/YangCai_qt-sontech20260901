@@ -11,6 +11,7 @@ import sys
 from control_replay import ControlReplaySession
 from evidence_session import finite_number, finite_point
 from validation_replay import ValidationReplaySession
+from native_runtime import runtime_provenance
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
@@ -199,12 +200,12 @@ def main():
     command=[sys.executable,str(HERE/'replay.py'),str(manifest),'--evidence','--cache',str(args.cache),'--output',str(args.output/'detector')]
     if args.policy_config:
         command+=['--policy-config',str(args.policy_config)]
-    run=subprocess.run(command,capture_output=True,text=True)
+    run=subprocess.run(command,capture_output=True,text=True,encoding="utf-8")
     (args.output/'detector-run.txt').write_text(run.stdout+run.stderr,encoding='utf-8')
     if run.returncode:
         raise RuntimeError('detector replay failed: '+run.stderr)
     evidence=jsonl(args.output/'detector/results.jsonl')
-    control_config=json.loads(args.control_config.read_text()) if args.control_config else None
+    control_config=json.loads(args.control_config.read_text(encoding="utf-8")) if args.control_config else None
     control=ControlReplaySession(control_config).replay(evidence,context)
     validation=ValidationReplaySession().replay(evidence,context)
     if len(evidence)!=len(inputs) or len(control['release_diagnostics'])!=len(inputs):
@@ -254,20 +255,20 @@ def main():
         if frame.get('image'):
             frame['image']='detector/'+frame['image']
     (args.output/'manifest.jsonl').write_text(''.join(json.dumps(v)+'\n' for v in portable),encoding='utf-8')
-    for name,value in [('context',context),('policy',json.loads(args.policy_config.read_text()) if args.policy_config else {}),
+    for name,value in [('context',context),('policy',json.loads(args.policy_config.read_text(encoding="utf-8")) if args.policy_config else {}),
                        ('control-config',control_config or {}),('evaluation',evaluation)]:
         save(args.output/(name+'.json'),value)
     (args.output/'tcp.jsonl').write_text(''.join(json.dumps(v)+'\n' for v in tcp),encoding='utf-8')
     sources=list(HERE.glob('*.py'))+list(HERE.glob('*.cpp'))
     save(args.output/'reproducibility.json',dict(
-        source_revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),baseline_revision=BASELINE,
+        source_revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True,encoding="utf-8").strip(),baseline_revision=BASELINE,
         source_hashes={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sources},
         original_manifest_sha256=hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
         files_sha256={str(p.relative_to(args.output)):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.output.rglob('*') if p.is_file()},
-        dependency_versions=json.loads((args.output/'detector/metadata.json').read_text())['dependency_versions'],
-        msvc_validated=False,parameters_field_validated=False,truth_enters_detector=False,
+        dependency_versions=json.loads((args.output/'detector/metadata.json').read_text(encoding="utf-8"))['dependency_versions'],
+        native_runtime=runtime_provenance(),msvc_validated=False,parameters_field_validated=False,truth_enters_detector=False,
         production_changed_paths=subprocess.check_output(['git','diff','--name-only',BASELINE,'--',
-            'Vision','Control','UI','Localization','DigitalTwin','RobotComm','Camera','IBVS'],cwd=ROOT,text=True).splitlines()))
+            'Vision','Control','UI','Localization','DigitalTwin','RobotComm','Camera','IBVS'],cwd=ROOT,text=True,encoding="utf-8").splitlines()))
     print(json.dumps(dict(output=str(args.output),summary=summary),ensure_ascii=False))
 
 

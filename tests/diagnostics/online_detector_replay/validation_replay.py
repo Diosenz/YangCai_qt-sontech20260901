@@ -19,7 +19,7 @@ ROOT=HERE.parents[2]
 def replay_archived_surface():
     """每次实际运行10466归档的生产surface evaluate/measure/compare/observe。"""
     script=HERE.parent/'online_correction_repro/surface_replay.py'
-    run=subprocess.run([sys.executable,str(script)],capture_output=True,text=True)
+    run=subprocess.run([sys.executable,str(script)],capture_output=True,text=True,encoding="utf-8")
     if run.returncode not in (0,1) or 'numerical_metrics_match_archive=1' not in run.stdout:
         raise RuntimeError('actual surface replay failed: '+run.stderr+run.stdout)
     posts=[]
@@ -99,9 +99,9 @@ def main():
     args=parser.parse_args()
     if args.output.exists():
         raise ValueError('output exists; preserve previous evidence')
-    rows=[json.loads(line) for line in args.evidence.read_text().splitlines() if line.strip()]
+    rows=[json.loads(line) for line in args.evidence.read_text(encoding="utf-8").splitlines() if line.strip()]
     result=ValidationReplaySession({'max_weld_residual_mm':args.max_weld_residual_mm}).replay(
-        rows,json.loads(args.context.read_text()))
+        rows,json.loads(args.context.read_text(encoding="utf-8")))
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({'weld':result['weld_validation'],'surface':result['surface_validation']['decision']}))

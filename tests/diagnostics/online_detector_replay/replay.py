@@ -10,6 +10,8 @@ import subprocess
 import sys
 import tempfile
 
+from native_runtime import configured_native, runtime_provenance
+
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 HERE = pathlib.Path(__file__).resolve().parent
 SOURCES = ['track/LegacyOnlineKcfDetector', 'track/KcfTracker', 'track/KcfFhog',
@@ -21,6 +23,10 @@ SOURCES = ['track/LegacyOnlineKcfDetector', 'track/KcfTracker', 'track/KcfFhog',
 
 
 def build(cache):
+    native = configured_native('DetectorReplay')
+    if native:
+        binary, provenance = native
+        return binary, provenance['source_sha256'], json.dumps(provenance['dependency_versions'])
     if sys.platform != 'darwin':
         raise RuntimeError('Auxiliary clang runner requires macOS; production validation uses VS2022')
     sources = [ROOT / 'Vision/src' / (name + '.cpp') for name in SOURCES]
@@ -28,13 +34,13 @@ def build(cache):
                 HERE / 'GapDisabledAdapter.cpp']
     includes = [ROOT / 'Vision/include', ROOT / 'Vision/third_party', ROOT / 'DigitalTwin/include']
     flags = shlex.split(subprocess.check_output(
-        ['pkg-config', '--cflags', '--libs-only-L', 'opencv4', 'Qt6Core', 'eigen3'], text=True))
-    flags += shlex.split(subprocess.check_output(['pkg-config', '--libs', 'Qt6Core'], text=True))
+        ['pkg-config', '--cflags', '--libs-only-L', 'opencv4', 'Qt6Core', 'eigen3'], text=True,encoding="utf-8"))
+    flags += shlex.split(subprocess.check_output(['pkg-config', '--libs', 'Qt6Core'], text=True,encoding="utf-8"))
     flags += ['-lopencv_imgcodecs', '-lopencv_imgproc', '-lopencv_core']
     files = sources + [path for directory in includes for path in directory.rglob('*.h')]
     hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
               for path in files}
-    versions = subprocess.check_output(['pkg-config', '--modversion', 'opencv4', 'Qt6Core', 'eigen3'], text=True)
+    versions = subprocess.check_output(['pkg-config', '--modversion', 'opencv4', 'Qt6Core', 'eigen3'], text=True,encoding="utf-8")
     key = hashlib.sha256(json.dumps([hashes, flags, versions], sort_keys=True).encode()).hexdigest()[:16]
     cache.mkdir(parents=True, exist_ok=True)
     binary = cache / ('DetectorReplay-' + key)
@@ -97,19 +103,20 @@ def main():
     if args.output.exists():
         raise RuntimeError('output exists; choose a new directory to preserve previous evidence')
     binary, hashes, versions = build(args.cache)
-    inputs = [json.loads(line) for line in args.manifest.read_text().splitlines() if line.strip()]
+    inputs = [json.loads(line) for line in args.manifest.read_text(encoding="utf-8").splitlines() if line.strip()]
     if args.policy_config and not args.evidence:
         raise ValueError('--policy-config requires --evidence')
     def detector(frames, path):
         path.write_text(''.join(json.dumps(frame)+'\n' for frame in frames),encoding='utf-8')
-        process=subprocess.run([str(binary),str(path)],text=True,capture_output=True)
+        process=subprocess.run([str(binary),str(path)],text=True,encoding="utf-8",capture_output=True)
         if process.returncode:
             raise RuntimeError(process.stderr)
         return [json.loads(line) for line in process.stdout.splitlines()]
     if args.evidence:
         from evidence_session import EvidenceSession
-        config = json.loads(args.policy_config.read_text()) if args.policy_config else None
+        config = json.loads(args.policy_config.read_text(encoding="utf-8")) if args.policy_config else None
         session = EvidenceSession(config)
+        args.cache.mkdir(parents=True, exist_ok=True)
         transaction_dir=pathlib.Path(tempfile.mkdtemp(prefix='evidence-transactions-',dir=args.cache))
         checkpoint=None
         rows=[]
@@ -141,7 +148,7 @@ def main():
                 checkpoint=current
             rows.append(row)
     else:
-        process=subprocess.run([str(binary),str(args.manifest.resolve())],text=True,capture_output=True)
+        process=subprocess.run([str(binary),str(args.manifest.resolve())],text=True,encoding="utf-8",capture_output=True)
         if process.returncode:
             raise RuntimeError(process.stderr)
         rows=[json.loads(line) for line in process.stdout.splitlines()]
@@ -157,18 +164,19 @@ def main():
             row['display_image'] = name
         portable_inputs.append(dict(original, image=row['display_image']))
     (args.output/'manifest.jsonl').write_text(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in portable_inputs), encoding='utf-8')
-    (args.output/'results.jsonl').write_text(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in rows))
+    (args.output/'results.jsonl').write_text(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in rows), encoding='utf-8')
     (args.output/'viewer.html').write_text(viewer(rows, args.output), encoding='utf-8')
     metadata = {'scope': 'real CLegacyOnlineKcfDetector::process image branch; PCL gap excluded; no runtime adapter or control',
-                'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+                'source_revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True,encoding="utf-8").strip(),
                 'source_hashes': hashes, 'dependency_versions': versions.splitlines(),
+                'native_runtime': runtime_provenance(),
                 'manifest_sha256': hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
                 'synthetic_or_real': [row.get('kind') for row in rows],
                 'missing_metadata': 'null; detector receives frame=-1/reference=0 defaults without claiming archive identity',
                 'baseline_revision': '430aaa204fd5319dd7f697d3de2b4e1faddbb06f',
                 'baseline_production_diff': subprocess.check_output(
                     ['git', 'diff', '--name-only', '430aaa204fd5319dd7f697d3de2b4e1faddbb06f', '--',
-                     'Vision', 'DigitalTwin/include'], cwd=ROOT, text=True).splitlines(),
+                     'Vision', 'DigitalTwin/include'], cwd=ROOT, text=True,encoding="utf-8").splitlines(),
                 'msvc_validated': False, 'evidence_policy_enabled': args.evidence,
                 'evidence_transport': 'per-exposure reliable-checkpoint rebuild' if args.evidence else 'single detector full manifest',
                 'policy_source_hashes': {name:hashlib.sha256((HERE/name).read_bytes()).hexdigest() for name in

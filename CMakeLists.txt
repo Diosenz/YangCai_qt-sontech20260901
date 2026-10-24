@@ -26,6 +26,7 @@ set(CMAKE_AUTORCC OFF)
 option(I2R_RLC_ENABLE_OPENCV "Enable OpenCV-based vision utilities" ON)
 option(I2R_RLC_ENABLE_ONNX_RUNTIME "Enable ONNX Runtime based IBVS YOLO detector" OFF)
 option(I2R_RLC_ENABLE_TESTS "Build i2r_rlc tests" ON)
+option(I2R_RLC_ENABLE_KCF_DIAGNOSTICS "Build offline KCF replay programs (no devices)" OFF)
 option(I2R_RLC_ENABLE_SHAPE_MATCHING_EXPERIMENT
     "Build isolated penzui HALCON shape/skeleton comparison experiment targets" OFF)
 
@@ -49,6 +50,10 @@ add_subdirectory(RobotComm)
 add_subdirectory(Control)
 add_subdirectory(IBVS)
 add_subdirectory(UI)
+
+if(I2R_RLC_ENABLE_KCF_DIAGNOSTICS AND NOT I2R_RLC_ENABLE_TESTS)
+    message(FATAL_ERROR "KCF diagnostics require I2R_RLC_ENABLE_TESTS=ON")
+endif()
 
 if(I2R_RLC_ENABLE_TESTS)
     enable_testing()

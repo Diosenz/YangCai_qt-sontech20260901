@@ -1,5 +1,8 @@
 # 在线检测器图像分支回放
 
+Windows 的可选 MSVC/CMake 构建与运行见 [WINDOWS_README.md](WINDOWS_README.md)。
+显式设置 `I2R_KCF_REPLAY_BIN_DIR` 后，全部入口只调用预编译程序，不自动编译。
+
 单入口组合验收（任务10）见 INTEGRATED_README.md；通过 make_integrated_demo.py 生成相连场景、分层报告及真实归档TCP关联缺口清单。
 
 此入口调用真实 `CLegacyOnlineKcfDetector::process`，一个会话内保留同一个检测器。

@@ -1,5 +1,7 @@
 # 单入口组合离线验收
 
+Windows / VS2022 构建、程序目录、运行库及回归操作见 [WINDOWS_README.md](WINDOWS_README.md)。
+
 任务10公开边界已由用户确认：图像manifest JSONL经组合CLI到报告；同一工件坐标、冻结路径版本和显式沿缝位置关联后续TCP。测试不假造生产接口或运动。
 
 运行demo：python3 tests/diagnostics/online_detector_replay/make_integrated_demo.py --output output/analysis/integrated_demo_new
@@ -8,7 +10,7 @@
 
 复现：python3 tests/diagnostics/online_detector_replay/integrated_replay.py manifest.jsonl --context context.json --tcp tcp.jsonl --evaluation evaluation.json --policy-config policy.json --control-config control-config.json --output output/analysis/integrated_repeat_new
 
-所有输出必须是新目录。--cache可复用macOS辅助缓存。无新增依赖、无CMake/MSVC构建、无生产修改。
+所有输出必须是新目录。--cache可复用macOS辅助缓存。回放过程不触发CMake/MSVC构建，不修改生产；Windows先在VS生成程序，见上方说明。
 
 ## 数据流
 

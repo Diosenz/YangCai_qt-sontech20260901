@@ -7,17 +7,22 @@ import shlex
 import subprocess
 import tempfile
 
+from native_runtime import configured_native
+
 HERE = pathlib.Path(__file__).resolve().parent
 _BINARY = None
 
 
 def _binary():
+    native = configured_native('IdentityEvidence')
+    if native:
+        return native[0]
     global _BINARY
     if _BINARY is None:
         source = HERE/'IdentityEvidence.cpp'
         flags = shlex.split(subprocess.check_output(
-            ['pkg-config','--cflags','--libs-only-L','opencv4','Qt6Core'],text=True))
-        flags += shlex.split(subprocess.check_output(['pkg-config','--libs','Qt6Core'],text=True))
+            ['pkg-config','--cflags','--libs-only-L','opencv4','Qt6Core'],text=True,encoding="utf-8"))
+        flags += shlex.split(subprocess.check_output(['pkg-config','--libs','Qt6Core'],text=True,encoding="utf-8"))
         flags += ['-lopencv_imgcodecs','-lopencv_imgproc','-lopencv_core']
         digest=hashlib.sha256(source.read_bytes()+json.dumps(flags).encode()).hexdigest()[:16]
         cache=pathlib.Path(tempfile.gettempdir())/'sontech-kcf-identity-build'
@@ -44,7 +49,7 @@ def inspect_identity(historical, raw, expected, config):
              'candidate_pixel':candidate, 'corridor_pixel':int(config['identity_corridor_pixel'])}
     if reference_motion_rejected:
         evidence['reasons'].append('reference_motion_exceeds_identity_corridor')
-    process=subprocess.run([str(_binary())],input=json.dumps(request),capture_output=True,text=True)
+    process=subprocess.run([str(_binary())],input=json.dumps(request),capture_output=True,text=True,encoding="utf-8")
     if process.returncode:
         evidence['reasons'].append('identity_pixels_unavailable')
         evidence['diagnostic']=process.stderr.strip()

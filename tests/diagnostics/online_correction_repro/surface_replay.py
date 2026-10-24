@@ -9,6 +9,7 @@ import sys
 import time
 
 from replay import materialize, OUT, ROOT, REVISION
+from native_runtime import configured_native
 
 
 def main():
@@ -16,8 +17,6 @@ def main():
     parser.add_argument("--coverage", type=float)
     parser.add_argument("--minimized", action="store_true")
     args = parser.parse_args()
-    if sys.platform != "darwin":
-        raise RuntimeError("macOS auxiliary harness; production validation belongs in VS2022")
     sources = ["Localization/include/LocalizationTypes.h",
                "Localization/include/LocalizationSurfaceValidation.h",
                "Localization/src/LocalizationSurfaceValidation.cpp",
@@ -28,17 +27,22 @@ def main():
     for relative in sources + [base, base + ".retained.json"]:
         _, hashes[relative] = materialize(relative)
     harness = pathlib.Path(__file__).with_name("SurfaceReplay.cpp")
-    flags = shlex.split(subprocess.check_output(["pkg-config", "--cflags", "--libs", "Qt6Core"], text=True))
-    eigen = subprocess.check_output(["pkg-config", "--cflags", "eigen3"], text=True)
-    flags += shlex.split(eigen)
-    key = hashlib.sha256(harness.read_bytes() + json.dumps(hashes, sort_keys=True).encode()
-                         + repr(flags).encode()).hexdigest()[:16]
-    binary = OUT / f"SurfaceReplay-{key}"
-    if not binary.exists():
-        subprocess.run(["clang++", "-std=c++17", "-O2", "-I", str(OUT / "snapshot/Localization/include"),
-                        "-I", str(OUT / "snapshot/UI/include"), str(harness),
-                        str(OUT / "snapshot/Localization/src/LocalizationSurfaceValidation.cpp"),
-                        "-o", str(binary), *flags], cwd=ROOT, check=True)
+    native = configured_native("SurfaceReplay", {relative: hashlib.sha256(
+        (OUT / "snapshot" / relative).read_bytes().replace(b"\r\n", b"\n")).hexdigest() for relative in sources})
+    if native:
+        binary, provenance = native
+    else:
+        flags = shlex.split(subprocess.check_output(["pkg-config", "--cflags", "--libs", "Qt6Core"], text=True,encoding="utf-8"))
+        eigen = subprocess.check_output(["pkg-config", "--cflags", "eigen3"], text=True,encoding="utf-8")
+        flags += shlex.split(eigen)
+        key = hashlib.sha256(harness.read_bytes() + json.dumps(hashes, sort_keys=True).encode()
+                             + repr(flags).encode()).hexdigest()[:16]
+        binary = OUT / f"SurfaceReplay-{key}"
+        if not binary.exists():
+            subprocess.run(["clang++", "-std=c++17", "-O2", "-I", str(OUT / "snapshot/Localization/include"),
+                            "-I", str(OUT / "snapshot/UI/include"), str(harness),
+                            str(OUT / "snapshot/Localization/src/LocalizationSurfaceValidation.cpp"),
+                            "-o", str(binary), *flags], cwd=ROOT, check=True)
     started = time.perf_counter()
     command = [str(binary), str(OUT / "snapshot" / base),
                str(OUT / "snapshot" / (base + ".retained.json"))]
@@ -47,7 +51,7 @@ def main():
     if args.minimized:
         command.append("minimized")
     result = subprocess.run(command,
-                            capture_output=True, text=True, cwd=ROOT)
+                            capture_output=True, text=True,encoding="utf-8", cwd=ROOT)
     elapsed = time.perf_counter() - started
     print(result.stdout, end="")
     print(result.stderr, file=sys.stderr, end="")

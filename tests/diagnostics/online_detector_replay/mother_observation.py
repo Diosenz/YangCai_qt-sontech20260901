@@ -7,6 +7,8 @@ import shlex
 import subprocess
 import sys
 
+from native_runtime import configured_native
+
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 
@@ -17,24 +19,27 @@ def observe(raw, proposal, history, options, candidate=None):
     if not encoded or proposal is None:
         return dict(support_rank=0, center_supported=False, learned_model={},
                     estimated_pixel=None, reasons=['image_or_proposal_unavailable'])
-    if sys.platform != 'darwin':
-        raise RuntimeError('auxiliary mother observer uses macOS clang; production validation is VS2022')
     source = HERE/'MotherObservation.cpp'
-    flags = shlex.split(subprocess.check_output(
-        ['pkg-config','--cflags','--libs-only-L','opencv4','Qt6Core'],text=True))
-    flags += shlex.split(subprocess.check_output(['pkg-config','--libs','Qt6Core'],text=True))
-    flags += ['-lopencv_core','-lopencv_imgproc','-lopencv_imgcodecs']
-    versions = subprocess.check_output(['pkg-config','--modversion','opencv4','Qt6Core'],text=True).splitlines()
     digest = hashlib.sha256(source.read_bytes()).hexdigest()
-    key = hashlib.sha256(json.dumps([digest,flags,versions]).encode()).hexdigest()[:16]
-    cache = ROOT/'output/analysis/mother_observation_build'
-    cache.mkdir(parents=True,exist_ok=True)
-    binary = cache/('MotherObservation-'+key)
-    if not binary.exists():
-        subprocess.run(['clang++','-std=c++17','-O1',str(source),*flags,'-o',str(binary)],check=True)
+    native = configured_native('MotherObservation')
+    if native:
+        binary, provenance = native
+        versions = [json.dumps(provenance['dependency_versions'])]
+    else:
+        flags = shlex.split(subprocess.check_output(
+            ['pkg-config','--cflags','--libs-only-L','opencv4','Qt6Core'],text=True,encoding="utf-8"))
+        flags += shlex.split(subprocess.check_output(['pkg-config','--libs','Qt6Core'],text=True,encoding="utf-8"))
+        flags += ['-lopencv_core','-lopencv_imgproc','-lopencv_imgcodecs']
+        versions = subprocess.check_output(['pkg-config','--modversion','opencv4','Qt6Core'],text=True,encoding="utf-8").splitlines()
+        key = hashlib.sha256(json.dumps([digest,flags,versions]).encode()).hexdigest()[:16]
+        cache = ROOT/'output/analysis/mother_observation_build'
+        cache.mkdir(parents=True,exist_ok=True)
+        binary = cache/('MotherObservation-'+key)
+        if not binary.exists():
+            subprocess.run(['clang++','-std=c++17','-O1',str(source),*flags,'-o',str(binary)],check=True)
     request = dict(image_png_base64=encoded,proposal=proposal,history=history or {},
                    options=options,candidate_pixel=candidate)
-    result = subprocess.run([str(binary)],input=json.dumps(request),text=True,capture_output=True)
+    result = subprocess.run([str(binary)],input=json.dumps(request),text=True,encoding="utf-8",capture_output=True)
     if result.returncode:
         raise RuntimeError(result.stderr)
     value = json.loads(result.stdout)
