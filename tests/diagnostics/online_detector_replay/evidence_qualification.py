@@ -18,6 +18,8 @@ def independent_spatial_geometry(row, context, fresh):
     point=row.get('positioner_tcp_mm')
     provenance=context.get('spatial_provenance') or {}
     return (independent_image_geometry(row,fresh) and row.get('available') is True
+            and row.get('kind')=='synthetic' and raw.get('kind')=='synthetic'
+            and raw.get('projection_kind')=='synthetic_identity_1mm_per_pixel'
             and raw.get('available') is True and row.get('mode')=='measured'
             and row.get('source')=='geometry' and row.get('trust')=='independent_geometry'
             and raw.get('trust')=='independent_geometry' and row.get('fresh_exposure') is True

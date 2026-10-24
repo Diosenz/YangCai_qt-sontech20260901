@@ -12,7 +12,8 @@ from validation_replay import ValidationReplaySession
 
 
 def measured(frame=1):
-    raw=dict(frame_id=frame,available=True, image_observation_accepted=True,
+    raw=dict(frame_id=frame,kind='synthetic',projection_kind='synthetic_identity_1mm_per_pixel',
+             available=True, image_observation_accepted=True,
              image_source='geometry', source='geometry',trust='independent_geometry',
              accepted_image_pixel=[361,260],positioner_tcp_mm=[1,0,0])
     return dict(raw,raw_detector=raw,mode='measured',fresh_exposure=True,

@@ -12,10 +12,11 @@ from control_replay import ControlReplaySession
 
 
 def measured(frame, point):
-    return dict(frame_id=frame, available=True, mode='measured', source='geometry',
+    return dict(frame_id=frame, kind='synthetic', available=True, mode='measured', source='geometry',
                 trust='independent_geometry', can_independent_validate=True,
                 fresh_exposure=True, anchor_refreshed=True, anchor={'frame_id':frame}, positioner_tcp_mm=point,
                 raw_detector={'positioner_tcp_mm':point,'frame_id':frame,'available':True,
+                    'kind':'synthetic','projection_kind':'synthetic_identity_1mm_per_pixel',
                     'image_observation_accepted':True,'image_source':'geometry','source':'geometry',
                     'trust':'independent_geometry','accepted_image_pixel':[360,260]})
 
