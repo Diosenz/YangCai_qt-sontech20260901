@@ -1,5 +1,7 @@
 # 在线检测器图像分支回放
 
+单入口组合验收（任务10）见 INTEGRATED_README.md；通过 make_integrated_demo.py 生成相连场景、分层报告及真实归档TCP关联缺口清单。
+
 此入口调用真实 `CLegacyOnlineKcfDetector::process`，一个会话内保留同一个检测器。
 使用原生产 KCF、身份匹配、原图几何搜索和图像到空间投影，不调用运动设备。
 它区别于 `online_correction_repro` 的单帧 refiner 回放，也区别于方案状态机原型。
