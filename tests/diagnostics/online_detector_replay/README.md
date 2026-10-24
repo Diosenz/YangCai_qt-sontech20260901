@@ -82,5 +82,61 @@ TCP 正在跟随检测点，不能把 TCP 自身当作独立检测真值。
 源结果完整保留在 `raw_detector`；`anchor`、`anchor_refreshed`、`can_independent_validate`
 和 `confirmation_count` 是离线契约结果。参数未现场标定，首次确认期间会不可用。
 
-此阶段尚未实现续接、恢复与模板回滚。生产检测器仍按原规则运行；
+任务04已加入下述受限续接；恢复身份验收与模板回滚尚未实现。生产检测器仍按原规则运行；
 业务后置拒绝不意味着撤销了原始KCF训练，不能声称任务06已实现。
+
+
+## 有限续接（任务04）
+
+仍使用 `--evidence`，两个预算必须在 `--policy-config` 中显式给出：
+`max_prediction_ms` 和 `max_prediction_travel_mm`，均为正数。
+默认 null **不启用预测**；例示数值只属于离线候选，不是现场公差。
+
+```sh
+python3 tests/diagnostics/online_detector_replay/test_evidence_session.py
+python3 tests/diagnostics/online_detector_replay/make_continuation_demo.py --output output/analysis/continuation_demo_run1
+```
+
+除已确认独立几何锚点外，预测每帧需要：
+
+- 严格新增曝光身份和严格递增的 `timestamp_ms`。失测年龄从最后可靠锚的原曝光计时；
+  重复/倒序/未知曝光不增加确认次数，不输出可用预测，也不刷新锚点。
+- `weld_progress_mm`：调用方给出的**当前曝光关联的工件沿缝弧长坐标**，单位 mm；
+  `progress_exposure_frame_id` 必须等于本帧有效整数 ID，布尔值不算 ID。
+- `progress_reference`：非空、稳定的计量参考 ID，必须标识工件坐标系、冻结焊缝路径及路径版本；
+  参考变化会锁定距离未知，直到新的独立几何建立新锚。
+- `progress_provenance`：非空来源声明，说明弧长从实际曝光姿态/外轴反馈及冻结工件路径如何得到，
+  或说明它是明确的外部计量/合成契约。调用者负责计量器的正确性与帧关联。
+  本任务**没有**实现从机器人反馈推导弧长的计量器。
+  不接受用 TCP 端点净位移、配置速度、帧数、CAD 像素变化或真值像素当行程的解释。
+- `reference_point_at_exposure`、`reference_exposure_frame_id` 和 `reference_revision`：
+  当前参考版本在当前曝光姿态下的几何参考像素。它不是独立焊点。
+  同版本只把相邻已知曝光的参考相对变化加入图像锚的预测。
+
+距离累计相邻有效工件弧长增量的**绝对值之和**，所以往返不会抵消；
+TCP 在机器人基座几乎不动而外轴转动时，应由上游工件相对计量提供非零行程。
+演示使用明示的调用方进度输入，不声称由附带的 S2 数值实际算出了行程。
+
+任一预算在 `>=` 时到限。缺时间/进度、时钟回退、路径参考变化会锁定相应计量失败，
+后续预测或相似度结果不能清零；新的确认独立几何可另建锚。
+`prediction_travel_known=false` 时累计数字只是缺口前后的已知部分，不能当完整行程。
+
+换参考版本时，必须额外提供：
+`previous_reference_revision`、`previous_reference_point_at_exposure` 和
+`previous_reference_exposure_frame_id`。这是**旧参考版本在当前曝光同姿态下重新求得的几何**。
+不能提供上一曝光的旧点冒充当前曝光旧点。
+只累计“旧版本当前曝光点－旧版本上次曝光点”，再把新版本当前点作为后续参考基准；
+绝不累计新旧绝对 CAD 位置差。没有这份同姿态桥接时，真实锚点保留，参考预测不可用。
+桥接也不重置年龄和行程。参考丢失时该帧不可预测；同版本后续重新出现时，
+可从保留的同版本参考继续计算相对变化，仍受原预算与计量缺口约束。
+
+输出 `source=bounded_prediction`、`trust=estimated_not_independent`、
+`prediction_elapsed_ms`、`prediction_travel_mm`、已知性、拒绝原因和参考映射诊断。
+预测超出图像范围也不可用。此实现只输出**像素预测**：
+`positioner_tcp_mm=null`、`space_available=false`、`control_eligible=false`，
+不使用固定像素毫米比例造空间点，不给 TCP 执行资格，也不能参与独立焊点校验。
+原始生产结果完整保留在 `raw_detector`，其内部训练仍未被撤回。
+
+演示另有预算内误差反例：真实检测锚之后，隐藏的合成接缝运动与参考相对运动不一致，
+预测仍在预算内但误差约12.36px。真值只进入独立评估器，未传给检测/策略。
+这证明预算合格只意味着有限续接条件满足，不能作为位置准确或可执行的证明。

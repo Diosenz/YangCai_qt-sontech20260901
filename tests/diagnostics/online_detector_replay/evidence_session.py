@@ -2,12 +2,43 @@
 import copy
 import math
 
-DEFAULT_CONFIG = {'anchor_confirmation_frames': 2}
+DEFAULT_CONFIG = {'anchor_confirmation_frames': 2, 'max_prediction_ms': None,
+                  'max_prediction_travel_mm': None}
 
 
 def finite_point(value, dimensions=2):
     return (isinstance(value, (list, tuple)) and len(value)==dimensions
             and all(isinstance(v,(int,float)) and not isinstance(v,bool) and math.isfinite(v) for v in value))
+
+
+def finite_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def matching_exposure(value, identity):
+    return (isinstance(value, int) and not isinstance(value, bool) and value >= 0
+            and isinstance(identity, int) and not isinstance(identity, bool) and value == identity)
+
+
+def progress_sample(frame):
+    value = frame.get('weld_progress_mm')
+    reference = frame.get('progress_reference')
+    provenance = frame.get('progress_provenance')
+    if (not finite_number(value) or not isinstance(reference, str) or not reference.strip()
+            or not isinstance(provenance, str) or not provenance.strip()
+            or not matching_exposure(frame.get('progress_exposure_frame_id'), frame.get('frame_id'))):
+        return None
+    return value, reference
+
+
+def reference_sample(frame):
+    revision = frame.get('reference_revision')
+    point = frame.get('reference_point_at_exposure')
+    if (not isinstance(revision, int) or isinstance(revision, bool) or revision < 0
+            or not finite_point(point)
+            or not matching_exposure(frame.get('reference_exposure_frame_id'), frame.get('frame_id'))):
+        return None
+    return revision, list(point)
 
 
 class EvidenceSession:
@@ -21,10 +52,124 @@ class EvidenceSession:
         count = self.config['anchor_confirmation_frames']
         if isinstance(count,bool) or not isinstance(count,int) or count<1:
             raise ValueError('anchor_confirmation_frames must be a positive candidate integer')
+        for key in ('max_prediction_ms', 'max_prediction_travel_mm'):
+            value = self.config[key]
+            if value is not None and (not finite_number(value) or value <= 0):
+                raise ValueError(key + ' must be a positive unvalidated candidate limit or null')
         self.anchor = None
         self.last_frame_id = None
         self.pending = 0
         self.context_key = None
+        self.travel = 0.0
+        self.last_progress = None
+        self.last_timestamp = None
+        self.budget_provenance_failures = []
+        self.reference_mapping = None
+
+    def _seed_continuation(self, frame):
+        """新独立几何才重置预算；参考映射与真实锚点分开保存。"""
+        self.travel = 0.0
+        self.last_progress = progress_sample(frame)
+        self.last_timestamp = frame.get('timestamp_ms')
+        self.budget_provenance_failures = []
+        if self.last_progress is None:
+            self.budget_provenance_failures.append('progress_provenance_unknown')
+        if not finite_number(self.last_timestamp):
+            self.budget_provenance_failures.append('time_provenance_unknown')
+        reference = reference_sample(frame)
+        self.reference_mapping = (dict(revision=reference[0], point=reference[1],
+                                       estimate=list(self.anchor['pixel']),
+                                       exposure=frame['frame_id']) if reference else None)
+
+    def _account_exposure(self, frame):
+        """沿固定工件路径累计绝对弧长差，反向行程也消耗预算。缺口锁定至新锚。"""
+        timestamp = frame.get('timestamp_ms')
+        if (not finite_number(timestamp) or not finite_number(self.last_timestamp)
+                or timestamp <= self.last_timestamp):
+            self.budget_provenance_failures.append('time_provenance_unknown_or_nonmonotonic')
+        self.last_timestamp = timestamp
+        progress = progress_sample(frame)
+        if progress is None or self.last_progress is None:
+            self.budget_provenance_failures.append('progress_provenance_unknown')
+        elif progress[1] != self.last_progress[1]:
+            self.budget_provenance_failures.append('progress_reference_changed')
+        else:
+            self.travel += abs(progress[0] - self.last_progress[0])
+        self.last_progress = progress
+
+    def _continue(self, frame, result, fresh):
+        failures = list(dict.fromkeys(self.budget_provenance_failures))
+        result.update(prediction_elapsed_ms=None, prediction_travel_mm=self.travel,
+                      prediction_failures=failures, reference_alignment='unavailable',
+                      control_eligible=False, space_available=False,
+                      prediction_travel_known=False, prediction_time_known=False)
+        if self.anchor is None:
+            failures.append('reliable_anchor_missing')
+            return
+        if not fresh:
+            failures.append('exposure_not_fresh')
+        timestamp = frame.get('timestamp_ms')
+        anchored_time = self.anchor.get('timestamp_ms')
+        if finite_number(timestamp) and finite_number(anchored_time):
+            elapsed = timestamp - anchored_time
+            result['prediction_elapsed_ms'] = elapsed
+            if elapsed < 0:
+                failures.append('time_provenance_unknown_or_nonmonotonic')
+        else:
+            elapsed = None
+            failures.append('time_provenance_unknown')
+        for key in ('max_prediction_ms', 'max_prediction_travel_mm'):
+            if self.config[key] is None:
+                failures.append(key + '_unconfigured')
+        if elapsed is not None and self.config['max_prediction_ms'] is not None:
+            if elapsed >= self.config['max_prediction_ms']:
+                failures.append('time_budget_exhausted')
+        if self.config['max_prediction_travel_mm'] is not None:
+            if self.travel >= self.config['max_prediction_travel_mm']:
+                failures.append('travel_budget_exhausted')
+        reference = reference_sample(frame)
+        if reference is None or self.reference_mapping is None:
+            failures.append('reference_geometry_unavailable')
+        elif reference[0] != self.reference_mapping['revision']:
+            mapping = self.reference_mapping
+            bridge = frame.get('previous_reference_point_at_exposure')
+            if (not isinstance(frame.get('previous_reference_revision'), int)
+                    or isinstance(frame.get('previous_reference_revision'), bool)
+                    or frame.get('previous_reference_revision') != mapping['revision']
+                    or not matching_exposure(frame.get('previous_reference_exposure_frame_id'), frame.get('frame_id'))
+                    or not finite_point(bridge)):
+                failures.append('reference_revision_unaligned')
+            elif fresh:
+                # Only OLD revision motion at the CURRENT exposure is added.
+                # New-minus-old absolute CAD placement is never a motion estimate.
+                mapping['estimate'] = [estimate + current - previous for estimate, current, previous
+                                       in zip(mapping['estimate'], bridge, mapping['point'])]
+                mapping.update(revision=reference[0], point=reference[1], exposure=frame['frame_id'])
+                result['reference_alignment'] = 'same_exposure_bridge'
+        else:
+            mapping = self.reference_mapping
+            result['reference_alignment'] = 'same_revision_relative_motion'
+            if fresh:
+                mapping['estimate'] = [estimate + current - previous for estimate, current, previous
+                                       in zip(mapping['estimate'], reference[1], mapping['point'])]
+                mapping['point'] = reference[1]
+                mapping['exposure'] = frame['frame_id']
+        if self.reference_mapping is not None:
+            predicted = self.reference_mapping['estimate']
+            size = self.context_key[1] if self.context_key is not None else ()
+            if (not finite_point(predicted) or len(size) != 2
+                    or not 0 <= predicted[0] < size[0] or not 0 <= predicted[1] < size[1]):
+                failures.append('prediction_outside_image')
+        result['prediction_travel_known'] = not any('progress_' in reason for reason in failures)
+        result['prediction_time_known'] = not any('time_provenance' in reason for reason in failures)
+        result['reference_mapping'] = copy.deepcopy(self.reference_mapping)
+        if failures:
+            result['message'] = 'bounded continuation unavailable: ' + ', '.join(dict.fromkeys(failures))
+            return
+        result.update(available=True, final_pixel=list(self.reference_mapping['estimate']),
+                      source='bounded_prediction', trust='estimated_not_independent',
+                      mode='predicted', availability_scope='pixel_only_prediction',
+                      message='bounded relative-reference prediction; not a measured weld point; no spatial/control qualification')
 
     def process(self, frame, raw):
         """输入当前曝光与真实process记录，返回最终业务结果及不变原始证据。"""
@@ -46,6 +191,8 @@ class EvidenceSession:
                  and (self.last_frame_id is None or identity>self.last_frame_id))
         if isinstance(identity,int) and not isinstance(identity,bool) and identity>=0:
             self.last_frame_id = max(identity,self.last_frame_id if self.last_frame_id is not None else identity)
+        if self.anchor is not None and fresh:
+            self._account_exposure(frame)
         geometry = (raw.get('available') is True and raw.get('image_observation_accepted') is True
                     and raw.get('trust')=='independent_geometry' and raw.get('image_source')=='geometry'
                     and finite_point(raw.get('final_pixel')) and finite_point(raw.get('positioner_tcp_mm'),3))
@@ -55,7 +202,11 @@ class EvidenceSession:
                 self.anchor = dict(frame_id=identity, pixel=list(raw['final_pixel']),
                                    positioner_tcp_mm=list(raw['positioner_tcp_mm']),
                                    timestamp_ms=frame.get('timestamp_ms'),
-                                   reference_revision=frame.get('reference_revision'))
+                                   reference_revision=frame.get('reference_revision'),
+                                   weld_progress_mm=frame.get('weld_progress_mm'),
+                                   progress_reference=frame.get('progress_reference'),
+                                   progress_provenance=frame.get('progress_provenance'))
+                self._seed_continuation(frame)
                 result.update(available=True, final_pixel=list(raw['final_pixel']),
                               positioner_tcp_mm=list(raw['positioner_tcp_mm']),
                               source='geometry',trust='independent_geometry', mode='measured',
@@ -67,6 +218,19 @@ class EvidenceSession:
             self.pending = 0
             result['message']=('duplicate, out-of-order or unknown exposure; cannot refresh anchor'
                                if not fresh else 'no accepted geometry or valid projection; not a reliable measurement')
+        if not result['anchor_refreshed']:
+            self._continue(frame, result, fresh)
+        else:
+            result.update(prediction_elapsed_ms=0, prediction_travel_mm=0,
+                          prediction_failures=[], reference_alignment='anchored',
+                          space_available=True, control_eligible=False,
+                          prediction_travel_known=progress_sample(frame) is not None,
+                          prediction_time_known=finite_number(frame.get('timestamp_ms')))
+        result['continuation_inputs'] = {key: copy.deepcopy(frame.get(key)) for key in (
+            'timestamp_ms', 'weld_progress_mm', 'progress_reference', 'progress_provenance',
+            'progress_exposure_frame_id', 'reference_revision', 'reference_point_at_exposure',
+            'reference_exposure_frame_id', 'previous_reference_revision',
+            'previous_reference_point_at_exposure', 'previous_reference_exposure_frame_id')}
         result['anchor'] = copy.deepcopy(self.anchor)
         result['confirmation_count'] = self.pending
         result['fresh_exposure'] = fresh
