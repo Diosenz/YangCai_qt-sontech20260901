@@ -112,5 +112,22 @@ class ControlReplayTests(unittest.TestCase):
         self.assertFalse(result['follow']['valid'])
         self.assertEqual(len(result['released_positioner_tcp_mm']),1)
 
+    def test_actual_icp_model_replacement_is_compared_to_measured_release(self):
+        rows=[measured(i+1,[float(i),2+.03*i*i+(.35 if i%2 else -.25),.02*i*i])
+              for i in range(16)]
+        ctx=context()
+        ctx['spatial_provenance']['frame_ids']=list(range(1,17))
+        ctx['model_positioner_tcp_mm']=[[float(i),2+.03*i*i,.02*i*i] for i in range(16)]
+        result=ControlReplaySession({'max_reference_chord_deviation_mm':10}).replay(rows,ctx)
+        baseline=result['actual_icp_baseline']
+        self.assertTrue(baseline['icp_attempted'])
+        self.assertTrue(baseline['icp_applied'])
+        self.assertEqual(result['released_positioner_tcp_mm'],[row['positioner_tcp_mm'] for row in rows])
+        self.assertNotEqual(baseline['released_positioner_tcp_mm'],result['released_positioner_tcp_mm'])
+        self.assertTrue(baseline['follow']['valid'])
+        self.assertTrue(result['follow']['valid'])
+        self.assertGreater(baseline['max_raw_to_released_polyline_distance_mm'],.01)
+        self.assertFalse(baseline['distance_is_true_seam_error'])
+
 if __name__=='__main__':
     unittest.main()

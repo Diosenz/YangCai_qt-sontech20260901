@@ -20,8 +20,12 @@ def build(cache):
     if sys.platform != 'darwin':
         raise RuntimeError('Auxiliary clang runner requires macOS; production uses VS2022')
     sources = [HERE/'ControlReplay.cpp', ROOT/'Control/src/OnlineCorrectionPathFollower.cpp',
-               ROOT/'Vision/src/geometry/PositionerKinematics.cpp']
-    includes = [ROOT/(p+'/include') for p in ['Control','Vision','RobotComm']]
+               ROOT/'Vision/src/geometry/PositionerKinematics.cpp',
+               ROOT/'Control/src/OnlineCorrectionExceptionProcessor.cpp',
+               ROOT/'Vision/src/geometry/IcpRegistrationMatcher.cpp']
+    sources += [ROOT/'Vision/third_party/libicp'/(name+'.cpp') for name in
+                ['icp','icpPointToPoint','icpPointToPlane','kdtree','matrix']]
+    includes = [ROOT/(p+'/include') for p in ['Control','Vision','RobotComm']] + [ROOT/'Vision/third_party']
     flags = shlex.split(subprocess.check_output(
         ['pkg-config','--cflags','--libs','Qt6Core','eigen3'],text=True))
     files = sources+[p for directory in includes for p in directory.rglob('*.h')]
@@ -80,7 +84,7 @@ class ControlReplaySession:
                       real_exposure_control_enabled=False,
                       policy_sha256=hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),
                       policy_parameters_field_validated=False, config=dict(self.config),
-                      model_counterfactual_kind='supplied model line; ICP not executed',
+                      model_counterfactual_kind='supplied model line only; original processor executes separately in actual_icp_baseline',
                       reference_selection='first and last accepted point; local straight-segment snapshot',
                       follow={'valid':False,'message':'fewer than two qualified measurements'})
         if proposals is not None and len(proposals)!=len(evidence):
@@ -129,9 +133,16 @@ class ControlReplaySession:
             binary,hashes = build(self.cache)
             folder = pathlib.Path(tempfile.mkdtemp(prefix='kcf-control-snapshot-'))
             payload = folder/'input.json'
-            payload.write_text(json.dumps({'released':result['released_positioner_tcp_mm'],'context':context}),encoding='utf-8')
+            payload.write_text(json.dumps({'released':result['released_positioner_tcp_mm'],'context':context,'raw_measured':result['raw_measured_positioner_tcp_mm']}),encoding='utf-8')
             output = subprocess.check_output([str(binary),str(payload)],text=True)
             result.update(json.loads(output))
+            baseline=result.get('actual_icp_baseline')
+            if baseline:
+                distances=[nearest_polyline_distance(p,baseline['released_positioner_tcp_mm'])
+                           for p in result['raw_measured_positioner_tcp_mm']]
+                distances=[v for v in distances if v is not None]
+                baseline['max_raw_to_released_polyline_distance_mm']=max(distances) if distances else None
+                baseline['distance_is_true_seam_error']=False
             result['source_hashes'] = hashes
         return result
 
