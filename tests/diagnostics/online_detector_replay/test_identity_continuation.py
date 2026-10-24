@@ -106,6 +106,39 @@ class IdentityContinuationTests(unittest.TestCase):
                          'two different corners are not confirmation of one target')
         self.assertIsNone(rows[1]['anchor'])
 
+    def test_reference_bridge_and_later_new_revision_cannot_bypass_identity_corridor(self):
+        images={'anchor':[(360,260,150)],'blank-bridge':[],'blank-after':[]}
+        def context(index,name):
+            if name=='blank-bridge':
+                return dict(reference_revision=2,reference_point_at_exposure=[600,500],
+                    previous_reference_revision=1,previous_reference_point_at_exposure=[510,330],
+                    previous_reference_exposure_frame_id=index+1)
+            if name=='blank-after':
+                return dict(reference_revision=2,reference_point_at_exposure=[601,500])
+            return {}
+        rows=self.run_sequence(images,extra=context)
+        self.assertFalse(rows[2]['available'])
+        self.assertIn('reference_identity_conflict',rows[2]['prediction_failures'])
+        self.assertFalse(rows[3]['available'])
+        self.assertEqual(rows[3]['anchor']['frame_id'],2)
+        self.assertEqual(rows[3]['prediction_elapsed_ms'],200)
+        self.assertAlmostEqual(rows[3]['prediction_travel_mm'],.2)
+        def valid_then_large(index,name):
+            if name=='blank-bridge':
+                return dict(reference_revision=2,reference_point_at_exposure=[600,500],
+                    previous_reference_revision=1,previous_reference_point_at_exposure=[361,260],
+                    previous_reference_exposure_frame_id=index+1)
+            if name=='blank-after':
+                return dict(reference_revision=2,reference_point_at_exposure=[750,570])
+            return {}
+        rows=self.run_sequence(images,extra=valid_then_large)
+        self.assertTrue(rows[2]['available'])
+        self.assertLess(abs(rows[2]['final_pixel'][0]-361),2)
+        self.assertEqual(rows[2]['reference_alignment'],'same_exposure_bridge')
+        self.assertFalse(rows[3]['available'])
+        self.assertIn('reference_identity_conflict',rows[3]['prediction_failures'])
+        self.assertEqual(rows[3]['anchor']['frame_id'],2)
+
 
     def test_normal_target_motion_keeps_geometry_and_truth_labels_cannot_change_decisions(self):
         images={'anchor':[(360,260,150)],'motion-1':[(362,261,150)],'motion-2':[(364,262,150)]}

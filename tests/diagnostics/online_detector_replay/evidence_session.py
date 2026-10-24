@@ -220,7 +220,21 @@ class EvidenceSession:
         expected=list(self.identity_history['pixel'])
         previous=self.identity_history.get('reference')
         current=reference_sample(frame)
-        if previous and current and previous[0]==current[0]:
+        mapping=self.reference_mapping
+        # 已接受的参考映射保存跨版本关系；桥接只加入旧版本在当前曝光的相对运动。
+        # 仍以最近可靠原图身份为走廊中心，新CAD绝对偏置不能授权目标瞬移。
+        if mapping is not None and current is not None:
+            motion_point=None
+            if current[0]==mapping['revision']:
+                motion_point=current[1]
+            elif (frame.get('previous_reference_revision')==mapping['revision']
+                  and not isinstance(frame.get('previous_reference_revision'),bool)
+                  and matching_exposure(frame.get('previous_reference_exposure_frame_id'),frame.get('frame_id'))
+                  and finite_point(frame.get('previous_reference_point_at_exposure'))):
+                motion_point=frame['previous_reference_point_at_exposure']
+            if motion_point is not None:
+                expected=[p+c-h for p,c,h in zip(mapping['estimate'],motion_point,mapping['point'])]
+        elif previous and current and previous[0]==current[0]:
             expected=[p+c-h for p,c,h in zip(expected,current[1],previous[1])]
         evidence=inspect_identity(self.identity_history,raw,expected,self.config)
         if seed_failed:
