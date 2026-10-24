@@ -1,0 +1,43 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>KCF 点证据与精度｜离线原型</title>
+<style>
+body{font:15px/1.6 system-ui;margin:24px auto;max-width:1250px;padding:0 18px;color:#22313d;background:#f6f8fa}h1{font-size:26px}button,select,input{font:inherit;padding:6px;margin:4px;border:1px solid #ccd5dd;border-radius:5px}button{background:white;cursor:pointer}.card{background:white;border:1px solid #dde3e8;padding:18px;margin:14px 0;border-radius:8px}.row{display:grid;grid-template-columns:1fr 1fr;gap:20px}canvas{width:100%;background:#111}dt{color:#657381}dd{margin:0 0 8px}code{white-space:pre-wrap;word-break:break-all} .note{color:#805d15} svg{width:100%;height:155px} .tag{color:#066c9a} @media(max-width:800px){.row{grid-template-columns:1fr}}
+</style>
+<h1>KCF 点证据与精度｜独立离线原型</h1>
+<p>要验证的问题：遇到预焊凸起、反光和失测时，能否保持同一母材焊缝目标，明确每个点的依据，并在证据不足时停止输出？</p>
+<p class="note">这是可交互的方案演示，未接入线上。合成图像有已知像素真值；真实归档没有焊缝真值。所有阈值未现场标定。像素误差不能换算成实际 TCP 精度。</p>
+<div class="card"><label>场景 <select id="scenarios"></select></label><p id="description"></p>
+<button id="reset">从头回放</button><button id="prev">上一帧</button><button id="next">下一帧</button><button id="duplicate">重复当前曝光</button>
+<input id="frame" type="range" min="0" value="0"><span id="position"></span><br>
+<label>预测时间上限（秒）<input id="seconds" type="number" value="0.9" min="0.1" step="0.1"></label>
+<label>沿缝行程上限（合成 mm）<input id="distance" type="number" value="2" min="0.1" step="0.1"></label>
+<p class="note">可调值仅用于观察边界。合成进度设为每帧 0.2 mm、0.1 s；未使用真实 TCP 净位移估算焊缝进度。</p></div>
+<div class="row"><div class="card"><canvas id="image" width="340" height="220"></canvas>
+<p>青色十字：真值　橙圈：原图候选　绿色十字：最终 KCF 点　粉色十字：生产单帧精定位　灰线：母材拟合。遮挡时青色真值不可见于原图。</p></div>
+<div class="card"><h2 id="mode"></h2><p id="reason"></p><dl id="state"></dl></div></div>
+<div class="card"><b>最终 KCF 点的像素误差（仅合成真值）</b><svg id="chart" viewBox="0 0 1000 150"></svg><p>空缺表示不可用，不能通过删去失效帧声称全程准确。恢复过渡也可能存在误差；平滑不会自动提高准确性。</p></div>
+<div class="card"><b>真实单帧：固定版本生产精定位回放</b><p>这里展示现有生产精定位结果；未将合成专用的固定搜索带提取器应用到真实图像。没有连续预焊序列，不能据此宣称预焊问题已解决。</p>
+<select id="realSelect"></select><div class="row"><canvas id="realImage"></canvas><div><code id="realResult"></code></div></div></div>
+<div class="card"><b>TCP 精度必须逐层追踪</b><p>原始像素 → 曝光时标定投影 → 工件坐标 KCF 点 → 释放控制参考 → TCP 经过该沿缝位置。当前控制轨迹 ICP 可能以变换示教点替换视觉点；本原型没有运行该控制链。</p>
+<p>这些控制层在本页均为<b>未回放</b>，不是零误差。现场验收须分别检查投影误差、控制参考改变量与 TCP 跟踪误差；TCP 轨迹不能充当真实焊缝。</p></div>
+<script>
+/* CORE */
+/* INPUTS */
+const el=id=>document.getElementById(id);let index=0,selected=0,rows=[],current=initial();
+DATA.sequences.forEach((s,i)=>el('scenarios').add(new Option(s.name,i)));
+DATA.real.forEach((s,i)=>el('realSelect').add(new Option(s.name==='field'?'反光现场帧 10653':'几何对照帧 14591',i)));
+function config(){return {...CONFIG,maxSeconds:Number(el('seconds').value),maxDistance:Number(el('distance').value)}}
+function marker(ctx,p,color,r=5){if(!p)return;ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(p[0]-r,p[1]);ctx.lineTo(p[0]+r,p[1]);ctx.moveTo(p[0],p[1]-r);ctx.lineTo(p[0],p[1]+r);ctx.stroke()}
+function render(){const seq=DATA.sequences[selected],f=seq.frames[index];rows=replay(seq,config());current=initial();for(let n=0;n<=index;n++)current=advance(current,seq.frames[n],config());
+el('frame').max=seq.frames.length-1;el('frame').value=index;el('position').textContent=`${index+1}/${seq.frames.length} 帧`;
+el('description').textContent=seq.description;el('mode').textContent=current.mode;el('reason').textContent=current.reason;
+const p=v=>v?v.map(x=>x.toFixed(2)).join(', '):'无';const b=current.budget;
+const values={'数据性质':'合成原图，已知像素真值','曝光时间 / 沿缝进度':`${f.t.toFixed(1)} s / ${f.s.toFixed(1)} mm（合成）`,'原始几何测量':p(f.geometry),'最终 KCF 点':p(current.output),'对真值像素误差':current.output?norm(current.output,f.truth).toFixed(3)+' px':'不可用','可靠锚曝光 ID':current.anchor?.id??'无','预算消耗':b?`${b.seconds.toFixed(1)} s / ${b.distance.toFixed(1)} mm`:'未建立','恢复连续新帧':`${current.streak}（确认候选值 ${CONFIG.confirmation}）`,'参考版本':f.revision,'独立焊点校验资格':current.mode==='几何实测'?'有（仅本合成几何规则）':'无','实际 TCP / 控制参考':'未运行、无数据'};
+values['生产单帧精定位（非完整检测器）']=f.baseline ? `${p(f.baseline.point)}；误差 ${f.baseline.errorPixel===null?'不可用':f.baseline.errorPixel.toFixed(3)+' px'}` : '未回放';
+el('state').innerHTML=Object.entries(values).map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('');
+const image=new Image();image.onload=()=>{const c=el('image'),ctx=c.getContext('2d');ctx.drawImage(image,0,0);ctx.strokeStyle='#aaa';ctx.lineWidth=.7;f.lines.forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(50,a*50+b);ctx.lineTo(280,a*280+b);ctx.stroke()});f.candidates.forEach(q=>{ctx.strokeStyle='#ff9d35';ctx.beginPath();ctx.arc(...q.point,5,0,Math.PI*2);ctx.stroke()});marker(ctx,f.truth,'#21d5f4',8);marker(ctx,f.baseline?.point,'#ff87da',7);marker(ctx,current.output,'#56ff83',5)};image.src=f.image;
+const max=Math.max(1,...rows.map(r=>r.errorPixel??0));let path='',open=false;rows.forEach((r,i)=>{if(r.errorPixel===null){open=false;return}path+=`${open?'L':'M'}${30+i*940/(rows.length-1)},${125-100*r.errorPixel/max} `;open=true});
+el('chart').innerHTML=`<path d="M30 15V125H980" fill="none" stroke="#aaa"/><path d="${path}" fill="none" stroke="#087da5" stroke-width="2"/><text x="34" y="15">上限刻度 ${max.toFixed(2)} px</text><line x1="${30+index*940/(rows.length-1)}" x2="${30+index*940/(rows.length-1)}" y1="15" y2="125" stroke="#999"/>`;
+}
+function real(){const r=DATA.real[el('realSelect').value||0];const im=new Image();im.onload=()=>{const c=el('realImage');c.width=im.width;c.height=im.height;const ctx=c.getContext('2d');ctx.drawImage(im,0,0);marker(ctx,r.hint,'#ff9d35',14)};im.src=r.image;el('realResult').textContent=`原始提示位置（橙）：${r.hint.join(', ')}\n${r.result}\n焊缝真值：未知\n版本：${r.revision}\n图像 SHA256：${r.sha256}`}
+el('scenarios').onchange=e=>{selected=Number(e.target.value);index=0;render()};el('frame').oninput=e=>{index=Number(e.target.value);render()};el('reset').onclick=()=>{index=0;render()};el('prev').onclick=()=>{index=Math.max(0,index-1);render()};el('next').onclick=()=>{index=Math.min(DATA.sequences[selected].frames.length-1,index+1);render()};el('duplicate').onclick=()=>{current=advance(current,DATA.sequences[selected].frames[index],config());el('reason').textContent=current.reason;};el('seconds').onchange=render;el('distance').onchange=render;el('realSelect').onchange=real;render();real();
+</script></html>
