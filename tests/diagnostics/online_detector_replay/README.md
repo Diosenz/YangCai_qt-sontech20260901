@@ -182,6 +182,7 @@ checkpoint 冷启动必须重新检测到原锚附近（候选4px以内），否
 
 ```sh
 python3 tests/diagnostics/online_detector_replay/test_identity_continuation.py
+python3 tests/diagnostics/online_detector_replay/test_identity_mother_recovery.py
 ```
 
 测试保留可搬迁 viewer 与完整原图/manifest；可用 `KCF_IDENTITY_EVIDENCE` 环境变量指定证据父目录。
