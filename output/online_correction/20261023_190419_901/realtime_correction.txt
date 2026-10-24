@@ -1,0 +1,695 @@
+timestamp_ms	time	event	phase	vision_valid	vision_x_mm	vision_y_mm	vision_z_mm	gap_width_mm	seam_index	dx_um	dy_um	dz_um	speed_override	speed_mode	online_end_flag	sent	response_received	completed	error_code	request	response	message	estimated	point_source	degraded_frames
+1792753476261	2026-10-23T19:04:36.261	vision_sample	initial_detection_running	1	-102.686528	-99.716786	22.478283		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476310	2026-10-23T19:04:36.310	vision_sample	initial_detection_running	1	-103.157177	-99.228853	22.507138		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476367	2026-10-23T19:04:36.367	vision_sample	initial_detection_running	1	-103.331843	-98.912206	22.491453		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476429	2026-10-23T19:04:36.429	vision_sample	initial_detection_running	1	-103.347227	-98.944955	22.527235		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476505	2026-10-23T19:04:36.505	vision_sample	initial_detection_running	1	-103.495896	-98.683082	22.402234		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476557	2026-10-23T19:04:36.557	vision_sample	initial_detection_running	1	-103.627121	-98.478162	22.418056		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476625	2026-10-23T19:04:36.625	vision_sample	initial_detection_running	1	-103.721825	-98.608361	22.471945		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476685	2026-10-23T19:04:36.685	vision_sample	initial_detection_running	1	-103.860216	-98.262708	22.423719		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476757	2026-10-23T19:04:36.757	vision_sample	initial_detection_running	1	-103.941406	-98.364212	22.446316		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476840	2026-10-23T19:04:36.840	vision_sample	initial_detection_running	1	-104.008250	-98.059749	22.471431		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476916	2026-10-23T19:04:36.916	vision_sample	initial_detection_running	1	-104.187352	-97.866341	22.383281		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753476974	2026-10-23T19:04:36.974	vision_sample	initial_detection_running	1	-104.267967	-97.966784	22.404872		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477025	2026-10-23T19:04:37.025	vision_sample	initial_detection_running	1	-104.412698	-97.659171	22.357370		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477159	2026-10-23T19:04:37.159	vision_sample	initial_detection_running	1	-104.438587	-97.714573	22.418185		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477271	2026-10-23T19:04:37.271	vision_sample	initial_detection_running	1	-104.563427	-97.419432	22.382383		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477342	2026-10-23T19:04:37.342	vision_sample	initial_detection_running	1	-104.834672	-96.993370	22.353141		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477411	2026-10-23T19:04:37.411	vision_sample	initial_detection_running	1	-104.911033	-97.084929	22.365259		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477485	2026-10-23T19:04:37.485	vision_sample	initial_detection_running	1	-105.085585	-96.788321	22.375490		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477533	2026-10-23T19:04:37.533	vision_sample	initial_detection_running	1	-105.221157	-96.521028	22.329469		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477585	2026-10-23T19:04:37.585	vision_sample	initial_detection_running	1	-105.291126	-96.599009	22.326794		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477649	2026-10-23T19:04:37.649	vision_sample	initial_detection_running	1	-105.346973	-96.338324	22.320493		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477705	2026-10-23T19:04:37.705	vision_sample	initial_detection_running	1	-105.416345	-96.415059	22.316489		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477772	2026-10-23T19:04:37.772	vision_sample	initial_detection_running	1	-105.569641	-96.151981	22.323441		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477846	2026-10-23T19:04:37.846	vision_sample	initial_detection_running	1	-105.624305	-96.197199	22.284777		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477926	2026-10-23T19:04:37.926	vision_sample	initial_detection_running	1	-105.758781	-95.978028	22.257018		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753477987	2026-10-23T19:04:37.987	vision_sample	initial_detection_running	1	-105.812537	-96.021319	22.216263		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478059	2026-10-23T19:04:38.059	vision_sample	initial_detection_running	1	-105.984626	-95.716702	22.231251		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478106	2026-10-23T19:04:38.106	vision_sample	initial_detection_running	1	-106.112238	-95.524792	22.210437		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478200	2026-10-23T19:04:38.200	vision_sample	initial_detection_running	1	-106.111615	-95.523451	22.208954		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478272	2026-10-23T19:04:38.272	vision_sample	initial_detection_running	1	-106.265796	-95.312874	22.226693		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478323	2026-10-23T19:04:38.323	vision_sample	initial_detection_running	1	-106.458368	-95.145111	22.175924		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478407	2026-10-23T19:04:38.407	vision_sample	initial_detection_running	1	-106.457553	-95.143355	22.173981		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478464	2026-10-23T19:04:38.465	vision_sample	initial_detection_running	1	-106.619502	-94.859726	22.182413		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478523	2026-10-23T19:04:38.523	vision_sample	initial_detection_running	1	-106.793466	-94.675177	22.085080		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478592	2026-10-23T19:04:38.592	vision_sample	initial_detection_running	1	-106.812658	-94.716596	22.130979		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478646	2026-10-23T19:04:38.646	vision_sample	initial_detection_running	1	-106.908559	-94.356937	22.144630		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478703	2026-10-23T19:04:38.703	vision_sample	initial_detection_running	1	-106.970027	-94.417076	22.122793		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478761	2026-10-23T19:04:38.761	vision_sample	initial_detection_running	1	-107.094920	-94.215128	22.110807		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478838	2026-10-23T19:04:38.838	vision_sample	initial_detection_running	1	-107.154678	-94.271625	22.084992		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478908	2026-10-23T19:04:38.908	vision_sample	initial_detection_running	1	-107.297514	-93.986089	22.048448		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753478979	2026-10-23T19:04:38.979	vision_sample	initial_detection_running	1	-107.442575	-93.747054	22.056160		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479062	2026-10-23T19:04:39.062	vision_sample	initial_detection_running	1	-107.600732	-93.518958	22.065309		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479114	2026-10-23T19:04:39.114	vision_sample	initial_detection_running	1	-107.653797	-93.561074	22.023636		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479173	2026-10-23T19:04:39.173	vision_sample	initial_detection_running	1	-107.807616	-93.342621	22.038940		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479259	2026-10-23T19:04:39.259	vision_sample	initial_detection_running	1	-107.861730	-93.387051	21.999893		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479349	2026-10-23T19:04:39.349	vision_sample	initial_detection_running	1	-107.974800	-93.108237	22.061494		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479441	2026-10-23T19:04:39.441	vision_sample	initial_detection_running	1	-108.146983	-92.910846	21.972187		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479503	2026-10-23T19:04:39.503	vision_sample	initial_detection_running	1	-108.211507	-92.977916	21.958438		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479582	2026-10-23T19:04:39.582	vision_sample	initial_detection_running	1	-108.344779	-92.722642	21.941347		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479660	2026-10-23T19:04:39.660	vision_sample	initial_detection_running	1	-108.451606	-92.455577	21.934947		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479722	2026-10-23T19:04:39.722	vision_sample	initial_detection_running	1	-108.627797	-92.205355	21.955767		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479797	2026-10-23T19:04:39.797	vision_sample	initial_detection_running	1	-108.662837	-92.244986	21.955765		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479848	2026-10-23T19:04:39.848	vision_sample	initial_detection_running	1	-108.789234	-91.997403	21.916296		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479906	2026-10-23T19:04:39.906	vision_sample	initial_detection_running	1	-108.847043	-92.050046	21.886627		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753479975	2026-10-23T19:04:39.975	vision_sample	initial_detection_running	1	-108.992007	-91.824804	21.900876		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480075	2026-10-23T19:04:40.075	vision_sample	initial_detection_running	1	-109.127894	-91.535311	21.854737		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480153	2026-10-23T19:04:40.153	vision_sample	initial_detection_running	1	-109.217414	-91.620478	21.817300		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480234	2026-10-23T19:04:40.234	vision_sample	initial_detection_running	1	-109.337778	-91.395231	21.846005		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480319	2026-10-23T19:04:40.319	vision_sample	initial_detection_running	1	-109.446259	-91.047661	21.869289		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480384	2026-10-23T19:04:40.384	vision_sample	initial_detection_running	1	-109.624110	-90.897817	21.827541		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480454	2026-10-23T19:04:40.454	vision_sample	initial_detection_running	1	-109.632940	-90.917063	21.849103		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480546	2026-10-23T19:04:40.546	vision_sample	initial_detection_running	1	-109.813533	-90.667852	21.749323		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480607	2026-10-23T19:04:40.607	vision_sample	initial_detection_running	1	-109.968308	-90.507704	21.790832		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480667	2026-10-23T19:04:40.667	vision_sample	initial_detection_running	1	-110.055403	-90.587880	21.748157		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480742	2026-10-23T19:04:40.742	vision_sample	initial_detection_running	1	-110.129903	-90.206384	21.772003		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480803	2026-10-23T19:04:40.803	vision_sample	initial_detection_running	1	-110.201895	-90.290289	21.777777		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480882	2026-10-23T19:04:40.882	vision_sample	initial_detection_running	1	-110.346628	-90.045684	21.763992		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480943	2026-10-23T19:04:40.943	vision_sample	initial_detection_running	1	-110.414276	-89.771642	21.765244		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753480997	2026-10-23T19:04:40.997	vision_sample	initial_detection_running	1	-110.560660	-89.944895	21.783178		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481072	2026-10-23T19:04:41.072	vision_sample	initial_detection_running	1	-110.700700	-89.614453	21.743352		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481157	2026-10-23T19:04:41.157	vision_sample	initial_detection_running	1	-110.781265	-89.335613	21.750251		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481247	2026-10-23T19:04:41.247	vision_sample	initial_detection_running	1	-110.838726	-89.387912	21.720701		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481309	2026-10-23T19:04:41.309	vision_sample	initial_detection_running	1	-110.983356	-89.206317	21.740216		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481390	2026-10-23T19:04:41.390	vision_sample	initial_detection_running	1	-111.124558	-88.956351	21.719648		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481456	2026-10-23T19:04:41.456	vision_sample	initial_detection_running	1	-111.262361	-88.680571	21.705081		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481545	2026-10-23T19:04:41.545	vision_sample	initial_detection_running	1	-111.321188	-88.735970	21.679153		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481613	2026-10-23T19:04:41.613	vision_sample	initial_detection_running	1	-111.417788	-88.475172	21.724694		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481692	2026-10-23T19:04:41.692	vision_sample	initial_detection_running	1	-111.488510	-88.556698	21.728296		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481763	2026-10-23T19:04:41.763	vision_sample	initial_detection_running	1	-111.621761	-88.241383	21.680407		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481846	2026-10-23T19:04:41.846	vision_sample	initial_detection_running	1	-111.775465	-88.057338	21.691602		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481911	2026-10-23T19:04:41.911	vision_sample	initial_detection_running	1	-111.893374	-87.797299	21.649286		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753481979	2026-10-23T19:04:41.979	vision_sample	initial_detection_running	1	-111.973931	-87.900590	21.677662		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482039	2026-10-23T19:04:42.039	vision_sample	initial_detection_running	1	-112.130991	-87.589606	21.653232		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482103	2026-10-23T19:04:42.103	vision_sample	initial_detection_running	1	-112.188918	-87.643224	21.625531		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482168	2026-10-23T19:04:42.168	vision_sample	initial_detection_running	1	-112.276354	-87.374743	21.653792		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482254	2026-10-23T19:04:42.254	vision_sample	initial_detection_running	1	-112.330919	-87.420986	21.617782		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482361	2026-10-23T19:04:42.361	vision_sample	initial_detection_running	1	-112.525185	-87.240967	21.589144		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482429	2026-10-23T19:04:42.429	vision_sample	initial_detection_running	1	-112.612178	-86.958391	21.605499		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482505	2026-10-23T19:04:42.505	vision_sample	initial_detection_running	1	-112.770475	-86.755657	21.635398		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482574	2026-10-23T19:04:42.574	vision_sample	initial_detection_running	1	-112.818924	-86.788525	21.584338		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482662	2026-10-23T19:04:42.662	vision_sample	initial_detection_running	1	-112.983282	-86.513397	21.607824		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482746	2026-10-23T19:04:42.746	vision_sample	initial_detection_running	1	-113.123942	-86.267572	21.599498		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482809	2026-10-23T19:04:42.809	vision_sample	initial_detection_running	1	-113.192395	-86.344651	21.598707		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482870	2026-10-23T19:04:42.870	vision_sample	initial_detection_running	1	-113.336640	-86.103123	21.586375		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753482956	2026-10-23T19:04:42.956	vision_sample	initial_detection_running	1	-113.418293	-85.848323	21.624086		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483021	2026-10-23T19:04:43.021	vision_sample	initial_detection_running	1	-113.552073	-85.626194	21.600849		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483082	2026-10-23T19:04:43.082	vision_sample	initial_detection_running	1	-113.600082	-85.658204	21.548953		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483146	2026-10-23T19:04:43.146	vision_sample	initial_detection_running	1	-113.709622	-85.352824	21.589783		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483210	2026-10-23T19:04:43.210	vision_sample	initial_detection_running	1	-113.772855	-85.418525	21.576246		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483278	2026-10-23T19:04:43.278	vision_sample	initial_detection_running	1	-113.914525	-85.117692	21.529755		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483361	2026-10-23T19:04:43.361	vision_sample	initial_detection_running	1	-114.058926	-84.899438	21.554282		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483454	2026-10-23T19:04:43.454	vision_sample	initial_detection_running	1	-114.116928	-84.953645	21.527759		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483515	2026-10-23T19:04:43.515	vision_sample	initial_detection_running	1	-114.261083	-84.748408	21.528423		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483590	2026-10-23T19:04:43.590	vision_sample	initial_detection_running	1	-114.344254	-84.468923	21.568287		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483677	2026-10-23T19:04:43.677	vision_sample	initial_detection_running	1	-114.479772	-84.234322	21.545543		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483756	2026-10-23T19:04:43.756	vision_sample	initial_detection_running	1	-114.552625	-84.321561	21.556821		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483825	2026-10-23T19:04:43.825	vision_sample	initial_detection_running	1	-114.707305	-84.002137	21.517029		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483901	2026-10-23T19:04:43.901	vision_sample	initial_detection_running	1	-114.841609	-83.804189	21.530661		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753483969	2026-10-23T19:04:43.969	vision_sample	initial_detection_running	1	-114.962231	-83.566018	21.491981		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484057	2026-10-23T19:04:44.057	vision_sample	initial_detection_running	1	-115.075505	-83.668782	21.432944		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484130	2026-10-23T19:04:44.130	vision_sample	initial_detection_running	1	-115.186790	-83.370857	21.484680		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484192	2026-10-23T19:04:44.192	vision_sample	initial_detection_running	1	-115.326912	-83.133494	21.478460		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484275	2026-10-23T19:04:44.275	vision_sample	initial_detection_running	1	-115.331864	-83.144507	21.491063		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484341	2026-10-23T19:04:44.341	vision_sample	initial_detection_running	1	-115.476093	-82.865463	21.457702		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484415	2026-10-23T19:04:44.415	vision_sample	initial_detection_running	1	-115.548745	-82.952595	21.469254		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484511	2026-10-23T19:04:44.511	vision_sample	initial_detection_running	1	-115.632002	-82.666106	21.487637		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484586	2026-10-23T19:04:44.586	vision_sample	initial_detection_running	1	-115.822629	-82.499097	21.442463		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484644	2026-10-23T19:04:44.644	vision_sample	initial_detection_running	1	-115.831277	-82.518365	21.464555		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484712	2026-10-23T19:04:44.712	vision_sample	initial_detection_running	1	-115.991874	-82.234142	21.470173		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484782	2026-10-23T19:04:44.782	vision_sample	initial_detection_running	1	-116.066084	-82.003642	21.502810		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484862	2026-10-23T19:04:44.862	vision_sample	initial_detection_running	1	-116.125842	-82.062218	21.481828		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753484930	2026-10-23T19:04:44.930	vision_sample	initial_detection_running	1	-116.341575	-81.794480	21.447181		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753485023	2026-10-23T19:04:45.023	vision_sample	initial_detection_running	1	-116.439877	-81.537780	21.509256		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753485085	2026-10-23T19:04:45.085	vision_sample	initial_detection_running	1	-116.507555	-81.614147	21.508842		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753485142	2026-10-23T19:04:45.142	vision_sample	initial_detection_running	1	-116.636192	-81.424308	21.503780		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753485218	2026-10-23T19:04:45.218	vision_sample	initial_detection_running	1	-116.718147	-81.080628	21.488112		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753485284	2026-10-23T19:04:45.284	vision_sample	initial_detection_running	1	-116.878205	-80.845341	21.505327		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753485840	2026-10-23T19:04:45.840	vision_sample	initial_detection_running	1	-116.875505	-80.839307	21.498385		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753486393	2026-10-23T19:04:46.393	vision_sample	initial_detection_running	1	-117.778613	-79.835306	21.587569		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753486461	2026-10-23T19:04:46.461	vision_sample	initial_detection_running	1	-118.636917	-78.983198	21.797872		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753487090	2026-10-23T19:04:47.090	vision_sample	initial_detection_running	1	-118.745325	-78.573628	21.692363		-1													当前原图 KCF 身份及质量验收通过，非独立精定位。; RobotSim 线结构光虚拟参考查询成功。	0	2	0
+1792753487152	2026-10-23T19:04:47.153	vision_sample	initial_detection_running	1	-119.855865	-77.681359	22.144484		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753487229	2026-10-23T19:04:47.229	vision_sample	initial_detection_running	1	-119.903448	-77.788755	22.269257		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753487293	2026-10-23T19:04:47.293	vision_sample	initial_detection_running	1	-120.016139	-77.448821	22.186003		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753487357	2026-10-23T19:04:47.357	vision_sample	initial_detection_running	1	-120.117726	-77.136124	22.071554		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753487436	2026-10-23T19:04:47.436	vision_sample	initial_detection_running	1	-120.183874	-77.210348	22.070176		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753487526	2026-10-23T19:04:47.526	vision_sample	initial_detection_running	1	-120.251963	-76.855134	22.030710		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753487589	2026-10-23T19:04:47.589	vision_sample	initial_detection_running	1	-120.304890	-76.899482	21.994584		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753488181	2026-10-23T19:04:48.181	vision_sample	initial_detection_running	1	-120.449634	-76.754362	22.048240		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753488706	2026-10-23T19:04:48.706	vision_sample	initial_detection_running	1	-121.109404	-75.319666	21.823381		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753488761	2026-10-23T19:04:48.761	vision_sample	initial_detection_running	1	-121.841334	-74.189363	21.877526		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753488828	2026-10-23T19:04:48.828	vision_sample	initial_detection_running	1	-121.935075	-73.875460	21.907326		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753488897	2026-10-23T19:04:48.897	vision_sample	initial_detection_running	1	-121.983546	-73.909953	21.859982		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753488985	2026-10-23T19:04:48.985	vision_sample	initial_detection_running	1	-122.090896	-73.650902	21.788575		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489070	2026-10-23T19:04:49.070	vision_sample	initial_detection_running	1	-122.197327	-73.363641	21.854712		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489129	2026-10-23T19:04:49.129	vision_sample	initial_detection_running	1	-122.335311	-73.116534	21.832871		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489218	2026-10-23T19:04:49.218	vision_sample	initial_detection_running	1	-122.343664	-73.135548	21.855149		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489278	2026-10-23T19:04:49.278	vision_sample	initial_detection_running	1	-122.420456	-72.805860	21.848469		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489347	2026-10-23T19:04:49.347	vision_sample	initial_detection_running	1	-122.597429	-72.634884	21.790250		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489455	2026-10-23T19:04:49.455	vision_sample	initial_detection_running	1	-122.597493	-72.635029	21.790420		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489523	2026-10-23T19:04:49.523	vision_sample	initial_detection_running	1	-122.720287	-72.313701	21.721454		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489637	2026-10-23T19:04:49.637	vision_sample	initial_detection_running	1	-122.845660	-71.991815	21.664047		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489722	2026-10-23T19:04:49.722	vision_sample	initial_detection_running	1	-122.908927	-71.684828	21.629355		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489785	2026-10-23T19:04:49.785	vision_sample	initial_detection_running	1	-122.961618	-71.351550	21.565527		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489862	2026-10-23T19:04:49.862	vision_sample	initial_detection_running	1	-122.993629	-71.348507	21.474127		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753489936	2026-10-23T19:04:49.936	vision_sample	initial_detection_running	1	-123.052649	-70.910409	21.402401		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490008	2026-10-23T19:04:50.008	vision_sample	initial_detection_running	1	-123.082997	-70.903511	21.306402		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490090	2026-10-23T19:04:50.090	vision_sample	initial_detection_running	1	-123.180927	-70.627351	21.224101		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490168	2026-10-23T19:04:50.168	vision_sample	initial_detection_running	1	-123.176847	-70.618033	21.213148		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490247	2026-10-23T19:04:50.247	vision_sample	initial_detection_running	1	-123.316712	-70.265418	21.133422		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490327	2026-10-23T19:04:50.327	vision_sample	initial_detection_running	1	-123.366236	-69.935323	21.089582		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490429	2026-10-23T19:04:50.429	vision_sample	initial_detection_running	1	-123.495199	-69.692662	21.079515		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490507	2026-10-23T19:04:50.507	vision_sample	initial_detection_running	1	-123.636417	-69.459792	21.070044		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490580	2026-10-23T19:04:50.580	vision_sample	initial_detection_running	1	-123.658238	-69.509695	21.128787		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490653	2026-10-23T19:04:50.653	vision_sample	initial_detection_running	1	-123.845354	-69.216741	21.094240		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490749	2026-10-23T19:04:50.749	vision_sample	initial_detection_running	1	-123.960738	-68.927280	21.102944		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490817	2026-10-23T19:04:50.817	vision_sample	initial_detection_running	1	-124.098427	-68.698037	21.090867		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490891	2026-10-23T19:04:50.891	vision_sample	initial_detection_running	1	-124.173504	-68.492797	21.125333		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753490959	2026-10-23T19:04:50.959	vision_sample	initial_detection_running	1	-124.231456	-68.549059	21.103712		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491046	2026-10-23T19:04:51.046	vision_sample	initial_detection_running	1	-124.323776	-68.173945	21.104852		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491147	2026-10-23T19:04:51.147	vision_sample	initial_detection_running	1	-124.449498	-67.896408	21.061649		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491210	2026-10-23T19:04:51.210	vision_sample	initial_detection_running	1	-124.586966	-67.685064	21.052720		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491269	2026-10-23T19:04:51.269	vision_sample	initial_detection_running	1	-124.587427	-67.686123	21.053970		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491343	2026-10-23T19:04:51.343	vision_sample	initial_detection_running	1	-124.726488	-67.465760	21.070633		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491407	2026-10-23T19:04:51.407	vision_sample	initial_detection_running	1	-124.728640	-67.470698	21.076465		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491484	2026-10-23T19:04:51.484	vision_sample	initial_detection_running	1	-124.852038	-67.213207	21.025591		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491606	2026-10-23T19:04:51.606	vision_sample	initial_detection_running	1	-124.864363	-67.241503	21.059025		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491695	2026-10-23T19:04:51.695	vision_sample	initial_detection_running	1	-125.077306	-66.631801	21.014839		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491758	2026-10-23T19:04:51.758	vision_sample	initial_detection_running	1	-125.225559	-66.407176	21.033864		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491837	2026-10-23T19:04:51.837	vision_sample	initial_detection_running	1	-125.288600	-66.475341	21.026550		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491892	2026-10-23T19:04:51.892	vision_sample	initial_detection_running	1	-125.289294	-66.476936	21.028437		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753491983	2026-10-23T19:04:51.983	vision_sample	initial_detection_running	1	-125.411499	-66.150546	20.974272		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492066	2026-10-23T19:04:52.066	vision_sample	initial_detection_running	1	-125.492250	-65.874150	20.988049		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492137	2026-10-23T19:04:52.137	vision_sample	initial_detection_running	1	-125.636889	-65.708052	21.010127		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492752	2026-10-23T19:04:52.752	vision_sample	sending_initial_teach_points	1	-125.716783	-65.305164	20.979673		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492753	2026-10-23T19:04:52.753	vision_sample	sending_initial_teach_points	1	-125.822925	-65.199811	20.984774		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492754	2026-10-23T19:04:52.754	vision_sample	sending_initial_teach_points	1	-125.813327	-65.177707	20.958583		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492756	2026-10-23T19:04:52.756	vision_sample	sending_initial_teach_points	1	-125.817299	-65.186853	20.969421		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492757	2026-10-23T19:04:52.757	vision_sample	sending_initial_teach_points	1	-125.831735	-65.127899	20.975821		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492758	2026-10-23T19:04:52.758	vision_sample	sending_initial_teach_points	1	-125.835098	-65.125690	20.984154		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492761	2026-10-23T19:04:52.761	vision_sample	sending_initial_teach_points	1	-125.888302	-65.171329	20.950278		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492763	2026-10-23T19:04:52.763	vision_sample	sending_initial_teach_points	1	-125.836066	-65.127919	20.986794		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492764	2026-10-23T19:04:52.764	vision_sample	sending_initial_teach_points	1	-125.836393	-65.128672	20.987687		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753492765	2026-10-23T19:04:52.765	vision_sample	sending_initial_teach_points	1	-125.835916	-65.127573	20.986385		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753503814	2026-10-23T19:05:03.814	command_generated	online_running							1	0	1	10000	0	0							predicted control reference recomputed from current robot feedback			
+1792753503848	2026-10-23T19:05:03.848	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753503918	2026-10-23T19:05:03.918	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,0,1,0,0,0,10000,0	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893028,91205,-259858,-1661381,406450,432264,40,1799958,2,329,1415,138,5,0,0	robot request completed			
+1792753503920	2026-10-23T19:05:03.920	command_generated	online_running							1	0	1	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753503967	2026-10-23T19:05:03.967	command_generated	online_running							1	0	1	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504032	2026-10-23T19:05:04.032	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504067	2026-10-23T19:05:04.067	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504080	2026-10-23T19:05:04.080	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,0,1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893101,91215,-259818,-1661415,406414,432242,40,1799403,2,0,0,0,5,0,0	robot request completed			
+1792753504084	2026-10-23T19:05:04.084	command_generated	online_running							2	0	-2	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504141	2026-10-23T19:05:04.141	command_generated	online_running							2	0	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504154	2026-10-23T19:05:04.154	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504255	2026-10-23T19:05:04.255	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893163,91214,-259791,-1661412,406403,432289,40,1798259,2,-643,-1209,329,5,0,0	robot request completed			
+1792753504257	2026-10-23T19:05:04.257	command_generated	online_running							2	0	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504257	2026-10-23T19:05:04.257	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504322	2026-10-23T19:05:04.322	command_generated	online_running							2	0	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504335	2026-10-23T19:05:04.335	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504427	2026-10-23T19:05:04.427	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504448	2026-10-23T19:05:04.448	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,0,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893189,91197,-259776,-1661378,406449,432313,40,1796908,2,-641,-1213,328,5,0,0	robot request completed			
+1792753504450	2026-10-23T19:05:04.450	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504461	2026-10-23T19:05:04.461	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504504	2026-10-23T19:05:04.504	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504582	2026-10-23T19:05:04.582	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504627	2026-10-23T19:05:04.627	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893278,91198,-259824,-1661374,406452,432310,40,1795669,2,2709,-207,155,5,0,0	robot request completed			
+1792753504628	2026-10-23T19:05:04.628	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504629	2026-10-23T19:05:04.629	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504687	2026-10-23T19:05:04.687	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504707	2026-10-23T19:05:04.707	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504786	2026-10-23T19:05:04.786	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504809	2026-10-23T19:05:04.809	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893410,91160,-259814,-1661390,406448,432279,40,1794380,2,2709,-207,155,5,0,0	robot request completed			
+1792753504811	2026-10-23T19:05:04.811	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504820	2026-10-23T19:05:04.820	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504870	2026-10-23T19:05:04.871	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753504936	2026-10-23T19:05:04.936	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753504989	2026-10-23T19:05:04.989	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893538,91125,-259808,-1661374,406450,432309,40,1793135,2,2123,-1086,-1027,5,0,0	robot request completed			
+1792753504990	2026-10-23T19:05:04.990	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505001	2026-10-23T19:05:05.001	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505039	2026-10-23T19:05:05.039	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505080	2026-10-23T19:05:05.080	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505171	2026-10-23T19:05:05.171	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893675,91063,-259795,-1661375,406454,432297,40,1791885,2,2124,-1091,-1029,5,0,0	robot request completed			
+1792753505173	2026-10-23T19:05:05.173	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505178	2026-10-23T19:05:05.178	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505239	2026-10-23T19:05:05.239	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505262	2026-10-23T19:05:05.262	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505331	2026-10-23T19:05:05.331	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505364	2026-10-23T19:05:05.364	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893837,91014,-259786,-1661388,406445,432284,45,1790501,2,-466,-71,-138,5,0,0	robot request completed			
+1792753505366	2026-10-23T19:05:05.366	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505415	2026-10-23T19:05:05.415	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505491	2026-10-23T19:05:05.491	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505517	2026-10-23T19:05:05.517	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,893932,90969,-259780,-1661374,406465,432296,45,1789441,2,-468,-68,-137,5,0,0	robot request completed			
+1792753505519	2026-10-23T19:05:05.519	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505584	2026-10-23T19:05:05.584	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505645	2026-10-23T19:05:05.645	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505682	2026-10-23T19:05:05.682	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505711	2026-10-23T19:05:05.711	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,894088,90914,-259776,-1661380,406458,432309,45,1788118,2,1375,-3049,-601,5,0,0	robot request completed			
+1792753505712	2026-10-23T19:05:05.712	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505741	2026-10-23T19:05:05.741	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505768	2026-10-23T19:05:05.768	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505827	2026-10-23T19:05:05.827	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505881	2026-10-23T19:05:05.881	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753505890	2026-10-23T19:05:05.890	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,894224,90862,-259762,-1661381,406462,432304,45,1786857,2,760,96,-585,5,0,0	robot request completed			
+1792753505891	2026-10-23T19:05:05.891	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505960	2026-10-23T19:05:05.960	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753505969	2026-10-23T19:05:05.969	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506050	2026-10-23T19:05:06.050	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506074	2026-10-23T19:05:06.074	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,894372,90819,-259755,-1661378,406451,432317,45,1785556,2,758,96,-585,5,0,0	robot request completed			
+1792753506076	2026-10-23T19:05:06.076	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506118	2026-10-23T19:05:06.119	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506133	2026-10-23T19:05:06.134	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506216	2026-10-23T19:05:06.216	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506255	2026-10-23T19:05:06.255	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506258	2026-10-23T19:05:06.258	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,894508,90767,-259743,-1661379,406455,432313,45,1784284,2,-331,-1420,-139,5,0,0	robot request completed			
+1792753506259	2026-10-23T19:05:06.259	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506318	2026-10-23T19:05:06.318	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506349	2026-10-23T19:05:06.349	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506420	2026-10-23T19:05:06.420	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,894630,90719,-259740,-1661375,406460,432340,45,1783151,2,-332,-1416,-138,5,0,0	robot request completed			
+1792753506422	2026-10-23T19:05:06.422	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506428	2026-10-23T19:05:06.428	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506490	2026-10-23T19:05:06.490	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506503	2026-10-23T19:05:06.503	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506585	2026-10-23T19:05:06.585	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506595	2026-10-23T19:05:06.595	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,894769,90672,-259725,-1661388,406457,432305,45,1781935,2,998,1425,616,5,0,0	robot request completed			
+1792753506597	2026-10-23T19:05:06.597	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506641	2026-10-23T19:05:06.641	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506654	2026-10-23T19:05:06.654	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506742	2026-10-23T19:05:06.742	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506780	2026-10-23T19:05:06.780	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,894913,90627,-259727,-1661379,406451,432321,50,1780617,2,998,1424,616,5,0,0	robot request completed			
+1792753506781	2026-10-23T19:05:06.781	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506790	2026-10-23T19:05:06.790	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506839	2026-10-23T19:05:06.839	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753506861	2026-10-23T19:05:06.861	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506925	2026-10-23T19:05:06.925	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753506952	2026-10-23T19:05:06.952	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,895032,90584,-259716,-1661374,406461,432327,50,1779457,2,-469,-68,-140,5,0,0	robot request completed			
+1792753506957	2026-10-23T19:05:06.957	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507009	2026-10-23T19:05:07.009	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507074	2026-10-23T19:05:07.074	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507134	2026-10-23T19:05:07.134	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,895178,90532,-259708,-1661383,406458,432317,50,1778184,2,-469,-67,-138,5,0,0	robot request completed			
+1792753507136	2026-10-23T19:05:07.136	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507194	2026-10-23T19:05:07.194	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507233	2026-10-23T19:05:07.233	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507280	2026-10-23T19:05:07.280	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507304	2026-10-23T19:05:07.304	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,895305,90481,-259700,-1661379,406467,432316,50,1776962,2,97,-1368,1099,5,0,0	robot request completed			
+1792753507306	2026-10-23T19:05:07.306	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507349	2026-10-23T19:05:07.349	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507374	2026-10-23T19:05:07.374	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507431	2026-10-23T19:05:07.431	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507500	2026-10-23T19:05:07.500	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,895459,90437,-259697,-1661376,406456,432328,50,1775628,2,59,741,1002,5,0,0	robot request completed			
+1792753507502	2026-10-23T19:05:07.502	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507502	2026-10-23T19:05:07.502	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507550	2026-10-23T19:05:07.550	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507574	2026-10-23T19:05:07.574	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507652	2026-10-23T19:05:07.652	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,895573,90393,-259689,-1661375,406462,432331,50,1774552,2,58,741,1001,5,0,0	robot request completed			
+1792753507654	2026-10-23T19:05:07.654	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507665	2026-10-23T19:05:07.665	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507711	2026-10-23T19:05:07.711	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507739	2026-10-23T19:05:07.739	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507806	2026-10-23T19:05:07.807	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507825	2026-10-23T19:05:07.826	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,895703,90339,-259682,-1661379,406465,432324,50,1773357,2,1240,-1700,-602,5,0,0	robot request completed			
+1792753507827	2026-10-23T19:05:07.827	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507882	2026-10-23T19:05:07.882	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753507888	2026-10-23T19:05:07.888	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507977	2026-10-23T19:05:07.977	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753507996	2026-10-23T19:05:07.996	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,895835,90293,-259673,-1661381,406462,432347,50,1772163,2,1240,-1700,-604,5,0,0	robot request completed			
+1792753507997	2026-10-23T19:05:07.997	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508049	2026-10-23T19:05:08.049	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508063	2026-10-23T19:05:08.063	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508113	2026-10-23T19:05:08.113	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508178	2026-10-23T19:05:08.178	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,895968,90256,-259662,-1661376,406464,432318,50,1770885,2,2704,-206,156,5,0,0	robot request completed			
+1792753508180	2026-10-23T19:05:08.180	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508205	2026-10-23T19:05:08.205	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508224	2026-10-23T19:05:08.224	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508294	2026-10-23T19:05:08.294	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508328	2026-10-23T19:05:08.328	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,896083,90213,-259663,-1661378,406468,432320,55,1769865,2,2705,-209,155,5,0,0	robot request completed			
+1792753508330	2026-10-23T19:05:08.330	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508386	2026-10-23T19:05:08.386	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508389	2026-10-23T19:05:08.389	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508484	2026-10-23T19:05:08.484	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508493	2026-10-23T19:05:08.493	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,896212,90159,-259654,-1661382,406470,432313,55,1768693,2,1378,-1125,696,5,0,0	robot request completed			
+1792753508495	2026-10-23T19:05:08.495	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508543	2026-10-23T19:05:08.543	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508545	2026-10-23T19:05:08.545	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508645	2026-10-23T19:05:08.645	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508665	2026-10-23T19:05:08.665	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,896352,90124,-259642,-1661380,406458,432332,55,1767471,2,1378,-1125,696,5,0,0	robot request completed			
+1792753508667	2026-10-23T19:05:08.667	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508677	2026-10-23T19:05:08.677	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508724	2026-10-23T19:05:08.724	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508783	2026-10-23T19:05:08.783	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508829	2026-10-23T19:05:08.829	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,896477,90071,-259629,-1661384,406458,432324,55,1766333,2,2417,311,213,5,0,0	robot request completed			
+1792753508831	2026-10-23T19:05:08.831	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508886	2026-10-23T19:05:08.886	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753508899	2026-10-23T19:05:08.899	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753508953	2026-10-23T19:05:08.953	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509011	2026-10-23T19:05:09.011	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509014	2026-10-23T19:05:09.014	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,896611,90019,-259627,-1661380,406467,432322,55,1765066,2,2415,311,212,5,0,0	robot request completed			
+1792753509017	2026-10-23T19:05:09.017	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509066	2026-10-23T19:05:09.066	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509073	2026-10-23T19:05:09.073	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509157	2026-10-23T19:05:09.157	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509190	2026-10-23T19:05:09.190	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509197	2026-10-23T19:05:09.198	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,896755,89968,-259618,-1661387,406464,432312,55,1763771,2,1954,245,72,5,0,0	robot request completed			
+1792753509200	2026-10-23T19:05:09.200	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509258	2026-10-23T19:05:09.258	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509330	2026-10-23T19:05:09.330	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509385	2026-10-23T19:05:09.385	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,896897,89926,-259611,-1661379,406463,432307,55,1762448,2,1953,245,72,5,0,0	robot request completed			
+1792753509387	2026-10-23T19:05:09.387	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509451	2026-10-23T19:05:09.451	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509482	2026-10-23T19:05:09.482	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509541	2026-10-23T19:05:09.541	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509564	2026-10-23T19:05:09.564	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,897044,89883,-259604,-1661386,406457,432328,55,1761204,2,-469,-67,-140,5,0,0	robot request completed			
+1792753509566	2026-10-23T19:05:09.566	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509572	2026-10-23T19:05:09.572	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509622	2026-10-23T19:05:09.622	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509669	2026-10-23T19:05:09.669	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509723	2026-10-23T19:05:09.723	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509737	2026-10-23T19:05:09.737	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,897165,89829,-259591,-1661382,406466,432326,55,1760015,2,-470,-68,-142,5,0,0	robot request completed			
+1792753509739	2026-10-23T19:05:09.739	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509803	2026-10-23T19:05:09.803	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509807	2026-10-23T19:05:09.807	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509878	2026-10-23T19:05:09.878	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509912	2026-10-23T19:05:09.912	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,897300,89787,-259589,-1661377,406463,432319,60,1758771,2,757,94,-588,5,0,0	robot request completed			
+1792753509913	2026-10-23T19:05:09.913	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753509970	2026-10-23T19:05:09.970	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753509992	2026-10-23T19:05:09.992	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510057	2026-10-23T19:05:10.057	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510103	2026-10-23T19:05:10.103	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,897448,89731,-259572,-1661380,406459,432334,60,1757459,2,-471,-67,-143,5,0,0	robot request completed			
+1792753510105	2026-10-23T19:05:10.105	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510132	2026-10-23T19:05:10.132	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510153	2026-10-23T19:05:10.153	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510232	2026-10-23T19:05:10.232	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510277	2026-10-23T19:05:10.277	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,897573,89688,-259565,-1661376,406469,432340,60,1756242,2,-468,-71,-143,5,0,0	robot request completed			
+1792753510279	2026-10-23T19:05:10.279	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510303	2026-10-23T19:05:10.303	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510347	2026-10-23T19:05:10.347	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510399	2026-10-23T19:05:10.399	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510454	2026-10-23T19:05:10.454	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510473	2026-10-23T19:05:10.473	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,897736,89628,-259556,-1661390,406459,432319,60,1754875,2,1238,-1702,-605,5,0,0	robot request completed			
+1792753510474	2026-10-23T19:05:10.474	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510488	2026-10-23T19:05:10.488	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510543	2026-10-23T19:05:10.543	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510603	2026-10-23T19:05:10.603	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510656	2026-10-23T19:05:10.656	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,897872,89573,-259554,-1661382,406466,432342,60,1753574,2,1237,-1703,-605,5,0,0	robot request completed			
+1792753510658	2026-10-23T19:05:10.658	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510687	2026-10-23T19:05:10.687	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510706	2026-10-23T19:05:10.706	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510794	2026-10-23T19:05:10.794	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510821	2026-10-23T19:05:10.821	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,897987,89544,-259551,-1661374,406472,432321,60,1752436,2,1665,-1650,640,5,0,0	robot request completed			
+1792753510823	2026-10-23T19:05:10.823	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510868	2026-10-23T19:05:10.868	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510871	2026-10-23T19:05:10.871	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753510948	2026-10-23T19:05:10.948	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753510995	2026-10-23T19:05:10.995	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898126,89491,-259539,-1661384,406468,432311,60,1751247,2,1666,-1649,640,5,0,0	robot request completed			
+1792753510996	2026-10-23T19:05:10.996	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511016	2026-10-23T19:05:11.016	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511065	2026-10-23T19:05:11.065	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511089	2026-10-23T19:05:11.089	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511169	2026-10-23T19:05:11.169	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898268,89446,-259526,-1661391,406460,432330,60,1750014,2,-48,-1943,-202,5,0,0	robot request completed			
+1792753511171	2026-10-23T19:05:11.171	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511175	2026-10-23T19:05:11.175	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511229	2026-10-23T19:05:11.229	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511259	2026-10-23T19:05:11.259	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511349	2026-10-23T19:05:11.349	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511354	2026-10-23T19:05:11.354	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898399,89403,-259525,-1661377,406466,432328,60,1748714,2,-45,-1947,-202,5,0,0	robot request completed			
+1792753511356	2026-10-23T19:05:11.356	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511403	2026-10-23T19:05:11.403	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511403	2026-10-23T19:05:11.403	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511492	2026-10-23T19:05:11.492	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511516	2026-10-23T19:05:11.516	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898534,89350,-259516,-1661390,406458,432315,65,1747581,2,-279,-1348,-101,5,0,0	robot request completed			
+1792753511518	2026-10-23T19:05:11.518	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511557	2026-10-23T19:05:11.557	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511566	2026-10-23T19:05:11.566	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511628	2026-10-23T19:05:11.628	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511689	2026-10-23T19:05:11.689	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898657,89307,-259509,-1661385,406469,432321,65,1746393,2,-281,-1344,-101,5,0,0	robot request completed			
+1792753511690	2026-10-23T19:05:11.690	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511697	2026-10-23T19:05:11.697	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511750	2026-10-23T19:05:11.750	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511775	2026-10-23T19:05:11.775	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511849	2026-10-23T19:05:11.849	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511875	2026-10-23T19:05:11.875	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898794,89256,-259497,-1661386,406472,432317,65,1745098,2,-469,-71,-145,5,0,0	robot request completed			
+1792753511877	2026-10-23T19:05:11.877	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511882	2026-10-23T19:05:11.882	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753511932	2026-10-23T19:05:11.932	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753511998	2026-10-23T19:05:11.998	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753512057	2026-10-23T19:05:12.057	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753512069	2026-10-23T19:05:12.069	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898944,89216,-259485,-1661383,406466,432308,65,1743724,2,1046,-427,-649,5,0,0	robot request completed			
+1792753512071	2026-10-23T19:05:12.071	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512114	2026-10-23T19:05:12.114	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753512118	2026-10-23T19:05:12.118	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512211	2026-10-23T19:05:12.211	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753512245	2026-10-23T19:05:12.245	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899082,89159,-259483,-1661383,406465,432325,65,1742513,2,1047,-427,-648,5,0,0	robot request completed			
+1792753512246	2026-10-23T19:05:12.246	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512272	2026-10-23T19:05:12.272	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753512313	2026-10-23T19:05:12.313	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512367	2026-10-23T19:05:12.367	vision_sample	online_running	0					-1													同帧原图未通过接缝或 KCF 身份验收，不生成点。; RobotSim 线结构光虚拟参考查询成功。	0	0	0
+1792753512435	2026-10-23T19:05:12.435	vision_sample	online_running	1	-95.000122	-106.774702	22.035005		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753512437	2026-10-23T19:05:12.437	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=1 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753512439	2026-10-23T19:05:12.439	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512439	2026-10-23T19:05:12.439	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899225,89108,-259476,-1661384,406470,432319,65,1741174,2,-42,-18,1101,5,0,0	robot request completed			
+1792753512441	2026-10-23T19:05:12.441	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512503	2026-10-23T19:05:12.503	vision_sample	online_running	1	-94.999445	-106.772773	22.032983		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753512505	2026-10-23T19:05:12.505	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=2 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753512506	2026-10-23T19:05:12.506	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512507	2026-10-23T19:05:12.507	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512604	2026-10-23T19:05:12.604	vision_sample	online_running	1	-94.865356	-106.787906	22.002643		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753512606	2026-10-23T19:05:12.606	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=3 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753512606	2026-10-23T19:05:12.606	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512621	2026-10-23T19:05:12.621	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899370,89056,-259458,-1661391,406468,432310,65,1739867,2,-42,-19,1101,5,0,0	robot request completed			
+1792753512622	2026-10-23T19:05:12.622	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512670	2026-10-23T19:05:12.670	command_generated	online_running							3	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753512751	2026-10-23T19:05:12.751	vision_sample	online_running	1	-94.923099	-107.019289	22.071945		-1													当前原图 KCF 身份及质量验收通过，非独立精定位。; RobotSim 线结构光虚拟参考查询成功。	1	2	0
+1792753512755	2026-10-23T19:05:12.755	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=0 rms_mm=0.000000 reason=estimated seam continuation bypasses ICP; measured window isolated			
+1792753512756	2026-10-23T19:05:12.756	command_generated	online_running							-5	0	-1	10000	1	0							realtime online correction generated			
+1792753512796	2026-10-23T19:05:12.796	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,3,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899506,89009,-259456,-1661383,406463,432326,65,1738651,2,946,-1182,-550,5,0,0	robot request completed			
+1792753512798	2026-10-23T19:05:12.798	command_generated	online_running							0	-1	0	10000	1	0							realtime online correction generated			
+1792753512821	2026-10-23T19:05:12.821	vision_sample	online_running	1	-94.715631	-107.016489	22.108449		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753512825	2026-10-23T19:05:12.825	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=1 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753512825	2026-10-23T19:05:12.825	command_generated	online_running							0	-1	0	10000	1	0							realtime online correction generated			
+1792753512846	2026-10-23T19:05:12.846	command_generated	online_running							-1	-1	0	10000	1	0							realtime online correction generated			
+1792753512950	2026-10-23T19:05:12.950	vision_sample	online_running	1	-94.723716	-107.039819	22.132855		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753512952	2026-10-23T19:05:12.952	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=2 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753512953	2026-10-23T19:05:12.953	command_generated	online_running							-1	-1	0	10000	1	0							realtime online correction generated			
+1792753512964	2026-10-23T19:05:12.964	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899623,88971,-259444,-1661382,406474,432309,65,1737490,2,946,-1183,-551,5,0,0	robot request completed			
+1792753512966	2026-10-23T19:05:12.966	command_generated	online_running							-2	-1	0	10000	1	0							realtime online correction generated			
+1792753513014	2026-10-23T19:05:13.014	command_generated	online_running							-2	-1	-1	10000	1	0							realtime online correction generated			
+1792753513081	2026-10-23T19:05:13.081	vision_sample	online_running	1	-94.580579	-107.135488	22.137974		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753513084	2026-10-23T19:05:13.084	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=3 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753513085	2026-10-23T19:05:13.085	command_generated	online_running							-2	-1	-1	10000	1	0							realtime online correction generated			
+1792753513118	2026-10-23T19:05:13.118	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-2,-1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899685,88916,-259446,-1661378,406479,432334,70,1736425,2,888,-1264,-592,5,0,0	robot request completed			
+1792753513121	2026-10-23T19:05:13.121	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513177	2026-10-23T19:05:13.177	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513217	2026-10-23T19:05:13.217	vision_sample	online_running	1	-94.496591	-107.209542	22.103728		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753513221	2026-10-23T19:05:13.221	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=4 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753513221	2026-10-23T19:05:13.221	command_generated	online_running							5	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753513290	2026-10-23T19:05:13.290	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-3,-1,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899648,88874,-259445,-1661356,406495,432349,70,1735209,2,890,-1265,-591,5,0,0	robot request completed			
+1792753513292	2026-10-23T19:05:13.292	command_generated	online_running							-9	0	-1	10000	1	0							realtime online correction generated			
+1792753513336	2026-10-23T19:05:13.336	vision_sample	online_running	1	-94.359277	-107.329361	22.094753		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753513338	2026-10-23T19:05:13.338	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=5 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753513339	2026-10-23T19:05:13.339	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513340	2026-10-23T19:05:13.340	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513454	2026-10-23T19:05:13.454	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-9,0,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899519,88830,-259442,-1661337,406512,432368,70,1734071,2,661,-1209,189,5,0,0	robot request completed			
+1792753513456	2026-10-23T19:05:13.456	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513459	2026-10-23T19:05:13.459	vision_sample	online_running	1	-94.295678	-107.408858	22.129342		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753513462	2026-10-23T19:05:13.462	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=6 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753513462	2026-10-23T19:05:13.462	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513522	2026-10-23T19:05:13.522	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513598	2026-10-23T19:05:13.598	vision_sample	online_running	1	-94.076221	-107.622751	22.117384		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753513600	2026-10-23T19:05:13.600	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=7 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753513601	2026-10-23T19:05:13.601	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513628	2026-10-23T19:05:13.628	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-3,-1,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899274,88787,-259476,-1661337,406518,432356,70,1732860,2,661,-1209,188,5,0,0	robot request completed			
+1792753513630	2026-10-23T19:05:13.630	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513686	2026-10-23T19:05:13.686	command_generated	online_running							-3	-1	-1	10000	1	0							realtime online correction generated			
+1792753513693	2026-10-23T19:05:13.693	vision_sample	online_running	1	-93.773045	-107.897784	22.099787		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753513695	2026-10-23T19:05:13.695	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=8 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753513696	2026-10-23T19:05:13.696	command_generated	online_running							-3	0	-1	10000	1	0							realtime online correction generated			
+1792753513791	2026-10-23T19:05:13.791	vision_sample	online_running	1	-93.494185	-108.064597	22.148657		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753513793	2026-10-23T19:05:13.793	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=9 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753513794	2026-10-23T19:05:13.794	command_generated	online_running							5	-1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753513810	2026-10-23T19:05:13.810	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-3,-1,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899045,88767,-259514,-1661376,406487,432331,70,1731593,2,-2623,-2379,664,5,0,0	robot request completed			
+1792753513812	2026-10-23T19:05:13.812	command_generated	online_running							-8	2	-1	10000	1	0							realtime online correction generated			
+1792753513858	2026-10-23T19:05:13.858	command_generated	online_running							-3	0	0	10000	1	0							realtime online correction generated			
+1792753513886	2026-10-23T19:05:13.886	vision_sample	online_running	1	-93.439783	-108.264930	22.132553		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753513888	2026-10-23T19:05:13.888	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=10 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753513888	2026-10-23T19:05:13.888	command_generated	online_running							-3	0	0	10000	1	0							realtime online correction generated			
+1792753513972	2026-10-23T19:05:13.972	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-8,2,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898943,88742,-259558,-1661393,406473,432308,70,1730466,2,469,71,146,5,0,0	robot request completed			
+1792753513974	2026-10-23T19:05:13.974	command_generated	online_running							-3	1	0	10000	1	0							realtime online correction generated			
+1792753513974	2026-10-23T19:05:13.974	vision_sample	online_running	1	-93.147666	-108.402182	22.123067		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753514066	2026-10-23T19:05:14.066	online_icp	online_running																			enabled=1 attempted=1 applied=1 buffered=0 rms_mm=0.231592 reason=online ICP applied			
+1792753514066	2026-10-23T19:05:14.066	command_generated	online_running							0	-2	-2	10000	1	0							realtime online correction generated			
+1792753514069	2026-10-23T19:05:14.069	command_generated	online_running							-2	0	-1	10000	1	0							realtime online correction generated			
+1792753514116	2026-10-23T19:05:14.116	vision_sample	online_running	1	-93.112664	-108.545555	22.124881		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753514118	2026-10-23T19:05:14.118	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=1 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753514119	2026-10-23T19:05:14.119	command_generated	online_running							-2	0	-1	10000	1	0							realtime online correction generated			
+1792753514133	2026-10-23T19:05:14.133	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-3,1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898729,88728,-259594,-1661377,406487,432287,70,1729328,2,473,67,146,5,0,0	robot request completed			
+1792753514135	2026-10-23T19:05:14.135	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated			
+1792753514191	2026-10-23T19:05:14.191	command_generated	online_running							-1	0	-2	10000	1	0							realtime online correction generated			
+1792753514295	2026-10-23T19:05:14.295	vision_sample	online_running	1	-92.779193	-108.745122	22.132698		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753514298	2026-10-23T19:05:14.298	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=2 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753514298	2026-10-23T19:05:14.298	command_generated	online_running							-2	0	-2	10000	1	0							realtime online correction generated			
+1792753514303	2026-10-23T19:05:14.303	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-1,0,-2,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898517,88773,-259599,-1661394,406470,432342,70,1728173,2,-893,1260,588,5,0,0	robot request completed			
+1792753514305	2026-10-23T19:05:14.305	command_generated	online_running							-4	1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753514362	2026-10-23T19:05:14.362	command_generated	online_running							5	3	-1	10000	1	0							realtime online correction generated			
+1792753514418	2026-10-23T19:05:14.418	vision_sample	online_running	1	-92.440405	-109.080716	22.123689		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753514421	2026-10-23T19:05:14.421	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=3 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753514421	2026-10-23T19:05:14.421	command_generated	online_running							0	1	-1	10000	1	0							realtime online correction generated			
+1792753514477	2026-10-23T19:05:14.477	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,-4,1,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898406,88811,-259636,-1661384,406480,432318,70,1726934,2,-891,1260,589,5,0,0	robot request completed			
+1792753514479	2026-10-23T19:05:14.479	command_generated	online_running							1	1	-1	10000	1	0							realtime online correction generated			
+1792753514515	2026-10-23T19:05:14.515	vision_sample	online_running	1	-92.231582	-109.331787	22.150032		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753514518	2026-10-23T19:05:14.518	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=4 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753514518	2026-10-23T19:05:14.518	command_generated	online_running							1	1	-1	10000	1	0							realtime online correction generated			
+1792753514526	2026-10-23T19:05:14.526	command_generated	online_running							1	2	-1	10000	1	0							realtime online correction generated			
+1792753514650	2026-10-23T19:05:14.650	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,1,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898300,88842,-259667,-1661378,406475,432333,75,1725718,2,-277,-1892,573,5,0,0	robot request completed			
+1792753514651	2026-10-23T19:05:14.651	command_generated	online_running							1	2	-1	10000	1	0							realtime online correction generated			
+1792753514654	2026-10-23T19:05:14.655	vision_sample	online_running	1	-92.116559	-109.456262	22.188579		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753514657	2026-10-23T19:05:14.657	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=5 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753514657	2026-10-23T19:05:14.657	command_generated	online_running							2	2	-1	10000	1	0							realtime online correction generated			
+1792753514730	2026-10-23T19:05:14.730	command_generated	online_running							2	2	0	10000	1	0							realtime online correction generated			
+1792753514757	2026-10-23T19:05:14.757	vision_sample	online_running	1	-91.803211	-109.674078	22.254109		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753514759	2026-10-23T19:05:14.759	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=6 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753514759	2026-10-23T19:05:14.759	command_generated	online_running							2	2	0	10000	1	0							realtime online correction generated			
+1792753514842	2026-10-23T19:05:14.842	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,2,-1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898232,88880,-259682,-1661397,406464,432324,75,1724395,2,-278,-1892,572,5,0,0	robot request completed			
+1792753514844	2026-10-23T19:05:14.844	command_generated	online_running							2	2	0	10000	1	0							realtime online correction generated			
+1792753514851	2026-10-23T19:05:14.851	vision_sample	online_running	1	-91.445964	-110.016989	22.161112		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753514907	2026-10-23T19:05:14.907	online_icp	online_running																			enabled=1 attempted=1 applied=1 buffered=0 rms_mm=0.139886 reason=online ICP applied			
+1792753514907	2026-10-23T19:05:14.907	command_generated	online_running							-5	0	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753514910	2026-10-23T19:05:14.910	command_generated	online_running							7	3	1	10000	1	0							realtime online correction generated			
+1792753515003	2026-10-23T19:05:15.003	vision_sample	online_running	1	-91.451971	-110.035935	22.180856		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515006	2026-10-23T19:05:15.006	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=1 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515006	2026-10-23T19:05:15.006	command_generated	online_running							2	2	0	10000	1	0							realtime online correction generated			
+1792753515016	2026-10-23T19:05:15.016	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,2,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898311,88949,-259699,-1661409,406444,432316,75,1723173,2,-429,-54,-1243,5,0,0	robot request completed			
+1792753515018	2026-10-23T19:05:15.018	command_generated	online_running							2	2	0	10000	1	0							realtime online correction generated			
+1792753515075	2026-10-23T19:05:15.075	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515123	2026-10-23T19:05:15.123	vision_sample	online_running	1	-91.217091	-110.260255	22.162521		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515126	2026-10-23T19:05:15.126	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=2 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515126	2026-10-23T19:05:15.126	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515181	2026-10-23T19:05:15.181	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,2,0,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898407,89021,-259747,-1661412,406445,432328,75,1722012,2,-430,-54,-1243,5,0,0	robot request completed			
+1792753515183	2026-10-23T19:05:15.183	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515215	2026-10-23T19:05:15.215	vision_sample	online_running	1	-91.036340	-110.350585	22.212384		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515217	2026-10-23T19:05:15.217	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=3 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515217	2026-10-23T19:05:15.217	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515246	2026-10-23T19:05:15.246	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515361	2026-10-23T19:05:15.361	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,2,1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898515,89109,-259740,-1661420,406433,432310,75,1720757,2,-41,-18,1100,5,0,0	robot request completed			
+1792753515363	2026-10-23T19:05:15.363	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515377	2026-10-23T19:05:15.377	vision_sample	online_running	1	-90.979091	-110.402724	22.160293		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515379	2026-10-23T19:05:15.379	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=4 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515379	2026-10-23T19:05:15.379	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515430	2026-10-23T19:05:15.430	command_generated	online_running							-5	0	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753515512	2026-10-23T19:05:15.512	vision_sample	online_running	1	-90.755450	-110.602888	22.212086		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515515	2026-10-23T19:05:15.515	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=5 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515515	2026-10-23T19:05:15.515	command_generated	online_running							7	3	2	10000	1	0							realtime online correction generated			
+1792753515554	2026-10-23T19:05:15.554	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,2,1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898606,89197,-259698,-1661420,406440,432313,75,1719433,2,-42,-18,1099,5,0,0	robot request completed			
+1792753515556	2026-10-23T19:05:15.556	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515594	2026-10-23T19:05:15.594	vision_sample	online_running	1	-90.571574	-110.831947	22.146325		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515596	2026-10-23T19:05:15.596	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=6 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515597	2026-10-23T19:05:15.597	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515615	2026-10-23T19:05:15.615	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515717	2026-10-23T19:05:15.717	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,2,1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898686,89279,-259650,-1661408,406440,432331,75,1718290,2,-469,-71,-144,5,0,0	robot request completed			
+1792753515719	2026-10-23T19:05:15.719	command_generated	online_running							2	2	2	10000	1	0							realtime online correction generated			
+1792753515720	2026-10-23T19:05:15.720	vision_sample	online_running	1	-90.403010	-110.968113	22.204025		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515722	2026-10-23T19:05:15.722	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=7 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515723	2026-10-23T19:05:15.723	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753515765	2026-10-23T19:05:15.765	command_generated	online_running							2	1	2	10000	1	0							realtime online correction generated			
+1792753515874	2026-10-23T19:05:15.874	vision_sample	online_running	1	-90.317562	-111.010053	22.157718		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515877	2026-10-23T19:05:15.877	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=8 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515878	2026-10-23T19:05:15.878	command_generated	online_running							2	2	2	10000	1	0							realtime online correction generated			
+1792753515881	2026-10-23T19:05:15.881	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,2,2,1,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898765,89353,-259599,-1661409,406446,432324,75,1717129,2,-468,-71,-144,5,0,0	robot request completed			
+1792753515883	2026-10-23T19:05:15.883	command_generated	online_running							1	1	2	10000	1	0							realtime online correction generated			
+1792753515960	2026-10-23T19:05:15.960	command_generated	online_running							2	1	2	10000	1	0							realtime online correction generated			
+1792753515978	2026-10-23T19:05:15.978	vision_sample	online_running	1	-90.118197	-111.169648	22.200507		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753515980	2026-10-23T19:05:15.980	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=9 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753515980	2026-10-23T19:05:15.980	command_generated	online_running							-5	1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753516073	2026-10-23T19:05:16.073	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,1,2,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898846,89440,-259536,-1661396,406466,432336,75,1715795,2,467,617,-534,5,0,0	robot request completed			
+1792753516075	2026-10-23T19:05:16.075	command_generated	online_running							6	2	3	10000	1	0							realtime online correction generated			
+1792753516083	2026-10-23T19:05:16.083	vision_sample	online_running	1	-89.996403	-111.288790	22.167292		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516086	2026-10-23T19:05:16.086	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=10 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753516086	2026-10-23T19:05:16.086	command_generated	online_running							1	1	2	10000	1	0							realtime online correction generated			
+1792753516123	2026-10-23T19:05:16.123	command_generated	online_running							1	1	2	10000	1	0							realtime online correction generated			
+1792753516210	2026-10-23T19:05:16.210	vision_sample	online_running	1	-89.894476	-111.359625	22.135651		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516277	2026-10-23T19:05:16.277	online_icp	online_running																			enabled=1 attempted=1 applied=1 buffered=0 rms_mm=0.208912 reason=online ICP applied			
+1792753516277	2026-10-23T19:05:16.277	command_generated	online_running							1	1	2	10000	1	0							realtime online correction generated			
+1792753516278	2026-10-23T19:05:16.278	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,1,2,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898904,89498,-259477,-1661398,406466,432344,80,1714747,2,469,616,-534,5,0,0	robot request completed			
+1792753516280	2026-10-23T19:05:16.280	command_generated	online_running							1	1	2	10000	1	0							realtime online correction generated			
+1792753516295	2026-10-23T19:05:16.295	command_generated	online_running							1	1	2	10000	1	0							realtime online correction generated			
+1792753516324	2026-10-23T19:05:16.324	vision_sample	online_running	1	-89.697608	-111.564080	22.222396		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516328	2026-10-23T19:05:16.328	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=1 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753516330	2026-10-23T19:05:16.330	command_generated	online_running							1	1	2	10000	1	0							realtime online correction generated			
+1792753516409	2026-10-23T19:05:16.409	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,1,1,2,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898949,89547,-259380,-1661397,406473,432326,80,1713491,2,756,94,-591,5,0,0	robot request completed			
+1792753516411	2026-10-23T19:05:16.411	command_generated	online_running							0	1	2	10000	1	0							realtime online correction generated			
+1792753516458	2026-10-23T19:05:16.458	command_generated	online_running							0	1	2	10000	1	0							realtime online correction generated			
+1792753516491	2026-10-23T19:05:16.491	vision_sample	online_running	1	-89.560505	-111.630924	22.181109		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516494	2026-10-23T19:05:16.494	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=2 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753516495	2026-10-23T19:05:16.495	command_generated	online_running							1	1	2	10000	1	0							realtime online correction generated			
+1792753516594	2026-10-23T19:05:16.594	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,1,2,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,898998,89592,-259274,-1661398,406473,432328,80,1712157,2,-42,-18,1101,5,0,0	robot request completed			
+1792753516597	2026-10-23T19:05:16.597	command_generated	online_running							-4	1	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753516613	2026-10-23T19:05:16.613	vision_sample	online_running	1	-89.384017	-111.882271	22.192860		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516616	2026-10-23T19:05:16.616	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=3 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753516617	2026-10-23T19:05:16.617	command_generated	online_running							0	-3	2	10000	1	0							realtime online correction generated			
+1792753516653	2026-10-23T19:05:16.653	command_generated	online_running							-1	-1	1	10000	1	0							realtime online correction generated			
+1792753516741	2026-10-23T19:05:16.741	vision_sample	online_running	1	-89.319087	-111.893487	22.172184		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516744	2026-10-23T19:05:16.744	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=4 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753516744	2026-10-23T19:05:16.744	command_generated	online_running							-1	-1	1	10000	1	0							realtime online correction generated			
+1792753516775	2026-10-23T19:05:16.775	command_receipt	online_running													1	1	1	0	P 1,1,1,0,0,0,0,1,0,0,-3,2,0,0,0,10000,1	D 7,2,0,1,1,0,0,14,9,1,1,0,1,30,0,1,0,899017,89634,-259186,-1661386,406472,432325,80,1710912,2,-45,-14,1100,5,0,0	robot request completed			
+1792753516777	2026-10-23T19:05:16.777	command_generated	online_running							-2	-1	1	10000	1	0							realtime online correction generated			
+1792753516835	2026-10-23T19:05:16.835	vision_sample	online_running	1	-89.066674	-112.087163	22.217315		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516837	2026-10-23T19:05:16.837	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=5 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753516837	2026-10-23T19:05:16.837	command_generated	online_running							-2	-1	1	10000	1	0							realtime online correction generated			
+1792753516933	2026-10-23T19:05:16.933	vision_sample	online_running	1	-88.893743	-112.234490	22.241806		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516935	2026-10-23T19:05:16.935	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=6 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753516936	2026-10-23T19:05:16.936	command_generated	online_running							-2	-1	1	10000	1	0							realtime online correction generated			
+1792753516993	2026-10-23T19:05:16.993	vision_sample	online_running	1	-88.927904	-112.250957	22.171807		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753516997	2026-10-23T19:05:16.997	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=7 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753516997	2026-10-23T19:05:16.997	command_generated	online_running							-2	-2	1	10000	1	0							realtime online correction generated			
+1792753517057	2026-10-23T19:05:17.057	vision_sample	online_running	1	-88.925775	-112.243639	22.164257		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517061	2026-10-23T19:05:17.061	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=8 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517062	2026-10-23T19:05:17.062	command_generated	online_running							-2	-2	0	10000	1	0							realtime online correction generated			
+1792753517116	2026-10-23T19:05:17.116	vision_sample	online_running	1	-88.926825	-112.247247	22.167979		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517120	2026-10-23T19:05:17.120	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=9 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517121	2026-10-23T19:05:17.121	command_generated	online_running							-3	-2	0	10000	1	0							realtime online correction generated			
+1792753517172	2026-10-23T19:05:17.172	vision_sample	online_running	1	-88.924393	-112.238885	22.159352		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517176	2026-10-23T19:05:17.176	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=10 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517177	2026-10-23T19:05:17.177	command_generated	online_running							-3	-2	0	10000	1	0							realtime online correction generated			
+1792753517232	2026-10-23T19:05:17.232	vision_sample	online_running	1	-88.925934	-112.244183	22.164818		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517235	2026-10-23T19:05:17.235	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=11 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517235	2026-10-23T19:05:17.236	command_generated	online_running							-3	2	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753517290	2026-10-23T19:05:17.290	vision_sample	online_running	1	-88.925040	-112.241110	22.161648		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517292	2026-10-23T19:05:17.292	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=12 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517293	2026-10-23T19:05:17.293	command_generated	online_running							5	1	1	10000	1	0							realtime online correction generated			
+1792753517356	2026-10-23T19:05:17.356	vision_sample	online_running	1	-88.926409	-112.245817	22.166504		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517358	2026-10-23T19:05:17.358	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=13 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517358	2026-10-23T19:05:17.358	command_generated	online_running							0	0	0	10000	1	0							realtime online correction generated			
+1792753517410	2026-10-23T19:05:17.410	vision_sample	online_running	1	-88.924622	-112.239673	22.160166		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517412	2026-10-23T19:05:17.412	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=14 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517412	2026-10-23T19:05:17.413	command_generated	online_running							0	0	0	10000	1	0							realtime online correction generated			
+1792753517467	2026-10-23T19:05:17.467	vision_sample	online_running	1	-88.925470	-112.242589	22.163174		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517469	2026-10-23T19:05:17.469	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=15 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517470	2026-10-23T19:05:17.470	command_generated	online_running							1	1	0	10000	1	0							realtime online correction generated			
+1792753517525	2026-10-23T19:05:17.525	vision_sample	online_running	1	-88.924784	-112.240228	22.160738		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517527	2026-10-23T19:05:17.527	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=16 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517527	2026-10-23T19:05:17.527	command_generated	online_running							1	1	0	10000	1	0							realtime online correction generated			
+1792753517583	2026-10-23T19:05:17.583	vision_sample	online_running	1	-88.925822	-112.243798	22.164421		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517586	2026-10-23T19:05:17.586	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=17 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517586	2026-10-23T19:05:17.586	command_generated	online_running							1	1	1	10000	1	0							realtime online correction generated			
+1792753517642	2026-10-23T19:05:17.642	vision_sample	online_running	1	-88.923753	-112.236683	22.157081		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517647	2026-10-23T19:05:17.647	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=18 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517647	2026-10-23T19:05:17.647	command_generated	online_running							1	1	1	10000	1	0							realtime online correction generated			
+1792753517708	2026-10-23T19:05:17.708	vision_sample	online_running	1	-88.924973	-112.240877	22.161408		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517712	2026-10-23T19:05:17.712	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=19 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517713	2026-10-23T19:05:17.713	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753517767	2026-10-23T19:05:17.767	vision_sample	online_running	1	-88.925492	-112.242665	22.163252		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517772	2026-10-23T19:05:17.772	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=20 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517772	2026-10-23T19:05:17.772	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753517825	2026-10-23T19:05:17.825	vision_sample	online_running	1	-88.926027	-112.244505	22.165150		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517827	2026-10-23T19:05:17.827	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=21 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517828	2026-10-23T19:05:17.828	command_generated	online_running							2	2	1	10000	1	0							realtime online correction generated			
+1792753517894	2026-10-23T19:05:17.894	vision_sample	online_running	1	-88.925176	-112.241576	22.162129		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517896	2026-10-23T19:05:17.896	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=22 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517897	2026-10-23T19:05:17.897	command_generated	online_running							-5	0	0	10000	1	0							predicted control reference recomputed from current robot feedback			
+1792753517974	2026-10-23T19:05:17.974	vision_sample	online_running	1	-88.926440	-112.245924	22.166614		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753517977	2026-10-23T19:05:17.977	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=23 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753517977	2026-10-23T19:05:17.977	command_generated	online_running							7	3	0	10000	1	0							realtime online correction generated			
+1792753518053	2026-10-23T19:05:18.053	vision_sample	online_running	1	-88.924215	-112.238272	22.158721		-1													原图接缝精定位测量；仿真仅辅助搜索。; RobotSim 线结构光虚拟参考查询成功。	0	1	0
+1792753518055	2026-10-23T19:05:18.055	online_icp	online_running																			enabled=1 attempted=0 applied=0 buffered=24 rms_mm=0.000000 reason=online ICP waiting for five sampled points, 2 mm span and new batch			
+1792753518056	2026-10-23T19:05:18.056	command_generated	online_running							2	2	0	10000	1	0							realtime online correction generated			

@@ -1,0 +1,33 @@
+timestamp_ms	update_index	batch_index	segment_index	phase	enabled	attempted	applied	flush	fit_count	model_count	pending_count	released_count	rms_mm	matrix_present	m00	m01	m02	m03	m10	m11	m12	m13	m20	m21	m22	m23	m30	m31	m32	m33	message
+1792753321740	756	1	0	online_running	1	0	0	1	0	0	2	2		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753323271	793	2	0	online_running	1	1	1	0	5	1368	13	5	0.227184448	1	-0.480900941412	-0.633027980907	-0.606638162284	-89.937677921467	-0.772291863245	0.633396122432	-0.048730176003	-101.933854669763	0.415089824634	0.445067329151	-0.793483150425	539.930237765804	0.000000000000	0.000000000000	0.000000000000	1.000000000000	online ICP applied
+1792753325071	839	3	0	online_running	1	1	1	0	10	1368	15	5	0.137078443	1	0.457629890242	0.409827783778	0.789060245609	-242.704404942653	-0.714430147408	0.697777044489	0.051930344303	-114.811288597692	-0.529305628188	-0.587493305348	0.612116956259	-15.737751513810	0.000000000000	0.000000000000	0.000000000000	1.000000000000	online ICP applied
+1792753326368	872	4	0	online_running	1	1	1	0	11	1368	10	5	0.212828091	1	0.708788846083	0.705269649958	0.014597688722	8.725561544583	-0.705116426958	0.708939140378	-0.014701009302	-95.964003518094	-0.020717048578	0.000126841306	0.999785370872	-2.790588812617	0.000000000000	0.000000000000	0.000000000000	1.000000000000	online ICP applied
+1792753327580	902	5	0	online_running	1	1	1	0	13	1368	11	4	0.154296295	1	0.632597028598	0.601743593502	-0.487571171306	117.486589155148	-0.713004000194	0.698299857635	-0.063266140497	-85.274674335843	0.302400884780	0.387662168010	0.870788004269	101.997811740268	0.000000000000	0.000000000000	0.000000000000	1.000000000000	online ICP applied
+1792753328841	936	6	0	online_running	1	1	1	0	14	1368	11	5	0.133950771	1	0.584742272900	0.519004657742	-0.623466630643	138.406031554362	-0.712102155414	0.696533475089	-0.088043388934	-79.067483429487	0.388570449904	0.495454622868	0.776876902823	145.537167377143	0.000000000000	0.000000000000	0.000000000000	1.000000000000	online ICP applied
+1792753330003	966	7	0	online_running	1	1	1	0	15	1368	10	5	0.159356978	1	-0.550017864217	-0.817669203974	0.169992417229	-313.089839628511	-0.830330197714	0.557236753054	-0.006242099878	-125.984112077797	-0.089622049782	-0.144583103851	-0.985425600578	477.566855723344	0.000000000000	0.000000000000	0.000000000000	1.000000000000	online ICP applied
+1792753331252	997	8	0	online_running	1	1	1	0	16	1368	10	6	0.183092994	1	0.706847355002	0.657145287634	-0.261776407776	73.186022462458	-0.691055414935	0.720534560719	-0.057204547881	-82.749449384142	0.151027249912	0.221336887459	0.963431757850	46.478058092265	0.000000000000	0.000000000000	0.000000000000	1.000000000000	online ICP applied
+1792753332726	1035	9	0	online_running	1	0	0	1	0	0	13	13		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753333018	1042	10	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753333317	1049	11	0	online_running	1	0	0	1	0	0	2	2		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753333533	1053	12	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753334014	1066	13	0	online_running	1	0	0	1	0	0	4	4		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753334315	1072	14	0	online_running	1	0	0	1	0	0	2	2		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753334517	1076	15	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753334644	1080	16	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753334902	1088	17	0	online_running	1	0	0	1	0	0	2	2		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335109	1092	18	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335196	1093	19	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335251	1094	20	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335326	1095	21	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335381	1096	22	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335463	1097	23	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335517	1098	24	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335588	1099	25	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335639	1100	26	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335711	1101	27	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335767	1102	28	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335842	1103	29	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335892	1104	30	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753335962	1105	31	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
+1792753336007	1106	32	0	online_running	1	0	0	1	0	0	1	1		0																	estimated seam continuation bypasses ICP; measured window isolated
