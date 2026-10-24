@@ -15,6 +15,12 @@ class EvidenceReplayTests(unittest.TestCase):
         image = bytearray(225 if abs(y - (260 - .45 * abs(x - 360))) < 1.5 else 14
                           for y in range(480) for x in range(640))
         (folder/'visible.pgm').write_bytes(b'P5\n640 480\n255\n'+image)
+        shifted = bytearray(225 if abs(y - (260 - .45 * abs(x - 365))) < 1.5 else 14
+                            for y in range(480) for x in range(640))
+        (folder/'shifted.pgm').write_bytes(b'P5\n640 480\n255\n'+shifted)
+        far = bytearray(225 if abs(y - (260 - .45 * abs(x - 380))) < 1.5 else 14
+                        for y in range(480) for x in range(640))
+        (folder/'far.pgm').write_bytes(b'P5\n640 480\n255\n'+far)
         (folder/'blank.pgm').write_bytes(b'P5\n640 480\n255\n'+bytes([14])*640*480)
         manifest = folder/'input.jsonl'
         values = []
