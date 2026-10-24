@@ -3,10 +3,12 @@ import argparse
 import base64
 import hashlib
 import json
+import math
 import pathlib
 import shlex
 import subprocess
 import sys
+import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 HERE = pathlib.Path(__file__).resolve().parent
@@ -77,18 +79,54 @@ def main():
     if args.output.exists():
         raise RuntimeError('output exists; choose a new directory to preserve previous evidence')
     binary, hashes, versions = build(args.cache)
-    result = subprocess.run([str(binary), str(args.manifest.resolve())], text=True, capture_output=True)
-    if result.returncode:
-        raise RuntimeError(result.stderr)
-    rows = [json.loads(line) for line in result.stdout.splitlines()]
     inputs = [json.loads(line) for line in args.manifest.read_text().splitlines() if line.strip()]
     if args.policy_config and not args.evidence:
         raise ValueError('--policy-config requires --evidence')
+    def detector(frames, path):
+        path.write_text(''.join(json.dumps(frame)+'\n' for frame in frames),encoding='utf-8')
+        process=subprocess.run([str(binary),str(path)],text=True,capture_output=True)
+        if process.returncode:
+            raise RuntimeError(process.stderr)
+        return [json.loads(line) for line in process.stdout.splitlines()]
     if args.evidence:
         from evidence_session import EvidenceSession
         config = json.loads(args.policy_config.read_text()) if args.policy_config else None
         session = EvidenceSession(config)
-        rows = [session.process(frame, raw) for frame, raw in zip(inputs, rows)]
+        transaction_dir=pathlib.Path(tempfile.mkdtemp(prefix='evidence-transactions-',dir=args.cache))
+        checkpoint=None
+        rows=[]
+        for index, original in enumerate(inputs):
+            current=dict(original)
+            if original.get('image'):
+                current['image']=str((args.manifest.parent/original['image']).resolve())
+            frames=([checkpoint] if checkpoint else [])+[current]
+            transaction=detector(frames,transaction_dir/(str(index)+'.jsonl'))
+            raw=transaction[-1]
+            reconstruction=None
+            if checkpoint:
+                seed=transaction[0]
+                point=seed.get('final_pixel')
+                expected=session.anchor['pixel'] if session.anchor else None
+                valid=bool(seed.get('available') and seed.get('trust')=='independent_geometry'
+                    and point and expected and math.dist(point,expected)<=4)
+                reconstruction=dict(valid=valid, expected_pixel=expected, actual_pixel=point,
+                    training_committed=seed.get('training_committed'),
+                    template_reinitialized=seed.get('template_reinitialized'))
+            raw['checkpoint_reconstruction']=reconstruction
+            raw['image']=original.get('image')
+            row=session.process(original,raw)
+            row['checkpoint_source_frame']=checkpoint.get('frame_id') if checkpoint else None
+            row['template_retained_for_next_exposure']=row['anchor_refreshed']
+            row['detector_training_policy']='temporary real detector rebuilt from reliable checkpoint; only final independent geometry promotes checkpoint'
+            row['temporary_training_discarded']=bool(raw.get('training_committed') and not row['anchor_refreshed'])
+            if row['anchor_refreshed']:
+                checkpoint=current
+            rows.append(row)
+    else:
+        process=subprocess.run([str(binary),str(args.manifest.resolve())],text=True,capture_output=True)
+        if process.returncode:
+            raise RuntimeError(process.stderr)
+        rows=[json.loads(line) for line in process.stdout.splitlines()]
     args.output.mkdir(parents=True)
     portable_inputs = []
     for index, (row, original) in enumerate(zip(rows, inputs)):
@@ -114,6 +152,10 @@ def main():
                     ['git', 'diff', '--name-only', '430aaa204fd5319dd7f697d3de2b4e1faddbb06f', '--',
                      'Vision', 'DigitalTwin/include'], cwd=ROOT, text=True).splitlines(),
                 'msvc_validated': False, 'evidence_policy_enabled': args.evidence,
+                'evidence_transport': 'per-exposure reliable-checkpoint rebuild' if args.evidence else 'single detector full manifest',
+                'policy_source_hashes': {name:hashlib.sha256((HERE/name).read_bytes()).hexdigest() for name in
+                    ('replay.py','evidence_session.py','identity_evidence.py','IdentityEvidence.cpp')} if args.evidence else None,
+                'identity_source_sha256': hashlib.sha256((HERE/'IdentityEvidence.cpp').read_bytes()).hexdigest() if args.evidence else None,
                 'evidence_policy_sha256': hashlib.sha256((HERE/'evidence_session.py').read_bytes()).hexdigest() if args.evidence else None,
                 'policy_config': session.config if args.evidence else None, 'policy_parameters_field_validated': False}
     (args.output/'metadata.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2)+'\n')

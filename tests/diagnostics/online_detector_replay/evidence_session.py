@@ -1,11 +1,13 @@
-"""真实检测结果之上的离线证据会话。不是在线控制或模板训练策略。"""
+"""真实检测结果之上的离线证据会话；可靠checkpoint运输由replay负责，不涉及在线控制。"""
 import copy
 import math
 
 DEFAULT_CONFIG = {'anchor_confirmation_frames': 2, 'max_prediction_ms': None,
-                  'max_prediction_travel_mm': None, 'enable_mother_constraints': False,
-                  'mother_options': {}, 'recovery_confirmation_frames': 2,
-                  'max_recovery_step_pixel': None, 'max_reacquisition_distance_pixel': None}
+                  'max_prediction_travel_mm': None,
+                  'identity_corridor_pixel':12, 'identity_min_patch_score':.70,
+                  'identity_min_branch_score':.55, 'identity_min_uniqueness':.04,
+                  'identity_min_kcf_peak':.20, 'recovery_confirmation_frames':2,
+                  'max_recovery_step_pixel':None, 'max_reacquisition_distance_pixel':None, 'enable_mother_constraints':False, 'mother_options':{}}
 
 
 def finite_point(value, dimensions=2):
@@ -63,6 +65,16 @@ class EvidenceSession:
             value = self.config[key]
             if value is not None and (not finite_number(value) or value <= 0):
                 raise ValueError(key + ' must be a positive unvalidated candidate limit or null')
+        corridor=self.config['identity_corridor_pixel']
+        if isinstance(corridor,bool) or not isinstance(corridor,int) or not 1 <= corridor <= 128:
+            raise ValueError('identity_corridor_pixel must be a candidate integer in [1,128]')
+        for key in ('identity_min_patch_score','identity_min_branch_score','identity_min_uniqueness'):
+            value=self.config[key]
+            if not finite_number(value) or not 0 <= value <= 1:
+                raise ValueError(key+' must be a candidate number in [0,1]')
+        if not finite_number(self.config['identity_min_kcf_peak']) or self.config['identity_min_kcf_peak'] < 0:
+            raise ValueError('identity_min_kcf_peak must be a nonnegative candidate number')
+
         if not isinstance(self.config['enable_mother_constraints'], bool):
             raise ValueError('enable_mother_constraints must be boolean')
         if not isinstance(self.config['mother_options'], dict):
@@ -76,6 +88,9 @@ class EvidenceSession:
         self.last_timestamp = None
         self.budget_provenance_failures = []
         self.reference_mapping = None
+        self.identity_history = None
+        self.reference_identity_conflict = False
+
         self.mother_model = None
 
         self.recovery_active = False
@@ -86,6 +101,7 @@ class EvidenceSession:
     def _seed_continuation(self, frame):
         """新独立几何才重置预算；参考映射与真实锚点分开保存。"""
         self.travel = 0.0
+        self.reference_identity_conflict = False
         self.last_progress = progress_sample(frame)
         self.last_timestamp = frame.get('timestamp_ms')
         self.budget_provenance_failures = []
@@ -145,7 +161,10 @@ class EvidenceSession:
             if self.travel >= self.config['max_prediction_travel_mm']:
                 failures.append('travel_budget_exhausted')
         reference = reference_sample(frame)
-        if reference is None or self.reference_mapping is None:
+        if self.reference_identity_conflict:
+            failures.append('reference_identity_conflict')
+            result['reference_alignment']='identity_conflict'
+        elif reference is None or self.reference_mapping is None:
             failures.append('reference_geometry_unavailable')
         elif reference[0] != self.reference_mapping['revision']:
             mapping = self.reference_mapping
@@ -173,6 +192,8 @@ class EvidenceSession:
                 mapping['exposure'] = frame['frame_id']
         if self.reference_mapping is not None:
             predicted = self.reference_mapping['estimate']
+            if self.reference_identity_conflict:
+                predicted=result.get('identity_evidence',{}).get('reference_proposal_pixel',predicted)
             size = self.context_key[1] if self.context_key is not None else ()
             if (not finite_point(predicted) or len(size) != 2
                     or not 0 <= predicted[0] < size[0] or not 0 <= predicted[1] < size[1]):
@@ -187,6 +208,25 @@ class EvidenceSession:
                       source='bounded_prediction', trust='estimated_not_independent',
                       mode='predicted', availability_scope='pixel_only_prediction',
                       message='bounded relative-reference prediction; not a measured weld point; no spatial/control qualification')
+
+    def _identity(self, frame, raw):
+        """独立几何入锚前验收身份；外观与参考都不能自行建立可靠锚。"""
+        reconstruction=raw.get('checkpoint_reconstruction')
+        seed_failed=reconstruction is not None and not reconstruction['valid']
+        if self.identity_history is None:
+            return dict(geometry_accepted=True, appearance_accepted=False, reasons=[],
+                        status='initial_acquisition_without_prior_target')
+        from identity_evidence import inspect_identity
+        expected=list(self.identity_history['pixel'])
+        previous=self.identity_history.get('reference')
+        current=reference_sample(frame)
+        if previous and current and previous[0]==current[0]:
+            expected=[p+c-h for p,c,h in zip(expected,current[1],previous[1])]
+        evidence=inspect_identity(self.identity_history,raw,expected,self.config)
+        if seed_failed:
+            evidence.update(geometry_accepted=False,appearance_accepted=False)
+            evidence['reasons'].append('trusted_checkpoint_reconstruction_failed')
+        return evidence
 
     def _mother_constraints(self, frame, raw):
         """历史几何只提供搜索提案；实际母材线、残差及中心一致性来自原图。"""
@@ -266,12 +306,13 @@ class EvidenceSession:
                       source='unavailable', trust='unavailable', can_independent_validate=False,
                       anchor=None, anchor_refreshed=False, mode='unavailable',
                       policy_unvalidated=True, policy_config=dict(self.config),
-                      detector_training_policy='unmodified baseline; postprocessing cannot undo training')
+                      detector_training_policy='raw process training retained in diagnostics; checkpoint retention belongs to replay transport')
         key = (frame.get('seam_index'), tuple(raw.get('image_size') or []))
         if self.context_key is not None and key != self.context_key and raw.get('image_size'):
             self.anchor = None
             self.mother_model = None
             self.pending = 0
+            self.identity_history = None
             self.recovery_active = False
             self.recovery_count = 0
             self.recovery_candidate = None
@@ -285,12 +326,17 @@ class EvidenceSession:
             self.last_frame_id = max(identity,self.last_frame_id if self.last_frame_id is not None else identity)
         if self.anchor is not None and fresh:
             self._account_exposure(frame)
-        geometry = (raw.get('available') is True and raw.get('image_observation_accepted') is True
+        identity_evidence=self._identity(frame,raw)
+        result['identity_evidence']=identity_evidence
+        if 'reference_motion_exceeds_identity_corridor' in identity_evidence.get('reasons',[]):
+            self.reference_identity_conflict = True
+        raw_geometry = (raw.get('available') is True and raw.get('image_observation_accepted') is True
                     and raw.get('trust')=='independent_geometry' and raw.get('image_source')=='geometry'
                     and finite_point(raw.get('final_pixel')) and finite_point(raw.get('positioner_tcp_mm'),3))
+        geometry = identity_evidence['geometry_accepted'] and raw_geometry
         mother = self._mother_constraints(frame, raw) if self.config['enable_mother_constraints'] else None
         result['mother_observation'] = copy.deepcopy(mother)
-        if mother is not None and geometry:
+        if mother is not None and raw_geometry:
             candidate = mother.get('estimated_pixel')
             consistent = (mother.get('center_supported') and mother.get('left', {}).get('valid')
                           and mother.get('right', {}).get('valid') and finite_point(candidate)
@@ -303,6 +349,9 @@ class EvidenceSession:
         geometry = self._recovery_decision(frame, raw, result, fresh, geometry)
         if fresh and geometry:
             self.pending += 1
+            if self.identity_history is None:
+                self.identity_history=dict(image=raw.get('image_png_base64'),
+                    pixel=list(raw['final_pixel']), reference=reference_sample(frame))
             if self.pending >= self.config['anchor_confirmation_frames']:
                 self.anchor = dict(frame_id=identity, pixel=list(raw['final_pixel']),
                                    positioner_tcp_mm=list(raw['positioner_tcp_mm']),
@@ -312,6 +361,9 @@ class EvidenceSession:
                                    progress_reference=frame.get('progress_reference'),
                                    progress_provenance=frame.get('progress_provenance'))
                 self._seed_continuation(frame)
+                self.identity_history=dict(image=raw.get('image_png_base64'),
+                    pixel=list(raw['final_pixel']), reference=reference_sample(frame))
+
                 if mother is not None:
                     self.mother_model = copy.deepcopy(mother['learned_model'])
                 result.update(available=True, final_pixel=list(raw['final_pixel']),
@@ -330,6 +382,14 @@ class EvidenceSession:
                 result.update(self.recovery_preview)
             else:
                 self._continue(frame, result, fresh)
+            pending_independent_recovery=(self.recovery_active and identity_evidence['geometry_accepted']
+                and raw.get('trust')=='independent_geometry')
+            if (result['available'] and identity_evidence.get('appearance_accepted')
+                    and not pending_independent_recovery):
+                result.update(final_pixel=list(identity_evidence['appearance_pixel']),
+                    source='appearance_tracking', trust='tracked_not_independent', mode='tracked',
+                    availability_scope='pixel_only_appearance',
+                    message='current image and real KCF support historical target; old anchor budgets apply')
             if self.recovery_transition_target is not None and result['available']:
                 target = self.recovery_transition_target
                 length = math.dist(target, self.last_output)
@@ -357,6 +417,8 @@ class EvidenceSession:
                           space_available=False, control_eligible=False, positioner_tcp_mm=None,
                           message='current outer mother pixels constrain historical target; not a measured hidden seam')
 
+        if identity_evidence.get('reasons'):
+            result['message']='identity distance/appearance conflict: '+', '.join(identity_evidence['reasons'])+'; '+result['message']
         result['recovery_measurement_pixel'] = (list(raw['final_pixel'])
             if raw.get('trust') == 'independent_geometry' and finite_point(raw.get('final_pixel')) else None)
         result['recovery_confirmation_count'] = self.recovery_count

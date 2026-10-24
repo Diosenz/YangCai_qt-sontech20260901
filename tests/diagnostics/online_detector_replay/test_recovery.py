@@ -10,7 +10,7 @@ class RecoveryTests(unittest.TestCase):
     def test_recovered_measurement_is_preserved_while_transition_is_not_an_anchor(self):
         frames=[self.continuation_frame(i,1000+i*100,i*.1,[100,100],
                     image='blank.pgm' if i==3 else ('shifted.pgm' if i>=4 else 'visible.pgm'))
-                for i in range(1,10)]
+                for i in range(1,11)]
         rows=self.run_sequence(frames,dict(max_prediction_ms=1000,max_prediction_travel_mm=10,
                   recovery_confirmation_frames=2,max_recovery_step_pixel=1,
                   max_reacquisition_distance_pixel=12))

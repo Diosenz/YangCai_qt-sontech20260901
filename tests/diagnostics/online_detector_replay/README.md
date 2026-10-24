@@ -82,8 +82,8 @@ TCP 正在跟随检测点，不能把 TCP 自身当作独立检测真值。
 源结果完整保留在 `raw_detector`；`anchor`、`anchor_refreshed`、`can_independent_validate`
 和 `confirmation_count` 是离线契约结果。参数未现场标定，首次确认期间会不可用。
 
-任务04已加入下述受限续接；恢复身份验收与模板回滚尚未实现。生产检测器仍按原规则运行；
-业务后置拒绝不意味着撤销了原始KCF训练，不能声称任务06已实现。
+任务04提供下述受限续接；任务06增加逐曝光身份验收与模板事务，详见后文。
+每次生产 process 内部仍按原规则训练；原始训练事实不会被后处理改写。
 
 
 ## 有限续接（任务04）
@@ -135,8 +135,58 @@ TCP 在机器人基座几乎不动而外轴转动时，应由上游工件相对�
 预测超出图像范围也不可用。此实现只输出**像素预测**：
 `positioner_tcp_mm=null`、`space_available=false`、`control_eligible=false`，
 不使用固定像素毫米比例造空间点，不给 TCP 执行资格，也不能参与独立焊点校验。
-原始生产结果完整保留在 `raw_detector`，其内部训练仍未被撤回。
+原始生产结果完整保留在 `raw_detector`；事务保留/丢弃与实际训练事件分开记录。
 
 演示另有预算内误差反例：真实检测锚之后，隐藏的合成接缝运动与参考相对运动不一致，
 预测仍在预算内但误差约12.36px。真值只进入独立评估器，未传给检测/策略。
 这证明预算合格只意味着有限续接条件满足，不能作为位置准确或可执行的证明。
+
+## 身份验收和模板事务（任务06）
+
+`--evidence` 现在逐曝光建立短检测会话：重放上一个**最终确认的独立几何**原图及原曝光上下文，
+再运行当前原图。当前帧只有通过曝光身份、投影、几何及同目标身份验收，并完成原有确认，
+才晋升为下一曝光的可靠 checkpoint。默认 baseline 不使用该运输，仍是单检测器完整 manifest。
+这是一种成本较高的离线事务，不是实时实现，也不等价于恢复全部历史 KCF 数值状态。
+
+`raw_detector.training_committed` 保留真实训练事件；`temporary_training_discarded=true` 表示
+该临时会话的训练没有保留到下一曝光，不能解释为原 process 没有训练。
+`checkpoint_source_frame` 是本帧实际使用的旧可靠帧；
+`template_retained_for_next_exposure` 只在最终独立几何晋升时为 true。
+checkpoint 冷启动必须重新检测到原锚附近（候选4px以内），否则图像身份路径 fail closed，
+仅允许仍满足旧预算的已有预测。所有输入与临时 manifest 都保留，不删除历史材料。
+
+身份 helper 读取原图像素与历史确认 patch，在历史目标的局部运动走廊内匹配双侧形状；
+几何候选同时需要历史距离、当前局部匹配、左右分支 patch 一致性及匹配唯一性。
+可用同版参考只提供历史附近的相对运动提案，不能用大幅参考位移授权远端同形目标。
+更亮或 NCC=1 的远候选仍会拒绝，不能通过连续出现累计夺取身份。
+参考相对运动超出可验收身份走廊时，`reference_identity_conflict` 也阻止参考依赖预测，
+保留旧锚和累计预算；冲突锁定到新的独立几何确认，不把换来源标签当作避免拖点。
+这只表示超出该离线候选尺度后的不确定性过大，不断言参考运动在物理上必然错误。
+首锚确认也要求连续候选身份一致；第一帧无先验目标时的初始化本身不证明母材语义。
+
+外观输出额外需要真实 KCF 响应和 KCF 位置与历史局部匹配相容。
+它标为 `source=appearance_tracking`、`trust=tracked_not_independent`，
+只在原时间/行程/参考预算满足时输出像素，不刷新锚、确认次数、预算或 checkpoint，
+没有空间点、控制资格或独立校验资格。身份冲突原因保留在 `identity_evidence.reasons`。
+
+显式离线候选参数（均未现场标定）：
+
+- `identity_corridor_pixel=12`，整数1～128；
+- `identity_min_patch_score=.70`、`identity_min_branch_score=.55`；
+- `identity_min_uniqueness=.04`（排除同一峰附近8px之后的分数差）；
+- `identity_min_kcf_peak=.20`。
+
+固定97×65 patch、左右各32列、候选与局部匹配4px一致性，也只是本离线设计的候选尺度。
+当前未实现遮挡后的远距离自动换目标；无法区分的近邻同形纹理、真实形状突变或大运动可能拒绝，
+预算内预测仍不保证精度。相似度不是目标语义证明。缺少真实连续遮挡数据，不能外推现场误切换率。
+
+```sh
+python3 tests/diagnostics/online_detector_replay/test_identity_continuation.py
+python3 tests/diagnostics/online_detector_replay/test_identity_mother_recovery.py
+```
+
+测试保留可搬迁 viewer 与完整原图/manifest；可用 `KCF_IDENTITY_EVIDENCE` 环境变量指定证据父目录。
+亮反光竞争、多个同形候选、正常运动、恢复与模板丢弃、首锚身份一致性、参考诱导和真值标签不敏感
+均通过公开 `replay.py --evidence`，不 mock 原图、KCF 或 refiner。
+外观演示另用显式 `.60` patch 候选参数，以容许交叉亮纹污染；该序列输出约3px偏差，
+默认 `.70` 会更保守地降级预测。这不构成推荐阈值或现场精度结论。

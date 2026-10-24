@@ -103,7 +103,7 @@ class MotherConstraintTests(unittest.TestCase):
         cap = raster(cap=True,cap_radius=12,cap_height=1)
         guarded = self.run_case([cap,cap],config_override={'max_prediction_ms':200})
         baseline = self.run_case([cap],config_override={'enable_mother_constraints':False})
-        self.assertEqual(baseline[-1]['source'],'geometry')
+        self.assertEqual(baseline[-1]['raw_detector']['source'],'geometry')
         self.assertEqual(guarded[2]['raw_detector']['source'],'geometry')
         self.assertTrue(guarded[2]['mother_geometry_rejected'])
         self.assertEqual(guarded[2]['source'],'mother_material_estimate')
