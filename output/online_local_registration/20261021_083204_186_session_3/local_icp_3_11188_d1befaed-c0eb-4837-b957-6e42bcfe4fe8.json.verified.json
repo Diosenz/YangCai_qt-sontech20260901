@@ -1,0 +1,209 @@
+{
+    "baseline_parent_from_workpiece": [
+        1.0000000000000002,
+        -6.341757906571909e-18,
+        0,
+        -3.3668519166266254e-24,
+        5.971359973353194e-19,
+        1.0000000000000002,
+        0,
+        6.508225629927189e-23,
+        -1.3552527156068805e-20,
+        0,
+        1.0000000000000002,
+        0,
+        0,
+        0,
+        0,
+        1
+    ],
+    "before_parent_from_workpiece": [
+        0.9995317280346674,
+        0.030599422413370905,
+        4.0657581468206416e-19,
+        -1.0313196263596889,
+        -0.030599422413370908,
+        0.9995317280346673,
+        4.336808689942018e-19,
+        -6.575507075208966,
+        -4.0657581468206416e-19,
+        -2.168404344971009e-19,
+        1,
+        -3.467098891735077,
+        0,
+        0,
+        0,
+        1
+    ],
+    "cumulative_rotation_deg": 1.4848352068898387,
+    "cumulative_translation_mm": 7.74078571053469,
+    "epoch": "33",
+    "has_pending_pose": false,
+    "maximum_keypoint_displacement_mm": 10.5715036371743,
+    "message": "独立新帧验证后，工件位姿已晋升为可信位姿。",
+    "parent_id": 1063,
+    "pending_parent_from_workpiece": [
+        0.9996642183596193,
+        0.02591114748189467,
+        4.0453730881452686e-19,
+        -1.5174142664678163,
+        -0.025911147481894672,
+        0.9996642183596192,
+        4.355829803164529e-19,
+        -7.034334552108773,
+        -4.0657581468206416e-19,
+        -2.168404344971009e-19,
+        1,
+        -2.852254331111908,
+        0,
+        0,
+        0,
+        1
+    ],
+    "pending_pose_confirmed": false,
+    "phase": "verified",
+    "post_write_samples": [
+        {
+            "capture_time_ms": "1792571678407",
+            "counterfactual_previous_error_mm": 1.886765659737319,
+            "current_error_mm": 1.979691904902939,
+            "frame_id": "11234",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571678441",
+            "counterfactual_previous_error_mm": 1.8141029177923258,
+            "current_error_mm": 1.954160060946343,
+            "frame_id": "11235",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571678507",
+            "counterfactual_previous_error_mm": 1.5997993052330388,
+            "current_error_mm": 1.6553345273352844,
+            "frame_id": "11237",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571678606",
+            "counterfactual_previous_error_mm": 1.6208893348076614,
+            "current_error_mm": 1.706003390932514,
+            "frame_id": "11240",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571678771",
+            "counterfactual_previous_error_mm": 1.6705372962448448,
+            "current_error_mm": 1.7868727828045732,
+            "frame_id": "11245",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571678870",
+            "counterfactual_previous_error_mm": 1.7630354652164797,
+            "current_error_mm": 1.846477985962559,
+            "frame_id": "11248",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571678936",
+            "counterfactual_previous_error_mm": 1.8325194606943278,
+            "current_error_mm": 1.9700291211002474,
+            "frame_id": "11250",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679002",
+            "counterfactual_previous_error_mm": 1.756150482416338,
+            "current_error_mm": 1.8452053345745836,
+            "frame_id": "11252",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679101",
+            "counterfactual_previous_error_mm": 1.7610990558789061,
+            "current_error_mm": 1.848703763832867,
+            "frame_id": "11255",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679166",
+            "counterfactual_previous_error_mm": 1.8771573090345863,
+            "current_error_mm": 2.0030899568471243,
+            "frame_id": "11257",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679233",
+            "counterfactual_previous_error_mm": 1.6860639711614023,
+            "current_error_mm": 1.803242586671539,
+            "frame_id": "11259",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679332",
+            "counterfactual_previous_error_mm": 1.7513957864287988,
+            "current_error_mm": 1.8434668600750113,
+            "frame_id": "11262",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679431",
+            "counterfactual_previous_error_mm": 1.7975915509760712,
+            "current_error_mm": 1.9098386494524329,
+            "frame_id": "11265",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679497",
+            "counterfactual_previous_error_mm": 1.6779572701656176,
+            "current_error_mm": 1.8042980125708226,
+            "frame_id": "11267",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679629",
+            "counterfactual_previous_error_mm": 1.616954085958451,
+            "current_error_mm": 1.6814708062537636,
+            "frame_id": "11271",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679728",
+            "counterfactual_previous_error_mm": 2.0384121954914503,
+            "current_error_mm": 2.1092147509116015,
+            "frame_id": "11274",
+            "valid": true
+        },
+        {
+            "capture_time_ms": "1792571679862",
+            "counterfactual_previous_error_mm": 1.8974828812675009,
+            "current_error_mm": 1.8939990699856066,
+            "frame_id": "11278",
+            "valid": true
+        }
+    ],
+    "rollback_attempted": false,
+    "scene_revision": "1",
+    "succeeded": true,
+    "verified_by_independent_observation": true,
+    "verified_parent_from_workpiece": [
+        0.9996642183596193,
+        0.02591114748189467,
+        4.0453730881452686e-19,
+        -1.5174142664678163,
+        -0.025911147481894672,
+        0.9996642183596192,
+        4.355829803164529e-19,
+        -7.034334552108773,
+        -4.0657581468206416e-19,
+        -2.168404344971009e-19,
+        1,
+        -2.852254331111908,
+        0,
+        0,
+        0,
+        1
+    ],
+    "workpiece_id": 1068
+}
