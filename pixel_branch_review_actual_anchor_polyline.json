@@ -1,0 +1,41 @@
+{
+  "scope": "Read-only pixel math using actual archived anchor CAD slopes; not native replay",
+  "anchor_left": {
+    "count": 56,
+    "ambiguous_columns": 0,
+    "valid": true,
+    "slope": 0.3558712855629283,
+    "intercept": 613.2575029895712,
+    "rms": 0.30327812388909087
+  },
+  "anchor_right": {
+    "count": 56,
+    "ambiguous_columns": 0,
+    "valid": true,
+    "slope": -0.2628138045858162,
+    "intercept": 603.8908655338671,
+    "rms": 0.6066209258142088
+  },
+  "target_left": {
+    "count": 56,
+    "ambiguous_columns": 0,
+    "valid": true,
+    "slope": 0.40976478750830664,
+    "intercept": 616.4311462979346,
+    "rms": 0.2556199906702315
+  },
+  "target_right": {
+    "count": 56,
+    "ambiguous_columns": 0,
+    "valid": true,
+    "slope": -0.26175727913022107,
+    "intercept": 605.4272760979386,
+    "rms": 0.30452420380609196
+  },
+  "target_point": [
+    432.01678877552797,
+    610.6714404906922
+  ],
+  "innovation_px": 4.071649312365964,
+  "landmark_distance": 7.9192676427223905
+}

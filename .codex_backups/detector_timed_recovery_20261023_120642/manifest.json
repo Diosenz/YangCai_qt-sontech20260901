@@ -1,0 +1,27 @@
+[
+  {
+    "path": "Vision/include/track/OnlineSeamContinuity.h",
+    "sha256": "CCD298904ADEA82B3C9B3F25455F27B5FE72BA988DE0BFF2651846D38709D61D",
+    "bytes": 4360
+  },
+  {
+    "path": "Vision/src/track/OnlineSeamContinuity.cpp",
+    "sha256": "94B98B65997BB869AA66CE0DCDE428CBC58872C31C02289AFB714DE76CFABB64",
+    "bytes": 8837
+  },
+  {
+    "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+    "sha256": "E3CCC24F8395F529A231B71A9B177858619D6E30D3C7D493C137B7500FFCC6DB",
+    "bytes": 5666
+  },
+  {
+    "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+    "sha256": "D0640750ED3AF5CA4853C0925326D01A02256FC48961206ECF6527D86EC9654F",
+    "bytes": 35373
+  },
+  {
+    "path": "tests/test_online_seam_continuity.cpp",
+    "sha256": "98CE453074AB4F47EC01E70DBABC032F050B7D1144252E1476E32BAA421ED751",
+    "bytes": 8639
+  }
+]

@@ -1,0 +1,112 @@
+[
+  {
+    "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Vision\\include\\track\\LegacyOnlineKcfDetector.h",
+    "sha256": "E3CCC24F8395F529A231B71A9B177858619D6E30D3C7D493C137B7500FFCC6DB"
+  },
+  {
+    "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Vision\\src\\track\\LegacyOnlineKcfDetector.cpp",
+    "sha256": "D0640750ED3AF5CA4853C0925326D01A02256FC48961206ECF6527D86EC9654F"
+  },
+  {
+    "path": "Vision/include/track/KcfTracker.h",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Vision\\include\\track\\KcfTracker.h",
+    "sha256": "CF60A6C25DEA26F1D463CBA99FBE3B79B973674481635066E09360D4EF99DD96"
+  },
+  {
+    "path": "Vision/src/track/KcfTracker.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Vision\\src\\track\\KcfTracker.cpp",
+    "sha256": "B2797C9F641FA74C0A0D2DEF62A37357AAF19C2309A8BD2914C90D08B5E0824E"
+  },
+  {
+    "path": "Vision/include/feature/OnlineSeamRefiner.h",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Vision\\include\\feature\\OnlineSeamRefiner.h",
+    "sha256": "0BC64E5E360658CFC4758611BB1271E90D2EE0D30C3E68E3771A0CA0BA541F5F"
+  },
+  {
+    "path": "Vision/src/feature/OnlineSeamRefiner.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Vision\\src\\feature\\OnlineSeamRefiner.cpp",
+    "sha256": "8BB4701B1E8EAF171C3782C54E9C4E7A424BCA0A0AFB60F5C6A841B22414F200"
+  },
+  {
+    "path": "UI/include/RuntimeWorkerAdapters.h",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\UI\\include\\RuntimeWorkerAdapters.h",
+    "sha256": "6781270420701C15630724AB78632D2947AC69E6850B6A8F0CB7C53C6C1A1829"
+  },
+  {
+    "path": "UI/src/RuntimeWorkerAdapters.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\UI\\src\\RuntimeWorkerAdapters.cpp",
+    "sha256": "2A8B25DE46BBE43AFFAB4480DB42E20AE06B6A1C26F1AFC996B621D68A1CB527"
+  },
+  {
+    "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\UI\\src\\OnlineCorrectionRunRecorder.cpp",
+    "sha256": "235540DC614D36DD33E2096A076CA9EC2D5DD1BA39B9913AA6EF77B8C69EC8E0"
+  },
+  {
+    "path": "UI/src/UiController.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\UI\\src\\UiController.cpp",
+    "sha256": "1E977D31AA98249154DA913D92B9937BE97535E5F8289B823C4435016DA91882"
+  },
+  {
+    "path": "UI/include/RuntimeTrackingTypes.h",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\UI\\include\\RuntimeTrackingTypes.h",
+    "sha256": "AE03CE285B41923F4EE5D24282012F4E12212EA31F113214A7FBA052CD0C45EB"
+  },
+  {
+    "path": "tests/test_runtime_tracking_flow.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\tests\\test_runtime_tracking_flow.cpp",
+    "sha256": "70AA39E1A6C3C961ADAD87C994B1F74CB8177050D958C3408C05EF10DA5641A8"
+  },
+  {
+    "path": "tests/test_online_correction_run_recorder.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\tests\\test_online_correction_run_recorder.cpp",
+    "sha256": "1A06E7D2008C0879E8DD133B509ECECB862F0D087C0623EB664A2E0230E096E6"
+  },
+  {
+    "path": "tests/test_online_image_geometry.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\tests\\test_online_image_geometry.cpp",
+    "sha256": "458BFA2D398B03D7BE8A285723B112A8295CF503D3914D9507058CA63AD32107"
+  },
+  {
+    "path": "tests/CMakeLists.txt",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\tests\\CMakeLists.txt",
+    "sha256": "DFBEACC30BA1F859FFB9FFE233513FD4D30434FAE30EF44D739E83A78215578D"
+  },
+  {
+    "path": "Vision/CMakeLists.txt",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Vision\\CMakeLists.txt",
+    "sha256": "9D1F3E34F4ABD41975320CA26A834101FCC281858AB35E85E5FBD02F60AABD43"
+  },
+  {
+    "path": "docs/online_local_registration.md",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\docs\\online_local_registration.md",
+    "sha256": "D68399B631345022D44105630753ECCB66C68863AC79800A4DC1D7E567D00CA4"
+  },
+  {
+    "path": "Control/include/OnlineCorrectionTypes.h",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Control\\include\\OnlineCorrectionTypes.h",
+    "sha256": "325AB7CACCF6C436428DA8B5ACF059805C98D43ECB41D1BAF8419CB11C7CB41C"
+  },
+  {
+    "path": "Control/src/OnlineCorrectionController.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Control\\src\\OnlineCorrectionController.cpp",
+    "sha256": "C9C961E1569822C0E9CE99AC2CB2E137A9F1A82336C99FD0B905EB3FED953729"
+  },
+  {
+    "path": "Control/src/OnlineCorrectionExceptionProcessor.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\Control\\src\\OnlineCorrectionExceptionProcessor.cpp",
+    "sha256": "8D6FF065FF4FC1A6083B66F1C8C8D1962B8826A925C25DE5DD1BC9D2A090A378"
+  },
+  {
+    "path": "tests/test_online_correction_controller.cpp",
+    "backup": ".codex_backups\\image_measurement_A_20261023_155432\\tests\\test_online_correction_controller.cpp",
+    "sha256": "42FE082C1AFCB10EC012EE4EF86584B5995DDC186C211608A14D24AF6CFBC0A6"
+  },
+  {
+    "path": "tests/test_correction_robot_sim_frame_sync.cpp",
+    "backup": ".codex_backups/image_measurement_A_20261023_155432/tests/test_correction_robot_sim_frame_sync.cpp",
+    "sha256": "ACEDDD950A1E2478FD7F25D30A54210655B4A3A700023ED522AF95306E7F4BB8"
+  }
+]

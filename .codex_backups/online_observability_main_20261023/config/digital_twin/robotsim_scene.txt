@@ -1,0 +1,9 @@
+# RobotSim 场景对象 ID。更换场景后只需修改本文件。
+scene_name=test31
+robot_id=1001
+positioner_id=1062
+sensor_id=1013
+tcp_id=1011
+workpiece_id=1068
+# test31.xml 中工件 1068 的父级为变位机 TCP 参考对象 1063（相对末节 Z=231 mm）。
+workpiece_parent_id=1063

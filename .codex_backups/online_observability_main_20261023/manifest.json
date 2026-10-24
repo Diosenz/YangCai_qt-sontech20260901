@@ -1,0 +1,92 @@
+[
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\include\\RuntimeWorkerAdapters.h",
+    "path": "UI/include/RuntimeWorkerAdapters.h",
+    "sha256": "6781270420701C15630724AB78632D2947AC69E6850B6A8F0CB7C53C6C1A1829"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\src\\RuntimeWorkerAdapters.cpp",
+    "path": "UI/src/RuntimeWorkerAdapters.cpp",
+    "sha256": "2A8B25DE46BBE43AFFAB4480DB42E20AE06B6A1C26F1AFC996B621D68A1CB527"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\include\\OnlineLocalRegistrationWorker.h",
+    "path": "UI/include/OnlineLocalRegistrationWorker.h",
+    "sha256": "DE27074BB14C5111CE316B3F58D3AE87B61CB94E27E2A33A1B4C1341BC3CF079"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\src\\OnlineLocalRegistrationWorker.cpp",
+    "path": "UI/src/OnlineLocalRegistrationWorker.cpp",
+    "sha256": "47ECB7953C0658FA0CDEF73987285ADECD2FAE81D96D423D98C9A99824A5885B"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\src\\RuntimeLocalRegistration.cpp",
+    "path": "UI/src/RuntimeLocalRegistration.cpp",
+    "sha256": "26BB64A324AE71904FF9201C390744054D4D242DE2C067ED07BE917195DBFA49"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\include\\RuntimeTrackingTypes.h",
+    "path": "UI/include/RuntimeTrackingTypes.h",
+    "sha256": "AE03CE285B41923F4EE5D24282012F4E12212EA31F113214A7FBA052CD0C45EB"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\include\\RuntimeCoordinator.h",
+    "path": "UI/include/RuntimeCoordinator.h",
+    "sha256": "6D85844AE64D8E19A0F0C4120699AE3432E2BF381E796A28712437CC1365AD97"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\src\\RuntimeCoordinator.cpp",
+    "path": "UI/src/RuntimeCoordinator.cpp",
+    "sha256": "C1166CBE57008843170567F4451A3A7BC11521C4A7F550FD44B832BDEA1C1F90"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\src\\OnlineCorrectionRunRecorder.cpp",
+    "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+    "sha256": "235540DC614D36DD33E2096A076CA9EC2D5DD1BA39B9913AA6EF77B8C69EC8E0"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\UI\\src\\MainWidget.cpp",
+    "path": "UI/src/MainWidget.cpp",
+    "sha256": "E5E57129289428B7C5A8876B4B9DAE7C5FB7A0DBEDC05414BB4EA4407A7BCCAF"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\DigitalTwin\\CMakeLists.txt",
+    "path": "DigitalTwin/CMakeLists.txt",
+    "sha256": "102F31C24901072B6F67A63232734F546DBF069EF1C3036BB9F77ABA15DDF15E"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\config\\digital_twin\\robotsim_scene.txt",
+    "path": "config/digital_twin/robotsim_scene.txt",
+    "sha256": "A6D6631CB1677FA0DDED943715919A46738637AFAE9B5E9BB3B16D4BE4F4099B"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\config\\digital_twin\\online_local_registration.ini",
+    "path": "config/digital_twin/online_local_registration.ini",
+    "sha256": "C801BF9209BBCE00AB67BFFA859F23685E503A7547AFB44F7B69FC4115437642"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\tests\\CMakeLists.txt",
+    "path": "tests/CMakeLists.txt",
+    "sha256": "DFBEACC30BA1F859FFB9FFE233513FD4D30434FAE30EF44D739E83A78215578D"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\tests\\test_runtime_tracking_flow.cpp",
+    "path": "tests/test_runtime_tracking_flow.cpp",
+    "sha256": "70AA39E1A6C3C961ADAD87C994B1F74CB8177050D958C3408C05EF10DA5641A8"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\tests\\test_online_local_registration_surface.cpp",
+    "path": "tests/test_online_local_registration_surface.cpp",
+    "sha256": "7C27F4547D1FFB543A183D03F0AC7E3E851A2B548D7D20C196EF3189AABBB200"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\tests\\test_online_correction_run_recorder.cpp",
+    "path": "tests/test_online_correction_run_recorder.cpp",
+    "sha256": "1A06E7D2008C0879E8DD133B509ECECB862F0D087C0623EB664A2E0230E096E6"
+  },
+  {
+    "backup": ".codex_backups\\online_observability_main_20261023\\docs\\online_local_registration.md",
+    "path": "docs/online_local_registration.md",
+    "sha256": "D68399B631345022D44105630753ECCB66C68863AC79800A4DC1D7E567D00CA4"
+  }
+]

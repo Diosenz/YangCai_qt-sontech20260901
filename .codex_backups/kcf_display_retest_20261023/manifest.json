@@ -1,0 +1,26 @@
+[
+  {
+    "path": "UI/src/UiController.cpp",
+    "sha256": "5A11399DD68A2B7930D6B4B1F3A570555DC7C79D2C0F8684D0F964BAA8FAB7F4"
+  },
+  {
+    "path": "tests/test_online_control_target_presentation.cpp",
+    "sha256": "D684B122B218653278EE15A7745B383C63F0EF4F42063FD14834C2068512B53B"
+  },
+  {
+    "path": "tests/test_online_image_measurement.cpp",
+    "sha256": "8B0EA93D5E449D243DAB2B5C21CCCC0193B2C05A86868F1F118E37D7FF43B081"
+  },
+  {
+    "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+    "sha256": "6BD9C04F9F73ADC9ED5E5968F47129B6C5FE32EE1FE2C2E29BDD7606B68BBF91"
+  },
+  {
+    "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+    "sha256": "E0053117B7638A4265F141D82D398E2DCB843DB31004A76B489D966E2E39D2E9"
+  },
+  {
+    "path": "docs/online_local_registration.md",
+    "sha256": "70E7693557F5CFB5B8FC42FBFDD0266B53BEE39F5CC65A9BF438C3B8FC3B08D3"
+  }
+]

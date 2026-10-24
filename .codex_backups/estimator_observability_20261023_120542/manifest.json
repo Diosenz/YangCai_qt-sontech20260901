@@ -1,0 +1,17 @@
+﻿[
+  {
+    "path": "Vision/include/feature/SimulationGuidedSeamEstimator.h",
+    "sha256": "053156D7CFB2453669D8F15D0C2CFE18F21F159A0BFE3AC48F65CEF749B93621",
+    "bytes": 6744
+  },
+  {
+    "path": "Vision/src/feature/SimulationGuidedSeamEstimator.cpp",
+    "sha256": "66C46DF5F4D084142CD6894EF21B1CE96C69B795647C1188DFF12F5169CFE7FC",
+    "bytes": 43481
+  },
+  {
+    "path": "tests/test_simulation_guided_seam.cpp",
+    "sha256": "09049B3830A77C5242DA8528228AC80D644A7DFBE62BDB0184B3ED7DF1E37B55",
+    "bytes": 30827
+  }
+]

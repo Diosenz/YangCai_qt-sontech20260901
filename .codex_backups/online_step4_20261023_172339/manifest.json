@@ -1,0 +1,137 @@
+[
+  {
+    "path": "Vision/include/track/LegacyOnlineKcfDetector.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\Vision\\include\\track\\LegacyOnlineKcfDetector.h",
+    "sha256": "032C684AE7854CC1EC9BAEC36F8C718D544A48256109680FD43EEADDCD4DAD4D"
+  },
+  {
+    "path": "Vision/src/track/LegacyOnlineKcfDetector.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\Vision\\src\\track\\LegacyOnlineKcfDetector.cpp",
+    "sha256": "CC7914FE52BEE89CC498CF03E732E16AB457DF89A1A995E94CE10F95BFB6F9E3"
+  },
+  {
+    "path": "tests/test_online_image_measurement.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\tests\\test_online_image_measurement.cpp",
+    "sha256": "4667B25B75D51377CDFD04679375BB4A3C14D65621D547499206C679CF2734F0"
+  },
+  {
+    "path": "UI/src/RuntimeLocalRegistration.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\src\\RuntimeLocalRegistration.cpp",
+    "sha256": "26BB64A324AE71904FF9201C390744054D4D242DE2C067ED07BE917195DBFA49"
+  },
+  {
+    "path": "UI/src/RuntimeCoordinator.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\src\\RuntimeCoordinator.cpp",
+    "sha256": "C1166CBE57008843170567F4451A3A7BC11521C4A7F550FD44B832BDEA1C1F90"
+  },
+  {
+    "path": "UI/include/RuntimeCoordinator.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\include\\RuntimeCoordinator.h",
+    "sha256": "6D85844AE64D8E19A0F0C4120699AE3432E2BF381E796A28712437CC1365AD97"
+  },
+  {
+    "path": "UI/include/RuntimeWorkerAdapters.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\include\\RuntimeWorkerAdapters.h",
+    "sha256": "0A142E12F6FE95778DEC4AE067B59B7BF3F0B00FF3414780F75606585A8DB93F"
+  },
+  {
+    "path": "UI/src/RuntimeWorkerAdapters.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\src\\RuntimeWorkerAdapters.cpp",
+    "sha256": "9AC0B0EADC5EEF1E200682968BF591B5B3CBD025E9615FE87D26C05455C9AD9F"
+  },
+  {
+    "path": "UI/include/RuntimeTrackingTypes.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\include\\RuntimeTrackingTypes.h",
+    "sha256": "C3E012565A9ED8D57968EE8C33B9AD701FD770E51F5F2A8930654FE50FBE49A8"
+  },
+  {
+    "path": "UI/include/TrackingFramePresentation.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\include\\TrackingFramePresentation.h",
+    "sha256": "C242374AEE012CC96B10121FD2A8BCA2EBD94B014CC788658BA7E16C8914FF6E"
+  },
+  {
+    "path": "UI/include/UiController.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\include\\UiController.h",
+    "sha256": "B935173EBBEFD19906FA82C0BB8C4E539EA9585F0B2A222B09490A747370225E"
+  },
+  {
+    "path": "UI/src/UiController.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\src\\UiController.cpp",
+    "sha256": "7BC39D180C021097F661727AA223EDD99C9E6653C50B21F2E22A139B79151E50"
+  },
+  {
+    "path": "UI/include/MainWidget.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\include\\MainWidget.h",
+    "sha256": "5E9973CF6272717C61B09C9D07F674FE6391597633C4B58B24230DE1472391E9"
+  },
+  {
+    "path": "UI/src/MainWidget.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\src\\MainWidget.cpp",
+    "sha256": "E5E57129289428B7C5A8876B4B9DAE7C5FB7A0DBEDC05414BB4EA4407A7BCCAF"
+  },
+  {
+    "path": "UI/src/OnlineCorrectionRunRecorder.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\src\\OnlineCorrectionRunRecorder.cpp",
+    "sha256": "C785BA2DE0C7BFB21402AC9F782A7FEB7CB1CDDD2A302F3BE7D25894C37F7279"
+  },
+  {
+    "path": "Control/include/OnlineCorrectionController.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\Control\\include\\OnlineCorrectionController.h",
+    "sha256": "DAF2EDDF327343550047F0AB485CC2A7705213E692BED0A0DB64719E2B934F90"
+  },
+  {
+    "path": "Control/src/OnlineCorrectionController.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\Control\\src\\OnlineCorrectionController.cpp",
+    "sha256": "C9C961E1569822C0E9CE99AC2CB2E137A9F1A82336C99FD0B905EB3FED953729"
+  },
+  {
+    "path": "Control/include/OnlineCorrectionTypes.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\Control\\include\\OnlineCorrectionTypes.h",
+    "sha256": "325AB7CACCF6C436428DA8B5ACF059805C98D43ECB41D1BAF8419CB11C7CB41C"
+  },
+  {
+    "path": "Control/include/OnlineCorrectionPathFollower.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\Control\\include\\OnlineCorrectionPathFollower.h",
+    "sha256": "2E908305DA5451926936D48DA732D128EACDFE1BF6007F8B4748D0FDEF3BA157"
+  },
+  {
+    "path": "Control/src/OnlineCorrectionPathFollower.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\Control\\src\\OnlineCorrectionPathFollower.cpp",
+    "sha256": "0EE0F91411E41E3F10282F41EFA42FD84E19344E2358FA0C30CE1F79ACEBDCDA"
+  },
+  {
+    "path": "tests/test_online_correction_controller.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\tests\\test_online_correction_controller.cpp",
+    "sha256": "42FE082C1AFCB10EC012EE4EF86584B5995DDC186C211608A14D24AF6CFBC0A6"
+  },
+  {
+    "path": "tests/test_main_widget_panels.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\tests\\test_main_widget_panels.cpp",
+    "sha256": "AE43AEB5577FFE25B802D1250C603870C993FD3BDA03AA299F4D945239E3BF38"
+  },
+  {
+    "path": "tests/test_runtime_tracking_flow.cpp",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\tests\\test_runtime_tracking_flow.cpp",
+    "sha256": "912502C1FFE9D8FDCB5AF3A4E097E384F31B23D468D4AA1E9319858319C85189"
+  },
+  {
+    "path": "tests/CMakeLists.txt",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\tests\\CMakeLists.txt",
+    "sha256": "897A290187C14342A8917256A7676A33F77BAA6A13DCBC11770715D47270DF0E"
+  },
+  {
+    "path": "docs/online_local_registration.md",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\docs\\online_local_registration.md",
+    "sha256": "144FFE5D74D6EC08B77BAF531839A34C5AE54F80A6F05FBA298FFC28EBBE3C17"
+  },
+  {
+    "path": "UI/include/OnlineLocalRegistrationVerification.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\include\\OnlineLocalRegistrationVerification.h",
+    "sha256": "6EA40F67FAC96E19A4895BA4E13B034D100B5FBA608738CC7B7D22D5CF342728"
+  },
+  {
+    "path": "UI/include/OnlineLocalSurfaceVerification.h",
+    "backup": ".codex_backups\\online_step4_20261023_172339\\UI\\include\\OnlineLocalSurfaceVerification.h",
+    "sha256": "28963A1E9B3333AA0FF0803E38F19932B878C785949776C8ABFA4917A620B0AD"
+  }
+]
