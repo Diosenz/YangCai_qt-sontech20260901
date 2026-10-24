@@ -1,0 +1,173 @@
+{
+    "auto_rollback_enabled": false,
+    "baseline_parent_from_workpiece": [
+        0.9999999999999999,
+        2.6306487944924324e-18,
+        0,
+        3.516649324030538e-18,
+        -1.124713942691233e-17,
+        1,
+        0,
+        -3.883656611693776e-19,
+        0,
+        0,
+        1,
+        -2.842170943040401e-14,
+        0,
+        0,
+        0,
+        1
+    ],
+    "before_parent_from_workpiece": [
+        0.9999999999999999,
+        2.6306487944924324e-18,
+        0,
+        3.516649324030538e-18,
+        -1.124713942691233e-17,
+        1,
+        0,
+        -3.883656611693776e-19,
+        0,
+        0,
+        1,
+        -2.842170943040401e-14,
+        0,
+        0,
+        0,
+        1
+    ],
+    "confirmed_parent_from_workpiece": [
+        0.9998695051883683,
+        0.0161503288721494,
+        0,
+        -2.360650727532412,
+        -0.016150328872149403,
+        0.9998695051883684,
+        0,
+        -6.094445962459059,
+        0,
+        0,
+        1,
+        -2.7212736606598185,
+        0,
+        0,
+        0,
+        1
+    ],
+    "cumulative_rotation_deg": 0.9256333115080955,
+    "cumulative_translation_mm": 7.079567344332107,
+    "current_pose_geometrically_verified": false,
+    "epoch": "13",
+    "has_confirmed_pose": true,
+    "has_pending_pose": false,
+    "maximum_keypoint_displacement_mm": 6.86429050362027,
+    "message": "当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。",
+    "parent_id": 1063,
+    "pending_parent_from_workpiece": [
+        0.9998695051883683,
+        0.0161503288721494,
+        0,
+        -2.360650727532412,
+        -0.016150328872149403,
+        0.9998695051883684,
+        0,
+        -6.094445962459059,
+        0,
+        0,
+        1,
+        -2.7212736606598185,
+        0,
+        0,
+        0,
+        1
+    ],
+    "pending_pose_confirmed": false,
+    "phase": "retained",
+    "post_write_samples": [
+        {
+            "accepted_observation": false,
+            "capture_time_ms": "1792675825038",
+            "counterfactual_previous_error_mm": 139.99116058736718,
+            "current_error_mm": 145.75513016605632,
+            "frame_id": "3861",
+            "real_parent_mm": [
+                0,
+                0,
+                0
+            ],
+            "stability_protection_enabled": true,
+            "valid": false,
+            "virtual_parent_mm": [
+                -82.55629596088316,
+                -117.78521936196961,
+                23.57240053104016
+            ]
+        },
+        {
+            "accepted_observation": false,
+            "capture_time_ms": "1792675825104",
+            "counterfactual_previous_error_mm": 139.99116058736718,
+            "current_error_mm": 145.75513016605632,
+            "frame_id": "3863",
+            "real_parent_mm": [
+                0,
+                0,
+                0
+            ],
+            "stability_protection_enabled": true,
+            "valid": false,
+            "virtual_parent_mm": [
+                -82.55629596088316,
+                -117.78521936196961,
+                23.57240053104016
+            ]
+        },
+        {
+            "accepted_observation": false,
+            "capture_time_ms": "1792675825137",
+            "counterfactual_previous_error_mm": 139.99116058736718,
+            "current_error_mm": 145.75513016605632,
+            "frame_id": "3864",
+            "real_parent_mm": [
+                0,
+                0,
+                0
+            ],
+            "stability_protection_enabled": true,
+            "valid": false,
+            "virtual_parent_mm": [
+                -82.55629596088316,
+                -117.78521936196961,
+                23.57240053104016
+            ]
+        }
+    ],
+    "retained_without_geometric_verification": true,
+    "rollback_attempted": false,
+    "scene_revision": "1",
+    "succeeded": true,
+    "verification_kind": "independent_seam",
+    "verified_by_independent_observation": false,
+    "verified_good_observations": [
+    ],
+    "verified_parent_from_workpiece": [
+        0.9999999999999999,
+        2.6306487944924324e-18,
+        0,
+        3.516649324030538e-18,
+        -1.124713942691233e-17,
+        1,
+        0,
+        -3.883656611693776e-19,
+        0,
+        0,
+        1,
+        -2.842170943040401e-14,
+        0,
+        0,
+        0,
+        1
+    ],
+    "workpiece_id": 1068,
+    "workpiece_pose_revision": "2"
+}

@@ -1,0 +1,173 @@
+{
+    "auto_rollback_enabled": false,
+    "baseline_parent_from_workpiece": [
+        1,
+        5.2420904551613835e-18,
+        0,
+        1.670229956977686e-20,
+        5.2420904551613835e-18,
+        0.9999999999999999,
+        -6.776263578034403e-21,
+        -6.202785031399985e-19,
+        -2.710505431213761e-20,
+        0,
+        1,
+        -2.842170943040401e-14,
+        0,
+        0,
+        0,
+        1
+    ],
+    "before_parent_from_workpiece": [
+        1,
+        5.2420904551613835e-18,
+        0,
+        1.670229956977686e-20,
+        5.2420904551613835e-18,
+        0.9999999999999999,
+        -6.776263578034403e-21,
+        -6.202785031399985e-19,
+        -2.710505431213761e-20,
+        0,
+        1,
+        -2.842170943040401e-14,
+        0,
+        0,
+        0,
+        1
+    ],
+    "confirmed_parent_from_workpiece": [
+        0.9999970362058023,
+        -0.0024257808807913507,
+        1.643773063079868e-23,
+        -4.08841548121756,
+        0.0024257808807913615,
+        0.9999970362058022,
+        -6.776243494583728e-21,
+        -4.629303488865576,
+        -2.710505431213761e-20,
+        0,
+        1,
+        -2.979574918746977,
+        0,
+        0,
+        0,
+        1
+    ],
+    "cumulative_rotation_deg": 0.13949600150646388,
+    "cumulative_translation_mm": 6.857365283803124,
+    "current_pose_geometrically_verified": false,
+    "epoch": "13",
+    "has_confirmed_pose": true,
+    "has_pending_pose": false,
+    "maximum_keypoint_displacement_mm": 6.8383513136999845,
+    "message": "当前工件位姿已回读并保留，未执行回退；清窗冷却后继续局部修正，几何后验未晋升。",
+    "parent_id": 1063,
+    "pending_parent_from_workpiece": [
+        0.9999970362058023,
+        -0.0024257808807913507,
+        1.643773063079868e-23,
+        -4.08841548121756,
+        0.0024257808807913615,
+        0.9999970362058022,
+        -6.776243494583728e-21,
+        -4.629303488865576,
+        -2.710505431213761e-20,
+        0,
+        1,
+        -2.979574918746977,
+        0,
+        0,
+        0,
+        1
+    ],
+    "pending_pose_confirmed": false,
+    "phase": "retained",
+    "post_write_samples": [
+        {
+            "accepted_observation": false,
+            "capture_time_ms": "1792660433051",
+            "counterfactual_previous_error_mm": 139.9911577675581,
+            "current_error_mm": 145.51291185356948,
+            "frame_id": "2582",
+            "real_parent_mm": [
+                0,
+                0,
+                0
+            ],
+            "stability_protection_enabled": true,
+            "valid": false,
+            "virtual_parent_mm": [
+                -82.06378727969216,
+                -117.88127547880117,
+                23.314099272953
+            ]
+        },
+        {
+            "accepted_observation": false,
+            "capture_time_ms": "1792660433083",
+            "counterfactual_previous_error_mm": 139.9911577675581,
+            "current_error_mm": 145.51291185356948,
+            "frame_id": "2583",
+            "real_parent_mm": [
+                0,
+                0,
+                0
+            ],
+            "stability_protection_enabled": true,
+            "valid": false,
+            "virtual_parent_mm": [
+                -82.06378727969216,
+                -117.88127547880117,
+                23.314099272953
+            ]
+        },
+        {
+            "accepted_observation": false,
+            "capture_time_ms": "1792660433182",
+            "counterfactual_previous_error_mm": 139.99113786866857,
+            "current_error_mm": 145.5111092039005,
+            "frame_id": "2586",
+            "real_parent_mm": [
+                0,
+                0,
+                0
+            ],
+            "stability_protection_enabled": true,
+            "valid": false,
+            "virtual_parent_mm": [
+                -81.77861706223771,
+                -118.07706580123099,
+                23.31409927295303
+            ]
+        }
+    ],
+    "retained_without_geometric_verification": true,
+    "rollback_attempted": false,
+    "scene_revision": "1",
+    "succeeded": true,
+    "verification_kind": "independent_seam",
+    "verified_by_independent_observation": false,
+    "verified_good_observations": [
+    ],
+    "verified_parent_from_workpiece": [
+        1,
+        5.2420904551613835e-18,
+        0,
+        1.670229956977686e-20,
+        5.2420904551613835e-18,
+        0.9999999999999999,
+        -6.776263578034403e-21,
+        -6.202785031399985e-19,
+        -2.710505431213761e-20,
+        0,
+        1,
+        -2.842170943040401e-14,
+        0,
+        0,
+        0,
+        1
+    ],
+    "workpiece_id": 1068,
+    "workpiece_pose_revision": "2"
+}
