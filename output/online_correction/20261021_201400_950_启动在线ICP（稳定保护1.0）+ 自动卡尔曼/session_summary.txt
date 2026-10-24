@@ -1,0 +1,36 @@
+key	value
+session_state	running
+vision_diagnostics_schema	2
+vision_diagnostics_enabled	1
+vision_images_enabled	1
+vision_image_sample_every_n	15
+vision_max_image_pairs	30
+vision_max_image_bytes	33554432
+vision_image_sampling_policy	startup/online_sampling_early/middle/late/anomaly=3/6/6/6/9; quadratic_backoff; anomaly_minimum_interval_ms=60000; raw_deviation_px=10; layers_are_not_physical_seam_segments
+icp_diagnostics_schema	1
+start_time	2026-10-21T20:14:00.955
+start_timestamp_ms	1792584840950
+start_mode	init_type
+enable_online_icp	true
+work_path_file	H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_W.txt
+teach_pose_file	H:/YangCai_Code/YangCai_qt-sontech20260901/data/WorkPiece/20260404CHUFENGKOU1_T.txt
+rbcalib_file	H:/YangCai_Code/YangCai_qt-sontech20260901/config/calibration/RBCALIB.DAT
+initial_match_max_distance_mm	15.000000
+initial_match_direction_sample_count	32
+initial_match_min_scan_span_mm	2.000000
+initial_match_min_reverse_direction_cosine	0.250000
+initial_match_min_remaining_length_mm	10.000000
+session_state	completed
+end_time	2026-10-21T20:24:10.951
+end_timestamp_ms	1792585450951
+duration_ms	610001
+robot_state_count	6723
+tracking_result_count	8127
+corrected_path_point_count	1368
+initial_command_count	5
+realtime_command_count	7569
+command_receipt_count	2938
+icp_batch_count	428
+vision_diagnostic_count	8127
+vision_image_submission_count	29
+message	online correction completed after robot program stopped
