@@ -11,6 +11,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+#include "OnlineCorrectionExceptionProcessor.h"
 #include "OnlineCorrectionPathFollower.h"
 
 namespace {
@@ -79,6 +80,60 @@ QJsonObject follow(const QJsonArray &points, const QJsonObject &context)
         {"delta_um", QJsonArray{static_cast<double>(result.command.dxUm),
             static_cast<double>(result.command.dyUm), static_cast<double>(result.command.dzUm)}}};
 }
+/**
+ * @brief 执行原异常处理器轨迹ICP，与实测主导的释放结果对照。
+ * @details 原接口需要末节坐标，加入偏移后传入；输出同时保留末节及TCP系。
+ *          把TCP副本交给相同跟随适配器，避免末节点被再次加入偏移。
+ */
+QJsonObject baselineIcp(const QJsonArray &raw, const QJsonObject &context)
+{
+    const auto offset = context["tool_tcp_in_last_link_mm"].toArray();
+    vision::PositionerCalibration calibration;
+    calibration.toolTcpInLastLinkMm = Eigen::Vector3d(
+        offset[0].toDouble(), offset[1].toDouble(), offset[2].toDouble());
+    std::vector<control::OnlineCorrectionDetectionSample> samples;
+    for (const auto &point : raw)
+    {
+        control::OnlineCorrectionDetectionSample sample;
+        sample.point = lastLinkPoint(point, calibration);
+        samples.push_back(sample);
+    }
+    control::OnlineCorrectionPlannedTrajectory trajectory;
+    for (const auto &point : context["model_positioner_tcp_mm"].toArray())
+    {
+        trajectory.segmentPathPoints.push_back(lastLinkPoint(point, calibration));
+    }
+    control::COnlineCorrectionExceptionProcessor processor;
+    const auto result = processor.process(samples, trajectory, true);
+    QJsonArray lastLink;
+    QJsonArray tcp;
+    for (const auto &sample : result.samples)
+    {
+        lastLink.push_back(jsonPoint(sample.point));
+        tcp.push_back(QJsonArray{sample.point.xMm - offset[0].toDouble(),
+            sample.point.yMm - offset[1].toDouble(),
+            sample.point.zMm - offset[2].toDouble()});
+    }
+    QJsonArray matrix;
+    if (!result.batches.empty() && result.batches.back().detectionToModel.has_value())
+    {
+        for (const auto value : *result.batches.back().detectionToModel)
+        {
+            matrix.push_back(value);
+        }
+    }
+    QJsonObject output{{"enabled", true}, {"flush", true},
+        {"icp_attempted", result.icpAttempted}, {"icp_applied", result.icpApplied},
+        {"rms_error_mm", result.rmsErrorMm},
+        {"message", QString::fromStdString(result.message)},
+        {"raw_positioner_tcp_mm", raw}, {"released_last_link_mm", lastLink},
+        {"released_positioner_tcp_mm", tcp}, {"detection_to_model_matrix", matrix}};
+    if (tcp.size() >= 2)
+    {
+        output["follow"] = follow(tcp, context);
+    }
+    return output;
+}
 } // namespace
 
 /** @brief 一次局部控制快照；不会缓存或发送P命令。 */
@@ -99,6 +154,11 @@ int main(int argc, char **argv)
     if (model.size() >= 2)
     {
         output["model_counterfactual"] = follow(model, input["context"].toObject());
+    }
+    if (model.size() >= 5 && input["raw_measured"].toArray().size() >= 5)
+    {
+        output["actual_icp_baseline"] = baselineIcp(
+            input["raw_measured"].toArray(), input["context"].toObject());
     }
     const auto bytes = QJsonDocument(output).toJson(QJsonDocument::Compact);
     std::fwrite(bytes.constData(), 1, static_cast<std::size_t>(bytes.size()), stdout);

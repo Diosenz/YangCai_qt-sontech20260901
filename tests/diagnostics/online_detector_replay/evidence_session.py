@@ -6,7 +6,8 @@ DEFAULT_CONFIG = {'anchor_confirmation_frames': 2, 'max_prediction_ms': None,
                   'max_prediction_travel_mm': None,
                   'identity_corridor_pixel':12, 'identity_min_patch_score':.70,
                   'identity_min_branch_score':.55, 'identity_min_uniqueness':.04,
-                  'identity_min_kcf_peak':.20}
+                  'identity_min_kcf_peak':.20, 'recovery_confirmation_frames':2,
+                  'max_recovery_step_pixel':None, 'max_reacquisition_distance_pixel':None}
 
 
 def finite_point(value, dimensions=2):
@@ -55,7 +56,12 @@ class EvidenceSession:
         count = self.config['anchor_confirmation_frames']
         if isinstance(count,bool) or not isinstance(count,int) or count<1:
             raise ValueError('anchor_confirmation_frames must be a positive candidate integer')
-        for key in ('max_prediction_ms', 'max_prediction_travel_mm'):
+        if (isinstance(self.config['recovery_confirmation_frames'], bool)
+                or not isinstance(self.config['recovery_confirmation_frames'], int)
+                or self.config['recovery_confirmation_frames'] < 1):
+            raise ValueError('recovery_confirmation_frames must be a positive candidate integer')
+        for key in ('max_prediction_ms', 'max_prediction_travel_mm',
+                    'max_recovery_step_pixel', 'max_reacquisition_distance_pixel'):
             value = self.config[key]
             if value is not None and (not finite_number(value) or value <= 0):
                 raise ValueError(key + ' must be a positive unvalidated candidate limit or null')
@@ -78,6 +84,10 @@ class EvidenceSession:
         self.budget_provenance_failures = []
         self.reference_mapping = None
         self.identity_history = None
+        self.recovery_active = False
+        self.recovery_count = 0
+        self.recovery_candidate = None
+        self.last_output = None
 
     def _seed_continuation(self, frame):
         """新独立几何才重置预算；参考映射与真实锚点分开保存。"""
@@ -201,6 +211,58 @@ class EvidenceSession:
             expected=[p+c-h for p,c,h in zip(expected,current[1],previous[1])]
         return inspect_identity(self.identity_history,raw,expected,self.config)
 
+    def _recovery_decision(self, frame, raw, result, fresh, geometry):
+        """新几何先确认同一目标；过渡不更新锚点，也不为旧预测续期。"""
+        self.recovery_transition_target = None
+        self.recovery_preview = None
+        self.recovery_reason = None
+        if self.anchor is None:
+            return geometry
+        if not fresh or not geometry:
+            self.recovery_active = True
+            self.recovery_count = 0
+            self.recovery_candidate = None
+            return geometry
+        if not self.recovery_active:
+            return geometry
+        preview = copy.deepcopy(result)
+        self._continue(frame, preview, fresh)
+        self.recovery_preview = preview
+        target = raw['final_pixel']
+        expected = (self.reference_mapping['estimate'] if self.reference_mapping is not None
+                    else self.anchor['pixel'])
+        distance = math.dist(target, expected)
+        radius = self.config['max_reacquisition_distance_pixel']
+        if distance > 1e-6 and (radius is None or distance > radius):
+            self.recovery_count = 0
+            self.recovery_candidate = None
+            self.recovery_reason = 'reacquisition identity distance unconfigured or exceeded; candidate not adopted'
+            return False
+        consistent = (self.recovery_candidate is None or
+                      math.dist(target, self.recovery_candidate) <= (radius if radius is not None else 1e-6))
+        self.recovery_count = self.recovery_count + 1 if consistent else 1
+        self.recovery_candidate = list(target)
+        if self.recovery_count < self.config['recovery_confirmation_frames']:
+            self.recovery_reason = 'fresh same-target recovery confirmation pending'
+            return False
+        if self.last_output is not None:
+            remaining = math.dist(target, self.last_output)
+            step = self.config['max_recovery_step_pixel']
+            if remaining > 1e-6 and step is None:
+                self.recovery_reason = 'recovery transition limit unconfigured; no automatic position jump'
+                return False
+            if step is not None and remaining > step:
+                # A transition from an old estimate remains subject to the old budget.
+                if preview.get('available'):
+                    self.recovery_transition_target = list(target)
+                    self.recovery_reason = 'confirmed raw recovery with bounded estimated transition'
+                else:
+                    self.recovery_reason = 'old continuation budget unavailable; no transition output'
+                return False
+        self.pending = self.config['anchor_confirmation_frames'] - 1
+        self.recovery_active = False
+        return True
+
     def process(self, frame, raw):
         """输入当前曝光与真实process记录，返回最终业务结果及不变原始证据。"""
         result = copy.deepcopy(raw)
@@ -215,6 +277,10 @@ class EvidenceSession:
             self.anchor = None
             self.pending = 0
             self.identity_history = None
+            self.recovery_active = False
+            self.recovery_count = 0
+            self.recovery_candidate = None
+            self.last_output = None
         if raw.get('image_size'):
             self.context_key = key
         identity = frame.get('frame_id')
@@ -229,6 +295,7 @@ class EvidenceSession:
         geometry = (identity_evidence['geometry_accepted'] and raw.get('available') is True and raw.get('image_observation_accepted') is True
                     and raw.get('trust')=='independent_geometry' and raw.get('image_source')=='geometry'
                     and finite_point(raw.get('final_pixel')) and finite_point(raw.get('positioner_tcp_mm'),3))
+        geometry = self._recovery_decision(frame, raw, result, fresh, geometry)
         if fresh and geometry:
             self.pending += 1
             if self.identity_history is None:
@@ -257,18 +324,41 @@ class EvidenceSession:
             result['message']=('duplicate, out-of-order or unknown exposure; cannot refresh anchor'
                                if not fresh else 'no accepted geometry or valid projection; not a reliable measurement')
         if not result['anchor_refreshed']:
-            self._continue(frame, result, fresh)
-            if result['available'] and identity_evidence.get('appearance_accepted'):
+            if self.recovery_preview is not None:
+                result.update(self.recovery_preview)
+            else:
+                self._continue(frame, result, fresh)
+            pending_independent_recovery=(self.recovery_active and identity_evidence['geometry_accepted']
+                and raw.get('trust')=='independent_geometry')
+            if (result['available'] and identity_evidence.get('appearance_accepted')
+                    and not pending_independent_recovery):
                 result.update(final_pixel=list(identity_evidence['appearance_pixel']),
                     source='appearance_tracking', trust='tracked_not_independent', mode='tracked',
                     availability_scope='pixel_only_appearance',
                     message='current image and real KCF support historical target; old anchor budgets apply')
+            if self.recovery_transition_target is not None and result['available']:
+                target = self.recovery_transition_target
+                length = math.dist(target, self.last_output)
+                step = self.config['max_recovery_step_pixel']
+                result.update(final_pixel=[x+(y-x)*step/length for x,y in zip(self.last_output,target)],
+                              source='recovery_transition',mode='recovery_transition',
+                              trust='estimated_not_independent',can_independent_validate=False,
+                              positioner_tcp_mm=None,space_available=False,control_eligible=False)
+            if self.recovery_reason is not None:
+                result['message'] = self.recovery_reason + '; ' + result['message']
         else:
             result.update(prediction_elapsed_ms=0, prediction_travel_mm=0,
                           prediction_failures=[], reference_alignment='anchored',
                           space_available=True, control_eligible=False,
                           prediction_travel_known=progress_sample(frame) is not None,
                           prediction_time_known=finite_number(frame.get('timestamp_ms')))
+        if identity_evidence.get('reasons'):
+            result['message']='identity distance/appearance conflict: '+', '.join(identity_evidence['reasons'])+'; '+result['message']
+        result['recovery_measurement_pixel'] = (list(raw['final_pixel'])
+            if raw.get('trust') == 'independent_geometry' and finite_point(raw.get('final_pixel')) else None)
+        result['recovery_confirmation_count'] = self.recovery_count
+        result['recovery_active'] = self.recovery_active
+        self.last_output = copy.deepcopy(result['final_pixel']) if result['available'] else None
         result['continuation_inputs'] = {key: copy.deepcopy(frame.get(key)) for key in (
             'timestamp_ms', 'weld_progress_mm', 'progress_reference', 'progress_provenance',
             'progress_exposure_frame_id', 'reference_revision', 'reference_point_at_exposure',
