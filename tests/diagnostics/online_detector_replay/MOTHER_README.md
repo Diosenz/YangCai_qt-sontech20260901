@@ -60,5 +60,6 @@ python3 tests/diagnostics/online_detector_replay/make_mother_demo.py --output ou
 
 原生产 KCF 可能已在当前 `process` 内训练；离线母材门禁只能拒绝业务资格，
 不能撤销它的私有训练。实际训练事实完整保留于 `raw_detector`，后续训练事务策略另行实现。
-辅助约束不能覆盖重捕获过渡输出；新的业务锚需母材门禁和恢复身份门禁都通过。
+辅助约束不能覆盖重捕获过渡输出，也不能在完整几何候选等待恢复确认时提前采纳该位置；
+新的业务锚需母材门禁和恢复身份门禁都通过。
 不安装依赖，不运行设备，不替代 Windows/VS2022/OpenCV3.4.x 验证。

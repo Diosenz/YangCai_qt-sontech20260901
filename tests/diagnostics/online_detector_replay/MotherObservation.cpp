@@ -162,6 +162,7 @@ CSupport support(const cv::Mat &gray, const cv::Point2d &proposal,
     result.diagnostic["points"] = pixels;
     result.diagnostic["point_count"] = static_cast<int>(result.points.size());
     result.diagnostic["fit_rms_px"] = result.rms;
+    result.diagnostic["support_span_px"] = result.points.back().x - result.points.front().x;
     result.diagnostic["slope"] = result.slope;
     result.diagnostic["intercept"] = result.intercept;
     if (result.points.back().x - result.points.front().x < o.minSpan) { return reject("support_span_too_short"); }

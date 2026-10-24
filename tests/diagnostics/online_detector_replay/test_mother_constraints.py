@@ -10,11 +10,11 @@ import unittest
 HERE = pathlib.Path(__file__).resolve().parent
 
 
-def raster(left=True, right=True, cap=False, shift_y=0, slope=.45, cap_radius=32, cap_height=13):
+def raster(left=True, right=True, cap=False, shift_y=0, slope=.45, cap_radius=32, cap_height=13, shift_x=0):
     values = bytearray()
     for y in range(480):
         for x in range(640):
-            dx = x-360
+            dx = x-360-shift_x
             mother = 260+shift_y-slope*abs(dx)
             stripe = ((left if dx<0 else right) and abs(y-mother)<1.5)
             if cap and abs(dx)<cap_radius:
@@ -111,6 +111,16 @@ class MotherConstraintTests(unittest.TestCase):
         self.assertFalse(guarded[3]['available'])
         self.assertIn('time_budget_exhausted',guarded[3]['prediction_failures'])
         self.assertEqual(guarded[3]['anchor']['frame_id'],2)
+
+    def test_mother_auxiliary_does_not_bypass_recovery_confirmation_or_step(self):
+        blank = b'P5\n640 480\n255\n'+bytes([14])*640*480
+        rows = self.run_case([blank,raster(shift_x=5),raster(shift_x=5)],
+            config_override={'recovery_confirmation_frames':2,'max_recovery_step_pixel':1,
+                             'max_reacquisition_distance_pixel':12})
+        self.assertEqual(rows[3]['source'],'bounded_prediction')
+        self.assertEqual(rows[4]['source'],'recovery_transition')
+        self.assertLessEqual(math.dist(rows[4]['final_pixel'],rows[3]['final_pixel']),1.00001)
+        self.assertEqual(rows[4]['anchor']['frame_id'],2)
 
 if __name__=='__main__':
     unittest.main()

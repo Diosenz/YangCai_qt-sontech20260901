@@ -12,11 +12,11 @@ HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 
 
-def raster(left=True,right=True,cap=False,shift_y=0,slope=.45,cap_radius=32,cap_height=13):
+def raster(left=True,right=True,cap=False,shift_y=0,slope=.45,cap_radius=32,cap_height=13,shift_x=0):
     values = bytearray()
     for y in range(480):
         for x in range(640):
-            dx=x-360
+            dx=x-360-shift_x
             mother=260+shift_y-slope*abs(dx)
             stripe=((left if dx<0 else right) and abs(y-mother)<1.5)
             if cap and abs(dx)<cap_radius:
@@ -44,6 +44,9 @@ def main():
         'weak-normals':([raster(slope=.18),raster(slope=.18),raster(cap=True,slope=.18,shift_y=3)],
                         [[360,260],[360,260],[360,263]],{'mother_options':{'min_normal_determinant':.4}}),
         'accepted-extra-corner':([visible,visible,small],[[360,260]]*3,{}),
+        'recovery-with-mother':([visible,visible,blank,raster(shift_x=5),raster(shift_x=5)],
+            [[360,260],[360,260],[360,260],[365,260],[365,260]],
+            {'recovery_confirmation_frames':2,'max_recovery_step_pixel':1,'max_reacquisition_distance_pixel':12}),
         'budget-expired':([visible,visible,cap,cap],[[360,260],[360,260],[360,263],[360,263]],{'max_prediction_ms':200})}
     evaluations=[]
     links=[]
