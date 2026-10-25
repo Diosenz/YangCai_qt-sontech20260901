@@ -44,7 +44,7 @@ struct OnlineSeamRefinementOptions {
     /// @brief 扣背景后次峰达到主峰该比例，才视为竞争条纹。
     double secondaryPeakRatio = 0.8;
     /// @brief 有效列中双窄峰比例超过该值时，拒绝整体单条纹假设。
-    double maxAmbiguousColumnRatio = 0.2;
+    double maxAmbiguousColumnRatio = 0.4;
 };
 
 /**
