@@ -1,0 +1,2 @@
+{"image": "/private/var/folders/f1/fgs3j0gj2t5cy89nnjpj6kgw0000gp/T/kcf-integrated-0whuj96f/1.pgm", "kind": "synthetic", "frame_id": 2, "timestamp_ms": 1100, "reference_revision": 1, "projection": {"fixture": "synthetic_identity_1mm_per_pixel"}}
+{"image": "/private/var/folders/f1/fgs3j0gj2t5cy89nnjpj6kgw0000gp/T/kcf-integrated-0whuj96f/2.pgm", "kind": "synthetic", "frame_id": 3, "timestamp_ms": 1200, "reference_revision": 1, "projection": {"fixture": "synthetic_identity_1mm_per_pixel"}}

@@ -266,3 +266,20 @@ C++ 修改必须遵守以下最小硬约束：
 - 非 Windows 环境中的编译结果只能作为辅助验证，不能替代 MSVC 验证。
 
 涉及 `.h`、`.cpp`、CMake 或 Qt 运行行为的修改，最终以 Windows 上 Visual Studio 2022 / MSVC 的构建、测试和必要的运行验证结果为准。
+
+## Agent skills
+
+### Issue tracker
+
+创建、读取或更新任务前，阅读 `docs/agents/issue-tracker.md`。
+本仓库使用 `.scratch/` 下的本地 Markdown 跟踪问题。
+
+### Triage labels
+
+分诊或变更任务状态前，阅读 `docs/agents/triage-labels.md`，
+使用其中的默认状态名称。
+
+### Domain docs
+
+探索领域概念或讨论架构决策前，阅读 `docs/agents/domain.md`。
+采用 single-context 布局。

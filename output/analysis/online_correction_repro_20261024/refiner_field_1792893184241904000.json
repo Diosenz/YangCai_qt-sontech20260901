@@ -1,0 +1,30 @@
+{
+  "revision": "430aaa204fd5319dd7f697d3de2b4e1faddbb06f",
+  "opencv": "4.11.0",
+  "case": "field",
+  "fixture": "output/online_local_registration/20261023_114602_096_session_1/local_icp_1_10726_fb7e0934-3e27-469c-9bf8-b09fdc477c05.json.source.png",
+  "hint": [
+    443.790314,
+    609.482733
+  ],
+  "minimized": false,
+  "probe_options": {
+    "ambiguity_limit": null,
+    "half_height": null,
+    "hint_dy": 0.0
+  },
+  "hashes": {
+    "Vision/include/feature/OnlineSeamRefiner.h": "a9b8647efcd7fe22a04bec96c363f12e087b0081b6e9f96acf2f6bb42d30f4d8",
+    "Vision/src/feature/OnlineSeamRefiner.cpp": "a1698ca4e24dbce2f53a25565901bc830623b8cfd6ceff2e060c1dad212b3f46",
+    "Vision/include/stripe/SubpixelCenterlineTools.h": "e59e4ef6eb1138a3c0a237527f0641faf1b7cdb5babecd3f5bd5366e6b2f6886",
+    "Vision/src/stripe/SubpixelCenterlineTools.cpp": "e41a2a3c6862d78856c1b4e7727f225dc59b754e0f5479dcfa9243c949d8f868",
+    "Vision/include/common/VisionImageTypes.h": "57ba4b13f195e2ad6cbaea9ee2a6d7121a5c03fae4d48fab729cfa7dab397e0d",
+    "Vision/include/stripe/LaserStripeExtractor.h": "db8cf9bc1eb5b458799cb435700491bd0312f3e5ca60d942e163862214ad199b",
+    "output/online_local_registration/20261023_114602_096_session_1/local_icp_1_10726_fb7e0934-3e27-469c-9bf8-b09fdc477c05.json.source.png": "1118a73a9ae9d10bb250889f5196a25f38f872cda0387a4eb62718e68b446c0a"
+  },
+  "stdout": "RED visible_fold_measurement valid=0 status=2 ambiguous_ratio=0.497382 limit=0.200000 half_height=60 input=1292x964 point=(-1.000000,-1.000000)\n",
+  "stderr": "",
+  "returncode": 1,
+  "replay_seconds": 0.021138291000000003,
+  "scope": "Actual production refiner; not full detector, robot, or MSVC replay."
+}

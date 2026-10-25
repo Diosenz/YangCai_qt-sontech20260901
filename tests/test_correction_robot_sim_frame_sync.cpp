@@ -693,6 +693,31 @@ bool testLatestPendingAndSuccessfulCorrelation(TestMode mode)
 
 bool testFailuresResetThenThirdFailureStops(TestMode mode)
 {
+    if (mode == TestMode::Online) {
+        CorrectionFixture fixture(mode);
+        fixture.start(true, true);
+        fixture.script({ScriptedReply::Empty, ScriptedReply::Invalid,
+            ScriptedReply::Valid, ScriptedReply::Empty, ScriptedReply::Invalid, ScriptedReply::Empty});
+        bool ok = true;
+        for (qint64 frameId = 200; frameId <= 205; ++frameId) {
+            fixture.runtime.publishCameraFrame(makeFrame(frameId));
+            ok &= expectTrue(waitUntil([&fixture, frameId]() {
+                return std::any_of(fixture.trackingResults.begin(), fixture.trackingResults.end(),
+                    [frameId](const ui::RuntimeTrackingResult &result) { return result.frameId == frameId; });
+            }), "online optional-reference failure still reaches current-image Vision");
+        }
+        ok &= expectTrue(std::none_of(fixture.syncUpdates.begin(), fixture.syncUpdates.end(),
+            [](const ui::CorrectionSyncUpdate &update) {
+                return update.state == ui::CorrectionSyncState::StoppedAfterFailures;
+            }), "missing optional CAD alone cannot stop independent online image detection");
+        for (const auto &result : fixture.trackingResults) {
+            ok &= expectTrue(result.evidencePolicyEnabled && result.frameContext.has_value()
+                && result.frameContext->observation.frameId == result.frameId,
+                "fallback retains same-exposure identity and never reuses previous observation");
+        }
+        fixture.stop();
+        return ok;
+    }
     CorrectionFixture fixture(mode);
     fixture.start(true, true);
     fixture.script({
@@ -789,9 +814,20 @@ bool testTransportFailureAndWrongFrameDoNotReuseObservation(TestMode mode)
     ok &= expectTrue(
         fixture.queryCount() == queriesBefore + 1,
         "transport failure should consume exactly the current frame query");
-    ok &= expectTrue(
-        fixture.trackingResults.empty(),
-        "transport failure must not route Vision with an older observation");
+    if (mode == TestMode::Online) {
+        ok &= expectTrue(waitUntil([&fixture]() { return !fixture.trackingResults.empty(); }),
+            "online transport failure still submits frozen original image");
+        if (!fixture.trackingResults.empty()) {
+            const auto &result = fixture.trackingResults.back();
+            ok &= expectTrue(result.frameContext.has_value()
+                && !result.frameContext->observation.valid
+                && result.frameContext->observation.frameId == 700,
+                "online fallback carries invalid current reference rather than an old observation");
+        }
+    } else {
+        ok &= expectTrue(fixture.trackingResults.empty(),
+            "offline transport failure still requires synchronized reference");
+    }
     fixture.stop();
     return ok;
 }
@@ -949,7 +985,10 @@ bool testOnlineInternalPauseKeepsSession()
     bool ok = expectTrue(
         waitUntil([&fixture]() { return !fixture.trackingResults.empty(); }),
         "online initial detection should consume its synchronized frame");
-    if (!fixture.trackingResults.empty()) {
+    fixture.runtime.publishCameraFrame(makeFrame(811));
+    ok &= expectTrue(waitUntil([&fixture]() { return fixture.trackingResults.size() >= 2U; }),
+        "second fresh exposure confirms initial geometry");
+    if (fixture.trackingResults.size() >= 2U) {
         const auto &initial = fixture.trackingResults.back();
         ok &= expectTrue(initial.valid && initial.sample.point.valid,
             "online pause fixture must provide a valid initial weld point");
@@ -1010,9 +1049,9 @@ bool testOnlineInternalPauseKeepsSession()
         }
     }
 
-    fixture.runtime.publishCameraFrame(makeFrame(811));
+    fixture.runtime.publishCameraFrame(makeFrame(812));
     ok &= expectTrue(
-        waitUntil([&fixture]() { return fixture.trackingResults.size() >= 2U; }),
+        waitUntil([&fixture]() { return fixture.trackingResults.size() >= 3U; }),
         "online Vision should consume a frame after its internal pause");
     if (fixture.trackingResults.size() >= 2U) {
         ok &= expectTrue(

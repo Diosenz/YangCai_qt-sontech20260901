@@ -1,0 +1,14 @@
+PASS field_repeat_1 exit=1 expected=1
+PASS field_repeat_2 exit=1 expected=1
+PASS field_repeat_3 exit=1 expected=1
+PASS field_minimized exit=1 expected=1
+PASS accepted_control exit=0 expected=0
+PASS ambiguity_probe exit=0 expected=0
+PASS height_probe exit=1 expected=1
+PASS hint_up_probe exit=1 expected=1
+PASS hint_down_probe exit=1 expected=1
+PASS surface_replay exit=1 expected=1
+PASS surface_minimized exit=1 expected=1
+PASS coverage_probe exit=0 expected=0
+12/12 checks; production baselines remain RED
+/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/output/analysis/online_correction_repro_20261024/verification_1792893187092937000.json

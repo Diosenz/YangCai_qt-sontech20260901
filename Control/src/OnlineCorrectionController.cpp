@@ -169,7 +169,23 @@ OnlineCorrectionExceptionResult processOnlineSamples(
     const std::vector<OnlineCorrectionDetectionSample> &samples, bool flush)
 {
     if (options.enableOnlineIcp) {
-        return processor.process(samples, trajectory, flush);
+        auto result = processor.process(samples, trajectory, flush);
+        if (options.preserveMeasuredReference) {
+            result.samples.clear();
+            result.icpApplied = false;
+            for (auto &batch : result.batches) {
+                if (batch.applied) { batch.modelProposalSamples = batch.releasedSamples; }
+                batch.releasedSamples = batch.pendingSamples;
+                batch.applied = false;
+                batch.message = "measured-reference policy: raw samples released, model proposal diagnostic only; candidate: "
+                    + batch.message;
+                result.samples.insert(result.samples.end(),
+                    batch.releasedSamples.begin(), batch.releasedSamples.end());
+            }
+            result.message = "measured-reference policy preserves measured positions; candidate: "
+                + result.message;
+        }
+        return result;
     }
     OnlineCorrectionExceptionResult result;
     result.valid = true;
@@ -291,8 +307,9 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
 
     std::vector<OnlineCorrectionDetectionSample> accepted;
     for (const auto &sample : event.samples) {
-        if (!finitePoint(sample.point) || (initialPhase && sample.estimated)) {
-            // 初始 O 点必须由独立实测支持，续接估计只服务在线跟随。
+        if (!finitePoint(sample.point)
+            || (sample.estimated && (initialPhase || m_options.preserveMeasuredReference))) {
+            // 初始 O 点和实测优先策略均只接纳独立实测；legacy 估计行为另行保留。
             continue;
         }
         if (m_options.enableGapDetection && !sample.gapWidthMm.has_value()) {
@@ -350,8 +367,8 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
         m_state.onlineDetectionSamples.end(),
         processed.samples.begin(),
         processed.samples.end());
-    // 轨迹匹配尚未释放或已失败的 raw 只能保留测量身份，不能先训练预测参考。
-    if (!m_options.enableOnlineIcp) {
+    // 传统模式等待匹配验收；实测优先模式只用实际释放的独立实测更新参考。
+    if (!m_options.enableOnlineIcp || m_options.preserveMeasuredReference) {
         updatePredictionAnchor(processed.samples);
     } else {
         for (const auto &batch : processed.batches) {

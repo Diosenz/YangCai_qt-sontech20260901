@@ -1,0 +1,29 @@
+Vision/src/geometry/PositionerKinematics.cpp:148:55: warning: 'eulerAngles' is deprecated: Use .canonicalEulerAngles() instead. [-Wdeprecated-declarations]
+  148 |     Eigen::Vector3d eulerZyx = poseInRobot.rotation().eulerAngles(2, 1, 0);
+      |                                                       ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/MatrixBase.h:396:3: note: 'eulerAngles' has been explicitly marked deprecated here
+  396 |   EIGEN_DEPRECATED_WITH_REASON("Use .canonicalEulerAngles() instead.")
+      |   ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+  965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+      |                                                              ^
+Vision/src/geometry/PositionerKinematics.cpp:197:63: warning: 'eulerAngles' is deprecated: Use .canonicalEulerAngles() instead. [-Wdeprecated-declarations]
+  197 |     const Eigen::Vector3d eulerZyx = poseInCurrent.rotation().eulerAngles(2, 1, 0);
+      |                                                               ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/MatrixBase.h:396:3: note: 'eulerAngles' has been explicitly marked deprecated here
+  396 |   EIGEN_DEPRECATED_WITH_REASON("Use .canonicalEulerAngles() instead.")
+      |   ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+  965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+      |                                                              ^
+2 warnings generated.
+Vision/third_party/libicp/matrix.cpp:838:5: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+  838 |                                 sprintf(buffer, "%12.7f ", M.val[i][j]);
+      |                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:218:48: note: expanded from macro '__deprecated_msg'
+  218 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+1 warning generated.

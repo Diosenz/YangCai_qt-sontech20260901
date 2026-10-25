@@ -163,3 +163,43 @@ D 必须包含 32 个字段。O 按原索引逐点发送，只有最终点发送
 - 输出限幅保持旧语义：上一输出非零且跳变超过 `60 um` 时沿用上次值，
   或绝对值超过 `80 um` 时沿用上次值；gap 调速保持 1/2 mm 归一化、
   1000 档量化和 `cur_interpolation==2` 时 `speedMode=1`。
+
+
+## 2026-10-25 实测优先证据策略正式接入
+
+本节更新正式在线行为，优先于本文此前的 legacy 映射描述。用户已明确授权修改
+现有 KCF 并接入此前离线验证过的策略。未改动 oldproject、RobotSim 或通信协议。
+
+- `CVisionTrackingWorkerAdapter::processDetType2` 在在线纠偏显式启用
+  `LegacyOnlineKcfOptions::enableEvidencePolicy`。实际运行路径是原主程序的
+  coordinator → Vision worker → detector → `COnlineSeamEvidence`，无需启动 Python。
+- `COnlineSeamEvidence` 与回放 `DetectorReplay` 共用生产 C++。先检验同目标原图
+  几何、双侧母材及连续新曝光，再训练/重建 KCF 模板。首次建立和缺测后恢复默认
+  各需两份新曝光；重复/乱序曝光不能刷新锚点、确认计数或模板。
+- 身份走廊及母材阈值来自既有回放候选，尚未标定现场公差。走廊外候选不自动替换
+  现有目标；显式重新配置跟踪会清空旧身份。不能以高相关分数证明焊缝准确。
+- 仿真查询失败时，在线链保留同会话冻结原图和 RobotState，以无效的同帧参考 DTO
+  继续图像检测，绝不借用上一帧仿真。缺失 RobotState、投影/标定无效仍拒绝空间输出。
+  离线扫描原有的强同步门禁未改变。新增 `ImageOnlyReady` 明确关联参考缺失时的
+  UI pending → consumed 门禁；迟到响应仍由 requestId/session/frame 隔离。
+- 续接同时要求显式时间和沿工件焊缝的弧长预算，累计绝对进度差，反向也消耗行程。
+  参考版本切换必须提供旧版本在当前曝光的投影桥接，不能把模型绝对偏移当作运动。
+  估计、单侧约束和恢复过渡都不更新可靠锚点或预算。
+- **当前生产 transport 没有逐曝光的工件沿缝弧长及旧版本同曝光桥接。** 两个续接
+  预算默认均为零，正式程序因此仅释放确认的原图实测；不能把 TCP 净位移替代弧长，
+  也不能宣称预焊遮挡已完成连续生产续接。回放可显式提供这些输入检验续接规则。
+- 像素可用、空间有效、独立校验、控制资格分别表达。母材估计/外观续跟/纯预测/
+  恢复过渡只可显示像素，不投影为业务空间样本，也不送给独立 ICP 或 Control。
+- 正式 `COnlineCorrectionWorkerAdapter` 启用 `preserveMeasuredReference`。
+  轨迹 ICP 可保留原有拟合/缓存，但实际释放点逐点等于同批原始实测点；未采用模型
+  轨迹以 `model_proposal_not_released` 单独归档。初始定位和独立表面 ICP 不受影响。
+- 图像实测为绿色；估计及控制参考线与激光平面的显示交点为黄色。控制参考交点
+  仍是旧控制预测的显示，不能当成新检测点；本次没有重新设计失测停机/降速策略。
+- `vision_diagnostics.tsv` schema 升为 8，追加证据资格、锚帧、确认次数、母材秩、
+  身份分数和预算诊断；已有列保留。ICP 点记录 schema 为 3，增加未释放模型候选种类。
+
+验证入口：生产策略使用 `replay.py manifest.jsonl --production --output <新目录>`；
+`--evidence` 保留为此前 Python 策略对照，不能将它的结果代替生产 C++ 验收。
+Windows 在原 Qt Debug 配置中生成主程序 `i2r_rlc`，并运行
+`i2r_rlc_online_kcf_evidence_worker_tests`、`i2r_rlc_online_correction_tests` 及
+在线/离线 frame sync 测试；Mac 辅助结果不能替代 MSVC 和必要运行验证。

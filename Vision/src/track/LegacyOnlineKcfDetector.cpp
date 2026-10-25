@@ -348,6 +348,7 @@ void CLegacyOnlineKcfDetector::reset()
 {
     m_tracker.reset();
     m_continuity.reset();
+    m_evidence.reset();
     m_guidedEstimator.reset();
     m_guidanceRevisionKnown = false;
     m_continuitySeamIndex = -1;
@@ -370,6 +371,7 @@ void CLegacyOnlineKcfDetector::reset()
 
 void CLegacyOnlineKcfDetector::notifyImageObservationGap()
 {
+    m_evidence.notifyGap();
     m_imageReacquisitionPoint = {-1.0, -1.0};
     m_imageReacquisitionFrames = 0;
     m_boundedImageSearch = {};
@@ -559,12 +561,14 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processImageMeasurement(
         result.message = "原图或投影上下文无效，不生成测量点。";
         return result;
     }
-    if ((m_initialized && m_templateImageSize != gray8.size())
-        || observation.seamIndex != m_continuitySeamIndex) {
+    if ((m_templateImageSize.area() > 0 && m_templateImageSize != gray8.size())
+        || (observation.valid && observation.seamIndex >= 0
+            && observation.seamIndex != m_continuitySeamIndex)) {
         reset();
         m_imageMeasurementActive = true;
         m_continuitySeamIndex = observation.seamIndex;
     }
+    m_templateImageSize = gray8.size();
     const bool freshImageFrame = observation.frameId >= 0
         && (m_imageLastObservationFrameId < 0
             || observation.frameId > m_imageLastObservationFrameId);
@@ -663,7 +667,41 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processImageMeasurement(
     } else {
         m_imageReacquisitionFrames = 0;
     }
-    const bool geometryAccepted = result.diagnostic.refinement.valid;
+    bool geometryAccepted = result.diagnostic.refinement.valid;
+    if (options.enableEvidencePolicy) {
+        const auto projected = geometryAccepted
+            ? CWeldImageToSpaceProjector::projectCvPoint(search.geometry.point,
+                projectionContext, WeldProjectionTargetFrame::PositionerTcp)
+            : WeldProjectionResult{};
+        auto &evidence = result.diagnostic.evidence;
+        evidence = m_evidence.evaluate(gray8, observation.frameId, options.referenceRevision,
+            options.evidenceContext, result.diagnostic.refinement,
+            projected.valid && projected.spacePoint.valid, coarse, coarseUsable,
+            options.evidenceOptions);
+        geometryAccepted = evidence.independentGeometry;
+        if (!geometryAccepted) {
+            result.diagnostic.refinement.valid = false;
+            result.diagnostic.continuity.valid = evidence.pixelAvailable;
+            result.diagnostic.continuity.point = evidence.point;
+            result.diagnostic.continuity.source = evidence.source;
+            result.weldPointPixel = evidence.point;
+            result.diagnostic.finalPoint = evidence.point;
+            result.message = evidence.message;
+            // 拒绝训练后还原搜索位置，避免临时 KCF 响应逐帧污染可靠基点。
+            if (m_tracker) {
+                m_tracker->commitOnlineObservationTraining(false);
+                if (m_hasImageSearchPoint) {
+                    m_tracker->m_roi.x = static_cast<float>(m_lastImageSearchPoint.x
+                        - m_tracker->m_roi.width * m_templateWeldAnchor.x);
+                    m_tracker->m_roi.y = static_cast<float>(m_lastImageSearchPoint.y
+                        - m_tracker->m_roi.height * m_templateWeldAnchor.y);
+                }
+                result.diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
+            }
+            // 估计仅保留像素，不投影为实测空间点，不进入 Control/独立 ICP。
+            return result;
+        }
+    }
     if (geometryAccepted) {
         m_imageReacquisitionFrames = 0;
         m_boundedImageSearch = {};
@@ -743,9 +781,9 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processImageMeasurement(
     result.diagnostic.templateAnchor = m_templateWeldAnchor;
     result.diagnostic.framesSinceInitialize = m_framesSinceInitialize;
     result.diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
-    result.message = geometryAccepted
+    result.message = options.enableEvidencePolicy ? result.diagnostic.evidence.message : (geometryAccepted
         ? "原图接缝精定位测量；仿真仅辅助搜索。"
-        : "当前原图 KCF 身份及质量验收通过，非独立精定位。";
+        : "当前原图 KCF 身份及质量验收通过，非独立精定位。");
     if (options.enableGapDetection) {
         DpStripeDetectionOptions centerlineOptions;
         centerlineOptions.roi = centeredRoi(result.weldPointPixel,

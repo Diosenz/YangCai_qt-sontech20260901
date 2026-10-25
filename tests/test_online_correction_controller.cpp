@@ -1400,6 +1400,54 @@ bool testControllerOnlineIcpSwitchAndFlush()
     return ok;
 }
 
+/** @brief 正式策略保留实测轨迹，模型输出单独归档且估计输入不能取得控制资格。 */
+bool testControllerMeasuredReferencePreservesRawSamples()
+{
+    using namespace i2r_rlc::control;
+    const auto trajectory = makeIcpTrajectory();
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.enableOnlineIcp = true;
+    options.preserveMeasuredReference = true;
+    controller.configure(options, trajectory, makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState robotState;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &robotState,
+        trajectory.segmentPathPoints.front()), "measured policy enters actual STARTCOR flow");
+    bool sawProposal = false;
+    std::size_t released = 0;
+    const auto inspect = [&ok, &sawProposal, &released](const OnlineCorrectionUpdate &update) {
+        for (const auto &batch : update.onlineIcpBatches) {
+            ok &= expectTrue(!batch.applied, "model proposal cannot be marked applied");
+            sawProposal = sawProposal || !batch.modelProposalSamples.empty();
+            ok &= expectTrue(batch.releasedSamples.size() == batch.pendingSamples.size(),
+                "released measured batch keeps raw count");
+            for (std::size_t index = 0; index < batch.releasedSamples.size(); ++index) {
+                const auto &raw = batch.pendingSamples[index].point;
+                const auto &point = batch.releasedSamples[index].point;
+                ok &= expectNear(point.xMm, raw.xMm, 1e-12, "measured x preserved");
+                ok &= expectNear(point.yMm, raw.yMm, 1e-12, "measured y preserved");
+                ok &= expectNear(point.zMm, raw.zMm, 1e-12, "measured z preserved");
+                ++released;
+            }
+        }
+    };
+    for (std::size_t index = 0; index < 14U; ++index) {
+        OnlineCorrectionDetectionEvent event;
+        event.samples.push_back(makeIcpSample(trajectory.segmentPathPoints[index], -1));
+        inspect(controller.appendDetectionEvent(event));
+    }
+    OnlineCorrectionDetectionEvent estimated;
+    auto sample = makeIcpSample(trajectory.segmentPathPoints[14], -1);
+    sample.estimated = true;
+    estimated.samples.push_back(sample);
+    const auto ignored = controller.appendDetectionEvent(estimated);
+    ok &= expectTrue(ignored.onlineIcpBatches.empty(), "estimate does not enter measured control flow");
+    inspect(controller.finishOnlineSegment());
+    ok &= expectTrue(released == 14U && sawProposal,
+        "all measured points and rejected model proposal remain traceable through flush");
+    return ok;
+}
+
 bool testControllerIcpUsesGlobalAndInitialCorrectionReference()
 {
     const auto trajectory = makeIcpTrajectory();
@@ -1965,6 +2013,7 @@ int main(int argc, char *argv[])
     ok &= testExceptionProcessorRetriesAfterSeamChange();
     ok &= testControllerEstimatedSamplesContinueCommands();
     ok &= testControllerOnlineIcpSwitchAndFlush();
+    ok &= testControllerMeasuredReferencePreservesRawSamples();
     ok &= testControllerIcpUsesGlobalAndInitialCorrectionReference();
     ok &= testPathFollowerRemovesRepeatedTarget();
     ok &= testPathFollowerKeepsDirectionReversalLikeLegacyActiveCode();

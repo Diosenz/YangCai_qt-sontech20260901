@@ -460,6 +460,7 @@ private:
     bool m_virtualWeldPointOverlayVisible = false;
     QPointF m_detectedWeldPointOverlay;
     bool m_detectedWeldPointOverlayVisible = false;
+    bool m_detectedWeldPointOverlayEstimated = false;
     QString m_trackingFrameCaption;
     QVector<QPointF> m_realLaserOverlayPoints;
     bool m_legacyPromptActive = false;

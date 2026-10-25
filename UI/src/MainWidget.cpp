@@ -1146,6 +1146,7 @@ void MainWidget::setDetectedWeldPointOverlay(
 {
     m_detectedWeldPointOverlay = imagePoint;
     m_detectedWeldPointOverlayVisible = visible;
+    m_detectedWeldPointOverlayEstimated = false;
     if (!m_currentImage.isNull()) {
         updateDisplayedImage();
     }
@@ -1164,6 +1165,7 @@ void MainWidget::showTrackingFrame(const TrackingFramePresentation& presentation
     m_virtualWeldPointOverlayVisible = presentation.virtualWeldPointVisible;
     m_detectedWeldPointOverlay = presentation.detectedWeldPoint;
     m_detectedWeldPointOverlayVisible = presentation.detectedWeldPointVisible;
+    m_detectedWeldPointOverlayEstimated = presentation.detectedWeldPointEstimated;
     m_realLaserOverlayPoints.clear();
     m_trackingFrameCaption = presentation.caption;
     updateDisplayedImage();
@@ -1834,7 +1836,8 @@ void MainWidget::updateDisplayedImage()
             const QPointF displayedPoint(
                 m_detectedWeldPointOverlay.x() * scaleX,
                 m_detectedWeldPointOverlay.y() * scaleY);
-            painter.setPen(QPen(QColor(0, 255, 0), 2.0));
+            painter.setPen(QPen(m_detectedWeldPointOverlayEstimated
+                ? QColor(255, 210, 64) : QColor(0, 255, 0), 2.0));
             painter.drawLine(
                 displayedPoint + QPointF(-15.0, 0.0),
                 displayedPoint + QPointF(15.0, 0.0));

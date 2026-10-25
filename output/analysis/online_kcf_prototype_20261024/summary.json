@@ -1,0 +1,147 @@
+[
+  {
+    "name": "正常实测",
+    "frames": 24,
+    "available": 22,
+    "measured": 22,
+    "maxPixelError": 0.13667027931471615,
+    "measuredMaxPixelError": 0.13667027931471615,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 24,
+    "baselineMaxPixelError": 0.5000016435212988,
+    "states": [
+      "不可用",
+      "几何实测"
+    ]
+  },
+  {
+    "name": "预焊凸起与恢复",
+    "frames": 24,
+    "available": 21,
+    "measured": 13,
+    "maxPixelError": 0.32228616385003167,
+    "measuredMaxPixelError": 0.13667027931471615,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 17,
+    "baselineMaxPixelError": 0.5000016435212988,
+    "states": [
+      "不可用",
+      "几何实测",
+      "母材辅助估计",
+      "有限预测"
+    ]
+  },
+  {
+    "name": "反光竞争",
+    "frames": 24,
+    "available": 21,
+    "measured": 13,
+    "maxPixelError": 0.32228616385003167,
+    "measuredMaxPixelError": 0.13667027931471615,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 17,
+    "baselineMaxPixelError": 0.5000016435212988,
+    "states": [
+      "不可用",
+      "几何实测",
+      "有限预测"
+    ]
+  },
+  {
+    "name": "遮挡预算耗尽",
+    "frames": 35,
+    "available": 21,
+    "measured": 13,
+    "maxPixelError": 0.32228616385003167,
+    "measuredMaxPixelError": 0.13667027931471615,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 17,
+    "baselineMaxPixelError": 0.5400277139564148,
+    "states": [
+      "不可用",
+      "几何实测",
+      "有限预测"
+    ]
+  },
+  {
+    "name": "参考位姿跳变",
+    "frames": 24,
+    "available": 21,
+    "measured": 13,
+    "maxPixelError": 0.13667027931471615,
+    "measuredMaxPixelError": 0.13667027931471615,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 17,
+    "baselineMaxPixelError": 0.5000016435212988,
+    "states": [
+      "不可用",
+      "几何实测",
+      "母材辅助估计",
+      "有限预测"
+    ]
+  },
+  {
+    "name": "单侧母材",
+    "frames": 24,
+    "available": 21,
+    "measured": 13,
+    "maxPixelError": 0.32228616385003167,
+    "measuredMaxPixelError": 0.13667027931471615,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 17,
+    "baselineMaxPixelError": 0.5000016435212988,
+    "states": [
+      "不可用",
+      "几何实测",
+      "单侧约束估计",
+      "有限预测"
+    ]
+  },
+  {
+    "name": "无锚点启动",
+    "frames": 19,
+    "available": 7,
+    "measured": 7,
+    "maxPixelError": 0.07754514220848178,
+    "measuredMaxPixelError": 0.07754514220848178,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 9,
+    "baselineMaxPixelError": 0.380015751778787,
+    "states": [
+      "不可用",
+      "几何实测"
+    ]
+  },
+  {
+    "name": "仿真中断",
+    "frames": 24,
+    "available": 15,
+    "measured": 15,
+    "maxPixelError": 0.13667027931471615,
+    "measuredMaxPixelError": 0.13667027931471615,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 19,
+    "baselineMaxPixelError": 0.5000016435212988,
+    "states": [
+      "不可用",
+      "几何实测"
+    ]
+  },
+  {
+    "name": "预测偏差与恢复过渡",
+    "frames": 22,
+    "available": 20,
+    "measured": 11,
+    "maxPixelError": 4.895449979486309,
+    "measuredMaxPixelError": 0.13667027931471615,
+    "baselineScope": "生产精定位单帧，不包括完整 KCF 跟踪、门控和控制链",
+    "baselineAvailable": 17,
+    "baselineMaxPixelError": 0.5000016435212988,
+    "states": [
+      "不可用",
+      "几何实测",
+      "有限预测",
+      "恢复过渡"
+    ]
+  }
+]

@@ -1,0 +1,23 @@
+/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/Vision/third_party/libicp/matrix.cpp:838:5: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+  838 |                                 sprintf(buffer, "%12.7f ", M.val[i][j]);
+      |                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:218:48: note: expanded from macro '__deprecated_msg'
+  218 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+1 warning generated.
+F..........
+======================================================================
+FAIL: test_bounded_online_search_can_establish_confirmed_geometry (test_production_policy.ProductionPolicyTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_detector_replay/test_production_policy.py", line 140, in test_bounded_online_search_can_establish_confirmed_geometry
+    self.assertTrue(any(row['control_eligible'] for row in rows))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 11 tests in 14.004s
+
+FAILED (failures=1)

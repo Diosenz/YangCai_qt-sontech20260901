@@ -53,6 +53,28 @@ struct COnlineControlTargetPresentationTestAccess {
             result.frameContext->observation.frameId = id;
             return result;
         };
+        CorrectionSyncUpdate imageOnly;
+        imageOnly.state = CorrectionSyncState::ImageOnlyReady;
+        imageOnly.sessionId = 7;
+        imageOnly.purpose = CorrectionPurpose::OnlineCorrection;
+        imageOnly.frameId = 9;
+        controller.handleCorrectionSyncUpdate(imageOnly);
+        imageOnly.state = CorrectionSyncState::VisionConsumed;
+        controller.handleCorrectionSyncUpdate(imageOnly);
+        auto independentWithoutCad = frame(9);
+        independentWithoutCad.valid = true;
+        independentWithoutCad.evidencePolicyEnabled = true;
+        independentWithoutCad.kcfPixelAvailable = independentWithoutCad.controlEligible = true;
+        independentWithoutCad.pointSource = vision::OnlineSeamPointSource::Geometry;
+        independentWithoutCad.imageXPixel = 355;
+        independentWithoutCad.imageYPixel = 260;
+        independentWithoutCad.frameContext->observation.valid = false;
+        controller.showRuntimeTrackingResult(independentWithoutCad);
+        check(controller.m_onlineCorrectionSyncState.lastConsumedFrameId == 9
+                && view.m_detectedWeldPointOverlayVisible
+                && !view.m_detectedWeldPointOverlayEstimated
+                && std::abs(view.m_detectedWeldPointOverlay.x() - 355) < 0.01,
+            "optional-reference failure still presents same-exposure independent geometry through the real UI gate");
         auto image = frame(10);
         image.valid = true;
         image.imageXPixel = 100;
@@ -89,6 +111,8 @@ struct COnlineControlTargetPresentationTestAccess {
                 && std::abs(view.m_detectedWeldPointOverlay.x() - 520) < 0.01
                 && view.m_trackingFrameCaption.contains(QStringLiteral("预测")),
             "missing measurement displays the control line at the laser plane even when its TCP foot is offscreen");
+        check(view.m_detectedWeldPointOverlayEstimated,
+            "control-reference intersection uses estimate color instead of measured green");
         check(!missing.valid && !missing.sample.point.valid && !missing.independentWeldPointInParent_mm.valid,
             "display projection cannot create a measurement or independent ICP point");
         auto moved = frame(12);

@@ -8,7 +8,9 @@ namespace i2r_rlc::vision {
 enum class OnlineSeamPointSource {
     Unavailable, Geometry, CorrectedKcf, SimulationPrediction,
     /// @brief 时序实测锚及原图肩部辅助估计；不具备独立焊点验收资格。
-    GuidedEstimate
+    GuidedEstimate,
+    /// @brief 已确认恢复目标的有界过渡，仍为估计，不授予独立几何或控制资格。
+    RecoveryTransition
 };
 /** @brief 当前帧连续目标；独立定位验收只能使用另存的原图精定位点。 */
 struct OnlineSeamContinuityResult {

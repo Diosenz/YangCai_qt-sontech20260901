@@ -1,0 +1,5 @@
+batch_index	kind	point_index	x_mm	y_mm	z_mm	valid	gap_width_mm	seam_index	estimated
+1	raw_pending	0	-99.215794	-103.061933	253.044118	1		-1	0
+1	raw_pending	1	-99.211523	-103.151232	253.034826	1		-1	1
+1	released_target	0	-99.215794	-103.061933	253.044118	1		-1	0
+1	released_target	1	-99.211523	-103.151232	253.034826	1		-1	1

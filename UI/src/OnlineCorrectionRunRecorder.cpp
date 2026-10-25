@@ -104,7 +104,8 @@ QString boolText(const bool value)
 bool estimatedPoint(const RuntimeTrackingResult &result)
 {
     return result.sample.estimated
-        || result.pointSource == vision::OnlineSeamPointSource::GuidedEstimate;
+        || result.pointSource == vision::OnlineSeamPointSource::GuidedEstimate
+        || result.pointSource == vision::OnlineSeamPointSource::RecoveryTransition;
 }
 
 QString numberText(const double value, const int precision = 6)
@@ -291,7 +292,10 @@ bool COnlineCorrectionRunRecorder::beginSession(
         "guided_image_continuity_active\tguided_image_observation_quality\tguided_model_translation_suppressed\t"
         "kcf_online_observation_mode\tkcf_training_deferred\tkcf_training_committed\t"
         "geometry_has_branch_directions\tgeometry_left_slope\tgeometry_right_slope\tkcf_real_search_fallback_used\t"
-        "image_measurement_output_enabled\timage_observation_accepted\timage_search_expanded\n"))) {
+        "image_measurement_output_enabled\timage_observation_accepted\timage_search_expanded\t"
+        "evidence_policy_enabled\tkcf_pixel_available\tcontrol_eligible\tevidence_fresh_exposure\t"
+        "evidence_anchor_frame\tevidence_anchor_refreshed\tevidence_confirmation_count\t"
+        "evidence_mother_rank\tevidence_identity_score\tevidence_elapsed_ms\tevidence_travel_mm\tevidence_message\n"))) {
             if (errorMessage != nullptr) *errorMessage = m_lastError;
             return false;
         }
@@ -324,7 +328,9 @@ bool COnlineCorrectionRunRecorder::beginSession(
     m_active = true;
     const bool summaryWritten =
         appendSummary(QStringLiteral("session_state"), QStringLiteral("running"))
-        && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("7"))
+        && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("8"))
+        && appendSummary(QStringLiteral("kcf_policy"), QStringLiteral("production_cpp_evidence_v1; measured_only_control; continuation_requires_explicit_time_and_workpiece_arc_budgets"))
+        && appendSummary(QStringLiteral("preserve_measured_reference"), boolText(configuration.options.preserveMeasuredReference))
         && appendSummary(QStringLiteral("vision_diagnostics_enabled"), boolText(m_visionDiagnosticOptions.enabled))
         && appendSummary(QStringLiteral("vision_images_enabled"), boolText(m_visionDiagnosticOptions.imagesEnabled))
         && appendSummary(QStringLiteral("vision_image_sample_every_n"), QString::number(m_visionDiagnosticOptions.imageSampleEveryN))
@@ -332,7 +338,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
         && appendSummary(QStringLiteral("vision_max_image_bytes"), QString::number(m_visionDiagnosticOptions.maxImageBytes))
         && appendSummary(QStringLiteral("vision_image_sampling_policy"),
                          QStringLiteral("startup/online_sampling_early/middle/late/anomaly=3/6/6/6/9; quadratic_backoff; anomaly_minimum_interval_ms=60000; raw_deviation_px=10; layers_are_not_physical_seam_segments"))
-        && appendSummary(QStringLiteral("icp_diagnostics_schema"), QStringLiteral("2"))
+        && appendSummary(QStringLiteral("icp_diagnostics_schema"), QStringLiteral("3"))
         && appendSummary(QStringLiteral("start_time"), timestampText())
         && appendSummary(
             QStringLiteral("start_timestamp_ms"),
@@ -618,6 +624,13 @@ bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
            << boolText(result.imageMeasurementOutputEnabled)
            << boolText(result.imageObservationAccepted)
            << boolText(algorithm.imageSearchExpanded);
+    const auto &evidence = algorithm.evidence;
+    fields << boolText(result.evidencePolicyEnabled) << boolText(result.kcfPixelAvailable)
+           << boolText(result.controlEligible) << boolText(evidence.freshExposure)
+           << QString::number(evidence.anchorFrameId) << boolText(evidence.anchorRefreshed)
+           << QString::number(evidence.confirmationCount) << QString::number(evidence.motherSupportRank)
+           << numberText(evidence.identityScore) << numberText(evidence.elapsedMs)
+           << numberText(evidence.travelMm) << sanitizeField(QString::fromStdString(evidence.message));
     const bool written = appendFields(QString::fromLatin1(kVisionDiagnosticFileName), fields);
     if (m_imageWriter && !m_imageErrorReported && !m_imageWriter->lastError().isEmpty()) {
         m_imageErrorReported = true;
@@ -868,6 +881,11 @@ bool COnlineCorrectionRunRecorder::recordIcpDiagnostics(
         for (std::size_t index = 0; index < batch.releasedSamples.size(); ++index) {
             const auto &sample = batch.releasedSamples[index];
             appendPoint(QStringLiteral("released_target"), index, sample.point,
+                        sample.gapWidthMm, QString::number(sample.simulatedSeamIndex), boolText(sample.estimated));
+        }
+        for (std::size_t index = 0; index < batch.modelProposalSamples.size(); ++index) {
+            const auto &sample = batch.modelProposalSamples[index];
+            appendPoint(QStringLiteral("model_proposal_not_released"), index, sample.point,
                         sample.gapWidthMm, QString::number(sample.simulatedSeamIndex), boolText(sample.estimated));
         }
     }

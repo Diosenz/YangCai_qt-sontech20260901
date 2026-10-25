@@ -1,0 +1,2 @@
+{"image": "/private/var/folders/f1/fgs3j0gj2t5cy89nnjpj6kgw0000gp/T/kcf-production-kf5u04b5/visible.pgm", "kind": "synthetic", "frame_id": 1, "timestamp_ms": 1000, "projection": {"fixture": "synthetic_identity_1mm_per_pixel"}, "evidence_policy": true, "evidence_options": {}}
+{"image": "/private/var/folders/f1/fgs3j0gj2t5cy89nnjpj6kgw0000gp/T/kcf-production-kf5u04b5/visible.pgm", "kind": "synthetic", "frame_id": 2, "timestamp_ms": 1100, "projection": {"fixture": "synthetic_identity_1mm_per_pixel"}, "evidence_policy": true, "evidence_options": {}}

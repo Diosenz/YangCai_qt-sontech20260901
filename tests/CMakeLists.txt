@@ -265,6 +265,10 @@ target_link_libraries(i2r_rlc_runtime_tracking_flow_tests
         i2r_rlc_ui
 )
 
+i2r_rlc_add_test(i2r_rlc_online_kcf_evidence_worker_tests
+    test_online_kcf_evidence_worker.cpp)
+target_link_libraries(i2r_rlc_online_kcf_evidence_worker_tests PRIVATE i2r_rlc_ui)
+
 add_test(NAME i2r_rlc_online_seam_refinement_contract_tests
     COMMAND i2r_rlc_runtime_tracking_flow_tests --seam-refinement-contract)
 i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_seam_refinement_contract_tests)
@@ -1222,3 +1226,7 @@ target_link_libraries(i2r_rlc_robotsim_probe
     PRIVATE
         i2r_rlc_digital_twin
 )
+
+if(I2R_RLC_ENABLE_KCF_DIAGNOSTICS)
+    add_subdirectory(diagnostics)
+endif()

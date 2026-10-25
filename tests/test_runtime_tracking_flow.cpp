@@ -1153,7 +1153,7 @@ bool testOnlineCalibrationSnapshot(QCoreApplication &app)
     QObject::connect(&runtime, &ui::CRuntimeCoordinator::trackingResultReady, &loop,
                      [&](const ui::RuntimeTrackingResult &result) {
                          results.push_back(result);
-                         loop.quit();
+                         if (result.valid) { loop.quit(); }
                      });
     runtime.start();
     runtime.configureTracking(options, makeProjectionContext());
@@ -1167,11 +1167,13 @@ bool testOnlineCalibrationSnapshot(QCoreApplication &app)
         // 会话已配置之后文件改为第三版本，两端必须继续使用刚选定的快照。
         std::ofstream(configuration.rbcalibFile) << "////SRANG 900,20,30,0,0,0\n";
         runtime.startOnlineTracking();
-        QTimer::singleShot(100, &loop, [&]() {
-            auto frame = makeOnlineSeamFrame();
-            frame.frameId = 900 + session;
-            runtime.publishCameraFrame(frame);
-        });
+        for (int exposure = 0; exposure < 2; ++exposure) {
+            QTimer::singleShot(100 + exposure * 100, &loop, [&, exposure]() {
+                auto frame = makeOnlineSeamFrame();
+                frame.frameId = 900 + session * 2 + exposure;
+                runtime.publishCameraFrame(frame);
+            });
+        }
         QTimer timeout;
         timeout.setSingleShot(true);
         QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
@@ -1180,9 +1182,9 @@ bool testOnlineCalibrationSnapshot(QCoreApplication &app)
         if (!results.empty() && !results.back().valid) {
             std::cerr << "snapshot Vision: " << results.back().message.toStdString() << '\n';
         }
-        ok &= expectTrue(results.size() == static_cast<std::size_t>(session + 1)
+        ok &= expectTrue(results.size() == static_cast<std::size_t>((session + 1) * 2)
                              && results.back().valid, "snapshot test gets a valid synchronized Vision result");
-        if (results.size() == static_cast<std::size_t>(session + 1) && results.back().valid) {
+        if (results.size() == static_cast<std::size_t>((session + 1) * 2) && results.back().valid) {
             const auto &result = results.back();
             const double rx = state.curRx_r * (3.14159265358979323846 / 1800000);
             const double ry = state.curRy_r * (3.14159265358979323846 / 1800000);
@@ -1269,6 +1271,9 @@ bool testVisionImageSamplingSessionAndMonotonicClock(QCoreApplication &app)
             && resumedStartup.diagnostic.has_value()
             && resumedStartup.diagnostic->sourceImage.isNull(),
         "same-session configure and pause/resume must retain exhausted startup quota");
+    const auto resumedConfirmed = submit(100, false, 160.0, 1000000000001LL);
+    ok &= expectTrue(resumedConfirmed.valid && bucket(resumedConfirmed) == -1,
+        "second fresh resumed exposure confirms identity without resetting sampling quota");
 
     const auto initial = submit(200, true, 160.0, 0);
     ok &= expectTrue(bucket(initial) == 1, "new session must reset the regular image sampling schedule");
@@ -1502,6 +1507,7 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
                 message);
         };
         expectMissing(submit(true), "initial reverse scan cannot create an initial point from CAD alone");
+        expectMissing(submit(false), "first new exposure cannot establish a reliable anchor");
         const auto first = submit(false);
         expectMeasured(first, 160.0, "reverse scan must use original-image geometry despite full CAD weight");
         ok &= expectTrue(first.independentWeldPointInParent_mm.valid,
@@ -1539,8 +1545,9 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
         ++poseRevision;
         simulatedX = 290.0;
         expectMissing(submit(true), "CAD update on a missing frame cannot project a transition estimate");
+        expectMissing(submit(false), "new image after missing frame begins recovery confirmation");
         expectMeasured(submit(false), 163.0,
-            "new CAD revision cannot displace a fresh accepted image measurement");
+            "new CAD revision cannot displace a fresh confirmed image measurement");
         worker.stopTracking();
         worker.startTracking();
         expectMissing(submit(true), "restart without a current image cannot seed business output from simulation");
@@ -1567,13 +1574,12 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
         simulatedX = 180.0;
         onlineWindow = false;
         symmetricCrossSection = true;
-        expectMeasured(submit(false), 160.0, "clear image initializes raw KCF identity for stage admission test");
+        expectMeasured(awaitIndependentMeasurement(), 160.0, "clear new exposures confirm KCF identity for stage admission test");
         hideCenter = true;
         const auto initialKcf = submit(false);
-        ok &= expectTrue(initialKcf.valid && initialKcf.imageObservationAccepted
-                && initialKcf.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
-                && !initialKcf.sample.estimated && !initialKcf.independentWeldPointInParent_mm.valid,
-            "image-quality accepted KCF is admissible during initial scan without claiming independent geometry");
+        ok &= expectTrue(!initialKcf.valid && !initialKcf.controlEligible
+                && !initialKcf.independentWeldPointInParent_mm.valid,
+            "hidden center cannot enter initial scan or control as an independent measurement");
         hideCenter = false;
         worker.stopTracking();
         worker.configure(options, makeProjectionContext());
@@ -1583,12 +1589,12 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
             "formal online KCF fallback starts from its own freshly accepted raw-image identity");
         hideCenter = true;
         const auto onlineKcf = submit(false);
-        ok &= expectTrue(onlineKcf.valid && onlineKcf.imageObservationAccepted
-                && onlineKcf.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
-                && onlineKcf.sample.estimated && !onlineKcf.independentWeldPointInParent_mm.valid,
-            "same image-quality KCF in formal online remains excluded from Control and local independent ICP");
+        ok &= expectTrue(!onlineKcf.valid && !onlineKcf.controlEligible
+                && !onlineKcf.independentWeldPointInParent_mm.valid,
+            "unconfigured continuation stays outside Control and independent ICP");
         hideCenter = false;
-        expectMeasured(submit(false), 160.0, "original geometry recovers after a quality-KCF interval");
+        expectMissing(submit(false), "first recovered geometry is still pending");
+        expectMeasured(submit(false), 160.0, "new exposures confirm original geometry after missing center");
         imageShiftX = 100.0;
         auto pendingFar = submit(false);
         expectMissing(pendingFar, "far raw image needs consecutive independent identity confirmations");
@@ -1621,18 +1627,12 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
         const auto secondFarAfterGap = submit(false);
         observeFarConfirmation(secondFarAfterGap);
         expectMissing(secondFarAfterGap, "second far image after invalid input is still unconfirmed");
-        ui::RuntimeTrackingResult recoveredFar;
-        for (int attempt = 0; attempt < 160; ++attempt) {
-            recoveredFar = submit(false);
-            observeFarConfirmation(recoveredFar);
-            if (recoveredFar.valid) { break; }
+        for (int attempt = 0; attempt < 20; ++attempt) {
+            expectMissing(submit(false), "far candidate cannot automatically replace historical target identity");
         }
-        expectMeasured(recoveredFar, 260.0,
-            "bounded far search eventually recovers from fresh independent images after the input gap");
-        if (diagnostics) {
-            ok &= expectTrue(confirmedFreshCandidates >= 3,
-                "far acceptance is supported by three consecutive independently refined new frames");
-        }
+        imageShiftX = 0.0;
+        expectMeasured(awaitIndependentMeasurement(), 160.0,
+            "original target can be recovered after rejecting distant candidates");
         worker.stopTracking();
         options.sensorCalibration.focalLengthM = 0.0;
         worker.configure(options, makeProjectionContext());

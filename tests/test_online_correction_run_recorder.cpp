@@ -438,6 +438,16 @@ int main(int argc, char **argv)
     tracking.pointSource = vision::OnlineSeamPointSource::GuidedEstimate;
     tracking.sample.estimated = false;
     tracking.degradedFrames = 17;
+    tracking.evidencePolicyEnabled = true;
+    tracking.kcfPixelAvailable = true;
+    tracking.controlEligible = false;
+    auto &evidence = tracking.diagnostic->algorithm.evidence;
+    evidence.enabled = true;
+    evidence.anchorFrameId = 43;
+    evidence.motherSupportRank = 1;
+    evidence.elapsedMs = 200;
+    evidence.travelMm = 0.7;
+    evidence.message = "partial constraint; no control";
     auto &guided = tracking.diagnostic->algorithm.guided;
     guided.attempted = true;
     guided.valid = true;
@@ -487,7 +497,8 @@ int main(int argc, char **argv)
                 == header.indexOf("guided_reacquisition_frames") + 1
             && header.indexOf("image_measurement_output_enabled")
                 == header.indexOf("kcf_real_search_fallback_used") + 1
-            && header.last() == "image_search_expanded",
+            && header.indexOf("evidence_policy_enabled") == header.indexOf("image_search_expanded") + 1
+            && header.last() == "evidence_message",
             "online fusion schema appends columns without moving existing fields");
         ok &= expect(value("estimated") == "1" && value("point_source") == "4"
             && value("geometry_valid") == "0" && value("geometry_x_px").isEmpty()
@@ -499,6 +510,12 @@ int main(int argc, char **argv)
             && value("guided_prediction_x_px") == "100.000000"
             && value("guided_x_px") == "100.500000" && value("workpiece_pose_revision") == "1234",
             "guided estimates retain support and pose provenance without becoming independent geometry");
+        ok &= expect(value("evidence_policy_enabled") == "1"
+            && value("kcf_pixel_available") == "1" && value("control_eligible") == "0"
+            && value("evidence_anchor_frame") == "43" && value("evidence_mother_rank") == "1"
+            && value("evidence_elapsed_ms") == "200.000000"
+            && value("evidence_travel_mm") == "0.700000",
+            "production estimate qualification and anchor budgets remain explicit in schema 8");
         ok &= expect(value("online_observation_fusion_enabled") == "1"
             && value("raw_geometry_valid") == "1" && value("geometry_valid") == "0"
             && value("raw_geometry_x_px") == "99.000000"

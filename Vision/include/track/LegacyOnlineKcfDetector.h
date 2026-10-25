@@ -22,6 +22,7 @@
 #include "geometry/WeldGeometryTypes.h"
 #include "track/KcfTracker.h"
 #include "track/OnlineSeamContinuity.h"
+#include "track/OnlineSeamEvidence.h"
 
 namespace i2r_rlc::vision {
 
@@ -30,6 +31,10 @@ namespace i2r_rlc::vision {
  */
 struct LegacyOnlineKcfOptions {
     KcfFusionOptions fusion;
+    /// @brief 正式在线与生产策略回放共用；legacy 入口保持既有行为。
+    bool enableEvidencePolicy = false;
+    COnlineSeamEvidenceOptions evidenceOptions;
+    COnlineSeamEvidenceContext evidenceContext;
     /// @brief 在线纠偏显式启用；仿真仅提示搜索，输出必须由同帧原图验收。
     bool enableImageMeasurementOutput = false;
     /// @brief 仅正式在线显式启用：原图重捕获分帧执行，默认保留初扫完整搜索。
@@ -55,6 +60,7 @@ struct LegacyOnlineKcfOptions {
  * @brief 检测器阶段快照，随本帧结果按值传递，不拥有跟踪器状态。
  */
 struct CLegacyOnlineKcfDiagnostic {
+    COnlineSeamEvidenceResult evidence;
     bool imageMeasurementOutputEnabled = false;
     bool imageObservationAccepted = false;
     bool imageSearchExpanded = false;
@@ -154,6 +160,7 @@ private:
 
     std::unique_ptr<CKcfTracker> m_tracker;
     COnlineSeamContinuity m_continuity;
+    COnlineSeamEvidence m_evidence;
     CSimulationGuidedSeamEstimator m_guidedEstimator;
     std::uint64_t m_guidanceReferenceRevision = 0;
     bool m_guidanceRevisionKnown = false;

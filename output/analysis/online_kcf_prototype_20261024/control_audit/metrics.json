@@ -1,0 +1,112 @@
+[
+  {
+    "batch_index": "1",
+    "counts": {
+      "raw_pending": 2,
+      "released_target": 2,
+      "reference_model": 0,
+      "fit_input": 0
+    },
+    "estimated_raw": [
+      "0",
+      "1"
+    ],
+    "applied": "0",
+    "message": "estimated seam continuation bypasses ICP; measured window isolated",
+    "raw_and_released_exact_same_sequence": true
+  },
+  {
+    "batch_index": "13",
+    "counts": {
+      "raw_pending": 11,
+      "released_target": 5,
+      "reference_model": 1368,
+      "fit_input": 5
+    },
+    "estimated_raw": [
+      "0"
+    ],
+    "applied": "1",
+    "message": "online ICP applied",
+    "detection_to_model_translation_mm": [
+      104.035482693355,
+      -89.303600695987,
+      423.287805652562
+    ],
+    "model_to_detection_translation_mm": [
+      -348.61438018649073,
+      -235.24137439432013,
+      145.26042431085452
+    ],
+    "translation_norm_mm": 444.93941292120746,
+    "rotation_deg": 103.5628191756427,
+    "raw_to_released_polyline_distance_mm": {
+      "min": 0.005693631617862804,
+      "median": 0.025168054272831603,
+      "max": 0.08373291150859447
+    },
+    "released_to_raw_polyline_distance_mm": {
+      "min": 0.005693631617862804,
+      "median": 0.010981235960711596,
+      "max": 0.015993414241784524
+    },
+    "released_to_inverse_model_polyline_distance_mm": {
+      "min": 1.1773649547259308e-07,
+      "median": 3.9418031304108954e-07,
+      "max": 8.299302773377489e-07
+    },
+    "original_model_to_inverse_model_displacement_at_released_phase_mm": {
+      "min": 35.81714590485679,
+      "median": 36.72713549496516,
+      "max": 37.1986356300588
+    },
+    "rms_mm": "0.107433265"
+  },
+  {
+    "batch_index": "14",
+    "counts": {
+      "raw_pending": 10,
+      "released_target": 6,
+      "reference_model": 1368,
+      "fit_input": 7
+    },
+    "estimated_raw": [
+      "0"
+    ],
+    "applied": "1",
+    "message": "online ICP applied",
+    "detection_to_model_translation_mm": [
+      -240.399396537374,
+      -113.520569565129,
+      -17.08990663167
+    ],
+    "model_to_detection_translation_mm": [
+      20.79734124741008,
+      169.5825738047901,
+      204.40175081780427
+    ],
+    "translation_norm_mm": 266.40355567935666,
+    "rotation_deg": 67.05822708529332,
+    "raw_to_released_polyline_distance_mm": {
+      "min": 0.014025250553204176,
+      "median": 0.03081572497511712,
+      "max": 0.05265679513599854
+    },
+    "released_to_raw_polyline_distance_mm": {
+      "min": 0.005579818214268703,
+      "median": 0.025491046908979104,
+      "max": 0.052529740713030654
+    },
+    "released_to_inverse_model_polyline_distance_mm": {
+      "min": 6.114574066195137e-07,
+      "median": 7.497871422216687e-07,
+      "max": 9.540079049052484e-07
+    },
+    "original_model_to_inverse_model_displacement_at_released_phase_mm": {
+      "min": 37.36838888019652,
+      "median": 38.04661080161347,
+      "max": 38.84399398314912
+    },
+    "rms_mm": "0.189617447"
+  }
+]

@@ -136,7 +136,9 @@ enum class CorrectionSyncState {
     /// @brief 离线扫描窗口结束；停止 KCF 并恢复实时图像，会话保留至 ICP/O 完成。
     OfflineSeamWindowClosed = 7,
     /// @brief 在线 KCF 检测窗口已暂停；会话保留且 UI 恢复实时图像。
-    TrackingPaused = 8
+    TrackingPaused = 8,
+    /// @brief 在线同帧参考缺失，冻结原图/RobotState 已交给 Vision 独立检测。
+    ImageOnlyReady = 9
 };
 
 /**
@@ -215,6 +217,8 @@ struct RuntimeTrackingOptions {
     bool enableGapDetection = false;
     /// @brief 在线仿真/KCF 融合参数，按帧更新，不重建跟踪模板。
     vision::KcfFusionOptions fusion;
+    /// @brief 生产证据策略；零续接预算表示仅输出确认的原图实测。
+    vision::COnlineSeamEvidenceOptions evidenceOptions;
     /// @brief 会话级逐帧诊断策略，仅在线纠偏链使用。
     COnlineVisionDiagnosticOptions visionDiagnostics;
     /// @brief true 表示使用全局定位专用“整条激光线提取”链路（Gabor+Steger），而非在线纠偏 KCF 单点。
@@ -333,6 +337,10 @@ struct RuntimeTrackingResult {
     bool imageMeasurementOutputEnabled = false;
     /// @brief 当前帧原图几何或图像质量验收 KCF 已通过；不代表独立几何资格。
     bool imageObservationAccepted = false;
+    /// @brief 估计像素可以显示，但独立几何和控制资格必须分别判断。
+    bool evidencePolicyEnabled = false;
+    bool kcfPixelAvailable = false;
+    bool controlEligible = false;
     double imageXPixel = 0.0;
     /// @brief 焊缝图像点 Y，单位 pixel。
     double imageYPixel = 0.0;

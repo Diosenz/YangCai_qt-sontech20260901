@@ -1,0 +1,18 @@
+{
+  "revision": "430aaa204fd5319dd7f697d3de2b4e1faddbb06f",
+  "hashes": {
+    "Localization/include/LocalizationTypes.h": "06b9d995b7a4f9ae593fbf60a27661f7793242f747a919c8ded7af929f274b54",
+    "Localization/include/LocalizationSurfaceValidation.h": "8d00b0591f85143e49a8fe6614c56b3b6686daef78661be98b8d77e03e07c40d",
+    "Localization/src/LocalizationSurfaceValidation.cpp": "49566a66b49b70d1063c275b19ffb9cf22d8c22d6bedf793b59aa10b906b90ed",
+    "UI/include/OnlineLocalSurfaceVerification.h": "86906e7f0a2bb98b01ed86c6502ed015b799a4b474b6b185dafcab373a7b1f60",
+    "output/online_local_registration/20261023_114602_096_session_1/local_icp_1_10466_f67ff4bc-f211-4cea-af37-febb45a73aef.json": "ab9a51fa182135e8745ad60cc0ba9f1a85e3d2c6d7e3d1062b0b8f8ef890b8c7",
+    "output/online_local_registration/20261023_114602_096_session_1/local_icp_1_10466_f67ff4bc-f211-4cea-af37-febb45a73aef.json.retained.json": "dfc53ae72834c2219d38e589cc93abe9ac6417248635562a30f97076572a18c1"
+  },
+  "stdout": "PREWRITE accepted=1 rank=3/4\nPOST frame=10538 real_coverage=0.735426 paired_support=0.735426 paired_before=1.8706 paired_after=1.17106 status=1 decision=0\nPOST frame=10550 real_coverage=0.668142 paired_support=0.668142 paired_before=1.79495 paired_after=1.11637 status=2 decision=0\nPOST frame=10563 real_coverage=0.676856 paired_support=0.676856 paired_before=1.83241 paired_after=1.14846 status=2 decision=0\nPOST frame=10576 real_coverage=0.628571 paired_support=0.457143 paired_before=1.66419 paired_after=1.11782 status=2 decision=2\nRED written_pose_geometry_verified=0 archived_retained=1 coverage_limit=0.7 numerical_metrics_match_archive=1\n",
+  "coverage_probe": null,
+  "minimized": false,
+  "stderr": "",
+  "returncode": 1,
+  "replay_seconds": 0.018369166999999992,
+  "scope": "Actual surface evaluate/measure/compare and posterior checker; no ICP solve or RobotSim SET_POSE."
+}

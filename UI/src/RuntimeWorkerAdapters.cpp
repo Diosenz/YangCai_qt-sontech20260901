@@ -1403,9 +1403,13 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
 
     digital_twin::DigitalTwinVisionLaserObservation observation;
     if (!makeObservation(frame.frameId, &observation)) {
-        if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
-        result.message = QStringLiteral("simulated observation unavailable");
-        return result;
+        if (!result.imageMeasurementOutputEnabled) {
+            result.message = QStringLiteral("simulated observation unavailable");
+            return result;
+        }
+        // 只缺仿真时仍验收当前原图；空 DTO 不能携带过期仿真像素或段切换。
+        observation = digital_twin::makeInvalidVisionLaserObservation(
+            frame.frameId, QStringLiteral("同帧仿真缺失，继续独立原图检测。"));
     }
     result.simulatedSeamIndex = observation.seamIndex;
     if (observation.scanLineChangePoint_mm.has_value()) {
@@ -1445,6 +1449,18 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         detectorOptions.enableSimulationGuidance = true;
         // 反向初扫与正式跟随使用同一原图测量边界；CAD 只辅助搜索。
         detectorOptions.enableImageMeasurementOutput = true;
+        detectorOptions.enableEvidencePolicy = true;
+        detectorOptions.evidenceOptions = m_options.evidenceOptions;
+        detectorOptions.evidenceContext.timestampMs = frame.timestamp.isValid()
+            ? frame.timestamp.toMSecsSinceEpoch() : -1;
+        if (observation.valid && observation.frameId == frame.frameId
+            && observation.hasWeldPointImage_px) {
+            detectorOptions.evidenceContext.referencePixel = cv::Point2d(
+                observation.weldPointImage_px.x_px, observation.weldPointImage_px.y_px);
+            detectorOptions.evidenceContext.referenceExposureFrameId = frame.frameId;
+        }
+        // 当前 transport 未提供曝光对应的工件沿缝弧长和旧版本同曝光桥接。
+        // 保留缺失值；不能用 TCP 净位移或上一帧 CAD 像素伪造这两种证据。
         detectorOptions.enableBoundedImageSearch = m_activeCorrelation.onlineControlWindowActive;
         detectorOptions.enableOnlineObservationFusion = false;
         detectorOptions.referenceRevision = m_activeCorrelation.workpiecePoseRevision;
@@ -1487,12 +1503,14 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     result.pointSource = detected.diagnostic.continuity.source;
     result.degradedFrames = detected.diagnostic.continuity.degradedFrames;
     result.imageObservationAccepted = detected.diagnostic.imageObservationAccepted;
+    result.evidencePolicyEnabled = detectorOptions.enableEvidencePolicy;
+    result.kcfPixelAvailable = result.evidencePolicyEnabled
+        ? detected.diagnostic.evidence.pixelAvailable : detected.valid;
+    result.controlEligible = result.evidencePolicyEnabled
+        ? detected.diagnostic.evidence.controlEligible : detected.valid;
     if (result.imageMeasurementOutputEnabled) {
-        // 初扫允许已验收 KCF 进入起点缓存；正式跟随保留其 estimated 标记，
-        // 沿用 Control 异常 ICP 的隔离门，不能因图像可用而冒充独立几何。
-        result.sample.estimated = result.imageObservationAccepted
-            && result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
-            && m_activeCorrelation.onlineControlWindowActive;
+        // 初扫和正式跟随均只给确认的独立几何实测资格；其余来源保留估计属性。
+        result.sample.estimated = result.pointSource != vision::OnlineSeamPointSource::Geometry;
     } else {
         result.sample.estimated = result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
             || result.pointSource == vision::OnlineSeamPointSource::SimulationPrediction
@@ -2936,6 +2954,8 @@ void COnlineCorrectionWorkerAdapter::configure(
     ++m_phaseTimeoutGeneration;
     m_timeoutPhase = control::OnlineCorrectionPhase::Idle;
     m_configuration = configuration;
+    // 正式在线只释放原始实测轨迹；保留 ICP 变换作为诊断，不用模型覆盖检测。
+    m_configuration.options.preserveMeasuredReference = true;
     const auto trajectory =
         control::COnlineCorrectionTrajectoryPlanner::loadTrajectory(
             configuration.trajectoryRequest);
@@ -2945,7 +2965,7 @@ void COnlineCorrectionWorkerAdapter::configure(
     }
     const auto &calibration = *m_configuration.positionerCalibrationSnapshot;
     m_positionerCalibration = calibration;
-    m_controller.configure(configuration.options, trajectory, calibration);
+    m_controller.configure(m_configuration.options, trajectory, calibration);
     emit statusChanged(QString::fromStdString(m_controller.state().message));
 }
 
@@ -3040,7 +3060,8 @@ void COnlineCorrectionWorkerAdapter::appendTrackingResult(
     if (!m_runRecorder.recordTrackingResult(result, m_controller.state().phase)) {
         reportRecordingFailure(QStringLiteral("视觉与实时修正输入"));
     }
-    if (!result.valid || !result.sample.point.valid) {
+    if (!result.valid || !result.sample.point.valid
+        || (result.evidencePolicyEnabled && !result.controlEligible)) {
         emit statusChanged(QStringLiteral("tracking result ignored: %1").arg(result.message));
         return;
     }

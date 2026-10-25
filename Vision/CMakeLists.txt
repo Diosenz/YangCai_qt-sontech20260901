@@ -115,6 +115,8 @@ if(I2R_RLC_ENABLE_OPENCV)
         src/track/FilterKalman.cpp
         src/track/KcfTracker.cpp
         src/track/OnlineSeamContinuity.cpp
+        src/track/OnlineSeamEvidence.cpp
+        include/track/OnlineSeamEvidence.h
         include/track/OnlineSeamContinuity.h
         src/track/LegacyOnlineKcfDetector.cpp
         src/track/KcfFftTools.cpp

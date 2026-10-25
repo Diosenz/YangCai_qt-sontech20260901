@@ -1,0 +1,9 @@
+{
+  "commit": "430aaa204fd5319dd7f697d3de2b4e1faddbb06f",
+  "session": "20261023_194602_142",
+  "coordinate_frame": "station_last_link (Control input adds toolTcpInLastLinkMm once to PositionerTcp measurement)",
+  "source_sha256": {
+    "online_icp_batches.txt": "deaecda3eb11eff998e78db2ef33507139df318e3a15dc388a86f5998779e47f",
+    "online_icp_points.txt": "f7991b5e598151abd08b830d7e6f49bfff315327229cfeb28298abe9cb69e157"
+  }
+}

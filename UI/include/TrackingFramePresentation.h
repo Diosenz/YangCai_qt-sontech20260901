@@ -23,6 +23,8 @@ struct TrackingFramePresentation {
     bool virtualWeldPointVisible = false;
     QPointF detectedWeldPoint;
     bool detectedWeldPointVisible = false;
+    /// @brief 黄色表示估计/控制参考显示；绿色保留给有效测量。
+    bool detectedWeldPointEstimated = false;
     QString caption;
 };
 

@@ -223,6 +223,8 @@ struct OnlineCorrectionOptions {
     bool enableGapDetection = false;
     /// @brief true 使用在线轨迹 ICP；false 直接跟随检测点，不影响起点/全局配准。
     bool enableOnlineIcp = true;
+    /// @brief 正式在线显式启用；保留 ICP 候选用于诊断，实际释放原始实测点。
+    bool preserveMeasuredReference = false;
     /// @brief 机器人 TCP 速度，单位 mm/s，用于保持旧纠偏周期语义。
     double stepTcpVelocityMmPerSecond = 11.0;
     /// @brief 控制周期，单位 s，旧活动路径使用 0.0043。
@@ -274,6 +276,8 @@ struct OnlineCorrectionIcpBatchDiagnostic {
     /// @brief 尚未释放的原始新点及实际释放给跟随器的点列。
     std::vector<OnlineCorrectionDetectionSample> pendingSamples;
     std::vector<OnlineCorrectionDetectionSample> releasedSamples;
+    /// @brief 实测优先策略下未采用的模型输出，仅诊断，不能解释为已释放轨迹。
+    std::vector<OnlineCorrectionDetectionSample> modelProposalSamples;
     std::string message;
 };
 

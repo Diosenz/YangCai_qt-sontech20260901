@@ -2432,6 +2432,33 @@ void CRuntimeCoordinator::failCorrectionFrameSynchronization(
         return;
     }
 
+    if (m_correctionSession.purpose == CorrectionPurpose::OnlineCorrection
+        && m_currentVisionFrame->hasRobotState && m_visionWorker != nullptr) {
+        // 仿真是可缺失的搜索参考；仍将冻结的原图/RobotState 交给视觉线程。
+        // 保留在途关联直到 Vision 返回，迟到的 RobotSim 回包由 requestId=0 隔离。
+        m_robotSimPriorInFlightRequestId = 0;
+        m_currentVisionFrame->requestId = 0;
+        const auto observation = digital_twin::makeInvalidVisionLaserObservation(frameId, message);
+        m_currentVisionFrame->synchronizedObservation = observation;
+        const auto correlation = makeVisionCorrelation(*m_currentVisionFrame);
+        ++m_correctionSession.consecutiveSyncFailures;
+        m_correctionSession.lastSyncError = message;
+        emitCorrectionSyncState(CorrectionSyncState::Failed, frameId, message);
+        // 信号订阅方可能同步停止会话；先重验身份再向 worker 投递。
+        if (!currentFrameMatches(correlation)) { return; }
+        emitCorrectionSyncState(CorrectionSyncState::ImageOnlyReady, frameId,
+            QStringLiteral("同帧仿真参考不可用，继续当前原图独立检测。"));
+        if (!currentFrameMatches(correlation)) { return; }
+        const auto frame = m_currentVisionFrame->frame;
+        const auto state = m_currentVisionFrame->robotState;
+        const int segment = m_currentVisionFrame->localizationSegmentIndex;
+        QMetaObject::invokeMethod(m_visionWorker,
+            [worker = m_visionWorker, frame, state, segment, observation, correlation]() {
+                worker->submitFrameWithRobotStateObservationAndCorrelation(
+                    frame, state, segment, observation, correlation);
+            }, Qt::QueuedConnection);
+        return;
+    }
     m_robotSimPriorInFlightRequestId = 0;
     m_currentVisionFrame.reset();
     m_visionFrameInFlight = false;

@@ -1,0 +1,9 @@
+{
+  "checkedFrames": 220,
+  "anchorIsolation": true,
+  "duplicateIsolation": true,
+  "independentBudgetCaps": true,
+  "referenceJumpIsolated": true,
+  "recoveryTransitionExercised": true,
+  "scope": "方案边界核查，非现场精度验收"
+}

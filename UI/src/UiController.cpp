@@ -557,6 +557,8 @@ QString correctionSyncStateToText(CorrectionSyncState state)
         return QStringLiteral("焊缝采集已关闭，侧面扫描中");
     case CorrectionSyncState::TrackingPaused:
         return QStringLiteral("检测窗口已暂停");
+    case CorrectionSyncState::ImageOnlyReady:
+        return QStringLiteral("参考缺失，原图独立检测");
     }
     return QStringLiteral("未知");
 }
@@ -4356,8 +4358,8 @@ bool UiController::presentCorrectionFrame(const RuntimeTrackingResult& result)
     const auto &context = result.frameContext.value();
     const auto &observation = context.observation;
     const auto &frame = context.sourceFrame;
-    if (frame.frameId != result.frameId
-        || !isUsableCorrectionObservationForFrame(result.frameId, observation)) {
+    if (frame.frameId != result.frameId || observation.frameId != result.frameId
+        || (!observation.valid && !result.evidencePolicyEnabled)) {
         return false;
     }
 
@@ -4373,9 +4375,12 @@ bool UiController::presentCorrectionFrame(const RuntimeTrackingResult& result)
     }
     presentation.virtualWeldPoint = QPointF(
         observation.weldPointImage_px.x_px, observation.weldPointImage_px.y_px);
-    presentation.virtualWeldPointVisible = observation.hasWeldPointImage_px;
+    presentation.virtualWeldPointVisible = observation.valid && observation.hasWeldPointImage_px;
     presentation.detectedWeldPoint = QPointF(result.imageXPixel, result.imageYPixel);
-    presentation.detectedWeldPointVisible = result.triggerAccepted && result.valid;
+    presentation.detectedWeldPointVisible = result.triggerAccepted
+        && (result.evidencePolicyEnabled ? result.kcfPixelAvailable : result.valid);
+    presentation.detectedWeldPointEstimated = result.evidencePolicyEnabled
+        && result.pointSource != vision::OnlineSeamPointSource::Geometry;
     if (result.correlation.purpose == CorrectionPurpose::OnlineCorrection) {
         // 缓存帧重绘也同步恢复图像坐标，避免只恢复像素而保留失效坐标。
         m_onlineKcfLatestValid = presentation.detectedWeldPointVisible
@@ -4405,8 +4410,16 @@ bool UiController::presentCorrectionFrame(const RuntimeTrackingResult& result)
             : QStringLiteral("绿色：仿真辅助预测（非实测）");
     } else if (result.pointSource == vision::OnlineSeamPointSource::GuidedEstimate) {
         pointLabel = QStringLiteral("绿色：时序锚/母材肩部辅助估计（非独立实测）");
+    } else if (result.pointSource == vision::OnlineSeamPointSource::RecoveryTransition) {
+        pointLabel = QStringLiteral("黄色：重捕获恢复过渡（估计，不进入控制）");
     }
-    presentation.caption = QStringLiteral("检测帧 %1｜原图与参考、检测点同帧｜%2")
+    if (presentation.detectedWeldPointEstimated) {
+        pointLabel.replace(QStringLiteral("绿色"), QStringLiteral("黄色"));
+        pointLabel += QStringLiteral("｜像素显示，无控制资格");
+    }
+    presentation.caption = (observation.valid
+        ? QStringLiteral("检测帧 %1｜原图与参考、检测点同帧｜%2")
+        : QStringLiteral("检测帧 %1｜同帧参考缺失，原图独立检测｜%2"))
         .arg(result.frameId)
         .arg(presentation.detectedWeldPointVisible
             ? pointLabel : QStringLiteral("本帧检测无效"));
@@ -4438,6 +4451,7 @@ bool UiController::presentCorrectionFrame(const RuntimeTrackingResult& result)
                     && pixel.yPixel < presentation.sourceImage.height()) {
                     presentation.detectedWeldPoint = {pixel.xPixel, pixel.yPixel};
                     presentation.detectedWeldPointVisible = true;
+                    presentation.detectedWeldPointEstimated = true;
                     presentation.caption = QStringLiteral(
                         "显示帧 %1｜控制参考 %2｜预测显示：参考线与激光平面交点（非实测）")
                         .arg(result.frameId).arg(m_onlineControlTarget.generation);
@@ -4839,6 +4853,13 @@ void UiController::handleCorrectionSyncUpdate(
                 .arg(m_globalLocateRobotSimEndpoint.port));
         break;
     case CorrectionSyncState::Querying:
+        break;
+    case CorrectionSyncState::ImageOnlyReady:
+        if (update.purpose != CorrectionPurpose::OnlineCorrection
+            || update.frameId < 0 || !state->acceptingFrames) { return; }
+        // 参考失败与 Vision 消费是不同事实；仍按同会话同曝光展示原图结果。
+        state->pendingFrameId = update.frameId;
+        state->lastError = update.message;
         break;
     case CorrectionSyncState::ObservationReady: {
         if (update.sessionId != 0

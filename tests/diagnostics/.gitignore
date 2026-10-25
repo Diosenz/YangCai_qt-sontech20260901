@@ -1,0 +1,3 @@
+# Python caches are local runtime artifacts, not replay evidence.
+__pycache__/
+*.py[cod]

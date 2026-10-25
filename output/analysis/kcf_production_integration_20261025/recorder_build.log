@@ -1,0 +1,19 @@
+Vision/src/geometry/PositionerKinematics.cpp:148:55: warning: 'eulerAngles' is deprecated: Use .canonicalEulerAngles() instead. [-Wdeprecated-declarations]
+  148 |     Eigen::Vector3d eulerZyx = poseInRobot.rotation().eulerAngles(2, 1, 0);
+      |                                                       ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/MatrixBase.h:396:3: note: 'eulerAngles' has been explicitly marked deprecated here
+  396 |   EIGEN_DEPRECATED_WITH_REASON("Use .canonicalEulerAngles() instead.")
+      |   ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+  965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+      |                                                              ^
+Vision/src/geometry/PositionerKinematics.cpp:197:63: warning: 'eulerAngles' is deprecated: Use .canonicalEulerAngles() instead. [-Wdeprecated-declarations]
+  197 |     const Eigen::Vector3d eulerZyx = poseInCurrent.rotation().eulerAngles(2, 1, 0);
+      |                                                               ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/MatrixBase.h:396:3: note: 'eulerAngles' has been explicitly marked deprecated here
+  396 |   EIGEN_DEPRECATED_WITH_REASON("Use .canonicalEulerAngles() instead.")
+      |   ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+  965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+      |                                                              ^
+2 warnings generated.

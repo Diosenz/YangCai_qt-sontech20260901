@@ -1,0 +1,181 @@
+{
+  "revision": "430aaa204fd5319dd7f697d3de2b4e1faddbb06f",
+  "all_checks_passed": true,
+  "meaning": "Probe assertions passed; production baseline symptoms remain unfixed and RED.",
+  "checks": [
+    {
+      "name": "field_repeat_1",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "field"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=field\nRED visible_fold_measurement valid=0 status=2 ambiguous_ratio=0.497382 limit=0.200000 half_height=60 input=1292x964 point=(-1.000000,-1.000000)\nreplay_seconds=0.5730 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "field_repeat_2",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "field"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=field\nRED visible_fold_measurement valid=0 status=2 ambiguous_ratio=0.497382 limit=0.200000 half_height=60 input=1292x964 point=(-1.000000,-1.000000)\nreplay_seconds=0.0199 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "field_repeat_3",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "field"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=field\nRED visible_fold_measurement valid=0 status=2 ambiguous_ratio=0.497382 limit=0.200000 half_height=60 input=1292x964 point=(-1.000000,-1.000000)\nreplay_seconds=0.0196 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "field_minimized",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "field",
+        "--minimized"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=field\nRED visible_fold_measurement valid=0 status=2 ambiguous_ratio=0.497382 limit=0.200000 half_height=60 input=201x121 point=(-1.000000,-1.000000)\nreplay_seconds=0.0198 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "accepted_control",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "anchor"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=anchor\nGREEN visible_fold_measurement valid=1 status=6 ambiguous_ratio=0.129353 limit=0.200000 half_height=60 input=1292x964 point=(435.500000,608.562927)\nreplay_seconds=1.4243 exit=0\n",
+      "stderr": ""
+    },
+    {
+      "name": "ambiguity_probe",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "field",
+        "--ambiguity-limit",
+        "0.6"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=field\nGREEN visible_fold_measurement valid=1 status=6 ambiguous_ratio=0.497382 limit=0.600000 half_height=60 input=1292x964 point=(445.500000,607.745053)\nreplay_seconds=0.0198 exit=0\n",
+      "stderr": ""
+    },
+    {
+      "name": "height_probe",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "field",
+        "--half-height",
+        "40"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=field\nRED visible_fold_measurement valid=0 status=2 ambiguous_ratio=0.338983 limit=0.200000 half_height=40 input=1292x964 point=(-1.000000,-1.000000)\nreplay_seconds=0.0196 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "hint_up_probe",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "field",
+        "--hint-dy",
+        "-5"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=field\nRED visible_fold_measurement valid=0 status=2 ambiguous_ratio=0.494681 limit=0.200000 half_height=60 input=1292x964 point=(-1.000000,-1.000000)\nreplay_seconds=0.0193 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "hint_down_probe",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/replay.py",
+        "--case",
+        "field",
+        "--hint-dy",
+        "5"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "revision=430aaa204fd5319dd7f697d3de2b4e1faddbb06f OpenCV=4.11.0 case=field\nRED visible_fold_measurement valid=0 status=2 ambiguous_ratio=0.486911 limit=0.200000 half_height=60 input=1292x964 point=(-1.000000,-1.000000)\nreplay_seconds=0.0192 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "surface_replay",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/surface_replay.py"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "PREWRITE accepted=1 rank=3/4\nPOST frame=10538 real_coverage=0.735426 paired_support=0.735426 paired_before=1.8706 paired_after=1.17106 status=1 decision=0\nPOST frame=10550 real_coverage=0.668142 paired_support=0.668142 paired_before=1.79495 paired_after=1.11637 status=2 decision=0\nPOST frame=10563 real_coverage=0.676856 paired_support=0.676856 paired_before=1.83241 paired_after=1.14846 status=2 decision=0\nPOST frame=10576 real_coverage=0.628571 paired_support=0.457143 paired_before=1.66419 paired_after=1.11782 status=2 decision=2\nRED written_pose_geometry_verified=0 archived_retained=1 coverage_limit=0.7 numerical_metrics_match_archive=1\nreplay_seconds=0.3209 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "surface_minimized",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/surface_replay.py",
+        "--minimized"
+      ],
+      "expected_exit": 1,
+      "exit": 1,
+      "passed": true,
+      "stdout": "PREWRITE accepted=1 rank=3/4\nPOST frame=10550 real_coverage=0.668142 paired_support=0.668142 paired_before=1.79495 paired_after=1.11637 status=2 decision=0\nPOST frame=10563 real_coverage=0.676856 paired_support=0.676856 paired_before=1.83241 paired_after=1.14846 status=2 decision=0\nPOST frame=10576 real_coverage=0.628571 paired_support=0.457143 paired_before=1.66419 paired_after=1.11782 status=2 decision=2\nRED written_pose_geometry_verified=0 archived_retained=1 coverage_limit=0.7 numerical_metrics_match_archive=1\nreplay_seconds=0.0193 exit=1\n",
+      "stderr": ""
+    },
+    {
+      "name": "coverage_probe",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/yangcai0130/Desktop/YangCai_qt-sontech20260901-main/tests/diagnostics/online_correction_repro/surface_replay.py",
+        "--coverage",
+        "0.4"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "passed": true,
+      "stdout": "PREWRITE accepted=1 rank=3/4\nPOST frame=10538 real_coverage=0.735426 paired_support=0.735426 paired_before=1.8706 paired_after=1.17106 status=1 decision=0\nPOST frame=10550 real_coverage=0.668142 paired_support=0.668142 paired_before=1.79495 paired_after=1.11637 status=1 decision=0\nPOST frame=10563 real_coverage=0.676856 paired_support=0.676856 paired_before=1.83241 paired_after=1.14846 status=1 decision=1\nPOST frame=10576 real_coverage=0.628571 paired_support=0.457143 paired_before=1.66419 paired_after=1.11782 status=0 decision=1\nGREEN written_pose_geometry_verified=1 archived_retained=1 coverage_limit=0.4 numerical_metrics_match_archive=1\nreplay_seconds=0.0193 exit=0\n",
+      "stderr": ""
+    }
+  ]
+}

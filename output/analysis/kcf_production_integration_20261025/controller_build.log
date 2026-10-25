@@ -1,0 +1,330 @@
+Vision/src/geometry/PositionerKinematics.cpp:148:55: warning: 'eulerAngles' is deprecated: Use .canonicalEulerAngles() instead. [-Wdeprecated-declarations]
+  148 |     Eigen::Vector3d eulerZyx = poseInRobot.rotation().eulerAngles(2, 1, 0);
+      |                                                       ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/MatrixBase.h:396:3: note: 'eulerAngles' has been explicitly marked deprecated here
+  396 |   EIGEN_DEPRECATED_WITH_REASON("Use .canonicalEulerAngles() instead.")
+      |   ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+  965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+      |                                                              ^
+Vision/src/geometry/PositionerKinematics.cpp:197:63: warning: 'eulerAngles' is deprecated: Use .canonicalEulerAngles() instead. [-Wdeprecated-declarations]
+  197 |     const Eigen::Vector3d eulerZyx = poseInCurrent.rotation().eulerAngles(2, 1, 0);
+      |                                                               ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/MatrixBase.h:396:3: note: 'eulerAngles' has been explicitly marked deprecated here
+  396 |   EIGEN_DEPRECATED_WITH_REASON("Use .canonicalEulerAngles() instead.")
+      |   ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+  965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+      |                                                              ^
+2 warnings generated.
+In file included from Vision/third_party/libicp/icp.cpp:28:
+In file included from Vision/third_party/libicp/icp.h:38:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:29:
+In file included from /opt/homebrew/include/boost/multi_array/base.hpp:25:
+/opt/homebrew/include/boost/multi_array/storage_order.hpp:51:18: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+   51 |       ascending_.assign(true);
+      |                  ^
+/opt/homebrew/include/boost/multi_array.hpp:153:34: note: in instantiation of member function 'boost::general_storage_order<2>::general_storage_order' requested here
+  153 |     super_type((T*)initial_base_,c_storage_order(),
+      |                                  ^
+Vision/third_party/libicp/icp.cpp:32:7: note: in instantiation of member function 'boost::multi_array<float, 2>::multi_array' requested here
+   32 | CIcp::CIcp(double *M, const int32_t M_num, const int32_t m_dim, int32_t m_maxIter, double m_minDelta) :
+      |       ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+In file included from Vision/third_party/libicp/icp.cpp:28:
+In file included from Vision/third_party/libicp/icp.h:38:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:34:
+/opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:343:18: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+  343 |      extent_list.assign(0);
+      |                  ^
+/opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:616:5: note: in instantiation of member function 'boost::const_multi_array_ref<float, 2, float *>::const_multi_array_ref' requested here
+  616 |     super_type(base,so,index_bases,extents) { }
+      |     ^
+/opt/homebrew/include/boost/multi_array.hpp:153:5: note: in instantiation of member function 'boost::multi_array_ref<float, 2>::multi_array_ref' requested here
+  153 |     super_type((T*)initial_base_,c_storage_order(),
+      |     ^
+Vision/third_party/libicp/icp.cpp:32:7: note: in instantiation of member function 'boost::multi_array<float, 2>::multi_array' requested here
+   32 | CIcp::CIcp(double *M, const int32_t M_num, const int32_t m_dim, int32_t m_maxIter, double m_minDelta) :
+      |       ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+In file included from Vision/third_party/libicp/icp.cpp:28:
+In file included from Vision/third_party/libicp/icp.h:38:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:34:
+In file included from /opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:26:
+/opt/homebrew/include/boost/multi_array/view.hpp:234:22: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+  234 |     index_base_list_.assign(0);
+      |                      ^
+/opt/homebrew/include/boost/multi_array/view.hpp:434:5: note: in instantiation of function template specialization 'boost::detail::multi_array::const_multi_array_view<float, 2, float *>::const_multi_array_view<boost::array<long, 2>, long>' requested here
+  434 |     super_type(base,extents,strides) { }
+      |     ^
+/opt/homebrew/include/boost/multi_array/base.hpp:488:7: note: in instantiation of function template specialization 'boost::detail::multi_array::multi_array_view<float, 2>::multi_array_view<boost::array<long, 2>, long>' requested here
+  488 |       ArrayRef(base+offset,
+      |       ^
+/opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:534:19: note: in instantiation of function template specialization 'boost::detail::multi_array::multi_array_impl_base<float, 2>::generate_array_view<boost::detail::multi_array::multi_array_view<float, 2>, 2, float *>' requested here
+  534 |       super_type::generate_array_view(boost::type<return_type>(),
+      |                   ^
+/opt/homebrew/include/boost/multi_array.hpp:494:79: note: in instantiation of function template specialization 'boost::multi_array_ref<float, 2>::operator[]<2>' requested here
+  494 |       multi_array::BOOST_NESTED_TEMPLATE array_view<NumDims>::type view_old = (*this)[old_idxes];
+      |                                                                               ^
+Vision/third_party/libicp/icp.cpp:50:9: note: in instantiation of member function 'boost::multi_array<float, 2>::resize' requested here
+   50 |         m_data.resize(boost::extents[M_num][m_dim]);
+      |                ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+In file included from Vision/third_party/libicp/icp.cpp:28:
+In file included from Vision/third_party/libicp/icp.h:38:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:29:
+In file included from /opt/homebrew/include/boost/multi_array/base.hpp:25:
+/opt/homebrew/include/boost/multi_array/storage_order.hpp:51:18: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+   51 |       ascending_.assign(true);
+      |                  ^
+/opt/homebrew/include/boost/multi_array.hpp:261:58: note: in instantiation of member function 'boost::general_storage_order<1>::general_storage_order' requested here
+  261 |               const general_storage_order<NumDims>& so = c_storage_order(),
+      |                                                          ^
+/opt/homebrew/include/boost/multi_array.hpp:499:14: note: in instantiation of member function 'boost::detail::multi_array::multi_array_view<float, 2>::operator=' requested here
+  499 |     view_new = view_old;
+      |              ^
+Vision/third_party/libicp/icp.cpp:50:9: note: in instantiation of member function 'boost::multi_array<float, 2>::resize' requested here
+   50 |         m_data.resize(boost::extents[M_num][m_dim]);
+      |                ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+In file included from Vision/third_party/libicp/icp.cpp:28:
+In file included from Vision/third_party/libicp/icp.h:38:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:34:
+In file included from /opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:26:
+/opt/homebrew/include/boost/multi_array/view.hpp:234:22: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+  234 |     index_base_list_.assign(0);
+      |                      ^
+/opt/homebrew/include/boost/multi_array/base.hpp:488:7: note: in instantiation of function template specialization 'boost::detail::multi_array::const_multi_array_view<float, 1>::const_multi_array_view<boost::array<long, 1>, long>' requested here
+  488 |       ArrayRef(base+offset,
+      |       ^
+/opt/homebrew/include/boost/multi_array/subarray.hpp:97:19: note: in instantiation of function template specialization 'boost::detail::multi_array::multi_array_impl_base<float, 1>::generate_array_view<boost::detail::multi_array::const_multi_array_view<float, 1>, 1, const float *>' requested here
+   97 |       super_type::generate_array_view(boost::type<return_type>(),
+      |                   ^
+/opt/homebrew/include/boost/multi_array/concept_checks.hpp:51:7: note: in instantiation of function template specialization 'boost::detail::multi_array::const_sub_array<float, 1>::operator[]<1>' requested here
+   51 |       a[ idgen ];
+      |       ^
+/opt/homebrew/include/boost/multi_array/concept_checks.hpp:71:40: note: in instantiation of function template specialization 'boost::multi_array_concepts::detail::idgen_helper<0>::call<boost::detail::multi_array::const_sub_array<float, 1>, boost::detail::multi_array::index_gen<1, 1>, long>' requested here
+   71 |       detail::idgen_helper<NumDims-1>::call(a,idgen[range],id);
+      |                                        ^
+/opt/homebrew/include/boost/concept/detail/general.hpp:65:41: note: in instantiation of member function 'boost::multi_array_concepts::ConstMultiArrayConcept<boost::detail::multi_array::const_sub_array<float, 1>, 1>::constraints' requested here
+   65 |     static void failed() { ((Model*)0)->constraints(); }
+      |                                         ^
+/opt/homebrew/include/boost/concept_check.hpp:50:7: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+   50 |       BOOST_CONCEPT_ASSERT((Model));
+      |       ^
+/opt/homebrew/include/boost/concept/assert.hpp:43:5: note: expanded from macro 'BOOST_CONCEPT_ASSERT'
+   43 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^
+/opt/homebrew/include/boost/concept/detail/general.hpp:92:51: note: expanded from macro 'BOOST_CONCEPT_ASSERT_FN'
+   92 |     &::boost::concepts::requirement_<ModelFnPtr>::failed>    \
+      |                                                   ^
+/opt/homebrew/include/boost/multi_array/subarray.hpp:230:5: note: in instantiation of function template specialization 'boost::function_requires<boost::multi_array_concepts::ConstMultiArrayConcept<boost::detail::multi_array::const_sub_array<float, 1>, 1>>' requested here
+  230 |     function_requires< boost::multi_array_concepts::ConstMultiArrayConcept< 
+      |     ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/copy.h:40:17: note: in instantiation of function template specialization 'boost::detail::multi_array::sub_array<float, 1>::operator=<boost::detail::multi_array::const_sub_array<float, 1>>' requested here
+   40 |       *__result = *__first;
+      |                 ^
+/opt/homebrew/include/boost/multi_array/view.hpp:318:12: note: in instantiation of function template specialization 'std::copy<boost::detail::multi_array::array_iterator<float, const float *, mpl_::size_t<2>, boost::detail::multi_array::const_sub_array<float, 1>, boost::iterators::random_access_traversal_tag>, boost::detail::multi_array::array_iterator<float, float *, mpl_::size_t<2>, boost::detail::multi_array::sub_array<float, 1>, boost::iterators::random_access_traversal_tag>>' requested here
+  318 |       std::copy(other.begin(),other.end(),begin());
+      |            ^
+/opt/homebrew/include/boost/multi_array.hpp:499:14: note: in instantiation of member function 'boost::detail::multi_array::multi_array_view<float, 2>::operator=' requested here
+  499 |     view_new = view_old;
+      |              ^
+Vision/third_party/libicp/icp.cpp:50:9: note: in instantiation of member function 'boost::multi_array<float, 2>::resize' requested here
+   50 |         m_data.resize(boost::extents[M_num][m_dim]);
+      |                ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+5 warnings generated.
+Vision/third_party/libicp/icpPointToPoint.cpp:587:34: warning: 'eulerAngles' is deprecated: Use .canonicalEulerAngles() instead. [-Wdeprecated-declarations]
+  587 |                 euler_angles = rotation_matrix.eulerAngles(2, 1, 0);
+      |                                                ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/MatrixBase.h:396:3: note: 'eulerAngles' has been explicitly marked deprecated here
+  396 |   EIGEN_DEPRECATED_WITH_REASON("Use .canonicalEulerAngles() instead.")
+      |   ^
+/opt/homebrew/Cellar/eigen/5.0.1/include/eigen3/Eigen/src/Core/util/Macros.h:965:62: note: expanded from macro 'EIGEN_DEPRECATED_WITH_REASON'
+  965 | #define EIGEN_DEPRECATED_WITH_REASON(message) __attribute__((deprecated(message)))
+      |                                                              ^
+1 warning generated.
+In file included from Vision/third_party/libicp/kdtree.cpp:19:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:29:
+In file included from /opt/homebrew/include/boost/multi_array/base.hpp:25:
+/opt/homebrew/include/boost/multi_array/storage_order.hpp:51:18: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+   51 |       ascending_.assign(true);
+      |                  ^
+/opt/homebrew/include/boost/multi_array.hpp:153:34: note: in instantiation of member function 'boost::general_storage_order<2>::general_storage_order' requested here
+  153 |     super_type((T*)initial_base_,c_storage_order(),
+      |                                  ^
+Vision/third_party/libicp/kdtree.cpp:84:11: note: in instantiation of member function 'boost::multi_array<float, 2>::multi_array' requested here
+   84 |   KDTree::KDTree(KDTreeArray& data_in, bool rearrange_in, int dim_in)
+      |           ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+In file included from Vision/third_party/libicp/kdtree.cpp:19:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:34:
+/opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:343:18: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+  343 |      extent_list.assign(0);
+      |                  ^
+/opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:616:5: note: in instantiation of member function 'boost::const_multi_array_ref<float, 2, float *>::const_multi_array_ref' requested here
+  616 |     super_type(base,so,index_bases,extents) { }
+      |     ^
+/opt/homebrew/include/boost/multi_array.hpp:153:5: note: in instantiation of member function 'boost::multi_array_ref<float, 2>::multi_array_ref' requested here
+  153 |     super_type((T*)initial_base_,c_storage_order(),
+      |     ^
+Vision/third_party/libicp/kdtree.cpp:84:11: note: in instantiation of member function 'boost::multi_array<float, 2>::multi_array' requested here
+   84 |   KDTree::KDTree(KDTreeArray& data_in, bool rearrange_in, int dim_in)
+      |           ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+In file included from Vision/third_party/libicp/kdtree.cpp:19:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:34:
+In file included from /opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:26:
+/opt/homebrew/include/boost/multi_array/view.hpp:234:22: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+  234 |     index_base_list_.assign(0);
+      |                      ^
+/opt/homebrew/include/boost/multi_array/view.hpp:434:5: note: in instantiation of function template specialization 'boost::detail::multi_array::const_multi_array_view<float, 2, float *>::const_multi_array_view<boost::array<long, 2>, long>' requested here
+  434 |     super_type(base,extents,strides) { }
+      |     ^
+/opt/homebrew/include/boost/multi_array/base.hpp:488:7: note: in instantiation of function template specialization 'boost::detail::multi_array::multi_array_view<float, 2>::multi_array_view<boost::array<long, 2>, long>' requested here
+  488 |       ArrayRef(base+offset,
+      |       ^
+/opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:534:19: note: in instantiation of function template specialization 'boost::detail::multi_array::multi_array_impl_base<float, 2>::generate_array_view<boost::detail::multi_array::multi_array_view<float, 2>, 2, float *>' requested here
+  534 |       super_type::generate_array_view(boost::type<return_type>(),
+      |                   ^
+/opt/homebrew/include/boost/multi_array.hpp:494:79: note: in instantiation of function template specialization 'boost::multi_array_ref<float, 2>::operator[]<2>' requested here
+  494 |       multi_array::BOOST_NESTED_TEMPLATE array_view<NumDims>::type view_old = (*this)[old_idxes];
+      |                                                                               ^
+Vision/third_party/libicp/kdtree.cpp:105:23: note: in instantiation of member function 'boost::multi_array<float, 2>::resize' requested here
+  105 |       rearranged_data.resize( boost::extents[N][m_dim] );
+      |                       ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+In file included from Vision/third_party/libicp/kdtree.cpp:19:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:29:
+In file included from /opt/homebrew/include/boost/multi_array/base.hpp:25:
+/opt/homebrew/include/boost/multi_array/storage_order.hpp:51:18: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+   51 |       ascending_.assign(true);
+      |                  ^
+/opt/homebrew/include/boost/multi_array.hpp:261:58: note: in instantiation of member function 'boost::general_storage_order<1>::general_storage_order' requested here
+  261 |               const general_storage_order<NumDims>& so = c_storage_order(),
+      |                                                          ^
+/opt/homebrew/include/boost/multi_array.hpp:499:14: note: in instantiation of member function 'boost::detail::multi_array::multi_array_view<float, 2>::operator=' requested here
+  499 |     view_new = view_old;
+      |              ^
+Vision/third_party/libicp/kdtree.cpp:105:23: note: in instantiation of member function 'boost::multi_array<float, 2>::resize' requested here
+  105 |       rearranged_data.resize( boost::extents[N][m_dim] );
+      |                       ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+In file included from Vision/third_party/libicp/kdtree.cpp:19:
+In file included from Vision/third_party/libicp/kdtree.h:23:
+In file included from /opt/homebrew/include/boost/multi_array.hpp:34:
+In file included from /opt/homebrew/include/boost/multi_array/multi_array_ref.hpp:26:
+/opt/homebrew/include/boost/multi_array/view.hpp:234:22: warning: 'assign' is deprecated: please use `fill` instead [-Wdeprecated-declarations]
+  234 |     index_base_list_.assign(0);
+      |                      ^
+/opt/homebrew/include/boost/multi_array/base.hpp:488:7: note: in instantiation of function template specialization 'boost::detail::multi_array::const_multi_array_view<float, 1>::const_multi_array_view<boost::array<long, 1>, long>' requested here
+  488 |       ArrayRef(base+offset,
+      |       ^
+/opt/homebrew/include/boost/multi_array/subarray.hpp:97:19: note: in instantiation of function template specialization 'boost::detail::multi_array::multi_array_impl_base<float, 1>::generate_array_view<boost::detail::multi_array::const_multi_array_view<float, 1>, 1, const float *>' requested here
+   97 |       super_type::generate_array_view(boost::type<return_type>(),
+      |                   ^
+/opt/homebrew/include/boost/multi_array/concept_checks.hpp:51:7: note: in instantiation of function template specialization 'boost::detail::multi_array::const_sub_array<float, 1>::operator[]<1>' requested here
+   51 |       a[ idgen ];
+      |       ^
+/opt/homebrew/include/boost/multi_array/concept_checks.hpp:71:40: note: in instantiation of function template specialization 'boost::multi_array_concepts::detail::idgen_helper<0>::call<boost::detail::multi_array::const_sub_array<float, 1>, boost::detail::multi_array::index_gen<1, 1>, long>' requested here
+   71 |       detail::idgen_helper<NumDims-1>::call(a,idgen[range],id);
+      |                                        ^
+/opt/homebrew/include/boost/concept/detail/general.hpp:65:41: note: in instantiation of member function 'boost::multi_array_concepts::ConstMultiArrayConcept<boost::detail::multi_array::const_sub_array<float, 1>, 1>::constraints' requested here
+   65 |     static void failed() { ((Model*)0)->constraints(); }
+      |                                         ^
+/opt/homebrew/include/boost/concept_check.hpp:50:7: note: (skipping 1 context in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+   50 |       BOOST_CONCEPT_ASSERT((Model));
+      |       ^
+/opt/homebrew/include/boost/concept/assert.hpp:43:5: note: expanded from macro 'BOOST_CONCEPT_ASSERT'
+   43 |     BOOST_CONCEPT_ASSERT_FN(void(*)ModelInParens)
+      |     ^
+/opt/homebrew/include/boost/concept/detail/general.hpp:92:51: note: expanded from macro 'BOOST_CONCEPT_ASSERT_FN'
+   92 |     &::boost::concepts::requirement_<ModelFnPtr>::failed>    \
+      |                                                   ^
+/opt/homebrew/include/boost/multi_array/subarray.hpp:230:5: note: in instantiation of function template specialization 'boost::function_requires<boost::multi_array_concepts::ConstMultiArrayConcept<boost::detail::multi_array::const_sub_array<float, 1>, 1>>' requested here
+  230 |     function_requires< boost::multi_array_concepts::ConstMultiArrayConcept< 
+      |     ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/copy.h:40:17: note: in instantiation of function template specialization 'boost::detail::multi_array::sub_array<float, 1>::operator=<boost::detail::multi_array::const_sub_array<float, 1>>' requested here
+   40 |       *__result = *__first;
+      |                 ^
+/opt/homebrew/include/boost/multi_array/view.hpp:318:12: note: in instantiation of function template specialization 'std::copy<boost::detail::multi_array::array_iterator<float, const float *, mpl_::size_t<2>, boost::detail::multi_array::const_sub_array<float, 1>, boost::iterators::random_access_traversal_tag>, boost::detail::multi_array::array_iterator<float, float *, mpl_::size_t<2>, boost::detail::multi_array::sub_array<float, 1>, boost::iterators::random_access_traversal_tag>>' requested here
+  318 |       std::copy(other.begin(),other.end(),begin());
+      |            ^
+/opt/homebrew/include/boost/multi_array.hpp:499:14: note: in instantiation of member function 'boost::detail::multi_array::multi_array_view<float, 2>::operator=' requested here
+  499 |     view_new = view_old;
+      |              ^
+Vision/third_party/libicp/kdtree.cpp:105:23: note: in instantiation of member function 'boost::multi_array<float, 2>::resize' requested here
+  105 |       rearranged_data.resize( boost::extents[N][m_dim] );
+      |                       ^
+/opt/homebrew/include/boost/array.hpp:193:9: note: 'assign' has been explicitly marked deprecated here
+  193 |         BOOST_DEPRECATED( "please use `fill` instead" )
+      |         ^
+/opt/homebrew/include/boost/config/compiler/clang.hpp:346:46: note: expanded from macro 'BOOST_DEPRECATED'
+  346 | #define BOOST_DEPRECATED(msg) __attribute__((deprecated(msg)))
+      |                                              ^
+5 warnings generated.
+Vision/third_party/libicp/matrix.cpp:838:5: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+  838 |                                 sprintf(buffer, "%12.7f ", M.val[i][j]);
+      |                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:218:48: note: expanded from macro '__deprecated_msg'
+  218 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+1 warning generated.
