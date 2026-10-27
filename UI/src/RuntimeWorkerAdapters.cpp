@@ -636,6 +636,8 @@ void CRobotCommWorkerAdapter::connectRobot()
 
 void CRobotCommWorkerAdapter::disconnectRobot()
 {
+    markHoldUnconfirmed(robot_comm::RobotCommandError::NotConnected,
+        "机器人连接已断开，HOLD 无法确认；停弧未验证");
     m_keepConnectionRequested = false;
     if (m_pollTimer != nullptr) {
         m_pollTimer->stop();
@@ -662,7 +664,7 @@ robot_comm::RobotProtocolContext CRobotCommWorkerAdapter::protocolContext() cons
     context.filterEnabled = m_filterEnabled;
     context.offlineSignal = m_offlineSignal;
     context.offlineStartCount = m_offlineStartCount;
-    context.holdRequested = 0;
+    context.holdRequested = m_holdRequested;
     context.firstDetectionSucceeded = m_firstDetectionSucceeded;
     return context;
 }
@@ -691,6 +693,10 @@ void CRobotCommWorkerAdapter::ensureReconnectTimer()
 
 void CRobotCommWorkerAdapter::pollRobotState()
 {
+    if (m_controlledHoldIntent.load() && m_holdRequested == 0) {
+        requestControlledHold();
+        return;
+    }
     if (!m_transport->isConnected()) {
         stopPollingAfterTransportFailure();
         return;
@@ -705,7 +711,20 @@ void CRobotCommWorkerAdapter::pollRobotState()
     if (receipt.sent
         && receipt.responseReceived
         && receipt.error == robot_comm::RobotCommandError::None) {
+        if (m_holdRequested != 0) {
+            m_operationStopState.status = m_state.sHold != 0
+                ? robot_comm::RobotOperationStopStatus::HoldConfirmed
+                : robot_comm::RobotOperationStopStatus::Pending;
+            m_operationStopState.error = robot_comm::RobotCommandError::None;
+            m_operationStopState.message = m_state.sHold != 0
+                ? "控制器 HOLD 已反馈，停弧未验证"
+                : "HOLD 请求已发送，等待控制器保持反馈；停弧未验证";
+            emit operationStopUpdated(m_operationStopState);
+        }
         emit robotStateReady(m_state);
+    } else {
+        markHoldUnconfirmed(receipt.error,
+            "机器人反馈失败，HOLD 无法确认；停弧未验证：" + receipt.message);
     }
 }
 
@@ -733,6 +752,10 @@ bool CRobotCommWorkerAdapter::ensureOfflineLaserEnabled()
 
 bool CRobotCommWorkerAdapter::ensureOnlineCorrectionReady()
 {
+    if (m_holdRequested != 0) {
+        emit statusChanged(QStringLiteral("在线预检被拒绝：作业 HOLD 已锁存，需要人工处理；停弧未验证"));
+        return false;
+    }
     if (m_state.offline == 4 || m_offlineSignal == 4) {
         emit statusChanged(QStringLiteral(
             "RobotComm 在线预检失败：机器人端仍有未完成的 O 示教点批次（offline=4）"));
@@ -816,10 +839,37 @@ void CRobotCommWorkerAdapter::setLaserEnabled(bool enabled)
 
 void CRobotCommWorkerAdapter::setTrackingRequested(bool enabled)
 {
-    m_trackerEnabled = enabled ? 1 : 0;
+    m_trackerEnabled = enabled && m_holdRequested == 0 ? 1 : 0;
     if (!enabled) {
         m_firstDetectionSucceeded = 0;
     }
+}
+
+void CRobotCommWorkerAdapter::publishControlledHoldIntent() noexcept
+{
+    m_controlledHoldIntent.store(true);
+}
+
+void CRobotCommWorkerAdapter::requestControlledHold()
+{
+    publishControlledHoldIntent();
+    if (m_holdRequested != 0) {
+        return;
+    }
+    m_holdRequested = 1;
+    m_trackerEnabled = 0;
+    m_firstDetectionSucceeded = 0;
+    if (m_latestRealtimeCommand.valid) {
+        rejectMotionDuringHold(robot_comm::RobotCommandType::RealtimeCorrection);
+        m_latestRealtimeCommand = {};
+    }
+    ++m_operationStopState.requestGeneration;
+    m_operationStopState.status = robot_comm::RobotOperationStopStatus::Pending;
+    m_operationStopState.holdRequestLatched = true;
+    m_operationStopState.error = robot_comm::RobotCommandError::None;
+    m_operationStopState.message = "已请求控制器 HOLD，等待反馈；停弧未验证";
+    emit operationStopUpdated(m_operationStopState);
+    pollRobotState();
 }
 
 void CRobotCommWorkerAdapter::setOfflineStartCount(const int count)
@@ -838,6 +888,9 @@ void CRobotCommWorkerAdapter::updateDetectionStatus(
 void CRobotCommWorkerAdapter::sendCorrectionCommand(
     const robot_comm::RobotCorrectionCommand &command)
 {
+    if (rejectMotionDuringHold(robot_comm::RobotCommandType::TeachPointUpdate)) {
+        return;
+    }
     const bool payloadIsComplete =
         command.pointCount > 0
         && command.pointCount
@@ -875,6 +928,10 @@ void CRobotCommWorkerAdapter::sendCorrectionCommand(
     context.offlineSignal = command.offlineSignal;
     m_offlineSignal = command.offlineSignal;
     for (int index = 0; index < command.pointCount; ++index) {
+        // UI 排队的停止槽可能仍在等待本批次退出；逐事务消费原子意图。
+        if (rejectMotionDuringHold(robot_comm::RobotCommandType::TeachPointUpdate)) {
+            break;
+        }
         const std::string request = robot_comm::CRobotProtocolCodec::encodeTeachPointUpdate(
             context,
             command.pointCount,
@@ -922,6 +979,9 @@ void CRobotCommWorkerAdapter::sendCorrectionCommand(
 void CRobotCommWorkerAdapter::sendRealtimeCorrectionCommand(
     const robot_comm::RobotRealtimeCorrectionCommand &command)
 {
+    if (rejectMotionDuringHold(robot_comm::RobotCommandType::RealtimeCorrection)) {
+        return;
+    }
     if (!command.valid) {
         return;
     }
@@ -944,6 +1004,10 @@ void CRobotCommWorkerAdapter::flushRealtimeCorrectionCommand()
     const robot_comm::RobotRealtimeCorrectionCommand command =
         m_latestRealtimeCommand;
     m_latestRealtimeCommand = {};
+    if (command.valid
+        && rejectMotionDuringHold(robot_comm::RobotCommandType::RealtimeCorrection)) {
+        return;
+    }
     if (!command.valid || !m_transport->isConnected()) {
         return;
     }
@@ -953,11 +1017,13 @@ void CRobotCommWorkerAdapter::flushRealtimeCorrectionCommand()
     context.onlineEndFlag = command.onlineEndFlag;
     const std::string request = robot_comm::CRobotProtocolCodec::encodeRealtimeCorrection(
         context, command);
-    const auto receipt = m_transport->transact(
+    auto receipt = m_transport->transact(
         robot_comm::RobotCommandType::RealtimeCorrection,
         request,
         -1,
         &m_state);
+    receipt.localTrace = command.localTrace;
+    receipt.localTransactionId = ++m_realtimeTransactionId;
     emit commandReceiptReady(receipt, m_state);
     recordDiagnostics(receipt);
     if (receipt.sent
@@ -970,6 +1036,9 @@ void CRobotCommWorkerAdapter::flushRealtimeCorrectionCommand()
 void CRobotCommWorkerAdapter::sendCalibrationCommand(
     const robot_comm::RobotCalibrationCommand &command)
 {
+    if (rejectMotionDuringHold(robot_comm::RobotCommandType::CalibrationAdvance)) {
+        return;
+    }
     if (!command.valid
         || !command.requestNextCalibrationPosition
         || command.calibResetSignal != 1
@@ -997,6 +1066,9 @@ void CRobotCommWorkerAdapter::sendCalibrationCommand(
 void CRobotCommWorkerAdapter::sendJobStartCommand(
     const robot_comm::RobotJobStartCommand &command)
 {
+    if (rejectMotionDuringHold(robot_comm::RobotCommandType::JobStart)) {
+        return;
+    }
     if (!command.valid || !command.requestStart || !m_transport->isConnected()) {
         emit statusChanged(QStringLiteral("RobotComm 作业 J 命令无效或未连接"));
         return;
@@ -1027,6 +1099,36 @@ void CRobotCommWorkerAdapter::sendJobStartCommand(
     }
 }
 
+void CRobotCommWorkerAdapter::markHoldUnconfirmed(
+    const robot_comm::RobotCommandError error, const std::string &message)
+{
+    if (m_holdRequested == 0) {
+        return;
+    }
+    m_operationStopState.status = robot_comm::RobotOperationStopStatus::Unconfirmed;
+    m_operationStopState.error = error;
+    m_operationStopState.message = message;
+    emit operationStopUpdated(m_operationStopState);
+}
+
+bool CRobotCommWorkerAdapter::rejectMotionDuringHold(
+    const robot_comm::RobotCommandType type)
+{
+    if (m_controlledHoldIntent.load() && m_holdRequested == 0) {
+        requestControlledHold();
+    }
+    if (m_holdRequested == 0) {
+        return false;
+    }
+    robot_comm::RobotCommandReceipt receipt;
+    receipt.type = type;
+    receipt.error = robot_comm::RobotCommandError::OperationStopped;
+    receipt.message = "作业 HOLD 已锁存，运动命令未发送；停弧未验证";
+    emit commandReceiptReady(receipt, m_state);
+    emit statusChanged(QString::fromStdString(receipt.message));
+    return true;
+}
+
 bool CRobotCommWorkerAdapter::shouldReconnectForFailure(
     const robot_comm::RobotCommandReceipt &receipt) const
 {
@@ -1047,6 +1149,8 @@ bool CRobotCommWorkerAdapter::shouldReconnectForFailure(
 
 void CRobotCommWorkerAdapter::stopPollingAfterTransportFailure(bool emitSnapshot)
 {
+    markHoldUnconfirmed(robot_comm::RobotCommandError::NotConnected,
+        "机器人通信不可用，HOLD 无法确认；停弧未验证");
     if (m_pollTimer != nullptr) {
         m_pollTimer->stop();
     }
@@ -1196,7 +1300,8 @@ void CVisionTrackingWorkerAdapter::configure(
     m_options = options;
     m_options.method = RuntimeTrackingMethod::Kcf;
     m_projectionContext = projectionContext;
-    m_detector.reset();
+    m_detector.restartTracking();
+    m_responseCalibrationPending = true;
     emit statusChanged(QStringLiteral("vision tracking configured"));
 }
 
@@ -1238,7 +1343,8 @@ void CVisionTrackingWorkerAdapter::stopTracking()
 {
     m_trackingActive = false;
     m_currentLocalizationSegmentIndex = -1;
-    m_detector.reset();
+    m_detector.restartTracking();
+    m_responseCalibrationPending = true;
     m_latestDigitalTwinObservation.reset();
     m_requireSynchronizedObservation = false;
     m_activeCorrelation = {};
@@ -1250,6 +1356,23 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
     if (!m_trackingActive) {
         return;
     }
+
+    if (m_responseCalibrationPending) {
+        const bool sameOnlineContinuation =
+            m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection
+            && m_activeCorrelation.onlineControlWindowActive
+            && m_activeCorrelation.sessionId != 0
+            && m_activeCorrelation.sessionId == m_responseCalibrationSessionId
+            && m_activeCorrelation.workpiecePoseRevision == m_responseCalibrationRevision;
+        if (!sameOnlineContinuation) {
+            m_detector.reset();
+        }
+        m_responseCalibrationPending = false;
+    }
+    m_responseCalibrationSessionId =
+        m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection
+        ? m_activeCorrelation.sessionId : 0;
+    m_responseCalibrationRevision = m_activeCorrelation.workpiecePoseRevision;
 
     control::TrackingTriggerInput triggerInput;
     triggerInput.testStart = m_options.testStart;
@@ -1383,6 +1506,9 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     result.posflag = m_robotState.posflag;
     result.imageMeasurementOutputEnabled =
         m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
+    result.activeAlgorithm = result.imageMeasurementOutputEnabled
+        ? QStringLiteral("liutao_mkcf_unavailable")
+        : QStringLiteral("legacy_standard_kcf");
     const bool diagnosticsEnabled = m_options.visionDiagnostics.enabled
         && m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
     if (diagnosticsEnabled) {
@@ -1394,10 +1520,29 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     }
 
     const QImage image = frame.image.isNull() ? frame.previewImage : frame.image;
+    if (diagnosticsEnabled && m_options.visionDiagnostics.imagesEnabled
+        && m_options.visionDiagnostics.lossWindowEnabled
+        && image.sizeInBytes() <= 16LL * 1024 * 1024) {
+        result.diagnostic->lossWindowSourceImage = image.copy();
+    }
     const cv::Mat gray8 = qImageToGray8(image);
+    // 输入不可用也经过检测器的曝光单调性门禁，不把旧曝光或缺图伪装成搜索失败。
+    const auto rejectUnavailableInput = [&]() {
+        if (!result.imageMeasurementOutputEnabled) { return; }
+        vision::LegacyOnlineKcfOptions unavailableOptions;
+        unavailableOptions.enablePaperTracking = true;
+        const auto unavailableObservation = digital_twin::makeInvalidVisionLaserObservation(
+            frame.frameId, QStringLiteral("当前曝光输入不可用。"));
+        result.localizationEvidence = m_detector.process(
+            cv::Mat{}, unavailableObservation, m_projectionContext,
+            unavailableOptions).localizationEvidence;
+    };
     if (gray8.empty()) {
-        if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
+        rejectUnavailableInput();
         result.message = QStringLiteral("invalid frame image");
+        if (diagnosticsEnabled) {
+            result.diagnostic->algorithm.evidence.debugDetail = "[DEBUG-kcf-20261026] invalid_frame_image";
+        }
         return result;
     }
 
@@ -1429,9 +1574,13 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
             m_options.positionerCalibration,
             m_robotState);
         if (!contextResult.valid) {
-            if (result.imageMeasurementOutputEnabled) { m_detector.notifyImageObservationGap(); }
+            rejectUnavailableInput();
             result.message = QStringLiteral("projection context rejected: %1")
                                  .arg(QString::fromStdString(contextResult.message));
+            if (diagnosticsEnabled) {
+                result.diagnostic->algorithm.evidence.debugDetail =
+                    "[DEBUG-kcf-20261026] projection_context_rejected: " + contextResult.message;
+            }
             return result;
         }
         projectionContext = contextResult.context;
@@ -1444,6 +1593,7 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     vision::LegacyOnlineKcfOptions detectorOptions;
     detectorOptions.enableGapDetection = m_options.enableGapDetection;
     if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
+        detectorOptions.enablePaperTracking = true;
         detectorOptions.fusion = m_options.fusion;
         detectorOptions.enableSeamRefinement = true;
         detectorOptions.enableSimulationGuidance = true;
@@ -1451,6 +1601,8 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         detectorOptions.enableImageMeasurementOutput = true;
         detectorOptions.enableEvidencePolicy = true;
         detectorOptions.evidenceOptions = m_options.evidenceOptions;
+        detectorOptions.evidenceOptions.enableContinuousOutput =
+            m_activeCorrelation.onlineControlWindowActive;
         detectorOptions.evidenceContext.timestampMs = frame.timestamp.isValid()
             ? frame.timestamp.toMSecsSinceEpoch() : -1;
         if (observation.valid && observation.frameId == frame.frameId
@@ -1469,8 +1621,19 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     }
     const auto detected = m_detector.process(
         gray8, observation, projectionContext, detectorOptions);
+    result.localizationEvidence = detected.localizationEvidence;
+    if (detectorOptions.enablePaperTracking) {
+        const int count = detected.diagnostic.tracker.responseTemplateCount;
+        if (count > 0) {
+            result.activeAlgorithm = QStringLiteral("liutao_mkcf%1_hog_gray_observation").arg(count);
+        }
+    }
     if (diagnosticsEnabled) {
         result.diagnostic->algorithm = detected.diagnostic;
+        if (result.diagnostic->algorithm.evidence.debugDetail.empty()) {
+            result.diagnostic->algorithm.evidence.debugDetail =
+                "[DEBUG-kcf-20261026] detector_returned_before_evidence: " + detected.message;
+        }
         const auto &policy = m_options.visionDiagnostics;
         if (!m_diagnosticImageSamplingClock.isValid()
             || m_diagnosticImageSamplingSessionId != m_activeCorrelation.sessionId) {
@@ -1509,8 +1672,11 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     result.controlEligible = result.evidencePolicyEnabled
         ? detected.diagnostic.evidence.controlEligible : detected.valid;
     if (result.imageMeasurementOutputEnabled) {
-        // 初扫和正式跟随均只给确认的独立几何实测资格；其余来源保留估计属性。
-        result.sample.estimated = result.pointSource != vision::OnlineSeamPointSource::Geometry;
+        // 论文跟踪的已接纳当前图像观测可形成初扫/跟随参考；预测仍保留估计属性。
+        // 这不授予独立几何或 ICP 资格，独立投影继续走下方原图几何条件。
+        result.sample.estimated = detectorOptions.enablePaperTracking
+            ? !result.imageObservationAccepted
+            : result.pointSource != vision::OnlineSeamPointSource::Geometry;
     } else {
         result.sample.estimated = result.pointSource == vision::OnlineSeamPointSource::CorrectedKcf
             || result.pointSource == vision::OnlineSeamPointSource::SimulationPrediction
@@ -2954,8 +3120,9 @@ void COnlineCorrectionWorkerAdapter::configure(
     ++m_phaseTimeoutGeneration;
     m_timeoutPhase = control::OnlineCorrectionPhase::Idle;
     m_configuration = configuration;
-    // 正式在线只释放原始实测轨迹；保留 ICP 变换作为诊断，不用模型覆盖检测。
+    // 正式在线跟随连续 KCF；估计旁路 ICP，实测不被模型候选覆盖。
     m_configuration.options.preserveMeasuredReference = true;
+    m_configuration.options.allowEstimatedReference = true;
     const auto trajectory =
         control::COnlineCorrectionTrajectoryPlanner::loadTrajectory(
             configuration.trajectoryRequest);
@@ -3036,43 +3203,67 @@ void COnlineCorrectionWorkerAdapter::updateRobotState(const robot_comm::RobotSta
     if (!m_runRecorder.recordRobotState(state, m_controller.state().phase)) {
         reportRecordingFailure(QStringLiteral("机器人实际路径"));
     }
-    publishUpdate(m_controller.onRobotStateChanged(state));
+    if (!m_operationStopRequested) {
+        publishUpdate(m_controller.onRobotStateChanged(state));
+    }
 }
 
 void COnlineCorrectionWorkerAdapter::handleRobotCommandReceipt(
     const robot_comm::RobotCommandReceipt &receipt,
     const robot_comm::RobotState &state)
 {
+    if (receipt.localTrace.has_value()
+        && receipt.localTrace->sessionId != m_controlSessionId) {
+        return;
+    }
     if (receipt.type != robot_comm::RobotCommandType::TeachPointUpdate
-        && receipt.type != robot_comm::RobotCommandType::RealtimeCorrection) {
+        && receipt.type != robot_comm::RobotCommandType::RealtimeCorrection
+        && !(m_operationStopRequested
+             && receipt.type == robot_comm::RobotCommandType::StatusPoll)) {
         return;
     }
     if (!m_runRecorder.recordCommandReceipt(
             receipt, state, m_controller.state().phase)) {
         reportRecordingFailure(QStringLiteral("机器人命令回执"));
     }
-    publishUpdate(m_controller.onRobotCommandReceipt(receipt, state));
+    if (!m_operationStopRequested) {
+        publishUpdate(m_controller.onRobotCommandReceipt(receipt, state));
+    }
 }
 
 void COnlineCorrectionWorkerAdapter::appendTrackingResult(
     const RuntimeTrackingResult &result)
 {
-    if (!m_runRecorder.recordTrackingResult(result, m_controller.state().phase)) {
-        reportRecordingFailure(QStringLiteral("视觉与实时修正输入"));
-    }
-    if (!result.valid || !result.sample.point.valid
-        || (result.evidencePolicyEnabled && !result.controlEligible)) {
-        emit statusChanged(QStringLiteral("tracking result ignored: %1").arg(result.message));
+    if (m_operationStopRequested) {
         return;
     }
-
+    if (!m_runRecorder.recordTrackingResult(result, m_controller.state().phase,
+                                           m_controller.state().controlTarget)) {
+        reportRecordingFailure(QStringLiteral("视觉与实时修正输入"));
+    }
     control::OnlineCorrectionDetectionEvent event;
+    const auto &evidence = result.localizationEvidence;
+    event.localizationInputUnavailable = evidence.inputUnavailable;
+    event.localizationAttempted = evidence.attempted;
+    event.currentImageSupported = evidence.currentImageSupported;
+    event.imageConstrainedEstimate = evidence.imageConstrainedEstimate;
+    event.recoveryFailed = evidence.recoveryAttempted && evidence.recoveryFailed;
     control::OnlineCorrectionDetectionSample sample = result.sample;
+    if (result.correlation.purpose == CorrectionPurpose::OnlineCorrection
+        && result.correlation.sessionId != 0 && result.frameId >= 0
+        && result.correlation.frameId == result.frameId) {
+        sample.sourceExposure = control::OnlineCorrectionExposureIdentity{
+            result.correlation.sessionId, result.frameId,
+            result.correlation.workpiecePoseRevision};
+    }
     sample.simulatedSeamIndex = result.simulatedSeamIndex;
     if (result.scanLineChangePoint.has_value()) {
         sample.scanLineChangePoint = result.scanLineChangePoint;
     }
-    event.samples.push_back(sample);
+    if (result.valid && result.sample.point.valid
+        && (!result.evidencePolicyEnabled || result.controlEligible)) {
+        event.samples.push_back(sample);
+    }
     // 初始检测结束由机器人 D 回包中的 onlineReverseCompleteFlag 决定：
     // 反向扫描走完或 IBVS 到达起始点时置 1，Vision 不自行结束该阶段。
     event.detectionFinished = false;
@@ -3091,6 +3282,31 @@ void COnlineCorrectionWorkerAdapter::failSynchronization(const QString &message)
     publishUpdate(m_controller.fail(message.toStdString()));
 }
 
+void COnlineCorrectionWorkerAdapter::stopForOperation()
+{
+    m_operationStopRequested = true;
+    ++m_phaseTimeoutGeneration;
+    m_timeoutPhase = control::OnlineCorrectionPhase::Idle;
+    // 不调用普通 reset：请求之后的真实 N/D 回执仍属于当前报告。
+    m_controller.reset();
+}
+
+void COnlineCorrectionWorkerAdapter::recordOperationStop(
+    const robot_comm::RobotOperationStopState &state)
+{
+    if (!m_operationStopRequested) {
+        return;
+    }
+    if (!m_runRecorder.recordOperationStop(m_controlSessionId, state)) {
+        reportRecordingFailure(QStringLiteral("作业保持进度"));
+    }
+    if (state.status == robot_comm::RobotOperationStopStatus::HoldConfirmed
+        && !m_runRecorder.finishSession(
+            QStringLiteral("hold_confirmed"), QString::fromStdString(state.message))) {
+        reportRecordingFailure(QStringLiteral("作业保持最终状态"));
+    }
+}
+
 void COnlineCorrectionWorkerAdapter::reset()
 {
     if (!m_runRecorder.finishSession(
@@ -3098,6 +3314,7 @@ void COnlineCorrectionWorkerAdapter::reset()
             QStringLiteral("在线纠偏在终态前被复位。"))) {
         reportRecordingFailure(QStringLiteral("会话复位状态"));
     }
+    m_operationStopRequested = false;
     publishUpdate(m_controller.reset());
 }
 
@@ -3108,17 +3325,30 @@ void COnlineCorrectionWorkerAdapter::publishUpdate(
         m_timeoutPhase = update.phase;
         armPhaseTimeout(update.phase);
     }
-    if (!m_runRecorder.recordUpdate(update, m_positionerCalibration)) {
-        reportRecordingFailure(QStringLiteral("在线纠偏计算结果"));
-    }
     auto published = update;
     published.state.controlTarget.sessionId = m_controlSessionId;
+    if (published.realtimeCommand.valid && m_controlSessionId != 0) {
+        published.realtimeCommand.localTrace = robot_comm::RobotLocalCommandTrace{
+            m_controlSessionId, ++m_realtimeCommandId, published.followDiagnostic.valid
+                ? std::optional<std::uint64_t>(published.state.controlTarget.generation) : std::nullopt};
+    }
+    if (!m_runRecorder.recordUpdate(published, m_positionerCalibration)) {
+        reportRecordingFailure(QStringLiteral("在线纠偏计算结果"));
+    }
+    if (update.requestOperationStop) {
+        // 先锁存再通知，直接连接的回调也不能重入生成新的运动命令。
+        stopForOperation();
+    }
     emit onlineCorrectionUpdated(published);
+    if (update.requestOperationStop) {
+        emit operationStopRequested(m_controlSessionId, QString::fromStdString(update.message));
+        return;
+    }
     if (update.command.valid) {
         emit robotCommandReady(update.command);
     }
     if (update.realtimeCommand.valid) {
-        emit realtimeCommandReady(update.realtimeCommand);
+        emit realtimeCommandReady(published.realtimeCommand);
     }
     if (update.startTracking) {
         emit startTrackingRequested();

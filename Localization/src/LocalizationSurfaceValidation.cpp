@@ -308,7 +308,24 @@ Result evaluateClouds(const Request &request)
             <= result.trainingBefore.robustSymmetricResidualMm * (1.0 - options.minimumImprovementRatio)
         && result.holdoutAfter.robustSymmetricResidualMm
             <= result.holdoutBefore.robustSymmetricResidualMm + options.maximumHoldoutWorseningMm;
-    result.message = result.accepted
+    if (!result.accepted && options.allowTrainingCoverageRecovery) {
+        auto trainingOptions = options;
+        // 仅给训练覆盖 5 个百分点余量；强收益和完整留出约束不以覆盖放宽替代。
+        trainingOptions.minimumBidirectionalCoverage = std::max(0.01,
+            options.minimumBidirectionalCoverage - 0.05);
+        const bool strongGain = result.trainingBefore.robustSymmetricResidualMm > 1e-6
+            && result.trainingAfter.robustSymmetricResidualMm
+                <= result.trainingBefore.robustSymmetricResidualMm
+                    * (1.0 - std::max(0.15, options.minimumImprovementRatio));
+        result.trainingCoverageRecoveryUsed = goodCoverage(result.trainingAfter, trainingOptions)
+            && goodCoverage(result.holdoutAfter, options) && strongGain
+            && result.holdoutAfter.robustSymmetricResidualMm
+                <= result.holdoutBefore.robustSymmetricResidualMm + options.maximumHoldoutWorseningMm;
+        result.accepted = result.trainingCoverageRecoveryUsed;
+    }
+    result.message = result.trainingCoverageRecoveryUsed
+        ? QStringLiteral("训练覆盖轻微不足、强收益及完整留出通过，采用受限恢复候选；仍待写后新帧验证。")
+        : result.accepted
         ? QStringLiteral("表面共同可观测方向投影及分帧留出验收通过；冻结切片近似，仍待写回后新帧验证。")
         : QStringLiteral("投影后表面收益、双向覆盖或分帧留出验收未通过。");
     return result;

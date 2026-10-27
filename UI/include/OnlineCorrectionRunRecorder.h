@@ -9,9 +9,11 @@
 #define I2R_RLC_UI_ONLINE_CORRECTION_RUN_RECORDER_H
 
 #include <array>
+#include <deque>
 #include <memory>
 
 #include <QByteArray>
+#include <QJsonObject>
 #include <QString>
 #include <QStringList>
 
@@ -50,6 +52,11 @@ public:
         const RuntimeTrackingResult &result,
         control::OnlineCorrectionPhase phase);
 
+    /// @brief 同时冻结结果到达控制线程时的参考；该快照不是曝光时刻的参考。
+    bool recordTrackingResult(const RuntimeTrackingResult &result,
+        control::OnlineCorrectionPhase phase,
+        const control::OnlineCorrectionTargetSnapshot &target);
+
     /// @brief 记录初始 O 点或实时 P 修正命令。
     bool recordUpdate(
         const control::OnlineCorrectionUpdate &update,
@@ -60,6 +67,11 @@ public:
         const robot_comm::RobotCommandReceipt &receipt,
         const robot_comm::RobotState &state,
         control::OnlineCorrectionPhase phase);
+
+    /// @brief 按原运行会话身份记录 HOLD 进度，不将保持反馈写成停弧确认。
+    bool recordOperationStop(
+        quint64 sessionId,
+        const robot_comm::RobotOperationStopState &state);
 
     /**
      * @brief 写入本轮最终状态并关闭会话。
@@ -78,6 +90,27 @@ public:
     QString lastError() const;
 
 private:
+    /** @brief 临时诊断环；每阶段一次首丢，最多六帧且原图合计不超过 16 MiB。 */
+    struct CLossFrame {
+        qint64 frameId = -1;
+        QString stem;
+        QImage source;
+        QByteArray context;
+    };
+    /// @brief 只归档到达顺序，不补造缺失曝光；后台编码不阻塞控制计算。
+    bool recordLossWindow(const RuntimeTrackingResult &result,
+        control::OnlineCorrectionPhase phase,
+        const control::OnlineCorrectionTargetSnapshot &target);
+    bool submitLossFrame(const CLossFrame &frame, qint64 triggerFrame, const QString &role);
+    std::unique_ptr<CTrackingDiagnosticImageWriter> m_lossImageWriter;
+    std::deque<CLossFrame> m_lossHistory;
+    std::array<bool, 2> m_lossTriggered{};
+    std::array<bool, 2> m_lossSeenValid{};
+    int m_lossStage = -1;
+    int m_lossRejected = 0;
+    int m_lossPostRemaining = 0;
+    qint64 m_lossTriggerFrame = -1;
+    qint64 m_lossLastFrame = -1;
     /// @brief 保存本帧各阶段快照；只读诊断，失败不改变控制状态。
     bool recordVisionDiagnostic(
         const RuntimeTrackingResult &result, control::OnlineCorrectionPhase phase);
@@ -94,6 +127,10 @@ private:
     bool createSessionFile(const QString &fileName, const QString &header);
     bool appendFields(const QString &fileName, const QStringList &fields);
     bool appendSummary(const QString &key, const QString &value);
+    /// @brief 同一 worker 到达顺序；只归档，不推测未传播的曝光与控制因果关系。
+    bool appendSessionEvent(QJsonObject event);
+    /// @brief 归档实际释放批次、消费几何及待发命令，和实际回执分别记录。
+    bool recordSessionUpdate(const control::OnlineCorrectionUpdate &update);
     void setFileError(const QString &operation, const QString &path);
 
     QString m_sessionDirectory;
@@ -106,6 +143,7 @@ private:
     quint64 m_realtimeCommandCount = 0;
     quint64 m_receiptCount = 0;
     quint64 m_updateCount = 0;
+    quint64 m_sessionEventCount = 0;
     quint64 m_icpBatchCount = 0;
     bool m_active = false;
 };

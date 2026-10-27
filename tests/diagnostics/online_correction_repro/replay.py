@@ -38,7 +38,15 @@ def materialize(relative):
     target = OUT / "snapshot" / relative
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists():
-        if target.read_bytes() != data:
+        existing = target.read_bytes()
+        # Git on Windows may check out text snapshots with CRLF. Keep binary
+        # artifacts byte-exact and reject every text change except line endings.
+        if target.suffix in {".h", ".cpp", ".json", ".txt", ".cmake"}:
+            existing = existing.replace(b"\r\n", b"\n")
+            expected = data.replace(b"\r\n", b"\n")
+        else:
+            expected = data
+        if existing != expected:
             raise RuntimeError(f"existing snapshot differs: {target}")
     else:
         target.write_bytes(data)

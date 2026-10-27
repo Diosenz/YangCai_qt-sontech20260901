@@ -33,6 +33,7 @@ int main(int argc, char **argv)
     robot_comm::RobotState robot;
     robot.sMode = 2;
     robot.sStart = robot.traflag = 1;
+    bool online = false;
     const auto submit = [&](qint64 id, bool blank) {
         camera::CameraFrame frame;
         frame.frameId = id;
@@ -48,6 +49,7 @@ int main(int argc, char **argv)
         correlation.sessionId = 42;
         correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
         correlation.frameId = id;
+        correlation.onlineControlWindowActive = online;
         // 实际 transport 失败 DTO；不得回退到任意旧仿真参考。
         const auto observation = digital_twin::makeInvalidVisionLaserObservation(id, "fixture missing CAD");
         worker.submitFrameWithRobotStateObservationAndCorrelation(frame, robot, -1, observation, correlation);
@@ -57,7 +59,10 @@ int main(int argc, char **argv)
     const auto check = [&ok](bool value, const char *message) {
         if (!value) { std::fprintf(stderr, "FAIL: %s\n", message); ok = false; }
     };
-    check(!submit(1, false).valid, "first raw geometry waits for confirmation");
+    const auto first = submit(1, false);
+    check(first.valid && first.imageObservationAccepted
+        && !first.independentWeldPointInParent_mm.valid,
+        "first current-image observation remains distinct from independently confirmed geometry");
     const auto measured = submit(2, false);
     check(measured.valid && measured.evidencePolicyEnabled && measured.controlEligible
         && measured.kcfPixelAvailable && measured.independentWeldPointInParent_mm.valid,
@@ -66,11 +71,33 @@ int main(int argc, char **argv)
     const auto blank = submit(3, true);
     check(!blank.valid && !blank.kcfPixelAvailable && !blank.controlEligible,
         "unconfigured continuation cannot manufacture a control sample");
-    check(!submit(4, false).valid, "recovery first exposure is pending");
+    const auto firstRecovery = submit(4, false);
+    check(firstRecovery.valid && firstRecovery.imageObservationAccepted
+        && !firstRecovery.independentWeldPointInParent_mm.valid,
+        "first recovery image is visible while independent geometry awaits confirmation");
     check(submit(5, false).controlEligible, "second fresh matching exposure recovers");
     const auto duplicate = submit(5, false);
     check(!duplicate.valid && !duplicate.independentWeldPointInParent_mm.valid,
         "duplicate cannot produce independent geometry or control sample");
+    online = true;
+    submit(6, false);
+    check(submit(7, false).controlEligible, "online mode starts with confirmed image identity");
+    for (qint64 id = 8; id < 28; ++id) {
+        const auto held = submit(id, true);
+        check(!held.valid && !held.kcfPixelAvailable && !held.controlEligible,
+            "fully blank input cannot manufacture an online control sample");
+        check(!held.independentWeldPointInParent_mm.valid
+            && !held.localizationEvidence.currentImageSupported
+            && !held.localizationEvidence.imageConstrainedEstimate,
+            "absent image support cannot masquerade as a shoulder estimate or independent geometry");
+    }
+    const auto recovering = submit(28, false);
+    check(recovering.valid && recovering.kcfPixelAvailable,
+        "first recovery exposure remains visible while geometry reconfirms");
+    check(std::hypot(recovering.imageXPixel - 360, recovering.imageYPixel - 260) < 2,
+        "visible recovery returns to the original seam without a displaced continuation");
+    check(submit(29, false).independentWeldPointInParent_mm.valid,
+        "confirmed recovery returns to independent measurement");
     worker.stopTracking();
     std::puts(ok ? "PASS: production Vision worker evidence contract" : "FAIL: production Vision worker evidence contract");
     return ok ? 0 : 1;

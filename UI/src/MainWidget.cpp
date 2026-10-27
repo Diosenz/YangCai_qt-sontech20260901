@@ -12,6 +12,7 @@
 #include <QColor>
 #include <QComboBox>
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
@@ -216,6 +217,20 @@ MainWidget::MainWidget(QWidget* parent)
     m_imagePlaceholder->setStyleSheet(QStringLiteral(
         "QLabel { border: 1px solid #777; background: #101010; color: #f1f3f4; }"));
     imageLayout->addWidget(m_imagePlaceholder);
+    m_runtimePreviewImage = new QLabel(m_imagePlaceholder);
+    m_runtimePreviewImage->setObjectName(QStringLiteral("runtimePreviewImage"));
+    m_runtimePreviewImage->setAlignment(Qt::AlignCenter);
+    m_runtimePreviewImage->setGeometry(kImageCanvasWidth - 228, 52, 220, 164);
+    m_runtimePreviewImage->setStyleSheet(QStringLiteral(
+        "QLabel { border: 1px solid #777; background: #101010; }"));
+    m_runtimePreviewCaption = new QLabel(m_imagePlaceholder);
+    m_runtimePreviewCaption->setObjectName(QStringLiteral("runtimePreviewCaption"));
+    m_runtimePreviewCaption->setGeometry(kImageCanvasWidth - 228, 8, 220, 44);
+    m_runtimePreviewCaption->setWordWrap(true);
+    m_runtimePreviewCaption->setStyleSheet(QStringLiteral(
+        "QLabel { background: #101010; color: #f1f3f4; padding: 2px; }"));
+    m_runtimePreviewImage->hide();
+    m_runtimePreviewCaption->hide();
     topLayout->addWidget(imageGroup);
 
     auto* rightLayout = new QVBoxLayout();
@@ -1098,6 +1113,8 @@ void MainWidget::setTeachTrajectoryStateText(const QString& text)
 
 void MainWidget::showFrame(const i2r_rlc::camera::CameraFrame& frame)
 {
+    m_runtimePreviewImage->hide();
+    m_runtimePreviewCaption->hide();
     m_trackingFrameCaption.clear();
     m_currentImage = frame.image.isNull() ? frame.previewImage : frame.image;
     if (m_currentImage.isNull()) {
@@ -1106,6 +1123,32 @@ void MainWidget::showFrame(const i2r_rlc::camera::CameraFrame& frame)
     }
 
     updateDisplayedImage();
+}
+
+void MainWidget::showLivePreview(const i2r_rlc::camera::CameraFrame& frame)
+{
+    const auto source = frame.image.isNull() ? frame.previewImage : frame.image;
+    if (source.isNull()) { return; }
+    m_runtimePreviewImage->setPixmap(QPixmap::fromImage(source).scaled(
+        m_runtimePreviewImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    m_runtimePreviewImage->setProperty("previewFrameId", frame.frameId);
+    updateLivePreviewCaption();
+    m_runtimePreviewImage->show();
+    m_runtimePreviewCaption->show();
+    m_runtimePreviewImage->raise();
+    m_runtimePreviewCaption->raise();
+}
+
+void MainWidget::updateLivePreviewCaption()
+{
+    m_runtimePreviewImage->setProperty("detectionFrameId", m_detectionFrameId);
+    const auto age = m_detectionExposureMs > 0
+        ? QStringLiteral(" · %1 ms").arg(std::max<qint64>(0,
+            QDateTime::currentMSecsSinceEpoch() - m_detectionExposureMs)) : QString();
+    m_runtimePreviewCaption->setText(QStringLiteral(
+        "实时预览 %1（无检测叠加）\n主图：检测快照 %2%3")
+        .arg(m_runtimePreviewImage->property("previewFrameId").toLongLong())
+        .arg(m_detectionFrameId).arg(age));
 }
 
 void MainWidget::setVirtualLaserOverlay(const QVector<QPointF>& imagePoints)
@@ -1159,6 +1202,9 @@ void MainWidget::setRealLaserOverlay(const QVector<QPointF>& imagePoints)
 
 void MainWidget::showTrackingFrame(const TrackingFramePresentation& presentation)
 {
+    m_detectionFrameId = presentation.frameId;
+    m_detectionExposureMs = presentation.exposureTimestampMs;
+    if (!m_runtimePreviewImage->isHidden()) { updateLivePreviewCaption(); }
     m_currentImage = presentation.sourceImage;
     m_virtualLaserOverlayPoints = presentation.virtualLaserPoints;
     m_virtualWeldPointOverlay = presentation.virtualWeldPoint;
@@ -1173,6 +1219,8 @@ void MainWidget::showTrackingFrame(const TrackingFramePresentation& presentation
 
 void MainWidget::setImagePlaceholderText(const QString& text)
 {
+    m_runtimePreviewImage->hide();
+    m_runtimePreviewCaption->hide();
     m_currentImage = {};
     m_trackingFrameCaption.clear();
     m_imagePlaceholder->setPixmap(QPixmap());
@@ -1836,8 +1884,8 @@ void MainWidget::updateDisplayedImage()
             const QPointF displayedPoint(
                 m_detectedWeldPointOverlay.x() * scaleX,
                 m_detectedWeldPointOverlay.y() * scaleY);
-            painter.setPen(QPen(m_detectedWeldPointOverlayEstimated
-                ? QColor(255, 210, 64) : QColor(0, 255, 0), 2.0));
+            // KCF 业务点统一绿色；实测/续接来源由文字和日志表达。
+            painter.setPen(QPen(QColor(0, 255, 0), 2.0));
             painter.drawLine(
                 displayedPoint + QPointF(-15.0, 0.0),
                 displayedPoint + QPointF(15.0, 0.0));

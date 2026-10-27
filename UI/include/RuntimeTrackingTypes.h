@@ -308,12 +308,18 @@ struct CRuntimeTrackingDiagnostic {
     int imageSampleBucket = -1;
     QImage sourceImage;
     QImage enhancedImage;
+    /// @brief 临时首丢窗口的自持有原图；在线 recorder 仅保留有界历史。
+    QImage lossWindowSourceImage;
 };
 
 /**
  * @brief 视觉跟踪线程单帧输出。
  */
 struct RuntimeTrackingResult {
+    /// @brief 非可选生产定位证据，供控制失测判断；不依赖诊断录制开关。
+    vision::OnlineSeamLocalizationEvidence localizationEvidence;
+    /// @brief 实际选用的生产处理路径；不以界面方法名称代替实际活跃算法。
+    QString activeAlgorithm = QStringLiteral("unavailable");
     /// @brief true 表示得到可投影的有效检测点。
     bool valid = false;
     /// @brief true 表示当前帧满足旧 OpencvThread 触发条件。

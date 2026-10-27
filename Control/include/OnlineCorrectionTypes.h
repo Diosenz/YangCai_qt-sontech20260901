@@ -181,10 +181,16 @@ struct OnlineCorrectionStationAxis {
     bool valid = false;
 };
 
+/** @brief 检测样本的冻结曝光身份；跨缓冲和坐标转换保留，不代表动作已执行。 */
+struct OnlineCorrectionExposureIdentity {
+    std::uint64_t sessionId = 0;
+    std::int64_t frameId = -1;
+    std::uint64_t referenceRevision = 0;
+};
+
 /**
  * @brief 单个在线检测样本。
- *
- * 点与间隙宽度放在同一结构中，保证启用间隙检测时两者按样本一一对应。
+ * @details 点与间隙宽度一一对应；曝光身份随原始样本保留，不授予测量资格。
  */
 struct OnlineCorrectionDetectionSample {
     /// @brief 检测事件输入为变位机 TCP 点，mm；在线内部缓存转换为末节点。
@@ -197,6 +203,8 @@ struct OnlineCorrectionDetectionSample {
     std::optional<OnlineCorrectionPoint> scanLineChangePoint;
     /// @brief true 为粗跟踪/仿真续接估计；可供在线跟随，不进入初始扫描或 ICP 拟合。
     bool estimated = false;
+    /// @brief 仅由曝光生产入口填充；未知调用方保持缺失，禁止使用最近帧补造。
+    std::optional<OnlineCorrectionExposureIdentity> sourceExposure;
 };
 
 /**
@@ -205,6 +213,14 @@ struct OnlineCorrectionDetectionSample {
  * 该事件承接旧 `D_initdata` 的填充语义，调用方负责把视觉点重建到空间坐标。
  */
 struct OnlineCorrectionDetectionEvent {
+    /// @brief 新曝光输入不可用；仅与可靠前视范围耗尽共同构成停止条件。
+    bool localizationInputUnavailable = false;
+    /// @brief 当前曝光已尝试定位；未知或旧调用方不凭缺字段触发停机。
+    bool localizationAttempted = false;
+    bool currentImageSupported = false;
+    bool imageConstrainedEstimate = false;
+    /// @brief 当前图像定位及恢复未确认目标，不能以单独缺几何代替。
+    bool recoveryFailed = false;
     /// @brief 当前批次视觉样本，调用方按检测顺序填充。
     std::vector<OnlineCorrectionDetectionSample> samples;
     /// @brief true 表示初始检测阶段已经结束。
@@ -225,6 +241,8 @@ struct OnlineCorrectionOptions {
     bool enableOnlineIcp = true;
     /// @brief 正式在线显式启用；保留 ICP 候选用于诊断，实际释放原始实测点。
     bool preserveMeasuredReference = false;
+    /// @brief 正式在线可跟随带来源的连续 KCF；初扫仍拒绝估计，估计不训练预测锚。
+    bool allowEstimatedReference = false;
     /// @brief 机器人 TCP 速度，单位 mm/s，用于保持旧纠偏周期语义。
     double stepTcpVelocityMmPerSecond = 11.0;
     /// @brief 控制周期，单位 s，旧活动路径使用 0.0043。
@@ -291,6 +309,9 @@ struct OnlineCorrectionFollowDiagnostic {
     OnlineCorrectionPoint futureFoot;
     double s1Deg = 0.0;
     double s2Deg = 0.0;
+    /// @brief 实际消费队列两端点的原曝光；预测参考保持缺失，不等同最新检测。
+    std::optional<OnlineCorrectionExposureIdentity> firstSourceExposure;
+    std::optional<OnlineCorrectionExposureIdentity> directionSourceExposure;
 };
 
 /** @brief 控制目标来源；预测只供实时跟随，不代表新增视觉测量。 */
@@ -386,6 +407,8 @@ struct OnlineCorrectionSessionState {
  * @brief 在线纠偏控制器单次状态更新结果。
  */
 struct OnlineCorrectionUpdate {
+    /// @brief 可靠前视范围耗尽且当前定位恢复失败；runtime应请求真实作业HOLD。
+    bool requestOperationStop = false;
     /// @brief 当前事件处理是否成功。
     bool succeeded = true;
     /// @brief 此次含新 ICP 诊断，记录器不应重复记录普通状态快照。

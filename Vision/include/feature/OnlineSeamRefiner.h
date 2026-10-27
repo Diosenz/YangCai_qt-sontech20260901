@@ -30,11 +30,12 @@ enum class OnlineSeamHeightPolicy {
 struct OnlineSeamRefinementOptions {
     int searchHalfWidthPixel = 100;
     int searchHalfHeightPixel = 60;
-    int minSideSupportColumns = 25;
+    int minSideSupportColumns = 20;
     double minContrastGrayValue = 40.0;
-    double minSupportRatio = 0.75;
+    /// @brief 测试阶段允许反光遮挡部分列；双侧支撑、残差与几何一致性仍独立验收。
+    double minSupportRatio = 0.50;
     double maxFitRmsPixel = 1.8;
-    double maxPositionUncertaintyPixel = 6.0;
+    double maxPositionUncertaintyPixel = 8.0;
     double maxHeightJumpPixel = 3.0;
     /// @brief GapCenter 只允许有限台阶，同时受搜索半高四分之一限制。
     double maxGapHeightPixel = 16.0;
@@ -44,7 +45,7 @@ struct OnlineSeamRefinementOptions {
     /// @brief 扣背景后次峰达到主峰该比例，才视为竞争条纹。
     double secondaryPeakRatio = 0.8;
     /// @brief 有效列中双窄峰比例超过该值时，拒绝整体单条纹假设。
-    double maxAmbiguousColumnRatio = 0.4;
+    double maxAmbiguousColumnRatio = 0.5;
 };
 
 /**

@@ -31,6 +31,8 @@ struct Options {
     double maximumResidualMm = 5.5;
     double minimumImprovementRatio = 0.05;
     double maximumHoldoutWorseningMm = 0.1;
+    /// @brief 上层连续拒绝后显式授权；仅放宽训练覆盖，留出/新帧门限保持原值。
+    bool allowTrainingCoverageRecovery = false;
     /// @brief 仅在线后验：当前CAD切片距冻结近邻切向足迹的有限外延上限，mm。
     /// 不扩大真实点覆盖距离；调用方仍须限制会话、曝光及位姿版本。
     double maximumModelContinuationMm = 10.0;
@@ -116,6 +118,8 @@ struct Request {
 /** @brief 弱模式冻结后的候选；accepted 仍须上层单步/累计预算与事务验收。 */
 struct Result {
     bool accepted = false;
+    /// @brief true 表示以更强训练收益补偿轻微覆盖不足，不能冒充普通验收。
+    bool trainingCoverageRecoveryUsed = false;
     bool projected = false;
     bool hasObservableCorrection = false;
     int observableRank = 0;

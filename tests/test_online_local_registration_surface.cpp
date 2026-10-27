@@ -178,8 +178,14 @@ bool heldoutAndRevisionMustReject(const QString &directory)
         result = worker.processClouds(5, 6, frame, surface(frame, 0.25), surface(frame, 0.0),
             evidence(directory, frame, true, frame == 8 ? 11 : 10));
     }
-    ok &= expect(result.attempted && result.surfaceOnly && !result.accepted,
-        "mixed workpiece pose revisions cannot enter a surface training window");
+    ok &= expect(!result.attempted && !result.accepted && result.frameCount == 1,
+        "pose revision switch clears old samples before a new surface training window");
+    for (int frame = 9; frame <= 15; ++frame) {
+        result = worker.processClouds(5, 6, frame, surface(frame, 0.25), surface(frame, 0.0),
+            evidence(directory, frame, true, 11));
+    }
+    ok &= expect(result.attempted && result.surfaceOnly && result.frameCount == 8,
+        "new pose revision resumes solving only after eight complete new exposures");
     return ok;
 }
 

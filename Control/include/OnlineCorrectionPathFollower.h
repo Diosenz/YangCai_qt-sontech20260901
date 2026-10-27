@@ -98,8 +98,6 @@ private:
     int m_historyCount = 0;
     int m_weldDirectionHistoryCount = 0;
     int m_controlCount = 0;
-    int m_sameTargetCount = 0;
-    OnlineCorrectionPoint m_lastTarget;
     double m_lastErrorDistanceMm = 0.0;
     double m_lastBaseDxUm = 0.0;
     double m_lastBaseDyUm = 0.0;

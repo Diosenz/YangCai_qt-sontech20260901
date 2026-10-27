@@ -97,6 +97,7 @@ OnlineCorrectionPlannedTrajectory correctedOnlineTrajectory(
 struct ReferenceProjection {
     bool valid = false;
     int segmentIndex = 0;
+    double fraction = 0.0;
     OnlineCorrectionPoint point;
     double distanceSquared = std::numeric_limits<double>::max();
 };
@@ -130,6 +131,7 @@ ReferenceProjection projectToControlReference(
         const Eigen::Vector3d projected = first + fraction * direction;
         candidate.valid = projected.allFinite();
         candidate.segmentIndex = index;
+        candidate.fraction = fraction;
         candidate.point = {projected.x(), projected.y(), projected.z(), candidate.valid};
         candidate.distanceSquared = (current - projected).squaredNorm();
         return candidate;
@@ -222,6 +224,11 @@ void COnlineCorrectionController::configure(
     const vision::PositionerCalibration &positionerCalibration)
 {
     m_options = options;
+    m_localizationUnsupported = false;
+    m_lastReliablePoint = {};
+    m_reliableEndSegmentIndex = 0;
+    m_reliableEndProgress = -1.0;
+    m_lossRobotSegmentIndex = 0;
     m_trajectory = trajectory;
     m_onlineTrajectory = trajectory;
     m_positionerCalibration = positionerCalibration;
@@ -266,6 +273,11 @@ OnlineCorrectionUpdate COnlineCorrectionController::startInitialDetection()
     }
 
     m_state.initialDetectionSamples.clear();
+    m_localizationUnsupported = false;
+    m_lastReliablePoint = {};
+    m_reliableEndSegmentIndex = 0;
+    m_reliableEndProgress = -1.0;
+    m_lossRobotSegmentIndex = 0;
     m_onlineTrajectory = m_trajectory;
     m_exceptionProcessor.reset();
     m_pathFollower.reset();
@@ -308,8 +320,9 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
     std::vector<OnlineCorrectionDetectionSample> accepted;
     for (const auto &sample : event.samples) {
         if (!finitePoint(sample.point)
-            || (sample.estimated && (initialPhase || m_options.preserveMeasuredReference))) {
-            // 初始 O 点和实测优先策略均只接纳独立实测；legacy 估计行为另行保留。
+            || (sample.estimated && (initialPhase
+                || (m_options.preserveMeasuredReference && !m_options.allowEstimatedReference)))) {
+            // 初始 O 点只接纳实测；正式在线显式授权连续 KCF，保留 estimated 来源。
             continue;
         }
         if (m_options.enableGapDetection && !sample.gapWidthMm.has_value()) {
@@ -353,12 +366,34 @@ OnlineCorrectionUpdate COnlineCorrectionController::appendDetectionEvent(
         return makeUpdate(true, event.message.empty() ? m_state.message : event.message);
     }
 
-    if (accepted.empty() && !event.detectionFinished) {
+    if (event.localizationAttempted || event.localizationInputUnavailable) {
+        m_localizationUnsupported = event.localizationInputUnavailable
+            || (event.recoveryFailed
+                && !event.currentImageSupported && !event.imageConstrainedEstimate);
+    }
+    for (const auto &sample : accepted) {
+        if (sample.estimated) { continue; }
+        const auto endProjection = projectToControlReference(m_onlineTrajectory.segmentPathPoints,
+            sample.point, m_predictionOffset, m_reliableEndSegmentIndex);
+        const double progress = endProjection.segmentIndex + endProjection.fraction;
+        if (endProjection.valid && progress > m_reliableEndProgress) {
+            m_reliableEndProgress = progress;
+            m_reliableEndSegmentIndex = endProjection.segmentIndex;
+            m_lastReliablePoint = sample.point;
+        }
+    }
+    if (shouldStopForLocalizationLoss()) {
+        auto update = fail("当前图像定位及恢复未确认目标，可靠前视轨迹已耗尽；请求作业保持。");
+        update.requestOperationStop = true;
+        return update;
+    }
+    if (accepted.empty() && !event.detectionFinished && !m_localizationUnsupported) {
         // 拒绝的原图不触发控制历史；缺测续行由有效机器人反馈重算。
         return makeUpdate(true, "no accepted image measurement");
     }
     const auto processed = processOnlineSamples(
-        m_exceptionProcessor, m_options, m_onlineTrajectory, accepted, event.detectionFinished);
+        m_exceptionProcessor, m_options, m_onlineTrajectory, accepted,
+        event.detectionFinished || m_localizationUnsupported);
     updateIcpStatus(m_state, m_options.enableOnlineIcp, processed);
     if (!processed.valid) {
         return makeUpdate(false, processed.message);
@@ -446,6 +481,24 @@ OnlineCorrectionUpdate COnlineCorrectionController::onDetectionFinished(
     m_predictionReferenceReady = m_onlineTrajectory.segmentPathPoints.size() >= 2U;
     m_predictionOffset = {0.0, 0.0, 0.0, true};
     m_predictionSegmentIndex = 0;
+    // 反扫最后曝光在起点，不能把采样时间顺序误当正向覆盖顺序。
+    // 仅用有序路径关联实测点，选前向最远实测末端；整条 CAD 不扩展可靠范围。
+    for (const auto &sample : m_state.initialDetectionSamples) {
+        if (sample.estimated || !finitePoint(sample.point)) { continue; }
+        auto point = sample.point;
+        point.xMm += m_positionerCalibration.toolTcpInLastLinkMm.x();
+        point.yMm += m_positionerCalibration.toolTcpInLastLinkMm.y();
+        point.zMm += m_positionerCalibration.toolTcpInLastLinkMm.z();
+        const auto projection = projectToControlReference(m_onlineTrajectory.segmentPathPoints,
+            point, m_predictionOffset, 0);
+        if (!projection.valid) { continue; }
+        const double progress = projection.segmentIndex + projection.fraction;
+        if (progress > m_reliableEndProgress) {
+            m_reliableEndProgress = progress;
+            m_lastReliablePoint = point;
+            m_reliableEndSegmentIndex = projection.segmentIndex;
+        }
+    }
     m_state.teachPointSendIndex = 0;
     m_state.initialTeachPointCount = planResult.command.pointCount;
     m_state.trackerActive = false;
@@ -562,6 +615,11 @@ OnlineCorrectionUpdate COnlineCorrectionController::onRobotStateChanged(
             m_state.controlTarget.valid = false;
             m_state.controlTarget.source = OnlineCorrectionTargetSource::Unavailable;
             return makeUpdate(true, "waiting for STARTCOR state");
+        }
+        if (shouldStopForLocalizationLoss()) {
+            auto update = fail("当前图像定位及恢复未确认目标，可靠前视轨迹已耗尽；请求作业保持。");
+            update.requestOperationStop = true;
+            return update;
         }
         if (!controlFeedbackChanged && m_state.controlTarget.valid) {
             return makeUpdate(true, "robot state accepted");
@@ -705,6 +763,11 @@ OnlineCorrectionUpdate COnlineCorrectionController::fail(
 
 OnlineCorrectionUpdate COnlineCorrectionController::reset()
 {
+    m_localizationUnsupported = false;
+    m_lastReliablePoint = {};
+    m_reliableEndSegmentIndex = 0;
+    m_reliableEndProgress = -1.0;
+    m_lossRobotSegmentIndex = 0;
     const bool trajectoryInitialized = m_trajectory.valid;
     const bool calibrationInitialized = usableCalibration(m_positionerCalibration);
     m_state = OnlineCorrectionSessionState{};
@@ -762,6 +825,51 @@ void COnlineCorrectionController::updatePredictionAnchor(
         m_predictionSegmentIndex = projection.segmentIndex;
         m_predictionGapWidthMm = sample.gapWidthMm;
     }
+}
+
+bool COnlineCorrectionController::reliableTrajectoryExhausted()
+{
+    if (!finitePoint(m_lastReliablePoint)) { return true; }
+    const auto current = vision::CPositionerKinematics::robotPoseToStationPose(
+        vision::PositionerPose{static_cast<double>(m_robotState.curx_r) / 1000.0,
+            static_cast<double>(m_robotState.cury_r) / 1000.0,
+            static_cast<double>(m_robotState.curz_r) / 1000.0,
+            static_cast<double>(m_robotState.curRx_r) / 10000.0,
+            static_cast<double>(m_robotState.curRy_r) / 10000.0,
+            static_cast<double>(m_robotState.curRz_r) / 10000.0, true},
+        static_cast<double>(m_robotState.curS1) / 10000.0,
+        static_cast<double>(m_robotState.curS2) / 10000.0, m_positionerCalibration);
+    if (!current.valid) { return false; }
+    const auto robotProjection = projectToControlReference(m_onlineTrajectory.segmentPathPoints,
+        OnlineCorrectionPoint{current.xMm, current.yMm, current.zMm, current.valid},
+        m_predictionOffset, m_lossRobotSegmentIndex);
+    if (robotProjection.valid) {
+        m_lossRobotSegmentIndex = robotProjection.segmentIndex;
+        // 回折路径的末段切平面可能穿过早期支系；先抵达同一有序区段再判末端。
+        if (m_lossRobotSegmentIndex < m_reliableEndSegmentIndex) { return false; }
+    }
+    Eigen::Vector3d direction = Eigen::Vector3d::Zero();
+    // 使用可靠末端所在的有序路径方向；曝光顺序或横向测量抖动不改变前进方向。
+    const auto &path = m_onlineTrajectory.segmentPathPoints;
+    const auto index = static_cast<std::size_t>(m_reliableEndSegmentIndex);
+    if (index + 1 < path.size()) {
+        direction = Eigen::Vector3d(path[index + 1].xMm - path[index].xMm,
+            path[index + 1].yMm - path[index].yMm, path[index + 1].zMm - path[index].zMm);
+    }
+    const Eigen::Vector3d fromEnd(current.xMm - m_lastReliablePoint.xMm,
+        current.yMm - m_lastReliablePoint.yMm, current.zMm - m_lastReliablePoint.zMm);
+    // 与既有前视消费相同参考系，仅沿最后可靠段判断已到/越过，不以帧数续期。
+    return direction.norm() > 1.0e-6
+        && fromEnd.dot(direction.normalized()) >= -m_options.passedPointDistanceMm;
+}
+
+bool COnlineCorrectionController::shouldStopForLocalizationLoss()
+{
+    if (m_state.phase != OnlineCorrectionPhase::OnlineRunning
+        || !m_state.trackerActive || m_state.segmentEndLatched) { return false; }
+    // 正常反馈也推进独立路径游标，不能等失测后才从路径起点重新关联。
+    const bool exhausted = reliableTrajectoryExhausted();
+    return m_localizationUnsupported && exhausted;
 }
 
 OnlineCorrectionFollowResult COnlineCorrectionController::followCurrentTarget()

@@ -1,0 +1,23 @@
+{
+  "scope": "Captured grayscale images; pixel-only tracking regression. First two exposure transforms not archived; explicit borrowed projection, no millimeter/TCP claim.",
+  "image_sha256": {
+    "first_1458.png": "6cbf6ff144b2e73a4aaa806a5dc01559d30f4f5f414554175c4771b76e040ce5",
+    "online_1712.png": "aa7f1a09bde76c46eeebd93902b3a2b628e3c84dfd094a74d5b5ec76f5cfd239",
+    "online_1741.png": "0d19c6c89efe7476880d9f46e3ff81756de15ed920f3fd54255e13b4d3ad672d",
+    "online_2539.png": "2dfe8b75b830a7c99ce9bf7bf718a3698c33d1acf887cf01f530808b5ca3f6ab",
+    "online_2548.png": "a7d241cb083091f24908c132523081a5bdce09af412ea0a102da2b37f3f457aa",
+    "online_2557.png": "44ce27c34c80ced11f5962aa705d4e2f80987d5dfc11de7741772e92bba4c045",
+    "online_2566.png": "f135dc77c3ad7d2d9bef6c4a4d48534ab8aae05a57fc0828c4bc339bf070ada5",
+    "online_2576.png": "6a3457c831ba36c43e75f88a010ec3043a6b040734975dcbfb7ff22abd9c0102",
+    "online_2586.png": "7ac9c2c16b98dd8b8bb32feb55f08136f8aa9b4baf91ef59467784fe17ea131b",
+    "online_2595.png": "fec5d623702bbfc877da7f4049987d734a6146b61b3c1321eb7f69cb0c11d952",
+    "online_2602.png": "d0b6c85a7c7d0ad8afcf48c150cfeef607758f22fb9e8663a86810e153adf6f3",
+    "online_2614.png": "044005cb1d72da13e5a8d7eed5585294f4a4299afbb189f0f0be965ab2a387bb",
+    "online_2622.png": "f20ddf291142be5e6de13add1b621dae00ba2216f01f5efe68329cb21b7e2262",
+    "online_2630.png": "1a02236b503ea4bbe53939b56352c10f5a01a45d78823498d46cf495d443a250",
+    "online_2638.png": "571c0f929b6e427726c1255efc495f04c024a692dc025c9f2758f1ca777437d3",
+    "online_2647.png": "5b7a3e2c0ca4a0b88e1529df4beeabc4d37dea2ef184ac0a219becbd9b8b7115",
+    "online_2656.png": "4f2f4a54d9a2f6b6023eeb77e5523b977a29ba886c1a8eaa671eca41b1e662b3",
+    "online_2665.png": "3352bef3bafcd39f3ae4e2a09a0890c7fd12209ceb632474a69735c98a9de133"
+  }
+}

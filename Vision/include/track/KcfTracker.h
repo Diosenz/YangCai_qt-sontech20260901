@@ -88,6 +88,17 @@ struct CKcfUpdateDiagnostic {
     bool onlineObservationMode = false;
     bool trainingDeferred = false;
     bool trainingCommitted = false;
+    /// @brief 调用方接纳当前观测，但数值优化未生成可提交模型。
+    bool trainingRejected = false;
+    /// @brief 本帧响应实际使用的成功提交模型；0 表示无 MKCF 模型。
+    int responseTemplateCount = 0;
+    /// @brief 本帧响应的 HOG/灰度联合权重；不代表新帧训练后的权重。
+    double responseHogWeight = 0.0;
+    double responseGrayWeight = 0.0;
+    /// @brief 式3-29响应图统计，不是目标身份或独立测量资格。
+    double responsePsr = 0.0;
+    /// @brief 本帧延迟训练采用仿真外观，不能记作实拍模板更新。
+    bool trainingFromSimulation = false;
     double responsePeak = 0.0;
     double normalizedPeak = 0.0;
     double observationNoise = 0.0;
@@ -164,6 +175,19 @@ public:
      * 后续 update、init 或模式切换会放弃未提交内容，拒绝帧不改变模板。
      */
     void commitOnlineObservationTraining(bool accepted);
+
+    /**
+     * @brief 放弃异常实拍待训练特征，以有效仿真外观替代检测模板（论文3-47）。
+     * @details 只更新外观/系数，不将仿真ROI作为位置观测；无有效仿真时保持旧模型。
+     * 与update串行调用，数值成功后才提交，来源写入诊断。
+     */
+    void commitOnlineSimulationTraining();
+
+    /**
+     * @brief 用同帧原图已校核的 ROI 修正搜索与待训练位置，保留原始相关响应诊断。
+     * @details 不重置或训练模型，不接纳仿真坐标；只能在 update 后、训练提交前串行调用。
+     */
+    void correctOnlineObservationRoi(const cv::Rect2f &roi);
 
     /**
      * @brief 设置 MKCF 使用的仿真模板图像与 ROI。
@@ -275,26 +299,29 @@ protected:
      * @brief 根据当前 MKCF 模式训练多模板模型。
      * @param image 当前帧图像。
      * @param trainInterpFactor 模板更新插值因子，取值通常为 `[0, 1]`。
+     * @return true 表示优化成功并原子提交模型；false 保留上次可用模型。
      */
-    void trainMKCF(const cv::Mat &image, float trainInterpFactor);
+    bool trainMKCF(const cv::Mat &image, float trainInterpFactor);
 
     /**
      * @brief 训练双模板 MKCF。
      * @param image 当前帧图像。
      * @param trainInterpFactor 模板更新插值因子。
-     * @param mu ADMM 约束初始权重。
-     * @param muInc ADMM 权重增长因子。
+     * @param mu 固定的跨模板耦合权重。
+     * @param muInc 兼容旧调用签名，当前不改变优化目标。
+     * @return true 表示优化成功并提交模型；false 保留上次可用模型。
      */
-    void train2TMKCF(const cv::Mat &image, float trainInterpFactor, double mu, double muInc);
+    bool train2TMKCF(const cv::Mat &image, float trainInterpFactor, double mu, double muInc);
 
     /**
      * @brief 训练三模板 MKCF。
      * @param image 当前帧图像。
      * @param trainInterpFactor 模板更新插值因子。
-     * @param mu ADMM 约束初始权重。
-     * @param muInc ADMM 权重增长因子。
+     * @param mu 固定的跨模板耦合权重。
+     * @param muInc 兼容旧调用签名，当前不改变优化目标。
+     * @return true 表示优化成功并提交模型；false 保留上次可用模型。
      */
-    void train3TMKCF(const cv::Mat &image, float trainInterpFactor, double mu, double muInc);
+    bool train3TMKCF(const cv::Mat &image, float trainInterpFactor, double mu, double muInc);
 
     /**
      * @brief 计算两个同尺寸特征图的 Gaussian kernel 相关。
@@ -347,7 +374,7 @@ protected:
      */
     void getFeatures(
         const cv::Mat &image,
-        const cv::Rect &roi,
+        const cv::Rect_<float> &roi,
         float scaleAdjust,
         cv::Mat &primaryFeature,
         cv::Mat &secondaryFeature);
@@ -432,20 +459,6 @@ private:
     double normalizedObservationNoise(float peakValue);
 
     /**
-     * @brief 求解单模板频域 alpha。
-     * @param primaryCoeff 主特征 kernel 权重。
-     * @param secondaryCoeff 辅特征 kernel 权重。
-     * @param primaryKernel 主特征自相关 kernel。
-     * @param secondaryKernel 辅特征自相关 kernel。
-     * @return 单模板 alpha 频域响应。
-     */
-    cv::Mat solveSingleTemplateAlpha(
-        float primaryCoeff,
-        float secondaryCoeff,
-        const cv::Mat &primaryKernel,
-        const cv::Mat &secondaryKernel) const;
-
-    /**
      * @brief 计算双模板训练所需的 kernel 缓存。
      * @param currentPrimary 当前帧主特征。
      * @param currentSecondary 当前帧辅特征。
@@ -495,10 +508,13 @@ private:
     CKcfUpdateDiagnostic m_updateDiagnostic;
     bool m_onlineObservationMode = false;
     cv::Mat m_pendingOnlineFeatures;
+    cv::Mat m_pendingOnlineSecondaryFeatures;
     cv::Mat m_pendingOnlineImage;
     cv::Rect2f m_pendingOnlineRoi;
     cv::Mat m_alphaF;
     cv::Mat m_prob;
+    /// @brief MKCF 求解使用零位移原点的标签谱；检测响应仍以图像中心表示零位移。
+    cv::Mat m_mkcfProb;
     cv::Mat m_tmpl;
     cv::Mat m_hann;
     cv::Mat m_hann2d;
@@ -509,6 +525,8 @@ private:
     bool m_labFeatures = false;
     int m_imageCount = 0;
     KcfFeatureMode m_featureMode = KcfFeatureMode::Standard;
+    /// @brief 与当前 alpha/检测基底一起提交的真实模板数，供响应来源审计。
+    int m_trainedTemplateCount = 0;
     int m_sizePatch[3] = {0, 0, 0};
     float m_peakValueMaximum = 1.0F;
     float m_peakValueMinimum = 0.85F;
@@ -522,6 +540,9 @@ private:
     float m_kernelCoeffSecondary = 0.1F;
     float m_sigmaPrimary = 0.6F;
     float m_sigmaSecondary = 0.2F;
+    /// @brief 与 m_alphaF 同次训练的递推检测模板；历史保存上一已接纳基底参与联合训练。
+    cv::Mat m_detectionTmplPrimary;
+    cv::Mat m_detectionTmplSecondary;
     cv::Mat m_histTmplPrimary;
     cv::Mat m_histTmplSecondary;
     cv::Mat m_imageSim;

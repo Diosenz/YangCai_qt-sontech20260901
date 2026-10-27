@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  *       ______   ______   _______         __                  __
  *      /      | /      \ /       \       /  |                /  |
  *      $$$$$$/ /$$$$$$  |$$$$$$$  |      $$ |        ______  $$ |____
@@ -32,6 +32,7 @@
 #define I2R_RLC_ROBOT_COMM_ONLINE_CORRECTION_COMMAND_H
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -130,6 +131,13 @@ struct RobotProtocolContext {
     int onlineEndFlag = 0;
 };
 
+/** @brief 上位机本地命令来源；不进入P/D线协议，不代表控制柜接纳或执行确认。 */
+struct RobotLocalCommandTrace {
+    std::uint64_t sessionId = 0;
+    std::uint64_t commandId = 0;
+    std::optional<std::uint64_t> targetGeneration;
+};
+
 /**
  * @brief 在线实时纠偏增量命令。
  *
@@ -137,6 +145,8 @@ struct RobotProtocolContext {
  * 1000~10000。
  */
 struct RobotRealtimeCorrectionCommand {
+    /// @brief 由生成该P的控制会话赋值；未知调用方保持缺失。
+    std::optional<RobotLocalCommandTrace> localTrace;
     long dxUm = 0;
     long dyUm = 0;
     long dzUm = 0;
@@ -170,13 +180,19 @@ enum class RobotCommandError {
     ReceiveFailed,
     EmptyResponse,
     InvalidResponse,
-    TransportError
+    TransportError,
+    /// @brief 本地作业保持已锁存，命令未交给传输层。
+    OperationStopped
 };
 
 /**
  * @brief 单次机器人协议请求的处理结果。
  */
 struct RobotCommandReceipt {
+    /// @brief 实际选中并交给传输层的P来源，不从最新命令或回包内容反推。
+    std::optional<RobotLocalCommandTrace> localTrace;
+    /// @brief RobotComm本地P事务序号；0表示未知，绝非机器人执行序号。
+    std::uint64_t localTransactionId = 0;
     RobotCommandType type = RobotCommandType::StatusPoll;
     bool sent = false;
     bool responseReceived = false;
@@ -184,6 +200,24 @@ struct RobotCommandReceipt {
     int pointIndex = -1;
     std::string request;
     std::string response;
+    RobotCommandError error = RobotCommandError::None;
+    std::string message;
+};
+
+/** @brief 作业停止的控制器保持状态；不代表机械零速或焊机停弧。 */
+enum class RobotOperationStopStatus {
+    NotRequested,
+    Pending,
+    HoldConfirmed,
+    Unconfirmed
+};
+
+/** @brief 跨线程发布的停止快照；停弧接口尚未核实，不能从 HOLD 推导弧状态。 */
+struct RobotOperationStopState {
+    RobotOperationStopStatus status = RobotOperationStopStatus::NotRequested;
+    std::uint64_t requestGeneration = 0;
+    bool holdRequestLatched = false;
+    bool arcStopVerified = false;
     RobotCommandError error = RobotCommandError::None;
     std::string message;
 };

@@ -59,15 +59,6 @@ vision::PositionerPose robotPose(const robot_comm::RobotState &state)
     };
 }
 
-double cosineBetween(const Eigen::Vector3d &lhs, const Eigen::Vector3d &rhs)
-{
-    const double denom = lhs.norm() * rhs.norm();
-    if (denom <= 1.0e-9) {
-        return 1.0;
-    }
-    return lhs.dot(rhs) / denom;
-}
-
 Eigen::Vector3d projectOnLine(
     const Eigen::Vector3d &point,
     const Eigen::Vector3d &lineStart,
@@ -250,9 +241,12 @@ OnlineCorrectionFollowResult COnlineCorrectionPathFollower::update(
         const Eigen::Vector3d third = vectorOf(thirdPoint);
         const Eigen::Vector3d currentFromFirst = vectorOf(current) - first;
         const Eigen::Vector3d direction = third - first;
-        const double angle = cosineBetween(currentFromFirst, direction);
+        // 横向/高度残差不会改变沿轨迹的进度；余弦接近零不代表已越过。
+        // 用有量纲投影的符号判断，避免远离检测线时提前清空可靠前视点。
+        const bool passedAlongPath = direction.squaredNorm() > 1.0e-12
+            && currentFromFirst.dot(direction) >= 0.0;
         if ((vectorOf(current) - first).norm() <= options.passedPointDistanceMm
-            || angle >= -0.1) {
+            || passedAlongPath) {
             detectionQueue->erase(detectionQueue->begin());
             continue;
         }
@@ -264,25 +258,18 @@ OnlineCorrectionFollowResult COnlineCorrectionPathFollower::update(
         return result;
     }
 
+    // 前视点只按上面的实际 TCP 空间进度消费，静止期间重复更新不得删点。
     const OnlineCorrectionPoint firstPoint = detectionQueue->front().point;
-    if (m_lastTarget.valid
-        && vectorOf(m_lastTarget).isApprox(vectorOf(firstPoint), 1.0e-9)) {
-        ++m_sameTargetCount;
-    } else {
-        m_sameTargetCount = 1;
-    }
-    m_lastTarget = firstPoint;
-    if (m_sameTargetCount > 10) {
-        detectionQueue->erase(detectionQueue->begin());
-        m_sameTargetCount = 0;
-        result.message = "repeated online target point removed";
-        return result;
-    }
-
     const OnlineCorrectionPoint thirdPoint =
         (*detectionQueue)[std::min<std::size_t>(3U, detectionQueue->size() - 1U)].point;
-    return updateReference(robotState, options, calibration, teachTrajectory,
+    auto follow = updateReference(robotState, options, calibration, teachTrajectory,
         OnlineCorrectionFollowReference{firstPoint, thirdPoint, gapAtCurrentPose(*detectionQueue, current)});
+    if (follow.diagnostic.valid) {
+        follow.diagnostic.firstSourceExposure = detectionQueue->front().sourceExposure;
+        follow.diagnostic.directionSourceExposure =
+            (*detectionQueue)[std::min<std::size_t>(3U, detectionQueue->size() - 1U)].sourceExposure;
+    }
+    return follow;
 }
 
 OnlineCorrectionFollowResult COnlineCorrectionPathFollower::updateReference(
@@ -498,8 +485,6 @@ void COnlineCorrectionPathFollower::reset()
     m_historyCount = 0;
     m_weldDirectionHistoryCount = 0;
     m_controlCount = 0;
-    m_sameTargetCount = 0;
-    m_lastTarget = {};
     m_lastErrorDistanceMm = 0.0;
     m_lastBaseDxUm = 0.0;
     m_lastBaseDyUm = 0.0;

@@ -265,6 +265,10 @@ target_link_libraries(i2r_rlc_runtime_tracking_flow_tests
         i2r_rlc_ui
 )
 
+add_test(NAME i2r_rlc_normal_session_replay_contract_tests
+    COMMAND i2r_rlc_runtime_tracking_flow_tests --normal-session-replay-contract)
+i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_normal_session_replay_contract_tests)
+
 i2r_rlc_add_test(i2r_rlc_online_kcf_evidence_worker_tests
     test_online_kcf_evidence_worker.cpp)
 target_link_libraries(i2r_rlc_online_kcf_evidence_worker_tests PRIVATE i2r_rlc_ui)
@@ -1230,3 +1234,12 @@ target_link_libraries(i2r_rlc_robotsim_probe
 if(I2R_RLC_ENABLE_KCF_DIAGNOSTICS)
     add_subdirectory(diagnostics)
 endif()
+
+# 现场归档回归同时覆盖严格拒绝、连续恢复和后续窗口隔离。
+add_test(NAME i2r_rlc_localization_surface_recovery_replay_tests
+    COMMAND i2r_rlc_localization_surface_validation_tests --recovery-fixture
+        "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/local_registration_recovery_20261026/11164.json")
+add_test(NAME i2r_rlc_online_local_registration_recovery_replay_tests
+    COMMAND i2r_rlc_online_local_registration_tests --recovery-fixtures
+        "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/local_registration_recovery_20261026")
+i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_local_registration_recovery_replay_tests)

@@ -8,6 +8,9 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <QUuid>
 
 #include "OnlineCorrectionRunRecorder.h"
@@ -226,6 +229,81 @@ bool testImageMeasurementProvenance(const QString &root)
         "finish image measurement provenance session");
     return ok;
 }
+/** @brief 首丢窗口保留连续帧、实际曝光投影和收到结果时的控制参考，且按阶段有界。 */
+bool testFirstLossWindow(const QString &root)
+{
+    using namespace i2r_rlc;
+    ui::COnlineCorrectionRunRecorder recorder;
+    ui::RuntimeOnlineCorrectionConfiguration configuration;
+    QString error;
+    bool ok = expect(recorder.beginSession(root, configuration, &error), "begin loss window session");
+    const auto submit = [&](int id, bool valid, control::OnlineCorrectionPhase phase) {
+        ui::RuntimeTrackingResult result;
+        result.frameId = result.correlation.frameId = id;
+        result.correlation.sessionId = 19;
+        result.correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
+        result.triggerAccepted = true;
+        result.valid = result.controlEligible = valid;
+        result.evidencePolicyEnabled = true;
+        result.diagnostic.emplace();
+        result.diagnostic->cameraTimestampMs = 1000 + id;
+        result.diagnostic->lossWindowSourceImage = QImage(32, 24, QImage::Format_Grayscale8);
+        result.diagnostic->lossWindowSourceImage.fill(id);
+        result.diagnostic->algorithm.evidence.debugDetail = "[DEBUG-kcf-20261026] identity_geometry=0";
+        result.displayProjectionContext.emplace();
+        result.displayProjectionContext->valid = true;
+        result.displayProjectionContext->calibration.kappa = 2.5;
+        control::OnlineCorrectionTargetSnapshot target;
+        target.generation = 200 + id;
+        target.source = control::OnlineCorrectionTargetSource::PredictedReference;
+        return recorder.recordTrackingResult(result, phase, target);
+    };
+    for (int stage = 0; stage < 2; ++stage) {
+        for (int index = 1; index <= 20; ++index) {
+            ok &= expect(submit(stage * 20 + index, index <= 8 || index == 18,
+                stage == 0 ? control::OnlineCorrectionPhase::InitialDetectionRunning
+                           : control::OnlineCorrectionPhase::OnlineRunning), "record loss frame");
+        }
+    }
+    const QString directory = recorder.sessionDirectory();
+    ok &= expect(recorder.finishSession("completed", "loss capture"), "drain loss capture");
+    const auto index = readRows(directory, "loss_window_index.tsv");
+    const auto contexts = readRows(directory, "loss_window_context.jsonl");
+    const auto manifest = readRows(directory, "loss_window_images/image_manifest.tsv");
+    ok &= expect(index.size() == 31 && contexts.size() == 30 && manifest.size() == 31,
+        "each stage captures exactly 6 before, trigger and 8 after, with no later retrigger");
+    if (contexts.size() == 30) {
+        const auto first = QJsonDocument::fromJson(contexts.front()).object();
+        const auto last = QJsonDocument::fromJson(contexts.back()).object();
+        ok &= expect(first["frame_id"].toInt() == 3 && last["frame_id"].toInt() == 37
+            && first["control_reference"].toObject()["generation"].toInt() == 203
+            && first["timestamp_ms"].toInt() == 1003
+            && first["projection"].toObject()["calibration"].toObject()["kappa"].toDouble() == 2.5,
+            "ring eviction preserves exposure context and the original per-frame reference");
+        const QImage saved(QDir(directory).filePath(first["image"].toString()));
+        ok &= expect(!saved.isNull() && saved.pixelColor(0, 0).red() == 3,
+            "saved raw image belongs to the original pre-loss exposure");
+    }
+    for (const auto &row : manifest.mid(1)) {
+        ok &= expect(row.split('\t').value(1) == "saved", "all bounded window images actually saved");
+    }
+    ok &= expect(recorder.beginSession(root, configuration, &error), "restart loss state");
+    for (int id = 1; id <= 8; ++id) {
+        ok &= submit(id, false, control::OnlineCorrectionPhase::InitialDetectionRunning);
+    }
+    ok &= submit(8, false, control::OnlineCorrectionPhase::InitialDetectionRunning);
+    const QString neverAcquired = recorder.sessionDirectory();
+    ok &= recorder.finishSession("completed", "never acquired");
+    const auto neverRows = readRows(neverAcquired, "loss_window_index.tsv");
+    ok &= expect(neverRows.size() == 8 && neverRows.back().split('\t').value(3) == "trigger",
+        "eight consecutive rejected exposures capture startup failure without duplicating frame eight");
+    configuration.visionDiagnostics.lossWindowEnabled = false;
+    ok &= recorder.beginSession(root, configuration, &error);
+    ok &= expect(!QFile::exists(QDir(recorder.sessionDirectory()).filePath("loss_window_index.tsv")),
+        "temporary window can be disabled independently");
+    ok &= recorder.finishSession("completed", "disabled window");
+    return ok;
+}
 } // namespace
 
 int main(int argc, char **argv)
@@ -243,6 +321,7 @@ int main(int argc, char **argv)
         return 1;
     }
     if (!testImageMeasurementProvenance(root)) { return 1; }
+    if (!testFirstLossWindow(root)) { return 1; }
     control::OnlineCorrectionUpdate update;
     update.onlineIcpUpdated = true;
     update.phase = control::OnlineCorrectionPhase::OnlineRunning;
@@ -498,7 +577,8 @@ int main(int argc, char **argv)
             && header.indexOf("image_measurement_output_enabled")
                 == header.indexOf("kcf_real_search_fallback_used") + 1
             && header.indexOf("evidence_policy_enabled") == header.indexOf("image_search_expanded") + 1
-            && header.last() == "evidence_message",
+            && header.indexOf("debug_kcf_20261026_gates") == header.indexOf("evidence_message") + 1
+            && header.last() == "debug_kcf_20261026_gates",
             "online fusion schema appends columns without moving existing fields");
         ok &= expect(value("estimated") == "1" && value("point_source") == "4"
             && value("geometry_valid") == "0" && value("geometry_x_px").isEmpty()
@@ -515,7 +595,7 @@ int main(int argc, char **argv)
             && value("evidence_anchor_frame") == "43" && value("evidence_mother_rank") == "1"
             && value("evidence_elapsed_ms") == "200.000000"
             && value("evidence_travel_mm") == "0.700000",
-            "production estimate qualification and anchor budgets remain explicit in schema 8");
+            "production estimate qualification and anchor budgets remain explicit in schema 9");
         ok &= expect(value("online_observation_fusion_enabled") == "1"
             && value("raw_geometry_valid") == "1" && value("geometry_valid") == "0"
             && value("raw_geometry_x_px") == "99.000000"

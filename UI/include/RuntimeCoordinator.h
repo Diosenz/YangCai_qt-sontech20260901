@@ -301,6 +301,12 @@ public:
     void stopOnlineTracking();
 
     /**
+     * @brief 请求停止在线作业；保持请求与设备确认分开，停弧能力仍需外部确认。
+     * @details 供现有停止按钮及失测处理调用，普通跟踪清理不应请求机器人保持。
+     */
+    void requestOnlineOperationStop();
+
+    /**
      * @brief 通知当前在线分段结束。
      */
     void finishOnlineSegment();
@@ -367,6 +373,8 @@ signals:
     void robotStateReady(const robot_comm::RobotState &state);
     void robotDiagnosticsReady(
         const robot_comm::RobotCommunicationDiagnostics &diagnostics);
+    /// @brief 仅表达控制器 HOLD 请求/反馈，停弧仍为未验证。
+    void onlineOperationStopUpdated(const robot_comm::RobotOperationStopState &state);
     void statusMessage(const QString &message);
     void globalLocateVirtualPriorReady(
         quint64 requestId,
@@ -648,6 +656,8 @@ private:
     vision::WeldProjectionContext m_trackingProjectionContext;
     RuntimeTrackingPurpose m_trackingPurpose = RuntimeTrackingPurpose::None;
     CorrectionRunSession m_correctionSession;
+    /// @brief 作业 HOLD 不由检测重启或普通清理解除；现场人工恢复协议尚未接入。
+    bool m_onlineOperationHoldLatched = false;
     OnlineCorrectionStartPhase m_onlineCorrectionStartPhase =
         OnlineCorrectionStartPhase::Idle;
     RuntimeOnlineCorrectionConfiguration

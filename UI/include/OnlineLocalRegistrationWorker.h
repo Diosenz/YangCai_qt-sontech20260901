@@ -11,6 +11,7 @@
 #include <QElapsedTimer>
 #include <QObject>
 #include <QJsonObject>
+#include <QStringList>
 
 #include "LocalizationLocalCorrectionPipeline.h"
 #include "LocalizationService.h"
@@ -32,6 +33,8 @@ public:
         bool enabled = true;
         /// @brief 已有可信位姿后，允许用母材表面与留出验收跨越缺焊点段。
         bool surfaceAssistedUpdatesEnabled = true;
+        /// @brief 连续两次表面拒绝后允许强收益训练覆盖恢复；留出及写后验证不放宽。
+        bool surfaceRecoveryEnabled = true;
         /// @brief 可选焊点收益保护和历史监测；未经几何校核的历史不否决候选。
         bool stabilityProtectionEnabled = false;
         int sampleIntervalMs = 200;
@@ -121,6 +124,10 @@ public:
         bool surfaceOnly = false;
         quint64 workpiecePoseRevision = 0;
         localization::surface_validation::Result surfaceValidation;
+        /// @brief 本候选之前的连续表面拒绝数；按会话、代次和工件位姿隔离。
+        int precedingSurfaceRejections = 0;
+        /// @brief 各阶段拒绝均保留，后续焊点否决不能覆盖较早的表面原因。
+        QStringList rejectionReasons;
         /// @brief 末两帧对冻结训练面的配对可支持性；只作写前准入，非新帧证明。
         localization::surface_validation::PairedSurfaceMetrics surfaceVerificationPreflight;
         /// @brief 表面候选投影前的PCL矩阵，供归档复核，不可直接写回。
@@ -217,6 +224,9 @@ private:
     qint64 m_lastMatchMs = -1;
     QElapsedTimer m_clock;
     std::deque<CloudFrame> m_frames;
+    int m_surfaceRejectionStreak = 0;
+    int m_surfaceRecoveryWindowFrames = 0;
+    quint64 m_surfaceRecoveryPoseRevision = 0;
     quint64 m_archiveSessionId = 0;
     int m_archiveAttemptCount = 0;
     localization::LocalizationService m_service;

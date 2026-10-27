@@ -23,6 +23,8 @@ struct COnlineVisionDiagnosticOptions {
     int imageSampleEveryN = 15;
     int maxImagePairs = 30;
     qint64 maxImageBytes = 32LL * 1024 * 1024;
+    /// @brief 临时首丢窗口：独立原图预算，关闭诊断或图像时也关闭。
+    bool lossWindowEnabled = true;
 };
 
 /**

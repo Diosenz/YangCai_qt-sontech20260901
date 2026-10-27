@@ -19,12 +19,16 @@ namespace i2r_rlc::ui {
 /**
  * @brief 每会话拥有一个可回收后台线程；调用者仅在在线 worker 中提交。
  *
- * 最多两对待写图；满队列立即跳过。stop 幂等并排空后 join，无 detached 线程。
+ * 常规队列最多两对；首丢窗口可显式使用最多 32 对。满队列立即跳过。
+ * stop 幂等并排空后 join，无 detached 线程。enhanced 为空时仅写原图。
  * 写入结果保存在独立 manifest，绝不删除旧图。该类不可复制。
  */
 class CTrackingDiagnosticImageWriter final {
 public:
     CTrackingDiagnosticImageWriter(const QString &directory, qint64 maxBytes);
+    /// @brief 首丢窗口使用独立有界突发队列，不占常规采样配额。
+    CTrackingDiagnosticImageWriter(const QString &directory, qint64 maxBytes,
+        std::size_t maxPendingPairs);
     ~CTrackingDiagnosticImageWriter();
     /// @brief 非阻塞入队；桶预算仅约束压缩后写入，不在调用线程编码图像。
     /// @return queued、queue_full、stopped 或 invalid_bucket。
@@ -50,6 +54,7 @@ private:
     QString m_lastError;
     QString m_directory;
     qint64 m_maxBytes = 0;
+    std::size_t m_maxPendingPairs = 2;
     qint64 m_writtenBytes = 0;
     std::array<qint64, 5> m_bucketWrittenBytes{};
     bool m_stopping = false;

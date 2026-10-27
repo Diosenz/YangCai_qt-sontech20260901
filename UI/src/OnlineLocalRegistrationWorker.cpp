@@ -296,6 +296,9 @@ void COnlineLocalRegistrationWorker::reset()
     m_lastFrameId = -1;
     m_lastSampleMs = -1;
     m_lastMatchMs = -1;
+    m_surfaceRejectionStreak = 0;
+    m_surfaceRecoveryWindowFrames = 0;
+    m_surfaceRecoveryPoseRevision = 0;
     m_clock.restart();
 }
 
@@ -557,6 +560,12 @@ COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::processCl
         m_sessionId = sessionId;
         m_generation = generation;
     }
+    if (surfaceEligible && m_surfaceRecoveryPoseRevision != validation.workpiecePoseRevision) {
+        m_frames.clear();
+        m_surfaceRejectionStreak = 0;
+        m_surfaceRecoveryWindowFrames = 0;
+        m_surfaceRecoveryPoseRevision = validation.workpiecePoseRevision;
+    }
     const qint64 now = m_clock.elapsed();
     if (frameId <= m_lastFrameId
         || (m_lastSampleMs >= 0 && now - m_lastSampleMs < m_options.sampleIntervalMs)) {
@@ -601,7 +610,8 @@ COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::processCl
     // 建立可信位姿后统一走表面验收；不能因恰好有焊点而重新耦合到焊点后验。
     const bool needsSurfaceWindow = useSurfaceWindow;
     const int minimumFrames = needsSurfaceWindow
-        ? std::max(8, m_options.minimumFrames) : m_options.minimumFrames;
+        ? std::max(std::max(8, m_options.minimumFrames), m_surfaceRecoveryWindowFrames)
+        : m_options.minimumFrames;
     if (result.frameCount < minimumFrames
         || (m_lastMatchMs >= 0 && now - m_lastMatchMs < m_options.minimumMatchIntervalMs)) {
         return result;
@@ -611,7 +621,18 @@ COnlineLocalRegistrationWorker::Result COnlineLocalRegistrationWorker::processCl
     if (needsSurfaceWindow) {
         std::deque<CloudFrame> attemptedFrames;
         attemptedFrames.swap(m_frames);
+        result.precedingSurfaceRejections = m_surfaceRejectionStreak;
         result = processSurfaceWindow(attemptedFrames, validation, result);
+        if (result.accepted) {
+            m_surfaceRejectionStreak = 0;
+            m_surfaceRecoveryWindowFrames = 0;
+        } else {
+            ++m_surfaceRejectionStreak;
+            // 本次旧窗已经移出；退化时增加下一批全新曝光的跨度，不重算同一坏窗。
+            if (m_options.surfaceRecoveryEnabled && !result.surfaceValidation.hasObservableCorrection) {
+                m_surfaceRecoveryWindowFrames = std::min(maximumFrames, minimumFrames + 4);
+            }
+        }
         result.elapsedMs = timer.elapsed();
         return result;
     }
@@ -784,6 +805,8 @@ COnlineLocalRegistrationWorker::processSurfaceWindow(const std::deque<CloudFrame
     }
     localization::surface_validation::Request surfaceRequest;
     surfaceRequest.options = surfaceOptions(m_options);
+    surfaceRequest.options.allowTrainingCoverageRecovery = m_options.surfaceRecoveryEnabled
+        && result.precedingSurfaceRejections >= 2;
     const std::size_t trainingCount = frames.size() - 2U;
     for (std::size_t index = 0; index < frames.size(); ++index) {
         auto &real = index < trainingCount ? request.realWindowPoints_mm
@@ -863,12 +886,16 @@ COnlineLocalRegistrationWorker::processSurfaceWindow(const std::deque<CloudFrame
         const double rotation = std::abs(std::atan2(matrix[4], matrix[0]))
             * 180.0 / 3.14159265358979323846;
         result.solveElapsedMs = solveTimer.elapsed();
+        const double translationLimit = checked.trainingCoverageRecoveryUsed
+            ? std::min(10.0, m_options.maximumTranslationMm) : m_options.maximumTranslationMm;
+        const double rotationLimit = checked.trainingCoverageRecoveryUsed
+            ? std::min(3.0, m_options.maximumRotationDeg) : m_options.maximumRotationDeg;
         result.accepted = checked.accepted
             && fullResidualWithinBudget(checked.trainingAfter)
             && fullResidualWithinBudget(checked.holdoutAfter)
             && result.matchedSpreadRatio >= m_options.minimumMatchedSpreadRatio
-            && translation <= m_options.maximumTranslationMm
-            && rotation <= m_options.maximumRotationDeg
+            && translation <= translationLimit
+            && rotation <= rotationLimit
             && result.solveElapsedMs <= m_options.maximumSolveTimeMs;
         // 仅作当前冻结模型参考的位移预算，不宣称这些激光交点具有固定材料身份。
         result.safetyKeypointsInParent_mm = request.virtualWindowPoints_mm;
@@ -898,6 +925,32 @@ COnlineLocalRegistrationWorker::processSurfaceWindow(const std::deque<CloudFrame
                 .arg(result.surfaceVerificationPreflight.supportedRatio, 0, 'f', 3)
                 .arg(result.surfaceVerificationPreflight.currentModelSupportedRatio, 0, 'f', 3);
         }
+        const auto recordRejection = [&result](bool failed, const QString &reason) {
+            if (failed) { result.rejectionReasons.append(reason); }
+        };
+        recordRejection(!checked.accepted, QStringLiteral("表面验收：%1").arg(checked.message));
+        recordRejection(!fullResidualWithinBudget(checked.trainingAfter)
+                || !fullResidualWithinBudget(checked.holdoutAfter),
+            QStringLiteral("完整两向平均残差超限。"));
+        recordRejection(result.matchedSpreadRatio < m_options.minimumMatchedSpreadRatio,
+            QStringLiteral("匹配区域跨度不足。"));
+        recordRejection(translation > translationLimit,
+            QStringLiteral("单步平移 %1 mm 超过本候选预算 %2 mm。").arg(translation).arg(translationLimit));
+        recordRejection(rotation > rotationLimit,
+            QStringLiteral("单步旋转 %1 度超过本候选预算 %2 度。").arg(rotation).arg(rotationLimit));
+        recordRejection(result.solveElapsedMs > m_options.maximumSolveTimeMs,
+            QStringLiteral("求解及验收耗时超预算。"));
+        recordRejection(!result.surfaceVerificationPreflight.valid,
+            QStringLiteral("写前冻结面配对不足：状态=%1，实测支持=%2，模型支持=%3。")
+                .arg(static_cast<int>(result.surfaceVerificationPreflight.status))
+                .arg(result.surfaceVerificationPreflight.supportedRatio)
+                .arg(result.surfaceVerificationPreflight.currentModelSupportedRatio));
+        if (!result.rejectionReasons.isEmpty()) {
+            result.message = result.rejectionReasons.join(QStringLiteral("；"));
+        } else if (checked.trainingCoverageRecoveryUsed) {
+            result.message = QStringLiteral("连续拒绝后受限恢复候选通过；留出门限保持原值，待写后新帧验证。");
+        }
+        int independentVetoCount = 0;
         // 缺失观测允许表面支路工作，但不能因此丢弃同窗其他真实焊点的反证。
         // 始终检查最终投影候选，不用PCL原矩阵或估计焊点替代这些原图点。
         for (const auto &frame : frames) {
@@ -914,8 +967,13 @@ COnlineLocalRegistrationWorker::processSurfaceWindow(const std::deque<CloudFrame
             if (!std::isfinite(after) || after > m_options.maximumIndependentErrorMm
                 || after > before + m_options.maximumIndependentWorseningMm) {
                 result.accepted = false;
-                result.message = QStringLiteral("表面窗已有真实焊点否决最终投影候选：frame=%1，前=%2 mm，后=%3 mm。")
-                    .arg(frame.frameId).arg(before).arg(after);
+                ++independentVetoCount;
+                if (independentVetoCount == 1) {
+                    const auto reason = QStringLiteral("表面窗已有真实焊点否决最终投影候选：frame=%1，前=%2 mm，后=%3 mm。")
+                        .arg(frame.frameId).arg(before).arg(after);
+                    result.rejectionReasons.append(reason);
+                    result.message += QStringLiteral(" ") + reason;
+                }
             }
         }
         result.baseSafetyAccepted = result.accepted;
@@ -1069,6 +1127,10 @@ bool COnlineLocalRegistrationWorker::archiveAttempt(const std::deque<CloudFrame>
         {QStringLiteral("schema_version"), 4},
         {QStringLiteral("history_policy_version"), 2},
         {QStringLiteral("base_safety_accepted"), result.baseSafetyAccepted},
+        {QStringLiteral("preceding_surface_rejections"), result.precedingSurfaceRejections},
+        {QStringLiteral("surface_recovery_enabled"), m_options.surfaceRecoveryEnabled},
+        {QStringLiteral("training_coverage_recovery_used"), result.surfaceValidation.trainingCoverageRecoveryUsed},
+        {QStringLiteral("rejection_reasons"), QJsonArray::fromStringList(result.rejectionReasons)},
         {QStringLiteral("session_id"), QString::number(result.sessionId)},
         {QStringLiteral("generation"), QString::number(result.generation)},
         {QStringLiteral("frame_id"), QString::number(result.frameId)},

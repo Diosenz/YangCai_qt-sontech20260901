@@ -2,6 +2,7 @@
  * @file test_online_control_target_presentation.cpp
  * @brief 控制业务目标经真实 Controller/View 显示，不受当前测量缺失或旧会话覆盖。
  */
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <QApplication>
@@ -107,36 +108,32 @@ struct COnlineControlTargetPresentationTestAccess {
         auto missing = frame(11);
         controller.m_onlineCorrectionSyncState.lastConsumedFrameId = 11;
         controller.showRuntimeTrackingResult(missing);
-        check(view.m_detectedWeldPointOverlayVisible
-                && std::abs(view.m_detectedWeldPointOverlay.x() - 520) < 0.01
-                && view.m_trackingFrameCaption.contains(QStringLiteral("预测")),
-            "missing measurement displays the control line at the laser plane even when its TCP foot is offscreen");
-        check(view.m_detectedWeldPointOverlayEstimated,
-            "control-reference intersection uses estimate color instead of measured green");
+        check(!view.m_detectedWeldPointOverlayVisible
+                && !controller.m_onlineKcfLatestValid && !controller.m_onlineKcfRobotPoint.valid,
+            "missing measurement cannot be replaced by an extrapolated control-line intersection or KCF coordinates");
         check(!missing.valid && !missing.sample.point.valid && !missing.independentWeldPointInParent_mm.valid,
             "display projection cannot create a measurement or independent ICP point");
         auto moved = frame(12);
         moved.displayProjectionContext->toolInRobotBase.translationMm.x() = 10;
         controller.m_onlineCorrectionSyncState.lastConsumedFrameId = 12;
         controller.showRuntimeTrackingResult(moved);
-        check(view.m_detectedWeldPointOverlayVisible
-                && std::abs(view.m_detectedWeldPointOverlay.x() - 420) < 0.01,
-            "display uses this exposure pose rather than reusing the previous target pixel");
+        check(!view.m_detectedWeldPointOverlayVisible && !controller.m_onlineKcfLatestValid,
+            "moving the exposure plane cannot manufacture a replacement image measurement");
         auto older = update;
         older.state.controlTarget.generation = 1;
         older.state.controlTarget.targetPointInLastLink_mm.xMm = -20;
         older.state.controlTarget.geometry.first.xMm = -20;
         older.state.controlTarget.geometry.directionPoint.xMm = -20;
         controller.showOnlineCorrectionUpdate(older);
-        check(std::abs(view.m_detectedWeldPointOverlay.x() - 420) < 0.01,
-            "older target snapshots cannot overwrite a newer target");
+        check(!view.m_detectedWeldPointOverlayVisible && controller.m_onlineControlTarget.generation == 2,
+            "older target snapshots cannot resurrect a missing image point or replace a newer target");
         auto wrongSession = update;
         wrongSession.state.controlTarget.sessionId = 6;
         wrongSession.state.controlTarget.generation = 999;
         wrongSession.state.controlTarget.geometry.first.xMm = -30;
         wrongSession.state.controlTarget.geometry.directionPoint.xMm = -30;
         controller.showOnlineCorrectionUpdate(wrongSession);
-        check(std::abs(view.m_detectedWeldPointOverlay.x() - 420) < 0.01,
+        check(!view.m_detectedWeldPointOverlayVisible && controller.m_onlineControlTarget.sessionId == 7,
             "late old-session target cannot overwrite the active session target");
         auto parallel = frame(12);
         parallel.displayProjectionContext->calibration.laserPlaneA = 10;
@@ -182,7 +179,7 @@ struct COnlineControlTargetPresentationTestAccess {
         controller.showRuntimeTrackingResult(current);
         newer.state.controlTarget.generation = 4;
         controller.showOnlineCorrectionUpdate(newer);
-        check(view.m_detectedWeldPointOverlayVisible, "lifecycle case starts with a visible current target");
+        check(!view.m_detectedWeldPointOverlayVisible, "a new business target does not create a detection marker");
         auto measuredAgain = frame(14);
         measuredAgain.valid = true;
         measuredAgain.imageXPixel = 100;
@@ -304,6 +301,32 @@ struct COnlineControlTargetPresentationTestAccess {
         worker.setControlSessionId(72);
         worker.reset();
         check(publishedSession == 72, "runtime worker does not retain an old session on target reset publication");
+        auto continuation = frame(3932);
+        continuation.correlation.sessionId = 8;
+        continuation.valid = continuation.evidencePolicyEnabled = true;
+        continuation.kcfPixelAvailable = continuation.controlEligible = true;
+        continuation.sample.estimated = true;
+        continuation.pointSource = vision::OnlineSeamPointSource::SimulationPrediction;
+        continuation.imageXPixel = 101;
+        continuation.imageYPixel = 121;
+        continuation.detectedRobotBasePoint = {1, 2, 3, true};
+        controller.m_onlineCorrectionSyncState.lastConsumedFrameId = 3932;
+        controller.showRuntimeTrackingResult(continuation);
+        check(view.m_detectedWeldPointOverlayVisible && view.m_detectedWeldPointOverlayEstimated
+            && std::abs(view.m_detectedWeldPointOverlay.x() - 101) < 0.01
+            && controller.m_onlineKcfLatestValid,
+            "same-exposure continuation remains visible with estimated provenance and coordinates");
+        const auto rendered = view.m_imagePlaceholder->pixmap().toImage();
+        const int markerX = static_cast<int>(std::lround(101.0 * rendered.width() / 640.0));
+        const int markerY = static_cast<int>(std::lround(121.0 * rendered.height() / 480.0));
+        bool greenMarker = false;
+        for (int y = std::max(0, markerY - 2); y <= std::min(rendered.height()-1, markerY+2); ++y) {
+            for (int x = std::max(0, markerX - 2); x <= std::min(rendered.width()-1, markerX+2); ++x) {
+                const auto color = rendered.pixelColor(x, y);
+                greenMarker = greenMarker || (color.green() > 200 && color.red() < 60 && color.blue() < 60);
+            }
+        }
+        check(greenMarker, "estimated KCF marker is rendered green while provenance remains estimated");
         controller.shutdown();
         return ok;
     }

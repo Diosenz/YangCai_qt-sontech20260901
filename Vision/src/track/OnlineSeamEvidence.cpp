@@ -41,6 +41,7 @@ struct CIdentity {
     bool appearance = false;
     double score = 0.0;
     cv::Point2d matched{-1, -1};
+    std::string debug = "patch_or_expected_missing";
 };
 
 /** @brief 限制模板匹配到历史走廊，双侧分别验收，避免反光峰凭亮度换目标。 */
@@ -50,6 +51,8 @@ CIdentity inspectIdentity(const cv::Mat &gray, const cv::Mat &patch,
     const COnlineSeamEvidenceOptions &options)
 {
     CIdentity result;
+    result.debug = "patch_empty=" + std::to_string(patch.empty())
+        + ";expected_inside=" + std::to_string(inside(expected, gray));
     if (patch.empty() || !inside(expected, gray)) { return result; }
     const auto expectedRect = identityRect(expected);
     cv::Rect search(expectedRect.x - options.identityCorridorPixel,
@@ -57,7 +60,10 @@ CIdentity inspectIdentity(const cv::Mat &gray, const cv::Mat &patch,
         patch.cols + options.identityCorridorPixel * 2,
         patch.rows + options.identityCorridorPixel * 2);
     search &= cv::Rect(0, 0, gray.cols, gray.rows);
-    if (search.width < patch.cols || search.height < patch.rows) { return result; }
+    if (search.width < patch.cols || search.height < patch.rows) {
+        result.debug = "search_smaller_than_patch";
+        return result;
+    }
     cv::Mat scores;
     cv::matchTemplate(gray(search), patch, scores, cv::TM_CCOEFF_NORMED);
     cv::Point best;
@@ -72,12 +78,19 @@ CIdentity inspectIdentity(const cv::Mat &gray, const cv::Mat &patch,
         || result.score - second >= options.identityMinUniqueness;
     const bool visible = std::isfinite(result.score)
         && result.score >= options.identityMinPatchScore && unique;
+    result.debug = "score=" + std::to_string(result.score)
+        + ";second=" + std::to_string(second) + ";unique=" + std::to_string(unique)
+        + ";visible=" + std::to_string(visible)
+        + ";candidate_inside=" + std::to_string(inside(candidate, gray))
+        + ";expected_distance=" + std::to_string(cv::norm(candidate - expected))
+        + ";matched_distance=" + std::to_string(cv::norm(candidate - result.matched));
     result.appearance = visible && coarseUsable
         && cv::norm(coarse - result.matched) <= options.identityCorridorPixel;
     if (!visible || !inside(candidate, gray)
         || cv::norm(candidate - expected) > options.identityCorridorPixel
-        || cv::norm(candidate - result.matched) > 4.0) { return result; }
+        || cv::norm(candidate - result.matched) > 10.0) { return result; }
     const auto rect = identityRect(candidate);
+    result.debug += ";candidate_patch_inside=" + std::to_string(inside(rect, gray));
     if (!inside(rect, gray)) { return result; }
     result.geometry = true;
     for (int side = 0; side < 2; ++side) {
@@ -85,6 +98,7 @@ CIdentity inspectIdentity(const cv::Mat &gray, const cv::Mat &patch,
         cv::Mat score;
         cv::matchTemplate(gray(rect)(section), patch(section), score, cv::TM_CCOEFF_NORMED);
         const double value = score.at<float>(0, 0);
+        result.debug += (side == 0 ? ";left_patch=" : ";right_patch=") + std::to_string(value);
         result.geometry = result.geometry && std::isfinite(value)
             && value >= options.identityMinBranchScore;
     }
@@ -99,6 +113,7 @@ struct CBranch {
     double targetNormalOffset = 0.0;
     cv::Vec2d normal{0, 0};
     double rhs = 0.0;
+    std::string debug = "not_fitted";
 };
 
 /** @brief 一列多个窄峰保留为歧义，不能只取更亮条纹；边界截断亮带不作支撑。 */
@@ -146,6 +161,9 @@ CBranch fitBranch(const cv::Mat &gray, const cv::Point2d &proposal,
         if (peaks.size() > 1U) { ++ambiguous; }
         if (peaks.size() == 1U) { points.emplace_back(x, peaks.front()); }
     }
+    result.debug = "columns=" + std::to_string(columns) + ";ambiguous=" + std::to_string(ambiguous)
+        + ";single_peak=" + std::to_string(points.size())
+        + ";span=" + std::to_string(points.empty() ? 0.0 : points.back().x - points.front().x);
     if (columns == 0 || static_cast<double>(ambiguous) / columns > 0.2
         || points.size() < 25U || points.back().x - points.front().x < 40.0) { return result; }
     cv::Vec4f line;
@@ -157,9 +175,17 @@ CBranch fitBranch(const cv::Mat &gray, const cv::Point2d &proposal,
     for (const auto &point : points) {
         square += std::pow(point.y - result.slope * point.x - result.intercept, 2);
     }
+    result.debug += ";rms=" + std::to_string(std::sqrt(square / points.size()))
+        + ";slope=" + std::to_string(result.slope)
+        + ";history_valid=" + std::to_string(history.valid)
+        + ";history_slope=" + std::to_string(history.slope);
     if (std::sqrt(square / points.size()) > 1.5
         || (history.valid && std::abs(result.slope - history.slope) > 0.18)
-        || (!history.valid && sign * result.slope >= -0.03)) { return {}; }
+        || (!history.valid && sign * result.slope >= -0.03)) {
+        CBranch rejected;
+        rejected.debug = result.debug;
+        return rejected;
+    }
     const double length = std::sqrt(1.0 + result.slope * result.slope);
     result.normal = {-result.slope / length, 1.0 / length};
     result.targetNormalOffset = history.valid ? history.targetNormalOffset : 0.0;
@@ -234,6 +260,7 @@ bool validOptions(const COnlineSeamEvidenceOptions &o)
         && std::isfinite(o.identityMinBranchScore) && o.identityMinBranchScore >= 0 && o.identityMinBranchScore <= 1
         && std::isfinite(o.identityMinUniqueness) && o.identityMinUniqueness >= 0 && o.identityMinUniqueness <= 1
         && std::isfinite(o.recoveryMaxStepPixel) && o.recoveryMaxStepPixel > 0
+        && std::isfinite(o.maxContinuousStepPixel) && o.maxContinuousStepPixel > 0
         && std::isfinite(o.maxPredictionMs) && o.maxPredictionMs >= 0
         && std::isfinite(o.maxPredictionTravelMm) && o.maxPredictionTravelMm >= 0;
 }
@@ -250,6 +277,10 @@ struct COnlineSeamEvidence::CState {
     std::int64_t lastTimeMs = -1;
     int pending = 0;
     bool recovery = false;
+    bool structuralCandidateActive = false;
+    bool hasIdentityDirections = false;
+    double identityLeftSlope = 0.0;
+    double identityRightSlope = 0.0;
     cv::Point2d recoveryCandidate{-1, -1};
     std::optional<cv::Point2d> lastOutput;
     bool budgetProvenanceValid = false;
@@ -263,6 +294,10 @@ struct COnlineSeamEvidence::CState {
     cv::Point2d estimate{-1, -1};
     CBranch left;
     CBranch right;
+    // 连续业务输出与独立实测锚分离；估计不能反向训练可靠身份。
+    std::optional<cv::Point2d> continuousPoint;
+    std::optional<cv::Point2d> continuousReference;
+    std::uint64_t continuousRevision = 0;
 };
 
 COnlineSeamEvidence::COnlineSeamEvidence() : m_state(std::make_unique<CState>()) {}
@@ -271,6 +306,7 @@ void COnlineSeamEvidence::reset() { m_state = std::make_unique<CState>(); }
 void COnlineSeamEvidence::notifyGap()
 {
     m_state->pending = 0;
+    m_state->structuralCandidateActive = false;
     m_state->recovery = m_state->anchorFrameId >= 0;
     m_state->lastOutput.reset();
     // 未处理曝光之间的行程不可推算；只有新的可靠几何才能重新授权预算。
@@ -284,11 +320,14 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
 {
     COnlineSeamEvidenceResult result;
     result.enabled = true;
+    result.debugOptions = options;
+    result.debugDetail = "[DEBUG-kcf-20261026] evaluation_not_completed";
     auto &state = *m_state;
     result.anchorFrameId = state.anchorFrameId;
     if (!validOptions(options)) {
         notifyGap();
         result.message = "证据策略参数无效。";
+        result.debugDetail = "[DEBUG-kcf-20261026] invalid_options";
         return result;
     }
     result.freshExposure = frameId >= 0 && frameId > state.lastFrameId;
@@ -296,6 +335,8 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
     if (!result.freshExposure || gray.empty() || gray.type() != CV_8UC1) {
         notifyGap();
         result.message = "重复/乱序曝光或原图缺失，不刷新锚点和模板。";
+        result.debugDetail = "[DEBUG-kcf-20261026] fresh=" + std::to_string(result.freshExposure)
+            + ";image_empty=" + std::to_string(gray.empty()) + ";image_type=" + std::to_string(gray.type());
         return result;
     }
     const bool hasProgress = context.weldProgressMm.has_value()
@@ -319,6 +360,17 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
     result.elapsedMs = state.anchorTimeMs >= 0 && context.timestampMs >= state.anchorTimeMs
         ? static_cast<double>(context.timestampMs - state.anchorTimeMs) : -1.0;
 
+    cv::Point2d continuousPrediction = state.continuousPoint.value_or(state.identityPoint);
+    if (options.enableContinuousOutput && state.continuousPoint.has_value() && hasReference
+        && state.continuousReference.has_value() && revision == state.continuousRevision) {
+        const cv::Point2d movement = *context.referencePixel - *state.continuousReference;
+        // 只使用同版本相邻曝光的相对运动；模型写回和突跳不直接移动业务点。
+        if (cv::norm(movement) <= options.identityCorridorPixel) {
+            const double distance = cv::norm(movement);
+            continuousPrediction += movement * (distance > options.maxContinuousStepPixel
+                ? options.maxContinuousStepPixel / distance : 1.0);
+        }
+    }
     bool aligned = state.mappingValid && hasReference;
     cv::Point2d proposal = state.identityPoint;
     if (aligned) {
@@ -331,25 +383,70 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
             proposal = state.estimate + *context.previousReferencePixel - state.reference;
         } else { aligned = false; }
     }
-    // 参考版本与当前曝光没有桥接时不沿用；模型绝对跳变不是实际目标运动。
+    // 走廊约束补偿后的图像残差，不约束扫描总位移。只有跨出身份模板覆盖的
+    // 参考跳变才撤销参考续接；它仍不能否决历史走廊中已被原图确认的目标。
+    const bool referenceProposalSupported = aligned && inside(proposal, gray)
+        && (identityRect(proposal) & identityRect(state.identityPoint)).area() > 0;
     if (aligned) {
         state.estimate = proposal;
         state.reference = *context.referencePixel;
         state.revision = revision;
-        if (cv::norm(proposal - state.identityPoint) > options.identityCorridorPixel) {
+        if (!referenceProposalSupported) {
             state.referenceConflict = true;
         }
     }
-    if (!inside(proposal, gray) || state.referenceConflict) { proposal = state.identityPoint; }
+    if (!referenceProposalSupported) { proposal = state.identityPoint; }
+    // 独立原图验收只围绕实测锚/曝光参考关联，不能让续接输出反向移动身份走廊。
     const bool rawGeometry = geometry.valid && geometryProjected && inside(geometry.point, gray);
     if (state.identityPatch.empty() && rawGeometry) { proposal = geometry.point; }
-    const auto identity = inspectIdentity(gray, state.identityPatch, proposal,
+    auto identity = inspectIdentity(gray, state.identityPatch, proposal,
         geometry.point, coarse, coarseUsable, options);
+    if (rawGeometry && !identity.geometry
+        && cv::norm(proposal - state.identityPoint) > 0.0) {
+        // CAD 只提供关联提案。新提案没有图像支撑时，保留旧身份的独立验收机会。
+        const auto historical = inspectIdentity(gray, state.identityPatch, state.identityPoint,
+            geometry.point, coarse, coarseUsable, options);
+        if (historical.geometry) {
+            identity = historical;
+            proposal = state.identityPoint;
+            state.referenceConflict = true;
+        }
+    }
+    // 反光可改变整块灰度外观。当前完整双支几何与历史方向一致、仍在锚的关联
+    // 走廊且有最低外观支持时，可由两份新曝光重建身份；估计点从不参与确认。
+    const bool structuralIdentity = rawGeometry && !identity.geometry
+        && state.anchorFrameId >= 0 && state.hasIdentityDirections && geometry.hasBranchDirections
+        && identity.score >= options.identityMinBranchScore
+        && cv::norm(geometry.point - proposal) <= options.identityCorridorPixel
+        && std::abs(geometry.leftSlope - state.identityLeftSlope) <= 0.25
+        && std::abs(geometry.rightSlope - state.identityRightSlope) <= 0.25;
+    if (structuralIdentity) {
+        identity.geometry = true;
+        if (!state.structuralCandidateActive) {
+            state.pending = 0;
+            state.recovery = true;
+        }
+    }
+    state.structuralCandidateActive = structuralIdentity;
+    identity.debug += ";structural_identity=" + std::to_string(structuralIdentity);
     result.identityScore = identity.score;
     bool accepted = rawGeometry && (state.identityPatch.empty() || identity.geometry);
     const auto mother = options.enableMotherConstraints
         ? observeMother(gray, proposal, geometry.point, state.left, state.right) : CMother{};
     result.motherSupportRank = mother.rank;
+    result.debugDetail = "[DEBUG-kcf-20261026] geometry_valid=" + std::to_string(geometry.valid)
+        + ";geometry_status=" + std::to_string(static_cast<int>(geometry.status))
+        + ";projected=" + std::to_string(geometryProjected)
+        + ";raw_geometry=" + std::to_string(rawGeometry)
+        + ";patch_empty=" + std::to_string(state.identityPatch.empty())
+        + ";identity_geometry=" + std::to_string(identity.geometry)
+        + ";identity{" + identity.debug + "}"
+        + ";mother_enabled=" + std::to_string(options.enableMotherConstraints)
+        + ";left_valid=" + std::to_string(mother.left.valid) + ";left{" + mother.left.debug + "}"
+        + ";right_valid=" + std::to_string(mother.right.valid) + ";right{" + mother.right.debug + "}"
+        + ";center_supported=" + std::to_string(mother.centerSupported)
+        + ";mother_rank=" + std::to_string(mother.rank)
+        + ";mother_distance=" + std::to_string(cv::norm(mother.estimate - geometry.point));
     if (options.enableMotherConstraints && rawGeometry) {
         accepted = accepted && mother.left.valid && mother.right.valid && mother.centerSupported
             && mother.rank == 2 && cv::norm(mother.estimate - geometry.point) <= 3.0;
@@ -358,9 +455,13 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
         state.recovery = state.anchorFrameId >= 0;
         state.pending = 0;
     } else {
+        const bool trackingEstablishedIdentity = state.anchorFrameId >= 0 && !state.recovery;
         const bool consistent = state.pending == 0
             || cv::norm(geometry.point - state.recoveryCandidate) <= options.identityCorridorPixel;
-        state.pending = consistent ? state.pending + 1 : 1;
+        // 首次建锚/失测恢复需要多曝光；稳定跟踪已有当前图像身份支持，不能因
+        // 绝对位移再次降为第一确认帧，继而把本可更新的锚点冻结在旧位置。
+        state.pending = trackingEstablishedIdentity ? options.anchorConfirmationFrames
+            : (consistent ? state.pending + 1 : 1);
         state.recoveryCandidate = geometry.point;
         // 第一份几何只建立待确认身份；不会训练 KCF 或建立可靠锚点。
         if (state.identityPatch.empty()) {
@@ -368,6 +469,7 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
             if (inside(rect, gray)) {
                 cv::Scalar mean, deviation;
                 cv::meanStdDev(gray(rect), mean, deviation);
+                result.debugDetail += ";seed_patch_stddev=" + std::to_string(deviation[0]);
                 if (deviation[0] >= 5.0) {
                     state.identityPatch = gray(rect).clone();
                     state.identityPoint = geometry.point;
@@ -383,8 +485,9 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
         && aligned && !state.referenceConflict && inside(state.estimate, gray);
     bool transition = false;
     if (accepted && state.pending >= required && !state.identityPatch.empty()) {
-        if (state.recovery && state.lastOutput.has_value()
+        if (!options.enableContinuousOutput && state.recovery && state.lastOutput.has_value()
             && cv::norm(geometry.point - *state.lastOutput) > options.recoveryMaxStepPixel) {
+            result.debugDetail += ";recovery_step=" + std::to_string(cv::norm(geometry.point - *state.lastOutput));
             if (continuation) { transition = true; }
             else { accepted = false; }
         } else {
@@ -409,6 +512,9 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
                 state.pending = required;
                 state.left = learnedBranch(mother.left, geometry.point);
                 state.right = learnedBranch(mother.right, geometry.point);
+                state.hasIdentityDirections = geometry.hasBranchDirections;
+                state.identityLeftSlope = geometry.leftSlope;
+                state.identityRightSlope = geometry.rightSlope;
                 result.pixelAvailable = result.independentGeometry = result.controlEligible = true;
                 result.anchorRefreshed = true;
                 result.anchorFrameId = frameId;
@@ -445,7 +551,43 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
             result.message += " 续接预算/曝光行程/参考关联缺失或已到限，不输出估计点。";
         }
     }
+    if (options.enableContinuousOutput && state.anchorFrameId >= 0) {
+        // 原图暂态失测仍输出同一目标。外观只能小幅修正续接，不能跳到反光峰。
+        if (!result.pixelAvailable) {
+            result.point = continuousPrediction;
+            result.source = OnlineSeamPointSource::SimulationPrediction;
+            if (identity.appearance && inside(identity.matched, gray)
+                && cv::norm(identity.matched - continuousPrediction) <= options.maxContinuousStepPixel) {
+                result.point += (identity.matched - continuousPrediction) * 0.25;
+                result.source = OnlineSeamPointSource::CorrectedKcf;
+            }
+            result.pixelAvailable = inside(result.point, gray);
+            result.message = "预焊/反光期间连续 KCF 续接，保留估计来源，用于跟随。";
+        }
+        if (result.pixelAvailable && state.continuousPoint.has_value()) {
+            // 检测恢复也受连续步长限制，不能一帧跳回新折点；原始几何另行保留。
+            const auto delta = result.point - *state.continuousPoint;
+            const double distance = cv::norm(delta);
+            if (distance > options.maxContinuousStepPixel) {
+                result.point = *state.continuousPoint + delta * (options.maxContinuousStepPixel / distance);
+                result.source = OnlineSeamPointSource::RecoveryTransition;
+                result.independentGeometry = false;
+                result.message = "KCF 恢复平滑过渡，用于跟随，不作为独立实测。";
+            }
+        }
+        result.controlEligible = result.pixelAvailable;
+        if (result.pixelAvailable) { state.continuousPoint = result.point; }
+        state.continuousReference = hasReference ? context.referencePixel : std::nullopt;
+        state.continuousRevision = revision;
+    }
     state.lastOutput = result.pixelAvailable ? std::optional<cv::Point2d>(result.point) : std::nullopt;
+    result.debugDetail += ";accepted=" + std::to_string(accepted)
+        + ";confirmation=" + std::to_string(result.confirmationCount)
+        + ";required=" + std::to_string(required)
+        + ";has_progress=" + std::to_string(hasProgress) + ";has_reference=" + std::to_string(hasReference)
+        + ";aligned=" + std::to_string(aligned) + ";reference_conflict=" + std::to_string(state.referenceConflict)
+        + ";continuation=" + std::to_string(continuation)
+        + ";control_eligible=" + std::to_string(result.controlEligible);
     return result;
 }
 

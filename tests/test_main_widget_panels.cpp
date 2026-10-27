@@ -14,6 +14,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QCoreApplication>
+#include <QDir>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
 #include <QLabel>
@@ -27,6 +28,7 @@
 #include "MainWidget.h"
 #include "OnlineCorrectionTypes.h"
 #include "UiController.h"
+#include "TrackingFramePresentation.h"
 
 namespace {
 
@@ -1063,6 +1065,205 @@ bool testOnlineBusinessAndSyncTextRemainStable()
     return ok;
 }
 
+/** @brief 复用现有停止信号，区分清理、保持待确认、设备反馈及通信失败。 */
+bool testOnlineOperationStopPresentation()
+{
+    using namespace i2r_rlc;
+    ui::MainWidget widget;
+    ui::UiController controller(widget);
+    controller.initialize();
+    auto *business = findLabel(widget, "onlineCorrectionStateLabel");
+    if (business == nullptr) { controller.shutdown(); return false; }
+    bool ok = expectTrue(QMetaObject::invokeMethod(&widget, "stopRequested", Qt::DirectConnection)
+            && !business->text().contains(QStringLiteral("HOLD")),
+        "stop without an online operation performs ordinary cleanup without requesting HOLD");
+    ui::CorrectionSyncUpdate sync;
+    sync.purpose = ui::CorrectionPurpose::OnlineCorrection;
+    sync.sessionId = 71;
+    sync.state = ui::CorrectionSyncState::Idle;
+    ok &= expectTrue(QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate",
+            Qt::DirectConnection, Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, sync)),
+        "online session presentation is established through its existing public Qt boundary");
+    ok &= expectTrue(QMetaObject::invokeMethod(&widget, "stopRequested", Qt::DirectConnection)
+            && business->text().contains(QStringLiteral("已请求"))
+            && business->text().contains(QStringLiteral("等待"))
+            && business->text().contains(QStringLiteral("停弧未验证")),
+        "existing Stop signal enters pending HOLD without claiming completed welding stop");
+    robot_comm::RobotOperationStopState stop;
+    stop.holdRequestLatched = true;
+    stop.requestGeneration = 1;
+    stop.status = robot_comm::RobotOperationStopStatus::HoldConfirmed;
+    const auto applyStop = [&controller](const robot_comm::RobotOperationStopState &state) {
+        return QMetaObject::invokeMethod(&controller, "showOnlineOperationStop",
+            Qt::DirectConnection, Q_ARG(i2r_rlc::robot_comm::RobotOperationStopState, state));
+    };
+    ok &= expectTrue(applyStop(stop)
+            && business->text().contains(QStringLiteral("HOLD 已反馈"))
+            && business->text().contains(QStringLiteral("停弧未验证"))
+            && business->text().contains(QStringLiteral("零速未验证"))
+            && business->text().contains(QStringLiteral("人工")),
+        "fresh HOLD feedback is presented separately from arc-off and mechanical-zero-speed confirmation");
+    const auto confirmedText = business->text();
+    control::OnlineCorrectionUpdate late;
+    late.succeeded = true;
+    late.phase = control::OnlineCorrectionPhase::Idle;
+    late.message = "late cleared control state";
+    ok &= expectTrue(QMetaObject::invokeMethod(&controller, "showOnlineCorrectionUpdate",
+            Qt::DirectConnection, Q_ARG(i2r_rlc::control::OnlineCorrectionUpdate, late))
+            && business->text() == confirmedText,
+        "late ordinary control reset cannot erase operation HOLD presentation");
+    ok &= expectTrue(QMetaObject::invokeMethod(&widget, "onlineCorrectionFeaturePanelClosed",
+            Qt::DirectConnection) && business->text() == confirmedText,
+        "closing the panel cannot erase the latched HOLD status");
+    stop.status = robot_comm::RobotOperationStopStatus::Unconfirmed;
+    stop.error = robot_comm::RobotCommandError::ReceiveFailed;
+    stop.message = "simulated feedback lost";
+    ok &= expectTrue(applyStop(stop)
+            && business->text().contains(QStringLiteral("无法确认"))
+            && !business->text().contains(QStringLiteral("HOLD 已反馈"))
+            && business->text().contains(QStringLiteral("停弧未验证")),
+        "feedback failure removes stale confirmation and preserves the unverified arc boundary");
+    controller.shutdown();
+    return ok;
+}
+
+/** @brief 已结束会话残留身份不能令普通停止误发机器人 HOLD。 */
+bool testOnlineCompletedSessionStopIsOrdinary()
+{
+    using namespace i2r_rlc;
+    bool ok = true;
+    for (int scenario = 0; scenario < 4; ++scenario) {
+        ui::MainWidget widget;
+        ui::UiController controller(widget);
+        controller.initialize();
+        auto *business = findLabel(widget, "onlineCorrectionStateLabel");
+        ui::CorrectionSyncUpdate sync;
+        sync.purpose = ui::CorrectionPurpose::OnlineCorrection;
+        sync.sessionId = 720 + scenario;
+        sync.state = ui::CorrectionSyncState::Idle;
+        ok &= QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate",
+            Qt::DirectConnection, Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, sync));
+        if (scenario < 2) {
+            control::OnlineCorrectionUpdate terminal;
+            terminal.succeeded = scenario == 0;
+            terminal.phase = scenario == 0 ? control::OnlineCorrectionPhase::Completed
+                                          : control::OnlineCorrectionPhase::Error;
+            terminal.message = "terminal operation";
+            ok &= QMetaObject::invokeMethod(&controller, "showOnlineCorrectionUpdate",
+                Qt::DirectConnection, Q_ARG(i2r_rlc::control::OnlineCorrectionUpdate, terminal));
+        } else {
+            sync.state = scenario == 2 ? ui::CorrectionSyncState::Cleared
+                                      : ui::CorrectionSyncState::StoppedAfterFailures;
+            ok &= QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate",
+                Qt::DirectConnection, Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, sync));
+        }
+        ok &= expectTrue(QMetaObject::invokeMethod(&widget, "stopRequested", Qt::DirectConnection)
+                && business != nullptr && !business->text().contains(QStringLiteral("HOLD")),
+            "completed, failed or terminated session identity cannot turn ordinary Stop into HOLD");
+        controller.shutdown();
+    }
+    return ok;
+}
+
+bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
+{
+    using namespace i2r_rlc;
+    ui::MainWidget widget;
+    ui::UiController controller(widget);
+    const auto root = QDir::current();
+    const QString directory = QStringLiteral("tests/fixtures/online_tracking_20261027/");
+    const QImage detected(root.filePath(directory + QStringLiteral("20261027_122726_191_3937.png")));
+    const QImage preview(root.filePath(directory + QStringLiteral("20261027_122726_191_3969.png")));
+    bool ok = expectTrue(!detected.isNull() && !preview.isNull(), "captured UI replay images exist");
+    ui::CorrectionSyncUpdate ready;
+    ready.state = ui::CorrectionSyncState::Idle;
+    ready.purpose = ui::CorrectionPurpose::OnlineCorrection;
+    ready.sessionId = 1;
+    ready.frameId = 3937;
+    ready.observation.frameId = 3937;
+    QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, ready));
+    ready.state = ui::CorrectionSyncState::ImageOnlyReady;
+    QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, ready));
+    ready.state = ui::CorrectionSyncState::VisionConsumed;
+    QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, ready));
+    ui::RuntimeTrackingResult result;
+    result.frameId = 3937;
+    result.triggerAccepted = result.valid = true;
+    result.evidencePolicyEnabled = result.kcfPixelAvailable = true;
+    result.pointSource = vision::OnlineSeamPointSource::Geometry;
+    result.imageXPixel = 550;
+    result.imageYPixel = 585;
+    result.correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
+    result.correlation.sessionId = 1;
+    result.correlation.frameId = 3937;
+    result.frameContext.emplace();
+    result.frameContext->sourceFrame.frameId = 3937;
+    result.frameContext->sourceFrame.image = detected;
+    result.frameContext->observation = ready.observation;
+    ok &= expectTrue(QMetaObject::invokeMethod(&controller, "showRuntimeTrackingResult", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::ui::RuntimeTrackingResult, result)), "runtime result boundary invoked");
+    auto *live = findLabel(widget, "runtimePreviewImage");
+    auto *mainImage = live == nullptr ? nullptr : qobject_cast<QLabel *>(live->parentWidget());
+    const QImage snapshot = mainImage == nullptr ? QImage() : mainImage->pixmap().toImage();
+    camera::CameraFrame frame;
+    frame.frameId = 3969;
+    frame.image = preview;
+    ok &= expectTrue(QMetaObject::invokeMethod(&controller, "handleRuntimeFrameReady", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::camera::CameraFrame, frame)), "runtime preview boundary invoked");
+    auto *caption = findLabel(widget, "runtimePreviewCaption");
+    auto *consumed = findLabel(widget, "onlineCorrectionConsumedFrameLabel");
+    if (live != nullptr && live->isHidden()) {
+        std::cerr << "preview diagnostic: consumed="
+            << (consumed == nullptr ? "missing" : consumed->text().toStdString())
+            << " caption=" << (caption == nullptr ? "missing" : caption->text().toStdString())
+            << '\n';
+    }
+    ok &= expectTrue(live != nullptr && !live->isHidden() && !live->pixmap().isNull(),
+                     "fresh camera image remains visible during delayed detection");
+    if (live != nullptr) {
+        ok &= expectTrue(live->property("previewFrameId").toLongLong() == 3969
+            && live->property("detectionFrameId").toLongLong() == 3937,
+            "preview and detection retain distinct exposure identities");
+        const auto shown = live->pixmap().toImage();
+        const auto expected = preview.scaled(shown.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        ok &= expectTrue(shown.pixelColor(shown.width() / 2, shown.height() / 2)
+            == expected.pixelColor(expected.width() / 2, expected.height() / 2),
+            "new preview pixels are not old snapshot pixels or stale overlay");
+        ok &= expectTrue(!snapshot.isNull() && mainImage->pixmap().toImage() == snapshot,
+            "live camera frames cannot replace the exposure supporting main-image overlays");
+    }
+    ready.frameId = 3969;
+    ready.observation.frameId = 3969;
+    ready.state = ui::CorrectionSyncState::ImageOnlyReady;
+    ok &= expectTrue(QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, ready)), "next exposure ready boundary invoked");
+    ready.state = ui::CorrectionSyncState::VisionConsumed;
+    ok &= expectTrue(QMetaObject::invokeMethod(&controller, "handleCorrectionSyncUpdate", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::ui::CorrectionSyncUpdate, ready)), "next exposure consumption boundary invoked");
+    result.frameId = 3969;
+    result.correlation.frameId = 3969;
+    result.frameContext->sourceFrame.frameId = 3969;
+    result.frameContext->sourceFrame.image = preview;
+    result.frameContext->observation.frameId = 3969;
+    ok &= expectTrue(QMetaObject::invokeMethod(&controller, "showRuntimeTrackingResult", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::ui::RuntimeTrackingResult, result)), "next runtime result boundary invoked");
+    ok &= expectTrue(live != nullptr && live->property("detectionFrameId").toLongLong() == 3969
+        && caption != nullptr && caption->text().contains(QStringLiteral("检测快照 3969")),
+        "a new detection updates preview attribution even without another camera callback");
+    const auto snapshotPath = qEnvironmentVariable("I2R_UI_REPLAY_SNAPSHOT");
+    if (!snapshotPath.isEmpty() && mainImage != nullptr) {
+        ok &= expectTrue(mainImage->grab().save(snapshotPath), "offline UI snapshot saved");
+    }
+    widget.showFrame(frame);
+    ok &= expectTrue(live != nullptr && live->isHidden() && caption->isHidden(),
+        "returning to camera-only display clears delayed detection preview state");
+    controller.shutdown();
+    return ok;
+}
+
 bool testCorrectionSyncThreeKeyPresentation()
 {
     using i2r_rlc::ui::CorrectionPurpose;
@@ -1220,6 +1421,13 @@ int main(int argc, char **argv)
     setenv("I2R_RLC_DISABLE_AUTO_DEVICE_START", "1", 1);
 #endif
     QApplication app(argc, argv);
+    if (app.arguments().contains(QStringLiteral("--live-preview-contract"))) {
+        return testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed() ? 0 : 1;
+    }
+    if (app.arguments().contains(QStringLiteral("--operation-stop-ui"))) {
+        return testOnlineOperationStopPresentation()
+            && testOnlineCompletedSessionStopIsOrdinary() ? 0 : 1;
+    }
     bool ok = true;
     ok &= testLegacyStatusAndDeviceControlPanel();
     ok &= testFeaturePanelSwitching();
@@ -1233,11 +1441,14 @@ int main(int argc, char **argv)
     ok &= testOnlineLocalIcpTranslationLimitControl();
     ok &= testOnlineLocalIcpStabilityControl();
     ok &= testOnlineBusinessAndSyncTextRemainStable();
+    ok &= testOnlineOperationStopPresentation();
+    ok &= testOnlineCompletedSessionStopIsOrdinary();
     ok &= testWorkpieceSelectorPanel();
     ok &= testIbvsAndLocalizationPanelsUseTwinButtonDesign();
     ok &= testTeachTrajectoryPanelSignals();
     ok &= testRobotSimJointTestPanel();
     ok &= testCorrectionSyncThreeKeyPresentation();
+    ok &= testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed();
     ok &= testAppendLogSmoke();
     if (!ok) {
         return 1;

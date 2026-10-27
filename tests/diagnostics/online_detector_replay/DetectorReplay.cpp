@@ -3,6 +3,7 @@
  * @brief 按曝光顺序调用真实 process 入口，导出公开结果与诊断。
  * @details 一个会话持有一个检测器，无线程、通信、设备或运动。间隙检测禁用。
  */
+#include <chrono>
 #include <cmath>
 #include <exception>
 #include <Eigen/Geometry>
@@ -15,6 +16,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <opencv2/imgcodecs.hpp>
+#include "feature/ActiveContourWeldFeatureDetector.h"
 #include "track/LegacyOnlineKcfDetector.h"
 
 namespace v = i2r_rlc::vision;
@@ -41,7 +43,8 @@ void validateInput(const QJsonObject &input)
             throw std::runtime_error(std::string("invalid integer ") + key);
         }
     }
-    for (const auto *key : {"bounded_search", "enable_gap", "evidence_policy"}) {
+    for (const auto *key : {"bounded_search", "enable_gap", "evidence_policy",
+             "paper_tracking", "probe_bootstrap"}) {
         if (input.contains(key) && !input.value(key).isBool()) {
             throw std::runtime_error(std::string("invalid boolean ") + key);
         }
@@ -130,6 +133,21 @@ QJsonObject record(const QJsonObject &input, const v::LegacyOnlineKcfResult &r)
         row[key] = input.contains(key) ? input.value(key) : QJsonValue(QJsonValue::Null);
     }
     row["available"] = r.valid;
+    row["detector_valid"] = r.valid;
+    row["detector_pixel"] = pixel(r.weldPointPixel, r.valid);
+    row["paper_tracking"] = input.value("paper_tracking").toBool(false);
+    row["response_template_count"] = d.tracker.responseTemplateCount;
+    row["simulation_shape_available"] = d.simulationShapeAvailable;
+    row["paper_diagnostics"] = QJsonObject{
+        {"identity_quality", d.coarseObservationQuality},
+        {"shoulder_accepted", d.shoulderObservationAccepted},
+        {"shoulder_quality", d.shoulderObservationQuality},
+        {"center_quality", d.centerObservationQuality},
+        {"complete_appearance", d.completeAppearanceSupported},
+        {"response_statistics_ready", d.responseStatisticsReady},
+        {"response_normal", d.responseNormal},
+        {"normal_response_samples", d.normalResponseSamples},
+        {"response_psr", d.tracker.responsePsr}};
     row["image_observation_accepted"] = d.imageObservationAccepted;
     row["source"] = r.valid ? source : "unavailable";
     row["image_source"] = source;
@@ -154,6 +172,7 @@ QJsonObject record(const QJsonObject &input, const v::LegacyOnlineKcfResult &r)
     row["image_search_expanded"] = d.imageSearchExpanded;
     row["bounded_search"] = d.boundedImageSearchEnabled;
     row["refinement_calls"] = d.imageRefinementCallCount;
+    row["image_search_diagnostic"] = QString::fromStdString(d.imageSearchDiagnostic);
     row["search_cycle_pending"] = d.imageSearchCyclePending;
     row["candidate_coverage"] = "public selected raw candidate only; exhaustive candidates not exposed";
     row["projection_provenance"] = input.value("projection").toObject().value("provenance");
@@ -161,7 +180,9 @@ QJsonObject record(const QJsonObject &input, const v::LegacyOnlineKcfResult &r)
         ? input.value("projection").toObject().value("fixture") : QJsonValue("provided_or_unknown");
     const auto &e = d.evidence;
     row["production_evidence_policy"] = e.enabled;
+    row["control_eligible"] = e.controlEligible;
     if (e.enabled) {
+        row["debug_kcf_20261026_gates"] = QString::fromStdString(e.debugDetail);
         const char *name = "unavailable";
         switch (e.source) {
         case v::OnlineSeamPointSource::Geometry: name = "geometry"; break;
@@ -194,6 +215,42 @@ QJsonObject record(const QJsonObject &input, const v::LegacyOnlineKcfResult &r)
 int main(int argc, char **argv)
 {
     try {
+        if (argc == 3 && std::string(argv[1]) == "--tracker-benchmark") {
+            const cv::Mat image = cv::imread(argv[2], cv::IMREAD_GRAYSCALE);
+            if (image.empty()) { throw std::runtime_error("real benchmark image missing"); }
+            const cv::Rect roi(425, 485, 250, 200);
+            v::CKcfTracker tracker(true, true, false, false, v::KcfFeatureMode::Mkcf, 3);
+            v::KcfFusionOptions fusion;
+            fusion.mode = v::KcfFusionMode::KcfOnly;
+            tracker.setFusionOptions(fusion);
+            tracker.setOnlineObservationMode(true);
+            tracker.init(roi, image);
+            tracker.setSimulatedTemplate(image, roi);
+            for (int index = 0; index < 4; ++index) {
+                const auto started = std::chrono::steady_clock::now();
+                tracker.update(image);
+                const auto trainingStarted = std::chrono::steady_clock::now();
+                tracker.commitOnlineObservationTraining(true);
+                const auto finished = std::chrono::steady_clock::now();
+                const auto &diagnostic = tracker.lastUpdateDiagnostic();
+                const QJsonObject row{
+                    {"scope", "Public tracker benchmark; captured real image also substitutes reference appearance; not field simulation truth."},
+                    {"iteration", index},
+                    {"threads", cv::getNumThreads()},
+                    {"processing_ms", std::chrono::duration<double, std::milli>(finished - started).count()},
+                    {"training_ms", std::chrono::duration<double, std::milli>(finished - trainingStarted).count()},
+                    {"templates", diagnostic.responseTemplateCount},
+                    {"training_committed", diagnostic.trainingCommitted},
+                    {"response_peak", diagnostic.responsePeak},
+                    {"response_psr", diagnostic.responsePsr},
+                    {"hog_weight", diagnostic.responseHogWeight},
+                    {"gray_weight", diagnostic.responseGrayWeight},
+                    {"point", QJsonArray{tracker.m_roi.x, tracker.m_roi.y}}};
+                const auto encoded = QJsonDocument(row).toJson(QJsonDocument::Compact);
+                std::printf("%s\n", encoded.constData());
+            }
+            return 0;
+        }
         if (argc != 2) { throw std::runtime_error("usage: DetectorReplay manifest.jsonl"); }
         QFile file(QString::fromLocal8Bit(argv[1]));
         if (!file.open(QIODevice::ReadOnly)) { throw std::runtime_error("cannot open manifest"); }
@@ -223,7 +280,16 @@ int main(int argc, char **argv)
                 observation.weldPointImage_px = {sim[0].toDouble(), sim[1].toDouble()};
             }
             observation.seamIndex = input.value("seam_index").toInt(-1);
+            for (const auto &value : input.value("sim_line").toArray()) {
+                const auto point = value.toArray();
+                if (point.size() != 2 || !point[0].isDouble() || !point[1].isDouble()) {
+                    throw std::runtime_error("sim_line needs numeric pixel pairs");
+                }
+                observation.laserLineImagePoints_px.push_back(
+                    {point[0].toDouble(), point[1].toDouble()});
+            }
             v::LegacyOnlineKcfOptions options;
+            options.enablePaperTracking = input.value("paper_tracking").toBool(false);
             options.enableImageMeasurementOutput = true;
             options.enableSeamRefinement = true;
             options.enableSimulationGuidance = true;
@@ -257,6 +323,10 @@ int main(int argc, char **argv)
             auto &evidenceOptions = options.evidenceOptions;
             for (auto it = policy.begin(); it != policy.end(); ++it) {
                 const auto key = it.key();
+                if (key == "enable_continuous_output" && it.value().isBool()) {
+                    evidenceOptions.enableContinuousOutput = it.value().toBool();
+                    continue;
+                }
                 if (key == "enable_mother_constraints" && it.value().isBool()) {
                     evidenceOptions.enableMotherConstraints = it.value().toBool();
                     continue;
@@ -275,6 +345,7 @@ int main(int argc, char **argv)
                     else { evidenceOptions.identityCorridorPixel = static_cast<int>(value); }
                 } else if (key == "max_prediction_ms") { evidenceOptions.maxPredictionMs = value; }
                 else if (key == "max_prediction_travel_mm") { evidenceOptions.maxPredictionTravelMm = value; }
+                else if (key == "max_continuous_step_pixel") { evidenceOptions.maxContinuousStepPixel = value; }
                 else if (key == "max_recovery_step_pixel") { evidenceOptions.recoveryMaxStepPixel = value; }
                 else if (key == "identity_min_patch_score") { evidenceOptions.identityMinPatchScore = value; }
                 else if (key == "identity_min_branch_score") { evidenceOptions.identityMinBranchScore = value; }
@@ -289,6 +360,14 @@ int main(int argc, char **argv)
             const auto result = detector.process(image, observation,
                 projection(input.value("projection").toObject()), options);
             auto row = record(input, result);
+            if (input.value("probe_bootstrap").toBool(false)) {
+                v::ActiveContourDetectionState bootstrapState;
+                const v::ActiveContourDetectionOptions bootstrapOptions;
+                const auto candidate = v::CActiveContourWeldFeatureDetector::detect(
+                    image, v::ActiveContourSeamMode::TJoint, bootstrapOptions, &bootstrapState);
+                row["bootstrap_proposal"] = pixel(
+                    {candidate.weldPoint.xPixel, candidate.weldPoint.yPixel}, candidate.valid);
+            }
             row["image_size"] = image.empty() ? QJsonValue(QJsonValue::Null)
                 : QJsonValue(QJsonArray{image.cols, image.rows});
             if (!image.empty()) {

@@ -149,7 +149,9 @@ def main():
             row['checkpoint_source_frame']=checkpoint.get('frame_id') if checkpoint else None
             row['template_retained_for_next_exposure']=row['anchor_refreshed']
             row['detector_training_policy']='temporary real detector rebuilt from reliable checkpoint; only final independent geometry promotes checkpoint'
-            row['temporary_training_discarded']=bool(raw.get('training_committed') and not row['anchor_refreshed'])
+            # Both an update and a rebuilt template mutate the temporary detector.
+            row['temporary_training_discarded']=bool((raw.get('training_committed')
+                or raw.get('template_reinitialized')) and not row['anchor_refreshed'])
             if row['anchor_refreshed']:
                 checkpoint=current
             rows.append(row)

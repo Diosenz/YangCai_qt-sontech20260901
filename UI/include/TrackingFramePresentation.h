@@ -18,6 +18,8 @@ namespace i2r_rlc::ui {
 /// @brief 与具体跟踪算法无关的完整显示快照，仅在 UI 线程组装和消费。
 struct TrackingFramePresentation {
     QImage sourceImage;
+    qint64 frameId = -1;
+    qint64 exposureTimestampMs = -1;
     QVector<QPointF> virtualLaserPoints;
     QPointF virtualWeldPoint;
     bool virtualWeldPointVisible = false;

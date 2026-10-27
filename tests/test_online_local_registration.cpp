@@ -16,6 +16,8 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDir>
+#include <QFile>
 #include <QElapsedTimer>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -1070,11 +1072,112 @@ bool testImageIndependentObservationFaults()
     return ok;
 }
 
+/** @brief 重放四批实际曝光：前三批拒绝后，11164 仅训练覆盖略不足可受限恢复。 */
+bool testArchivedSurfaceRecovery(const QString &directory)
+{
+    const auto readPoints = [](const QJsonValue &value) {
+        std::vector<loc::Point3D_mm> result;
+        for (const auto &entry : value.toArray()) {
+            const auto p = entry.toArray();
+            if (p.size() != 3) { return std::vector<loc::Point3D_mm>{}; }
+            result.push_back({p[0].toDouble(), p[1].toDouble(), p[2].toDouble()});
+        }
+        return result;
+    };
+    QTemporaryDir archive;
+    ui::COnlineLocalRegistrationWorker worker(nullptr);
+    ui::COnlineLocalRegistrationWorker::Options options;
+    options.sampleIntervalMs = options.minimumMatchIntervalMs = 0;
+    worker.configure(options);
+    bool ok = expect(archive.isValid(), "recovery replay has a writable diagnostic directory");
+    for (const int id : {10535, 10744, 10950, 11164}) {
+        QFile file(QDir(directory).filePath(QString::number(id) + QStringLiteral(".json")));
+        if (!file.open(QIODevice::ReadOnly)) { return expect(false, "recovery fixture missing"); }
+        const auto record = QJsonDocument::fromJson(file.readAll()).object();
+        ui::COnlineLocalRegistrationWorker::Result result;
+        for (const auto &entry : record.value(QStringLiteral("raw_frames")).toArray()) {
+            const auto frame = entry.toObject();
+            const auto independent = frame.value(QStringLiteral("independent")).toObject();
+            ui::COnlineLocalRegistrationWorker::CloudValidationContext validation;
+            validation.archiveDirectory = archive.path();
+            validation.hasVerifiedWorkpiecePose = true;
+            validation.workpiecePoseRevision = 16;
+            validation.evidenceContext = frame.value(QStringLiteral("evidence_context")).toObject();
+            validation.independentObservation.valid = independent.value(QStringLiteral("valid")).toBool();
+            validation.independentObservation.frameId = independent.value(QStringLiteral("frame_id")).toString().toLongLong();
+            const auto realWeld = independent.value(QStringLiteral("real_weld_parent_mm")).toArray();
+            const auto virtualWeld = independent.value(QStringLiteral("virtual_weld_parent_mm")).toArray();
+            if (realWeld.size() == 3 && virtualWeld.size() == 3) {
+                validation.independentObservation.realWeldPointInParent_mm = {
+                    realWeld[0].toDouble(), realWeld[1].toDouble(), realWeld[2].toDouble()};
+                validation.independentObservation.virtualWeldPointInParent_mm = {
+                    virtualWeld[0].toDouble(), virtualWeld[1].toDouble(), virtualWeld[2].toDouble()};
+            }
+            result = worker.processClouds(800, 1,
+                frame.value(QStringLiteral("frame_id")).toString().toLongLong(),
+                readPoints(frame.value(QStringLiteral("raw_real_parent_mm"))),
+                readPoints(frame.value(QStringLiteral("raw_virtual_parent_mm"))), validation);
+        }
+        std::printf("recovery worker frame=%d attempted=%d accepted=%d prior_rejections=%d recovery=%d message=%s\n",
+            id, result.attempted, result.accepted, result.precedingSurfaceRejections,
+            result.surfaceValidation.trainingCoverageRecoveryUsed, result.message.toUtf8().constData());
+        ok &= expect(result.attempted && result.archiveSucceeded, "actual worker attempts and archives every full batch");
+        if (id == 11164) {
+            ok &= expect(result.accepted && result.surfaceValidation.trainingCoverageRecoveryUsed
+                && result.precedingSurfaceRejections >= 2,
+                "actual worker must release the improving archived candidate after repeated rejections");
+        } else {
+            ok &= expect(!result.accepted, "earlier bad candidates remain rejected during recovery");
+        }
+        if (id == 10535) {
+            ok &= expect(result.rejectionReasons.size() >= 2
+                && result.message.contains(QStringLiteral("表面验收"))
+                && result.message.contains(QStringLiteral("真实焊点")),
+                "weld veto must retain earlier surface rejection diagnostics");
+        }
+    }
+    // 完全退化的新批次不得放行；下一次改为积累更宽的新曝光窗口。
+    std::vector<loc::Point3D_mm> line;
+    for (int i = 0; i < 40; ++i) { line.push_back({i * 0.5, 0.0, 0.0}); }
+    ui::COnlineLocalRegistrationWorker::CloudValidationContext validation;
+    validation.archiveDirectory = archive.path();
+    validation.hasVerifiedWorkpiecePose = true;
+    validation.workpiecePoseRevision = 16;
+    ui::COnlineLocalRegistrationWorker::Result bad;
+    for (int i = 1; i <= 8; ++i) { bad = worker.processClouds(800, 1, 12000 + i, line, line, validation); }
+    ok &= expect(bad.attempted && !bad.accepted && bad.precedingSurfaceRejections == 0,
+        "accepted candidate resets rejection history before next degenerate window");
+    for (int i = 9; i < 20; ++i) {
+        bad = worker.processClouds(800, 1, 12000 + i, line, line, validation);
+        ok &= expect(!bad.attempted, "degenerate recovery waits for twelve entirely new exposures");
+    }
+    bad = worker.processClouds(800, 1, 12020, line, line, validation);
+    ok &= expect(bad.attempted && bad.frameCount == 12 && !bad.accepted,
+        "wider window still rejects unobservable geometry");
+    // 更换位姿、模型代次或会话均恢复为八帧初始窗，不能继承旧拒绝历史。
+    const auto checkBoundary = [&](quint64 session, quint64 generation, qint64 firstFrame) {
+        for (int i = 0; i < 8; ++i) {
+            bad = worker.processClouds(session, generation, firstFrame + i, line, line, validation);
+        }
+        return expect(bad.attempted && !bad.accepted && bad.frameCount == 8
+            && bad.precedingSurfaceRejections == 0,
+            "pose/session/generation boundary resets rejection history and enlarged window");
+    };
+    validation.workpiecePoseRevision = 17;
+    ok &= checkBoundary(800, 1, 13000);
+    ok &= checkBoundary(800, 2, 14000);
+    ok &= checkBoundary(801, 2, 15000);
+    return ok;
+}
+
 } // namespace
 
 int main(int argc, char **argv)
 {
     QCoreApplication application(argc, argv);
+    if (argc == 3 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--recovery-fixtures")) {
+        return testArchivedSurfaceRecovery(QString::fromLocal8Bit(argv[2])) ? 0 : 1;
+    }
     std::cerr << "RUN: testRuntimeStartupConfiguration\n";
     bool ok = testRuntimeStartupConfiguration();
     std::cerr << "RUN: testRuntimeHotProcessingOptions\n";

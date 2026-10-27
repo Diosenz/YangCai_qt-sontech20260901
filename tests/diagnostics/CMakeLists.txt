@@ -5,6 +5,7 @@ endif()
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(Eigen3 CONFIG REQUIRED)
+find_package(tinysplinecxx CONFIG REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs)
 
 set(replay_dir "${CMAKE_CURRENT_SOURCE_DIR}/online_detector_replay")
@@ -28,6 +29,9 @@ foreach(name IN ITEMS
     track/LegacyOnlineKcfDetector track/KcfTracker track/KcfFhog track/KcfFftTools
     track/KcfRectTools track/FilterKalman track/OnlineSeamContinuity track/OnlineSeamEvidence
     feature/OnlineSeamRefiner feature/SimulationGuidedSeamEstimator
+    feature/ActiveContourWeldFeatureDetector feature/ContourControlPointTools
+    geometry/LineGeometryTools stripe/ActiveContourStripeExtractor
+    stripe/LaserLineResponseTools stripe/WeldSkeletonFeatureTools
     geometry/WeldImageToSpaceProjector preprocess/ImageDenoise
     stripe/DpStripeCenterlineDetector stripe/SubpixelCenterlineTools)
     list(APPEND detector_sources "${vision_dir}/src/${name}.cpp")
@@ -35,6 +39,7 @@ endforeach()
 i2r_rlc_add_replay(i2r_rlc_kcf_detector_replay DetectorReplay
     "${replay_dir}/DetectorReplay.cpp" "${replay_dir}/GapDisabledAdapter.cpp"
     "${vision_dir}/third_party/libicp/matrix.cpp" ${detector_sources})
+target_link_libraries(i2r_rlc_kcf_detector_replay PRIVATE tinysplinecxx::tinysplinecxx)
 i2r_rlc_add_replay(i2r_rlc_kcf_identity_evidence IdentityEvidence "${replay_dir}/IdentityEvidence.cpp")
 i2r_rlc_add_replay(i2r_rlc_kcf_mother_observation MotherObservation "${replay_dir}/MotherObservation.cpp")
 i2r_rlc_add_replay(i2r_rlc_kcf_refiner_replay RefinerReplay
@@ -53,6 +58,9 @@ i2r_rlc_add_replay(i2r_rlc_kcf_control_replay ControlReplay
     "${PROJECT_SOURCE_DIR}/Control/src/OnlineCorrectionExceptionProcessor.cpp"
     "${vision_dir}/src/geometry/PositionerKinematics.cpp"
     "${vision_dir}/src/geometry/IcpRegistrationMatcher.cpp" ${icp_sources})
+# libicp 的公开头直接使用 Boost；独立回放不能借生产库间接获得头文件路径。
+find_package(Boost REQUIRED)
+target_link_libraries(i2r_rlc_kcf_control_replay PRIVATE Boost::headers)
 set(image_targets i2r_rlc_kcf_detector_replay i2r_rlc_kcf_identity_evidence
     i2r_rlc_kcf_mother_observation i2r_rlc_kcf_refiner_replay)
 foreach(target_name IN LISTS image_targets)
@@ -65,6 +73,7 @@ set(replay_targets ${image_targets} i2r_rlc_kcf_surface_replay i2r_rlc_kcf_contr
 set(source_files)
 set(binary_entries)
 set(runtime_entries "\"$<TARGET_FILE_DIR:Qt${QT_VERSION_MAJOR}::Core>\"")
+list(APPEND runtime_entries "\"$<TARGET_FILE_DIR:tinysplinecxx::tinysplinecxx>\"")
 foreach(target_name IN LISTS replay_targets)
     get_target_property(target_sources ${target_name} SOURCES)
     list(APPEND source_files ${target_sources})

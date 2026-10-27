@@ -21,6 +21,14 @@ class ProductionPolicyTests(unittest.TestCase):
             pixels = bytes(225 if abs(y - (260 - .45 * abs(x - 360 - shift))) < 1.5
                            else 14 for y in range(480) for x in range(640))
             (folder / (name + '.pgm')).write_bytes(b'P5\n640 480\n255\n' + pixels)
+        competing = bytes(225 if min(abs(y - (260 - .45 * abs(x - 360))),
+                            abs(y - (280 - .45 * abs(x - 360)))) < 1.5
+                          else 14 for y in range(480) for x in range(640))
+        tack = bytes(225 if abs(y - (260 - .45 * abs(x-360)
+                         - (12 if abs(x-360) < 18 else 0))) < 1.5
+                     else 14 for y in range(480) for x in range(640))
+        (folder/'tack.pgm').write_bytes(b'P5\n640 480\n255\n' + tack)
+        (folder/'competing.pgm').write_bytes(b'P5\n640 480\n255\n' + competing)
         (folder/'blank.pgm').write_bytes(b'P5\n640 480\n255\n'+bytes([14])*640*480)
         for name in ['hidden_center', 'single_side']:
             pixels = bytes(225 if abs(y - (260 - .45 * abs(x - 360))) < 1.5
@@ -125,9 +133,12 @@ class ProductionPolicyTests(unittest.TestCase):
         self.assertTrue(rows[2]['control_eligible'])
 
     def test_hidden_center_and_single_side_remain_partial_estimates(self):
-        rows = self.run_frames([self.continuation(1), self.continuation(2),
+        frames = [self.continuation(1), self.continuation(2),
             self.continuation(3, image='hidden_center.pgm'),
-            self.continuation(4, image='single_side.pgm')])
+            self.continuation(4, image='single_side.pgm')]
+        for frame in frames:
+            frame['evidence_options'] = {'enable_mother_constraints': True}
+        rows = self.run_frames(frames)
         for row, rank in zip(rows[2:], [2, 1]):
             self.assertTrue(row['available'])
             self.assertEqual(row['source'], 'mother_material_estimate')
@@ -141,6 +152,88 @@ class ProductionPolicyTests(unittest.TestCase):
         rows=self.run_frames([{'bounded_search':True} for _ in range(160)])
         self.assertTrue(any(row['control_eligible'] for row in rows))
         self.assertTrue(all(row['refinement_calls'] <= 2 for row in rows))
+
+    def test_bounded_search_does_not_release_duplicate_blank_or_bad_projection(self):
+        prefix = [{'bounded_search': True, 'sim_point': [360, 260]} for _ in range(8)]
+        rows = self.run_frames(prefix + [
+            {'bounded_search': True, 'frame_id': 8},
+            {'bounded_search': True, 'image': 'blank.pgm'},
+            {'bounded_search': True, 'projection': None}])
+        self.assertTrue(rows[7]['control_eligible'])
+        for row in rows[8:]:
+            self.assertFalse(row.get('control_eligible', False))
+            self.assertFalse(row.get('training_committed', False))
+        self.assertTrue(all(row.get('refinement_calls', 0) <= 2 for row in rows))
+
+    def test_bounded_search_rejects_competing_stripes(self):
+        rows = self.run_frames([{'bounded_search': True, 'sim_point': [360, 260],
+                                 'image': 'competing.pgm'} for _ in range(16)])
+        self.assertFalse(any(row['control_eligible'] for row in rows))
+        self.assertFalse(any(row['training_committed'] for row in rows))
+        self.assertTrue(all(row['refinement_calls'] <= 2 for row in rows))
+
+    def test_continuous_kcf_crosses_tack_without_following_its_protrusion(self):
+        frames = [{'image': name, 'bounded_search': True,
+                   'evidence_options': {'enable_continuous_output': True}}
+                  for name in ['visible.pgm'] * 5 + ['tack.pgm'] * 12 + ['visible.pgm'] * 4]
+        rows = self.run_frames(frames)
+        self.assertTrue(rows[4]['control_eligible'])
+        for row in rows[5:]:
+            self.assertTrue(row['available'] and row['control_eligible'])
+            self.assertLess(abs(row['final_pixel'][0] - 360), 6)
+            self.assertLess(abs(row['final_pixel'][1] - 260), 6)
+        self.assertTrue(rows[-1]['can_independent_validate'])
+
+    def test_continuous_reference_motion_is_relative_and_revision_jump_is_ignored(self):
+        frames = []
+        for index, (x, revision) in enumerate([(360,1),(360,1),(366,1),(600,1),(800,2),(801,2)]):
+            frames.append({'image': 'visible.pgm' if index < 2 else 'blank.pgm',
+                'reference_revision': revision, 'reference_point_at_exposure': [x,260],
+                'reference_exposure_frame_id': index+1,
+                'evidence_options': {'enable_continuous_output': True}})
+        rows = self.run_frames(frames)
+        self.assertAlmostEqual(rows[2]['final_pixel'][0] - rows[1]['final_pixel'][0], 6, delta=.1)
+        self.assertAlmostEqual(rows[3]['final_pixel'][0], rows[2]['final_pixel'][0], delta=.1)
+        self.assertAlmostEqual(rows[4]['final_pixel'][0], rows[3]['final_pixel'][0], delta=.1)
+        self.assertAlmostEqual(rows[5]['final_pixel'][0] - rows[4]['final_pixel'][0], 1, delta=.1)
+        for row in rows[2:]:
+            self.assertTrue(row['control_eligible'])
+            self.assertFalse(row['can_independent_validate'])
+            self.assertEqual(row['anchor_frame_id'], 2)
+            self.assertFalse(row['training_committed'])
+
+    def test_continuation_drift_cannot_block_visible_geometry_recovery(self):
+        frames=[]
+        for index in range(12):
+            x = 360 if index < 2 else 360+20*min(index-1,4)
+            frames.append({'image': 'blank.pgm' if 2 <= index < 6 else 'visible.pgm',
+                'reference_revision': 1 if index < 6 else 2,
+                'reference_point_at_exposure': [x,260],
+                'reference_exposure_frame_id': index+1,
+                'evidence_options': {'enable_continuous_output': True}})
+        rows=self.run_frames(frames)
+        self.assertTrue(all(r['available'] for r in rows[1:]))
+        self.assertEqual(rows[-1]['source'], 'geometry',
+                         'continuation feedback must not lock out original image identity')
+        self.assertLess(abs(rows[-1]['final_pixel'][0]-360),2)
+
+    def test_reference_compensated_motion_keeps_established_identity(self):
+        rows = self.run_frames([{'evidence_options': {'identity_corridor_pixel': 12},
+            'reference_revision': 1, 'reference_point_at_exposure': [360 + shift, 260],
+            'reference_exposure_frame_id': index + 1,
+            'image': 'far.pgm' if shift else 'visible.pgm'}
+            for index, shift in enumerate([0, 0, 30, 30])])
+        self.assertTrue(rows[1]['control_eligible'])
+        self.assertTrue(rows[2]['control_eligible'], 'normal compensated motion must not restart anchor confirmation')
+        self.assertTrue(rows[3]['control_eligible'])
+
+    def test_bad_reference_cannot_veto_supported_historical_identity(self):
+        rows = self.run_frames([{'reference_revision': 1,
+            'reference_point_at_exposure': [360 if index < 2 else 600, 260],
+            'reference_exposure_frame_id': index + 1} for index in range(4)])
+        self.assertTrue(rows[1]['control_eligible'])
+        self.assertTrue(rows[2]['control_eligible'], 'bad reference must not lock out unchanged raw geometry')
+        self.assertAlmostEqual(rows[2]['final_pixel'][0], 360, delta=2)
 
     def test_missing_reference_never_outputs_unanchored_prediction(self):
         rows=self.run_frames([self.continuation(1),self.continuation(2),

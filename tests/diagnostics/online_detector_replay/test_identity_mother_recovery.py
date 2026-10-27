@@ -47,7 +47,9 @@ class CombinedIdentityTests(unittest.TestCase):
             config_override=combined({}))
         rejected=rows[2]
         self.assertEqual(rejected['raw_detector']['source'],'geometry')
-        self.assertTrue(rejected['raw_detector']['training_committed'])
+        self.assertTrue(rejected['raw_detector']['training_committed']
+                        or rejected['raw_detector']['template_reinitialized'],
+                        'test must exercise a real temporary template mutation before rollback')
         self.assertTrue(rejected['temporary_training_discarded'])
         self.assertFalse(rejected['template_retained_for_next_exposure'])
         self.assertEqual(rejected['checkpoint_source_frame'],2)

@@ -219,16 +219,20 @@ private:
     void onRobotSimRealSceneConnectionRequested(int port);
     void onStopRequested();
     void handleFrameReady(const i2r_rlc::camera::CameraFrame& frame);
-    void handleRuntimeFrameReady(const i2r_rlc::camera::CameraFrame& frame);
+    /// @brief UI 线程消费运行时曝光；实时预览不复用旧检测叠加。
+    Q_SLOT void handleRuntimeFrameReady(const i2r_rlc::camera::CameraFrame& frame);
     void showFrameWithCalibrationGuide(const i2r_rlc::camera::CameraFrame& frame);
     void showCalibrationCaptureUpdate(const i2r_rlc::control::CalibrationCaptureUpdate& update);
     void showOfflineCorrectionUpdate(const i2r_rlc::control::OfflineCorrectionUpdate& update);
     void renderOfflineCorrectionState();
     /// @brief UI 边界接收在线业务快照；保留业务状态并忽略无变化的轮询心跳。
     Q_SLOT void showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorrectionUpdate& update);
+    /// @brief 呈现锁存的作业 HOLD；反馈不代表停弧或机械零速，普通清理不得覆盖。
+    Q_SLOT void showOnlineOperationStop(const robot_comm::RobotOperationStopState &state);
     void showTeachTrajectoryRecorderUpdate(
         const i2r_rlc::control::TeachTrajectoryRecorderSnapshot& snapshot);
-    void showRuntimeTrackingResult(const i2r_rlc::ui::RuntimeTrackingResult& result);
+    /// @brief UI 线程消费同会话同曝光检测快照，拒绝混用最新相机图像。
+    Q_SLOT void showRuntimeTrackingResult(const i2r_rlc::ui::RuntimeTrackingResult& result);
     /// @brief 校验完整帧上下文后，一次提交原图、仿真参考和真实检测点；不回退到最新帧。
     bool presentCorrectionFrame(const RuntimeTrackingResult& result);
     /// @brief 清除检测快照的叠加和帧标识，恢复无检测标记的相机预览。
@@ -312,6 +316,9 @@ private:
     std::optional<RuntimeTrackingResult> m_onlineControlDisplayFrame;
     qint64 m_lastFrameId = -1;
     bool m_hasLatestFrame = false;
+    /// @brief 当前在线会话是否尚未完成/终止；历史 sessionId 不授予停止权限。
+    bool m_onlineOperationActive = false;
+    bool m_onlineOperationStopLatched = false;
     bool m_onlineCorrectionConfigured = false;
     bool m_offlineCorrectionConfigured = false;
     i2r_rlc::control::OnlineCorrectionStartMode m_onlineCorrectionStartMode =

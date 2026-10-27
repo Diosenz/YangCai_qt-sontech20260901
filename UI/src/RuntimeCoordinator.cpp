@@ -611,6 +611,14 @@ void CRuntimeCoordinator::startOnlineTracking()
         return;
     }
 
+    if (m_onlineOperationHoldLatched) {
+        const QString message = QStringLiteral(
+            "作业 HOLD 已锁存，请先人工确认并处理控制柜保持后重新启动；停弧未验证。");
+        emit onlineCorrectionStartFailed(message);
+        emit statusMessage(message);
+        return;
+    }
+
     beginCorrectionSession(CorrectionPurpose::OnlineCorrection);
     QMetaObject::invokeMethod(
         m_onlineCorrectionWorker,
@@ -622,6 +630,13 @@ void CRuntimeCoordinator::startOnlineCorrectionJob(
     const RuntimeOnlineCorrectionConfiguration &configuration,
     const std::string &jobName)
 {
+    if (m_onlineOperationHoldLatched) {
+        const QString message = QStringLiteral(
+            "作业 HOLD 已锁存，请先人工确认并处理控制柜保持后重新启动；停弧未验证。");
+        emit onlineCorrectionStartFailed(message);
+        emit statusMessage(message);
+        return;
+    }
     cancelOnlineCorrectionStart();
     m_pendingOnlineCorrectionConfiguration = configuration;
     if (!m_pendingOnlineCorrectionConfiguration.positionerCalibrationSnapshot.has_value()) {
@@ -1235,9 +1250,9 @@ void CRuntimeCoordinator::stopOnlineTracking()
     if (m_visionWorker != nullptr) {
         QMetaObject::invokeMethod(m_visionWorker, "stopTracking", Qt::QueuedConnection);
     }
-    if (m_onlineCorrectionWorker != nullptr) {
-        // 用户停止属于完整会话边界。重置控制器后可立即建立新的 session，
-        // 同时保留已经配置好的轨迹和标定数据。
+    if (m_onlineCorrectionWorker != nullptr && !m_onlineOperationHoldLatched) {
+        // 普通检测停止可重置控制会话；已进入作业保持时，报告由 HOLD
+        // 反馈或运行时退出结束，收起面板不能提前关闭它。
         QMetaObject::invokeMethod(
             m_onlineCorrectionWorker,
             "reset",
@@ -1250,6 +1265,25 @@ void CRuntimeCoordinator::stopOnlineTracking()
                 worker->setTrackingRequested(false);
             },
             Qt::QueuedConnection);
+    }
+}
+
+void CRuntimeCoordinator::requestOnlineOperationStop()
+{
+    m_onlineOperationHoldLatched = true;
+    // 作业停止撤销所有检测关联，但记录器须保留到真实 HOLD 回执归档。
+    clearOnlineCorrectionStart();
+    invalidateCorrectionSession(QStringLiteral("已请求作业 HOLD，等待控制器反馈。"));
+    if (m_visionWorker != nullptr) {
+        QMetaObject::invokeMethod(m_visionWorker, "stopTracking", Qt::QueuedConnection);
+    }
+    if (m_onlineCorrectionWorker != nullptr) {
+        QMetaObject::invokeMethod(m_onlineCorrectionWorker, "stopForOperation", Qt::QueuedConnection);
+    }
+    if (m_robotWorker != nullptr) {
+        // 只发布原子意图，不能等待机器人线程完成整批 O 后才收到停止。
+        m_robotWorker->publishControlledHoldIntent();
+        QMetaObject::invokeMethod(m_robotWorker, "requestControlledHold", Qt::QueuedConnection);
     }
 }
 
@@ -1386,6 +1420,8 @@ void CRuntimeCoordinator::registerMetaTypes()
         "i2r_rlc::robot_comm::RobotJobStartCommand");
     qRegisterMetaType<robot_comm::RobotCommandReceipt>(
         "i2r_rlc::robot_comm::RobotCommandReceipt");
+    qRegisterMetaType<robot_comm::RobotOperationStopState>(
+        "i2r_rlc::robot_comm::RobotOperationStopState");
     qRegisterMetaType<robot_comm::RobotCommunicationDiagnostics>(
         "i2r_rlc::robot_comm::RobotCommunicationDiagnostics");
     qRegisterMetaType<control::OnlineCorrectionUpdate>(
@@ -1428,6 +1464,14 @@ void CRuntimeCoordinator::registerMetaTypes()
 
 void CRuntimeCoordinator::connectWorkers()
 {
+    connect(m_onlineCorrectionWorker, &COnlineCorrectionWorkerAdapter::operationStopRequested,
+        this, [this](quint64 sessionId, const QString &reason) {
+            if (!m_running || m_stopping || !m_correctionSession.active
+                || sessionId != m_correctionSession.sessionId
+                || m_correctionSession.purpose != CorrectionPurpose::OnlineCorrection) { return; }
+            emit statusMessage(reason);
+            requestOnlineOperationStop();
+        }, Qt::QueuedConnection);
     connect(m_cameraWorker, &CCameraWorkerAdapter::frameReady,
             this, &CRuntimeCoordinator::handleCameraFrame,
             Qt::QueuedConnection);
@@ -1453,6 +1497,11 @@ void CRuntimeCoordinator::connectWorkers()
             this, &CRuntimeCoordinator::statusMessage);
     connect(m_robotWorker, &CRobotCommWorkerAdapter::diagnosticsReady,
             this, &CRuntimeCoordinator::robotDiagnosticsReady);
+    connect(m_robotWorker, &CRobotCommWorkerAdapter::operationStopUpdated,
+            this, &CRuntimeCoordinator::onlineOperationStopUpdated);
+    connect(m_robotWorker, &CRobotCommWorkerAdapter::operationStopUpdated,
+            m_onlineCorrectionWorker, &COnlineCorrectionWorkerAdapter::recordOperationStop,
+            Qt::QueuedConnection);
     connect(m_robotWorker, &CRobotCommWorkerAdapter::commandReceiptReady,
             m_onlineCorrectionWorker,
             &COnlineCorrectionWorkerAdapter::handleRobotCommandReceipt,
@@ -1593,6 +1642,19 @@ void CRuntimeCoordinator::connectWorkers()
             const quint64 targetSessionId = update.state.controlTarget.sessionId;
             if (targetSessionId != 0 && (!m_correctionSession.active
                     || targetSessionId != m_correctionSession.sessionId)) {
+                return;
+            }
+            if (update.requestOperationStop) {
+                // 严重失测必须在 Error 的普通会话失效路径前锁存 HOLD。
+                // 拒绝无身份或旧会话请求，防止迟到反馈停止新的作业。
+                if (m_running && !m_stopping && m_correctionSession.active
+                    && targetSessionId == m_correctionSession.sessionId
+                    && targetSessionId != 0
+                    && m_correctionSession.purpose == CorrectionPurpose::OnlineCorrection) {
+                    emit onlineCorrectionUpdated(update);
+                    emit statusMessage(QString::fromStdString(update.message));
+                    requestOnlineOperationStop();
+                }
                 return;
             }
             if (m_correctionSession.active
@@ -2800,6 +2862,15 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
             current.frame, synchronizedObservation.value()};
     }
     emit trackingResultReady(displayResult);
+    // UI 可在公开结果回调中立即停止并重新启动。发出信号前的校验不能
+    // 授权回调之后的路由，否则旧样本会排在新会话的控制初始化之后。
+    if (isCorrection
+        && (!m_correctionSession.active
+            || current.correctionSessionId != m_correctionSession.sessionId
+            || result.correlation.purpose != m_correctionSession.purpose)) {
+        dispatchPendingVisionFrame();
+        return;
+    }
     if (m_robotWorker != nullptr) {
         QMetaObject::invokeMethod(
             m_robotWorker,

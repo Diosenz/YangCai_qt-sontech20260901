@@ -1,0 +1,20 @@
+{
+  "scope": "Unaltered real field exposures; sparse history contrast, NOT full continuous preweld replay. Simulation polylines missing. Explicit borrowed frame-3377 projection is pixel-only, never spatial/TCP accuracy.",
+  "images": {
+    "frame_1987.png": {
+      "original_path": "output/online_correction/20261027_141721_266/vision_images/sample_44_session_1_frame_1987_source.png",
+      "sha256": "25b7dad85bbf6aff4b9fecd6c1b5707f8005e4478b586fcf210fc2142a9c7077"
+    },
+    "frame_4727.png": {
+      "original_path": "output/online_correction/20261027_141721_266/vision_images/sample_164_session_1_frame_4727_source.png",
+      "sha256": "69cb19670b51ded6da7d882de51368529c6371fe8c7b49a3fcb3ada49c381a56"
+    }
+  },
+  "manual_corner_px": {
+    "4727": [
+      614,
+      569
+    ]
+  },
+  "symptom_tolerance_px": 20
+}

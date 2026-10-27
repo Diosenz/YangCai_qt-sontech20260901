@@ -1,0 +1,70 @@
+[
+  {
+    "gray_weight": 0.10011330246925354,
+    "hog_weight": 0.9002259373664856,
+    "iteration": 0,
+    "point": [
+      425.0000305175781,
+      484.99993896484375
+    ],
+    "processing_ms": 635.2143,
+    "response_peak": 0.9995774030685425,
+    "response_psr": 6.775516146971688,
+    "scope": "Public tracker benchmark; captured real image also substitutes reference appearance; not field simulation truth.",
+    "templates": 1,
+    "threads": 17,
+    "training_committed": true,
+    "training_ms": 533.0383
+  },
+  {
+    "gray_weight": 0.10022614151239395,
+    "hog_weight": 0.9004608392715454,
+    "iteration": 1,
+    "point": [
+      425.0001220703125,
+      484.99993896484375
+    ],
+    "processing_ms": 632.8714,
+    "response_peak": 0.9995864033699036,
+    "response_psr": 6.7755311665452735,
+    "scope": "Public tracker benchmark; captured real image also substitutes reference appearance; not field simulation truth.",
+    "templates": 3,
+    "threads": 17,
+    "training_committed": true,
+    "training_ms": 531.1236
+  },
+  {
+    "gray_weight": 0.10034162551164627,
+    "hog_weight": 0.9006454348564148,
+    "iteration": 2,
+    "point": [
+      425.00018310546875,
+      484.99993896484375
+    ],
+    "processing_ms": 448.4037,
+    "response_peak": 0.9995808005332947,
+    "response_psr": 6.775507482008765,
+    "scope": "Public tracker benchmark; captured real image also substitutes reference appearance; not field simulation truth.",
+    "templates": 3,
+    "threads": 17,
+    "training_committed": true,
+    "training_ms": 348.0083
+  },
+  {
+    "gray_weight": 0.10038847476243973,
+    "hog_weight": 0.9007067084312439,
+    "iteration": 3,
+    "point": [
+      425.0002136230469,
+      485.0000305175781
+    ],
+    "processing_ms": 360.8018,
+    "response_peak": 0.9995731115341187,
+    "response_psr": 6.775513085678088,
+    "scope": "Public tracker benchmark; captured real image also substitutes reference appearance; not field simulation truth.",
+    "templates": 3,
+    "threads": 17,
+    "training_committed": true,
+    "training_ms": 260.6118
+  }
+]

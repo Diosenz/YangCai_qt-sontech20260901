@@ -13,12 +13,36 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 namespace i2r_rlc::ui {
 
 namespace {
 
 constexpr auto kVisionDiagnosticFileName = "vision_diagnostics.tsv";
+
+/** @brief 本地来源只描述上位机因果；缺失不以最新目标补造。 */
+QJsonValue sessionCommandTrace(const std::optional<robot_comm::RobotLocalCommandTrace> &trace)
+{
+    if (!trace.has_value()) { return QJsonValue(QJsonValue::Null); }
+    return QJsonObject{
+        {QStringLiteral("session_id"), QString::number(trace->sessionId)},
+        {QStringLiteral("command_id"), QString::number(trace->commandId)},
+        {QStringLiteral("target_generation"), trace->targetGeneration.has_value()
+            ? QJsonValue(QString::number(*trace->targetGeneration)) : QJsonValue(QJsonValue::Null)}};
+}
+
+/** @brief 原始曝光关联；缺失即 null，不从记录到达顺序推导因果。 */
+QJsonValue sessionExposure(const std::optional<control::OnlineCorrectionExposureIdentity> &identity)
+{
+    if (!identity.has_value()) { return QJsonValue(QJsonValue::Null); }
+    return QJsonObject{
+        {QStringLiteral("session_id"), QString::number(identity->sessionId)},
+        {QStringLiteral("frame_id"), QString::number(identity->frameId)},
+        {QStringLiteral("reference_revision"), QString::number(identity->referenceRevision)}};
+}
 constexpr auto kSummaryFileName = "session_summary.txt";
 constexpr auto kInitialCorrectionFileName = "initial_correction.txt";
 constexpr auto kRealtimeCorrectionFileName = "realtime_correction.txt";
@@ -26,6 +50,28 @@ constexpr auto kActualRobotPathFileName = "actual_robot_path.txt";
 constexpr auto kIcpBatchesFileName = "online_icp_batches.txt";
 constexpr auto kIcpPointsFileName = "online_icp_points.txt";
 constexpr auto kFollowTargetsFileName = "online_follow_targets.txt";
+constexpr auto kSessionEventsFileName = "unified_session.jsonl";
+
+/** @brief 记录点的真实有效标志；无效坐标不写成零值真值。 */
+QJsonValue sessionPoint(const control::OnlineCorrectionPoint &point)
+{
+    if (!point.valid) { return QJsonValue(QJsonValue::Null); }
+    return QJsonArray{point.xMm, point.yMm, point.zMm};
+}
+
+/** @brief 工程单位的机器人反馈，不把接收时间当成控制柜曝光时钟。 */
+QJsonObject sessionRobotState(const robot_comm::RobotState &state)
+{
+    return QJsonObject{
+        {QStringLiteral("tcp_mm"), QJsonArray{state.curx_r / 1000.0,
+            state.cury_r / 1000.0, state.curz_r / 1000.0}},
+        {QStringLiteral("rotation_deg"), QJsonArray{state.curRx_r / 10000.0,
+            state.curRy_r / 10000.0, state.curRz_r / 10000.0}},
+        {QStringLiteral("station_deg"), QJsonArray{state.curS1 / 10000.0, state.curS2 / 10000.0}},
+        {QStringLiteral("s_start"), state.sStart}, {QStringLiteral("s_hold"), state.sHold},
+        {QStringLiteral("traflag"), state.traflag}, {QStringLiteral("corflag"), state.corflag},
+        {QStringLiteral("detflag"), state.detflag}};
+}
 
 QString timestampText()
 {
@@ -147,6 +193,13 @@ bool COnlineCorrectionRunRecorder::beginSession(
         return false;
     }
     m_imageWriter.reset();
+    m_lossImageWriter.reset();
+    m_lossHistory.clear();
+    m_lossTriggered = {};
+    m_lossSeenValid = {};
+    m_lossStage = -1;
+    m_lossRejected = m_lossPostRemaining = 0;
+    m_lossTriggerFrame = m_lossLastFrame = -1;
     m_visionDiagnosticOptions = configuration.visionDiagnostics;
     m_visionDiagnosticCount = 0;
     m_imageSubmissionCount = 0;
@@ -163,6 +216,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
     m_realtimeCommandCount = 0;
     m_receiptCount = 0;
     m_updateCount = 0;
+    m_sessionEventCount = 0;
     m_icpBatchCount = 0;
 
     if (outputRootDirectory.trimmed().isEmpty()) {
@@ -262,6 +316,11 @@ bool COnlineCorrectionRunRecorder::beginSession(
         }
         return false;
     }
+    if (m_visionDiagnosticOptions.enabled
+        && !createSessionFile(QString::fromLatin1(kSessionEventsFileName), {})) {
+        if (errorMessage != nullptr) { *errorMessage = m_lastError; }
+        return false;
+    }
 
     if (m_visionDiagnosticOptions.enabled) {
         if (!createSessionFile(QString::fromLatin1(kVisionDiagnosticFileName), QStringLiteral(
@@ -295,7 +354,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
         "image_measurement_output_enabled\timage_observation_accepted\timage_search_expanded\t"
         "evidence_policy_enabled\tkcf_pixel_available\tcontrol_eligible\tevidence_fresh_exposure\t"
         "evidence_anchor_frame\tevidence_anchor_refreshed\tevidence_confirmation_count\t"
-        "evidence_mother_rank\tevidence_identity_score\tevidence_elapsed_ms\tevidence_travel_mm\tevidence_message\n"))) {
+        "evidence_mother_rank\tevidence_identity_score\tevidence_elapsed_ms\tevidence_travel_mm\tevidence_message\tdebug_kcf_20261026_gates\n"))) {
             if (errorMessage != nullptr) *errorMessage = m_lastError;
             return false;
         }
@@ -315,6 +374,20 @@ bool COnlineCorrectionRunRecorder::beginSession(
                 m_imageWriter = std::make_unique<CTrackingDiagnosticImageWriter>(
                     QDir(m_sessionDirectory).filePath(QStringLiteral("vision_images")),
                     m_visionDiagnosticOptions.maxImageBytes);
+                if (m_visionDiagnosticOptions.lossWindowEnabled) {
+                    const QString lossDirectory = QDir(m_sessionDirectory).filePath(QStringLiteral("loss_window_images"));
+                    if (!QDir().mkpath(lossDirectory)
+                        || !createSessionFile(QStringLiteral("loss_window_images/image_manifest.tsv"),
+                            QStringLiteral("stem\tstatus\tencoded_bytes\n"))
+                        || !createSessionFile(QStringLiteral("loss_window_context.jsonl"), {})
+                        || !createSessionFile(QStringLiteral("loss_window_index.tsv"),
+                            QStringLiteral("debug_tag\ttrigger_frame\tframe_id\trole\trequest_status\tsource_image\n"))) {
+                        if (errorMessage != nullptr) *errorMessage = m_lastError;
+                        return false;
+                    }
+                    m_lossImageWriter = std::make_unique<CTrackingDiagnosticImageWriter>(
+                        lossDirectory, 64LL * 1024 * 1024, 32);
+                }
             } catch (const std::exception &exception) {
                 m_lastError = QStringLiteral("无法启动诊断图像写入线程：%1")
                     .arg(QString::fromUtf8(exception.what()));
@@ -328,8 +401,10 @@ bool COnlineCorrectionRunRecorder::beginSession(
     m_active = true;
     const bool summaryWritten =
         appendSummary(QStringLiteral("session_state"), QStringLiteral("running"))
-        && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("8"))
-        && appendSummary(QStringLiteral("kcf_policy"), QStringLiteral("production_cpp_evidence_v1; measured_only_control; continuation_requires_explicit_time_and_workpiece_arc_budgets"))
+        && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("9"))
+        && appendSummary(QStringLiteral("debug_kcf_20261026_loss_window"),
+            m_lossImageWriter ? QStringLiteral("pre=6;post=8;once_per_initial_and_online_stage;never_acquired_after_8_rejections;raw_history=16MiB;disk=64MiB;queue=32;processed_exposures_only;control_snapshot_at_result_receipt") : QStringLiteral("disabled"))
+        && appendSummary(QStringLiteral("kcf_policy"), QStringLiteral("production_cpp_evidence_v2; online_continuous_kcf; measured_or_estimated_following; independent_geometry_only_icp"))
         && appendSummary(QStringLiteral("preserve_measured_reference"), boolText(configuration.options.preserveMeasuredReference))
         && appendSummary(QStringLiteral("vision_diagnostics_enabled"), boolText(m_visionDiagnosticOptions.enabled))
         && appendSummary(QStringLiteral("vision_images_enabled"), boolText(m_visionDiagnosticOptions.imagesEnabled))
@@ -385,7 +460,14 @@ bool COnlineCorrectionRunRecorder::beginSession(
         return false;
     }
 
-    return true;
+    return appendSessionEvent(QJsonObject{
+        {QStringLiteral("event"), QStringLiteral("session_start")},
+        {QStringLiteral("schema"), 1},
+        {QStringLiteral("trajectory_icp_enabled"), configuration.options.enableOnlineIcp},
+        {QStringLiteral("preserve_measured_reference"), configuration.options.preserveMeasuredReference},
+        // 工件配准由 coordinator 管理；Control recorder 不具备其开关证据。
+        {QStringLiteral("workpiece_online_icp_enabled"), QJsonValue(QJsonValue::Null)},
+        {QStringLiteral("exposure_attribution"), QStringLiteral("observations_only; releases_not_propagated")}});
 }
 
 bool COnlineCorrectionRunRecorder::recordRobotState(
@@ -427,12 +509,23 @@ bool COnlineCorrectionRunRecorder::recordRobotState(
     if (written) {
         ++m_robotStateCount;
     }
-    return written;
+    return appendSessionEvent(QJsonObject{
+        {QStringLiteral("event"), QStringLiteral("robot_state")},
+        {QStringLiteral("phase"), phaseText(phase)},
+        {QStringLiteral("state"), sessionRobotState(state)}}) && written;
 }
 
 bool COnlineCorrectionRunRecorder::recordTrackingResult(
     const RuntimeTrackingResult &result,
     const control::OnlineCorrectionPhase phase)
+{
+    return recordTrackingResult(result, phase, control::OnlineCorrectionTargetSnapshot{});
+}
+
+bool COnlineCorrectionRunRecorder::recordTrackingResult(
+    const RuntimeTrackingResult &result,
+    const control::OnlineCorrectionPhase phase,
+    const control::OnlineCorrectionTargetSnapshot &target)
 {
     if (!m_active) {
         return true;
@@ -460,7 +553,213 @@ bool COnlineCorrectionRunRecorder::recordTrackingResult(
         ++m_trackingResultCount;
     }
     const bool diagnosticWritten = recordVisionDiagnostic(result, phase);
-    return written && diagnosticWritten;
+    const bool lossWritten = recordLossWindow(result, phase, target);
+    QJsonObject observation{
+        {QStringLiteral("event"), QStringLiteral("observation")},
+        {QStringLiteral("phase"), phaseText(phase)},
+        {QStringLiteral("session_id"), QString::number(result.correlation.sessionId)},
+        {QStringLiteral("frame_id"), QString::number(result.frameId)},
+        {QStringLiteral("reference_revision"), QString::number(result.correlation.workpiecePoseRevision)},
+        {QStringLiteral("active_algorithm"), result.activeAlgorithm},
+        {QStringLiteral("point_source"), static_cast<int>(result.pointSource)},
+        {QStringLiteral("valid"), result.valid},
+        {QStringLiteral("pixel_available"), result.kcfPixelAvailable},
+        {QStringLiteral("control_eligible"), result.controlEligible},
+        {QStringLiteral("localization_evidence"), QJsonObject{
+            {QStringLiteral("input_unavailable"), result.localizationEvidence.inputUnavailable},
+            {QStringLiteral("attempted"), result.localizationEvidence.attempted},
+            {QStringLiteral("current_image_supported"), result.localizationEvidence.currentImageSupported},
+            {QStringLiteral("image_constrained_estimate"), result.localizationEvidence.imageConstrainedEstimate},
+            {QStringLiteral("recovery_attempted"), result.localizationEvidence.recoveryAttempted},
+            {QStringLiteral("recovery_failed"), result.localizationEvidence.recoveryFailed}}},
+        {QStringLiteral("estimated"), estimatedPoint(result)},
+        {QStringLiteral("pixel"), result.kcfPixelAvailable
+            ? QJsonValue(QJsonArray{result.imageXPixel, result.imageYPixel})
+            : QJsonValue(QJsonValue::Null)},
+        {QStringLiteral("space_parent_tcp_mm"), sessionPoint(result.sample.point)},
+        {QStringLiteral("message"), result.message}};
+    if (result.diagnostic.has_value()) {
+        const auto &diagnostic = *result.diagnostic;
+        observation.insert(QStringLiteral("camera_timestamp_ms"), QString::number(diagnostic.cameraTimestampMs));
+        observation.insert(QStringLiteral("exposure_robot_state"), sessionRobotState(diagnostic.robotState));
+        observation.insert(QStringLiteral("robot_state_received_ms"), QString::number(diagnostic.robotStateReceivedMs));
+        const auto &algorithm = diagnostic.algorithm;
+        // 原始已验收图像观测与融合先验单列；未执行融合时不补造先验或增益。
+        observation.insert(QStringLiteral("position_fusion"), QJsonObject{
+            {QStringLiteral("applied"), algorithm.positionFusionApplied},
+            {QStringLiteral("trusted_prior"), algorithm.simulationPositionTrusted},
+            {QStringLiteral("observation_px"), algorithm.imageObservationAccepted
+                ? QJsonValue(QJsonArray{algorithm.positionObservationPoint.x,
+                    algorithm.positionObservationPoint.y}) : QJsonValue(QJsonValue::Null)},
+            {QStringLiteral("prior_px"), algorithm.positionFusionApplied
+                ? QJsonValue(QJsonArray{algorithm.positionPriorPoint.x, algorithm.positionPriorPoint.y})
+                : QJsonValue(QJsonValue::Null)},
+            {QStringLiteral("local_bias_px"), algorithm.positionFusionApplied
+                ? QJsonValue(QJsonArray{algorithm.simulationLocalBias.x, algorithm.simulationLocalBias.y})
+                : QJsonValue(QJsonValue::Null)},
+            {QStringLiteral("gain"), algorithm.positionFusionApplied
+                ? QJsonValue(QJsonArray{algorithm.positionGainX, algorithm.positionGainY})
+                : QJsonValue(QJsonValue::Null)}});
+        // 同曝光原始仿真坐标和实际外观取样锚点分开记录，不能把重定位当位姿写回。
+        observation.insert(QStringLiteral("simulation_prior"), QJsonObject{
+            {QStringLiteral("source_point_px"), algorithm.simulatedPointAvailable
+                ? QJsonValue(QJsonArray{algorithm.simulatedPoint.x, algorithm.simulatedPoint.y})
+                : QJsonValue(QJsonValue::Null)},
+            {QStringLiteral("position_in_image"), algorithm.simulationPositionInImage},
+            {QStringLiteral("shape_available"), algorithm.simulationShapeAvailable},
+            {QStringLiteral("template_rebased"), algorithm.simulationTemplateRebased},
+            {QStringLiteral("template_point_px"), algorithm.simulationShapeAvailable
+                ? QJsonValue(QJsonArray{algorithm.simulationTemplatePoint.x, algorithm.simulationTemplatePoint.y})
+                : QJsonValue(QJsonValue::Null)}});
+    }
+    return appendSessionEvent(observation) && written && diagnosticWritten && lossWritten;
+}
+
+bool COnlineCorrectionRunRecorder::submitLossFrame(
+    const CLossFrame &frame, qint64 triggerFrame, const QString &role)
+{
+    const QString status = frame.source.isNull() ? QStringLiteral("source_missing_or_oversize")
+        : m_lossImageWriter->submit(frame.stem, frame.source, QImage(), 0, 64LL * 1024 * 1024);
+    const bool indexed = appendFields(QStringLiteral("loss_window_index.tsv"), {
+        QStringLiteral("[DEBUG-kcf-20261026]"), QString::number(triggerFrame),
+        QString::number(frame.frameId), role, status,
+        QStringLiteral("loss_window_images/%1_source.png").arg(frame.stem)});
+    const bool contextWritten = appendData(QStringLiteral("loss_window_context.jsonl"), frame.context);
+    return indexed && contextWritten;
+}
+
+bool COnlineCorrectionRunRecorder::recordLossWindow(
+    const RuntimeTrackingResult &result, control::OnlineCorrectionPhase phase,
+    const control::OnlineCorrectionTargetSnapshot &target)
+{
+    if (!m_lossImageWriter || !result.diagnostic.has_value() || !result.triggerAccepted
+        || result.correlation.purpose != CorrectionPurpose::OnlineCorrection) {
+        return true;
+    }
+    const int stage = phase == control::OnlineCorrectionPhase::InitialDetectionRunning ? 0
+        : (phase == control::OnlineCorrectionPhase::OnlineRunning ? 1 : -1);
+    if (stage < 0) { return true; }
+    if (m_lossStage != stage) {
+        m_lossStage = stage;
+        m_lossHistory.clear();
+        m_lossRejected = m_lossPostRemaining = 0;
+        m_lossLastFrame = -1;
+    }
+    if (m_lossTriggered[stage] && m_lossPostRemaining == 0) { return true; }
+    // 重复/乱序结果保留在数值日志中，不能伪装成窗口里的新增曝光。
+    if (result.frameId < 0 || result.frameId <= m_lossLastFrame) { return true; }
+    m_lossLastFrame = result.frameId;
+    const auto &diagnostic = *result.diagnostic;
+    const auto &algorithm = diagnostic.algorithm;
+    const auto &evidence = algorithm.evidence;
+    CLossFrame frame;
+    frame.frameId = result.frameId;
+    frame.stem = QStringLiteral("stage_%1_session_%2_frame_%3")
+        .arg(stage).arg(result.correlation.sessionId).arg(result.frameId);
+    if (diagnostic.lossWindowSourceImage.sizeInBytes() <= 16LL * 1024 * 1024) {
+        frame.source = diagnostic.lossWindowSourceImage;
+    }
+    QJsonObject context;
+    context["debug_tag"] = QStringLiteral("[DEBUG-kcf-20261026]");
+    context["image"] = QStringLiteral("loss_window_images/%1_source.png").arg(frame.stem);
+    context["image_availability"] = QStringLiteral("consult loss_window_index.tsv and image_manifest.tsv; queued is not saved");
+    context["kind"] = QStringLiteral("real");
+    context["frame_id"] = result.frameId;
+    context["session_id"] = static_cast<qint64>(result.correlation.sessionId);
+    context["timestamp_ms"] = diagnostic.cameraTimestampMs;
+    context["robot_state_received_ms"] = diagnostic.robotStateReceivedMs;
+    context["phase"] = phaseText(phase);
+    context["reference_revision"] = static_cast<qint64>(result.correlation.workpiecePoseRevision);
+    context["bounded_search"] = result.correlation.onlineControlWindowActive;
+    context["evidence_policy"] = result.evidencePolicyEnabled;
+    context["valid"] = result.valid;
+    context["control_eligible"] = result.controlEligible;
+    context["gate_detail"] = QString::fromStdString(evidence.debugDetail);
+    const auto &options = evidence.debugOptions;
+    context["evidence_options"] = QJsonObject{
+        {"enable_mother_constraints", options.enableMotherConstraints},
+        {"enable_continuous_output", options.enableContinuousOutput},
+        {"max_continuous_step_pixel", options.maxContinuousStepPixel},
+        {"anchor_confirmation_frames", options.anchorConfirmationFrames},
+        {"recovery_confirmation_frames", options.recoveryConfirmationFrames},
+        {"identity_corridor_pixel", options.identityCorridorPixel},
+        {"identity_min_patch_score", options.identityMinPatchScore},
+        {"identity_min_branch_score", options.identityMinBranchScore},
+        {"identity_min_uniqueness", options.identityMinUniqueness},
+        {"max_recovery_step_pixel", options.recoveryMaxStepPixel},
+        {"max_prediction_ms", options.maxPredictionMs},
+        {"max_prediction_travel_mm", options.maxPredictionTravelMm}};
+    if (algorithm.simulatedPointAvailable) {
+        const QJsonArray reference{algorithm.simulatedPoint.x, algorithm.simulatedPoint.y};
+        context["sim_point"] = reference;
+        context["reference_point_at_exposure"] = reference;
+        context["reference_exposure_frame_id"] = result.frameId;
+    }
+    // 记录完整曝光投影链，不用单位位姿或收到结果时的新位姿替代。
+    const auto transform = [](const vision::WeldRigidTransform &value) {
+        QJsonArray array;
+        for (int row = 0; row < 3; ++row) {
+            for (int column = 0; column < 3; ++column) { array.append(value.rotation(row, column)); }
+        }
+        for (int axis = 0; axis < 3; ++axis) { array.append(value.translationMm(axis)); }
+        return array;
+    };
+    if (result.displayProjectionContext.has_value() && result.displayProjectionContext->valid) {
+        const auto &projection = *result.displayProjectionContext;
+        const auto &calibration = projection.calibration;
+        context["projection"] = QJsonObject{
+            {"provenance", QStringLiteral("frozen exposure context from Vision worker")},
+            {"calibration", QJsonObject{{"focal_length_m", calibration.focalLengthM},
+                {"sx_m", calibration.sxM}, {"sy_m", calibration.syM},
+                {"cx_pixel", calibration.intrinsics.cxPixel}, {"cy_pixel", calibration.intrinsics.cyPixel},
+                {"kappa", calibration.kappa}, {"laser_plane_a", calibration.laserPlaneA},
+                {"laser_plane_b", calibration.laserPlaneB}, {"laser_plane_c", calibration.laserPlaneC}}},
+            {"camera_in_tool", transform(calibration.cameraInTool)},
+            {"tool_in_robot_base", transform(projection.toolInRobotBase)},
+            {"robot_base_to_positioner_tcp", transform(projection.robotBaseToPositionerTcp)}};
+    }
+    const auto point = [](const control::OnlineCorrectionPoint &value) {
+        return QJsonObject{{"valid", value.valid}, {"xyz_mm", QJsonArray{value.xMm, value.yMm, value.zMm}}};
+    };
+    context["control_reference"] = QJsonObject{
+        {"association", QStringLiteral("controller_snapshot_before_consuming_this_result; NOT exposure-time or UI-time target")},
+        {"session_id", static_cast<qint64>(target.sessionId)}, {"generation", static_cast<qint64>(target.generation)},
+        {"valid", target.valid}, {"source", static_cast<int>(target.source)},
+        {"geometry_valid", target.geometry.valid}, {"first", point(target.geometry.first)},
+        {"direction_point", point(target.geometry.directionPoint)},
+        {"target", point(target.targetPointInLastLink_mm)}};
+    if (result.displayPositionerCalibration.has_value()) {
+        const auto &offset = result.displayPositionerCalibration->toolTcpInLastLinkMm;
+        context["positioner_tool_tcp_offset_mm"] = QJsonArray{offset.x(), offset.y(), offset.z()};
+    }
+    frame.context = QJsonDocument(context).toJson(QJsonDocument::Compact) + '\n';
+    const bool accepted = result.valid && (!result.evidencePolicyEnabled || result.controlEligible);
+    m_lossSeenValid[stage] = m_lossSeenValid[stage] || accepted;
+    m_lossRejected = accepted ? 0 : m_lossRejected + 1;
+    bool written = true;
+    if (!m_lossTriggered[stage] && !accepted
+        && (m_lossSeenValid[stage] || m_lossRejected >= 8)) {
+        m_lossTriggered[stage] = true;
+        m_lossTriggerFrame = result.frameId;
+        for (const auto &previous : m_lossHistory) {
+            written = submitLossFrame(previous, m_lossTriggerFrame, QStringLiteral("before")) && written;
+        }
+        written = submitLossFrame(frame, m_lossTriggerFrame, QStringLiteral("trigger")) && written;
+        m_lossPostRemaining = 8;
+        m_lossHistory.clear();
+    } else if (m_lossPostRemaining > 0) {
+        written = submitLossFrame(frame, m_lossTriggerFrame, QStringLiteral("after")) && written;
+        --m_lossPostRemaining;
+    } else if (!m_lossTriggered[stage]) {
+        m_lossHistory.push_back(std::move(frame));
+        qint64 bytes = 0;
+        for (const auto &previous : m_lossHistory) { bytes += previous.source.sizeInBytes(); }
+        while (!m_lossHistory.empty() && (m_lossHistory.size() > 6U || bytes > 16LL * 1024 * 1024)) {
+            bytes -= m_lossHistory.front().source.sizeInBytes();
+            m_lossHistory.pop_front();
+        }
+    }
+    return written;
 }
 
 bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
@@ -630,7 +929,8 @@ bool COnlineCorrectionRunRecorder::recordVisionDiagnostic(
            << QString::number(evidence.anchorFrameId) << boolText(evidence.anchorRefreshed)
            << QString::number(evidence.confirmationCount) << QString::number(evidence.motherSupportRank)
            << numberText(evidence.identityScore) << numberText(evidence.elapsedMs)
-           << numberText(evidence.travelMm) << sanitizeField(QString::fromStdString(evidence.message));
+           << numberText(evidence.travelMm) << sanitizeField(QString::fromStdString(evidence.message))
+           << sanitizeField(QString::fromStdString(evidence.debugDetail));
     const bool written = appendFields(QString::fromLatin1(kVisionDiagnosticFileName), fields);
     if (m_imageWriter && !m_imageErrorReported && !m_imageWriter->lastError().isEmpty()) {
         m_imageErrorReported = true;
@@ -823,7 +1123,7 @@ bool COnlineCorrectionRunRecorder::recordUpdate(
         }
     }
 
-    return written;
+    return recordSessionUpdate(update) && written;
 }
 
 bool COnlineCorrectionRunRecorder::recordIcpDiagnostics(
@@ -918,7 +1218,6 @@ bool COnlineCorrectionRunRecorder::recordCommandReceipt(
     const robot_comm::RobotState &state,
     const control::OnlineCorrectionPhase phase)
 {
-    Q_UNUSED(state);
     if (!m_active) {
         return true;
     }
@@ -967,7 +1266,43 @@ bool COnlineCorrectionRunRecorder::recordCommandReceipt(
     if (written) {
         ++m_receiptCount;
     }
-    return written;
+    return appendSessionEvent(QJsonObject{
+        {QStringLiteral("event"), QStringLiteral("receipt")},
+        {QStringLiteral("local_trace"), sessionCommandTrace(receipt.localTrace)},
+        {QStringLiteral("local_transaction_id"), receipt.localTransactionId == 0
+            ? QJsonValue(QJsonValue::Null) : QJsonValue(QString::number(receipt.localTransactionId))},
+        {QStringLiteral("execution_semantics"), QStringLiteral("unknown_execution")},
+        {QStringLiteral("delivery"), receipt.responseReceived
+            ? QStringLiteral("response_received") : QStringLiteral("delivery_unknown")},
+        {QStringLiteral("phase"), phaseText(phase)},
+        {QStringLiteral("type"), static_cast<int>(receipt.type)},
+        {QStringLiteral("point_index"), receipt.pointIndex},
+        {QStringLiteral("sent"), receipt.sent},
+        {QStringLiteral("response_received"), receipt.responseReceived},
+        {QStringLiteral("completed"), receipt.completed},
+        {QStringLiteral("request"), QString::fromStdString(receipt.request)},
+        {QStringLiteral("response"), QString::fromStdString(receipt.response)},
+        {QStringLiteral("error"), static_cast<int>(receipt.error)},
+        {QStringLiteral("state"), sessionRobotState(state)}}) && written;
+}
+
+bool COnlineCorrectionRunRecorder::recordOperationStop(
+    quint64 sessionId,
+    const robot_comm::RobotOperationStopState &state)
+{
+    const QString status = state.status == robot_comm::RobotOperationStopStatus::HoldConfirmed
+        ? QStringLiteral("hold_confirmed")
+        : state.status == robot_comm::RobotOperationStopStatus::Unconfirmed
+            ? QStringLiteral("unconfirmed") : QStringLiteral("pending");
+    return appendSessionEvent(QJsonObject{
+        {QStringLiteral("event"), QStringLiteral("operation_stop")},
+        {QStringLiteral("session_id"), QString::number(sessionId)},
+        {QStringLiteral("request_generation"), QString::number(state.requestGeneration)},
+        {QStringLiteral("status"), status},
+        {QStringLiteral("hold_request_latched"), state.holdRequestLatched},
+        {QStringLiteral("arc_stop_verified"), state.arcStopVerified},
+        {QStringLiteral("error"), static_cast<int>(state.error)},
+        {QStringLiteral("message"), QString::fromStdString(state.message)}});
 }
 
 bool COnlineCorrectionRunRecorder::finishSession(
@@ -981,8 +1316,17 @@ bool COnlineCorrectionRunRecorder::finishSession(
     if (m_imageWriter) {
         m_imageWriter->stop();
     }
+    if (m_lossImageWriter) {
+        m_lossImageWriter->stop();
+        m_lossHistory.clear();
+    }
     const qint64 finishedAtMs = QDateTime::currentMSecsSinceEpoch();
     bool written = true;
+    if (m_lossImageWriter && !m_lossImageWriter->lastError().isEmpty()) {
+        m_lastError = m_lossImageWriter->lastError();
+        written = appendSummary(QStringLiteral("debug_kcf_20261026_loss_image_error"), m_lastError);
+        written = false;
+    }
     written = appendSummary(QStringLiteral("session_state"), resultText) && written;
     written = appendSummary(QStringLiteral("end_time"), timestampText()) && written;
     written = appendSummary(
@@ -1012,8 +1356,95 @@ bool COnlineCorrectionRunRecorder::finishSession(
     written = appendSummary(QStringLiteral("vision_diagnostic_count"), QString::number(m_visionDiagnosticCount)) && written;
     written = appendSummary(QStringLiteral("vision_image_submission_count"), QString::number(m_imageSubmissionCount)) && written;
     written = appendSummary(QStringLiteral("message"), sanitizeField(message)) && written;
+    written = appendSessionEvent(QJsonObject{
+        {QStringLiteral("event"), QStringLiteral("session_end")},
+        {QStringLiteral("result"), resultText}, {QStringLiteral("message"), message}}) && written;
     m_active = false;
     return written;
+}
+
+bool COnlineCorrectionRunRecorder::recordSessionUpdate(const control::OnlineCorrectionUpdate &update)
+{
+    if (!m_visionDiagnosticOptions.enabled) { return true; }
+    bool written = appendSessionEvent(QJsonObject{
+        {QStringLiteral("event"), QStringLiteral("control_update")},
+        {QStringLiteral("update_index"), QString::number(m_updateCount)},
+        {QStringLiteral("phase"), phaseText(update.phase)},
+        {QStringLiteral("queued_samples"), static_cast<qint64>(update.state.onlineDetectionSamples.size())},
+        {QStringLiteral("request_operation_stop"), update.requestOperationStop},
+        {QStringLiteral("source_exposure"), QJsonValue(QJsonValue::Null)},
+        {QStringLiteral("message"), QString::fromStdString(update.message)}});
+    int batchIndex = 0;
+    for (const auto &batch : update.onlineIcpBatches) {
+        ++batchIndex;
+        int pointIndex = 0;
+        for (const auto &sample : batch.releasedSamples) {
+            written = appendSessionEvent(QJsonObject{
+                {QStringLiteral("event"), QStringLiteral("release")},
+                {QStringLiteral("update_index"), QString::number(m_updateCount)},
+                {QStringLiteral("batch_index"), batchIndex},
+                {QStringLiteral("point_index"), pointIndex++},
+                {QStringLiteral("source_exposure"), sessionExposure(sample.sourceExposure)},
+                {QStringLiteral("space_last_link_mm"), sessionPoint(sample.point)},
+                {QStringLiteral("estimated"), sample.estimated},
+                {QStringLiteral("trajectory_icp_attempted"), batch.attempted},
+                {QStringLiteral("trajectory_icp_applied"), batch.applied}}) && written;
+        }
+    }
+    if (update.followDiagnostic.valid) {
+        const auto &follow = update.followDiagnostic;
+        written = appendSessionEvent(QJsonObject{
+            {QStringLiteral("event"), QStringLiteral("control_target")},
+            {QStringLiteral("update_index"), QString::number(m_updateCount)},
+            {QStringLiteral("target_generation"), QString::number(update.state.controlTarget.generation)},
+            {QStringLiteral("source_exposure"), sessionExposure(follow.firstSourceExposure)},
+            {QStringLiteral("direction_source_exposure"), sessionExposure(follow.directionSourceExposure)},
+            {QStringLiteral("target_source"), static_cast<int>(update.state.controlTarget.source)},
+            {QStringLiteral("current_last_link_mm"), sessionPoint(follow.current)},
+            {QStringLiteral("line_first_mm"), sessionPoint(follow.first)},
+            {QStringLiteral("line_direction_point_mm"), sessionPoint(follow.directionPoint)},
+            {QStringLiteral("future_foot_mm"), sessionPoint(follow.futureFoot)}}) && written;
+    }
+    if (update.command.valid) {
+        QJsonArray points;
+        const int count = std::min(update.command.pointCount, static_cast<int>(update.command.teachPoints.size()));
+        for (int index = 0; index < count; ++index) {
+            const auto &point = update.command.teachPoints[static_cast<std::size_t>(index)];
+            points.append(QJsonArray{point.xUm / 1000.0, point.yUm / 1000.0, point.zUm / 1000.0});
+        }
+        written = appendSessionEvent(QJsonObject{
+            {QStringLiteral("event"), QStringLiteral("command")},
+            {QStringLiteral("update_index"), QString::number(m_updateCount)},
+            {QStringLiteral("type"), QStringLiteral("teach_points")},
+            {QStringLiteral("delivery"), QStringLiteral("generated_not_sent")},
+            {QStringLiteral("points_robot_base_mm"), points}}) && written;
+    }
+    if (update.realtimeCommand.valid) {
+        const auto &command = update.realtimeCommand;
+        written = appendSessionEvent(QJsonObject{
+            {QStringLiteral("local_trace"), sessionCommandTrace(command.localTrace)},
+            {QStringLiteral("event"), QStringLiteral("command")},
+            {QStringLiteral("update_index"), QString::number(m_updateCount)},
+            {QStringLiteral("type"), QStringLiteral("realtime")},
+            {QStringLiteral("target_generation"), update.followDiagnostic.valid
+                ? QJsonValue(QString::number(update.state.controlTarget.generation))
+                : QJsonValue(QJsonValue::Null)},
+            {QStringLiteral("delivery"), QStringLiteral("generated_not_sent")},
+            {QStringLiteral("increment_um"), QJsonArray{static_cast<double>(command.dxUm),
+                static_cast<double>(command.dyUm), static_cast<double>(command.dzUm)}},
+            {QStringLiteral("speed_override"), static_cast<double>(command.speedOverride)},
+            {QStringLiteral("online_end_flag"), command.onlineEndFlag}}) && written;
+    }
+    return written;
+}
+
+bool COnlineCorrectionRunRecorder::appendSessionEvent(QJsonObject event)
+{
+    if (!m_active || !m_visionDiagnosticOptions.enabled) { return true; }
+    event.insert(QStringLiteral("sequence"), static_cast<qint64>(++m_sessionEventCount));
+    event.insert(QStringLiteral("recorded_at_ms"), timestampMsText());
+    return appendData(QString::fromLatin1(kSessionEventsFileName),
+        QJsonDocument(event).toJson(QJsonDocument::Compact) + '\n');
 }
 
 bool COnlineCorrectionRunRecorder::isActive() const

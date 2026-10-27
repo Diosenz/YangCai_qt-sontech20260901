@@ -334,15 +334,17 @@ int main()
                     && cv::norm(result.weldPointPixel - imageReferences[i]) < 8,
                     "clear field raw corner is recovered despite displaced CAD");
             } else {
-                // 当前原图 .3265 的竞争列比例超过原有 .2 门，不存在已标注物理真值。
-                // 此前必须 fresh geometry valid 的测试假设被原 refiner 的实际证据推翻。
-                check(!reference.valid
-                    && reference.status == v::OnlineSeamRefinementStatus::AmbiguousStripe
-                    && !result.valid && !result.diagnostic.imageObservationAccepted
-                    && !result.diagnostic.refinement.valid
-                    && result.diagnostic.rawRefinement.status
-                        == v::OnlineSeamRefinementStatus::AmbiguousStripe,
-                    "ambiguous unanchored field image cannot manufacture a CAD measurement or independent geometry");
+                // 该图竞争列约 .3265，低于当前测试默认 .4；显式验证 .2 严格策略，
+                // 不能把旧默认值写死后误判当前参数。这里没有独立物理焊缝真值。
+                auto strict = options.seamRefinement;
+                strict.maxAmbiguousColumnRatio = 0.2;
+                const auto strictReference = v::COnlineSeamRefiner::refine(
+                    image, imageReferences[i], strict);
+                check(reference.valid && result.valid
+                    && reference.ambiguousColumnRatio <= options.seamRefinement.maxAmbiguousColumnRatio
+                    && !strictReference.valid
+                    && strictReference.status == v::OnlineSeamRefinementStatus::AmbiguousStripe,
+                    "field ambiguity follows the configured threshold and remains rejectable by explicit strict policy");
             }
         }
     }

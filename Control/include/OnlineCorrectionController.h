@@ -126,6 +126,17 @@ public:
     const OnlineCorrectionSessionState &state() const;
 
 private:
+    /// @brief 在控制线程按当前空间进度检查可靠前视末端；不按帧数或超时删点。
+    bool reliableTrajectoryExhausted();
+    /// @brief 只在当前图像恢复失败且可靠空间范围耗尽时锁存作业停止。
+    bool shouldStopForLocalizationLoss();
+    bool m_localizationUnsupported = false;
+    OnlineCorrectionPoint m_lastReliablePoint;
+    /// @brief 独立维护可靠末端与机器人进度，避免回折支系切平面造成误停。
+    int m_reliableEndSegmentIndex = 0;
+    /// @brief 仅实测扩展的有序路径进度，不被较近的新曝光缩短。
+    double m_reliableEndProgress = -1.0;
+    int m_lossRobotSegmentIndex = 0;
     /**
      * @brief 基于当前状态生成统一更新 DTO。
      * @param succeeded 当前事件是否成功。

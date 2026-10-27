@@ -1,5 +1,34 @@
 # 在线检测器图像分支回放
 
+## 2026-10-27 预焊后历史锁偏回归
+
+`test_preweld_field_recovery.py` 通过生产 `process` 验证：保留旧历史后仍能恢复当前可见转折，
+以及参考缺失、局部校正缺少原身份条纹支持时不能授予错误点控制资格。
+`tests/fixtures/preweld_tracking_20261027/` 保存 1987、4727 两张未修改实拍原图及来源哈希。
+这是稀疏历史对照，不是完整连续预焊重演；缺失仿真折线，投影显式借用 3377 曝光，
+只验像素。20 px 是人工近似标注的故障回归容差，不是检测参数或毫米/TCP 精度公差。
+在配置原生程序目录后，可执行 `python -m unittest discover -s tests/diagnostics/online_detector_replay -p test_preweld_field_recovery.py -v`。
+
+## 2026-10-27 真实在线图像 TDD 回归
+
+`test_online_field_bootstrap.py` 在公开 process 边界覆盖 2070/7264 错误首捕、
+3801—4171 实拍曝光恢复，以及实拍 1712 图纵向翻转后的相反折点方向。原图、
+来源哈希和显式借用的像素回归投影位于 `tests/fixtures/online_tracking_20261027/`。
+不把稀疏归档视为完整连续相机会话，也不据此声称 TCP 或毫米精度。
+
+同一测试调用公开 tracker benchmark 比较响应峰、PSR、双特征权重和位置与优化前
+固定基线的一致性。3937 实拍图同时代替参考外观，仅用于稳定触发三模板计算负载，
+不代表现场仿真真值。250 ms 是本机 Debug 训练中位数回归预算，不是算法门限；
+应在无并行构建/回放负载时单独运行，硬件不同需重新建立性能基线。
+
+```powershell
+python -m unittest discover -s tests/diagnostics/online_detector_replay -p test_online_field_bootstrap.py -v
+```
+
+UI 的 `i2r_rlc_main_widget_panel_tests --live-preview-contract` 通过运行时 Qt 入口
+验证真实原图刷新、检测曝光不被替换、帧号归属同步和返回普通预览后的清除。
+设置 `I2R_UI_REPLAY_SNAPSHOT` 可保存离屏主图及小窗布局，不连接设备或操作鼠标。
+
 Windows 的可选 MSVC/CMake 构建与运行见 [WINDOWS_README.md](WINDOWS_README.md)。
 显式设置 `I2R_KCF_REPLAY_BIN_DIR` 后，全部入口只调用预编译程序，不自动编译。
 
@@ -36,6 +65,30 @@ python3 tests/diagnostics/online_detector_replay/replay.py output/analysis/detec
 无下载、安装或绝对开发机路径。测试的临时证据保留在系统临时目录，不清理文件。
 
 ## 会话输入 JSONL
+
+2026-10-27 的论文路径诊断可显式设置 `paper_tracking=true`，直接调用当前生产
+`processPaperTracking`；省略时保留既有回放行为。`detector_valid` 和
+`detector_pixel` 始终保留检测器原始业务结果，`paper_diagnostics` 提供当前身份、
+肩部匹配及响应统计。`probe_bootstrap=true` 仅额外读取当前图像初始化提案，
+不改变检测器状态。现有归档没有完整仿真折线时，不能声称重建了三模板输入。
+
+本机两轮现场诊断入口为 `retest_20261027.py` 和
+`retest_shoulder_20261027.py`，使用现有 `I2R_KCF_REPLAY_BIN_DIR` 环境。
+前者回放第一轮首曝光并检查左侧转折近似标注；后者复用实际生产肩部匹配函数，
+从第二轮归档重建身份与历史预测，并校验输出与归档一致。后者还需要本机
+`output/analysis/field_retest_20261027/` 内已编译的探针及源码哈希清单。
+默认非零退出表示现场错误仍可复现；`--center response` 仅改变搜索中心，
+另加 `--ranking response` 才改变候选排序参考。这些因果对照不表示生产程序已修复，
+15 px 人工近似标注范围也不是精度验收。该窗口缺少更早的全部连续图像，不能冒充完整 KCF 会话回放。
+
+修复回归使用 `test_paper_field_repair.py` 及 `tests/fixtures/paper_tracking_20261027/`：
+覆盖首帧左转折、黑图不能污染初始实拍模型、后续窗口漂移、低灰度相关仿真仍可用及单模板焊前统计。
+在设置上述原生程序目录后，执行
+`python -m unittest discover -s tests/diagnostics/online_detector_replay -p test_paper_field_repair.py`。
+前两张在线图缺少归档曝光变换，夹具显式借用后续曝光投影；这些断言只评价像素，
+不用于空间精度或 TCP 评分。重复图像的34曝光统计测试是受控软件测试，不是34张现场连续图。
+历史肩部探针的源码哈希随生产修复失效是预期行为；它仅保留旧错误的因果证据，
+不作为修复后程序的验证入口。
 
 一行一个曝光观测对象，按给定顺序处理，不插值、不补造曝光：
 

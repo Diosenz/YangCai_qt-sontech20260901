@@ -46,53 +46,6 @@ namespace {
 
 constexpr int AUTOMATIC_CALIBRATION_LASER_CAPTURE_DELAY_MS = 2800;
 
-/**
- * @brief 将同一控制参考线截到本曝光激光平面，仅用于缺测时的预测显示。
- * @details Control 的 futureFoot 位于 TCP 附近，不能代替前置相机的检测位置。
- * 无唯一交点时返回无效；不裁剪到画面边缘，不生成测量或 ICP 证据。
- */
-vision::WeldSpacePoint controlReferenceOnLaserPlane(
-    const control::OnlineCorrectionTargetSnapshot &target,
-    const vision::WeldProjectionContext &context,
-    const vision::PositionerCalibration &calibration)
-{
-    const auto &geometry = target.geometry;
-    if (!target.valid || !geometry.valid || !geometry.first.valid
-        || !geometry.directionPoint.valid || !context.valid || !calibration.valid) {
-        return {};
-    }
-    const Eigen::Vector3d first = Eigen::Vector3d(
-        geometry.first.xMm, geometry.first.yMm, geometry.first.zMm)
-        - calibration.toolTcpInLastLinkMm;
-    const Eigen::Vector3d direction = Eigen::Vector3d(
-        geometry.directionPoint.xMm, geometry.directionPoint.yMm,
-        geometry.directionPoint.zMm) - calibration.toolTcpInLastLinkMm - first;
-    const auto toCamera = [&context](const Eigen::Vector3d &point) {
-        const Eigen::Vector3d robot = context.robotBaseToPositionerTcp.rotation.transpose()
-            * (point - context.robotBaseToPositionerTcp.translationMm);
-        const Eigen::Vector3d tool = context.toolInRobotBase.rotation.transpose()
-            * (robot - context.toolInRobotBase.translationMm);
-        return Eigen::Vector3d(context.calibration.cameraInTool.rotation.transpose()
-            * (tool - context.calibration.cameraInTool.translationMm));
-    };
-    const Eigen::Vector3d cameraFirst = toCamera(first);
-    const Eigen::Vector3d cameraDirection = toCamera(first + direction) - cameraFirst;
-    const Eigen::Vector3d normal(context.calibration.laserPlaneA,
-        context.calibration.laserPlaneB, context.calibration.laserPlaneC);
-    const double denominator = normal.dot(cameraDirection);
-    const double scale = normal.norm() * cameraDirection.norm();
-    if (!first.allFinite() || !direction.allFinite() || !cameraFirst.allFinite()
-        || !cameraDirection.allFinite() || !normal.allFinite()
-        || !std::isfinite(scale) || scale <= 1.0e-12
-        || std::abs(denominator) <= 1.0e-9 * scale) {
-        return {};
-    }
-    // 激光平面沿用标定投影的 A*x+B*y+C*z+1000=0（相机坐标 mm）。
-    const double parameter = -(normal.dot(cameraFirst) + 1000.0) / denominator;
-    const Eigen::Vector3d point = first + parameter * direction;
-    return {point.x(), point.y(), point.z(), point.allFinite()};
-}
-
 enum class UiDetectionStatus {
     NotRun,
     Succeeded,
@@ -1254,6 +1207,8 @@ void UiController::bindView()
         Qt::QueuedConnection);
     connect(&m_runtimeCoordinator, &CRuntimeCoordinator::onlineCorrectionUpdated,
             this, &UiController::showOnlineCorrectionUpdate, Qt::QueuedConnection);
+    connect(&m_runtimeCoordinator, &CRuntimeCoordinator::onlineOperationStopUpdated,
+            this, &UiController::showOnlineOperationStop, Qt::QueuedConnection);
     connect(&m_runtimeCoordinator, &CRuntimeCoordinator::offlineCorrectionUpdated,
             this, &UiController::showOfflineCorrectionUpdate, Qt::QueuedConnection);
     connect(
@@ -2112,7 +2067,10 @@ void UiController::onOnlineCorrectionFeaturePanelClosed()
     m_onlineCorrectionConfigured = false;
     m_trackingOverlayActive = false;
     m_runtimeCoordinator.stopOnlineTracking();
-    m_view.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：空闲"));
+    if (!m_onlineOperationStopLatched) {
+        m_onlineOperationActive = false;
+        m_view.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：空闲"));
+    }
     m_onlineCorrectionP001Presentation.clear();
     m_view.setOnlineCorrectionP001Text(
         m_onlineCorrectionP001Presentation.text());
@@ -3623,6 +3581,13 @@ void UiController::onRobotSimRealSceneConnectionRequested(int port)
 void UiController::onStopRequested()
 {
     appendInfo(QStringLiteral("UI 请求停止。"));
+    if (m_onlineOperationActive && !m_onlineOperationStopLatched) {
+        robot_comm::RobotOperationStopState pending;
+        pending.status = robot_comm::RobotOperationStopStatus::Pending;
+        pending.holdRequestLatched = true;
+        showOnlineOperationStop(pending);
+        m_runtimeCoordinator.requestOnlineOperationStop();
+    }
     cancelOnlineAutoCorrectionWorkflow();
     cancelStandaloneGlobalLocate();
     cancelPendingCorrectionRobotStart();
@@ -3665,7 +3630,10 @@ void UiController::onStopRequested()
 
     m_view.resetFeaturePanelsAfterStop();
     m_view.setOfflineCorrectionStateText(QStringLiteral("离线纠偏：空闲"));
-    m_view.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：空闲"));
+    if (!m_onlineOperationStopLatched) {
+        m_onlineOperationActive = false;
+        m_view.setOnlineCorrectionStateText(QStringLiteral("在线纠偏：空闲"));
+    }
     m_onlineCorrectionP001Presentation.clear();
     m_view.setOnlineCorrectionP001Text(
         m_onlineCorrectionP001Presentation.text());
@@ -3903,6 +3871,8 @@ void UiController::handleRuntimeFrameReady(
     m_lastFrameId = frame.frameId;
     if (!m_trackingOverlayActive) {
         showFrameWithCalibrationGuide(frame);
+    } else {
+        m_view.showLivePreview(frame);
     }
 }
 
@@ -4079,6 +4049,15 @@ void UiController::renderOfflineCorrectionState()
 
 void UiController::showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorrectionUpdate& update)
 {
+    if (m_onlineOperationStopLatched) {
+        return;
+    }
+    if (update.phase == control::OnlineCorrectionPhase::Completed
+        || update.phase == control::OnlineCorrectionPhase::Error) {
+        m_onlineOperationActive = false;
+    } else if (update.phase != control::OnlineCorrectionPhase::Idle) {
+        m_onlineOperationActive = true;
+    }
     const auto &target = update.state.controlTarget;
     const bool currentSession = target.sessionId != 0
         && target.sessionId == m_onlineCorrectionSyncState.sessionId
@@ -4155,6 +4134,30 @@ void UiController::showOnlineCorrectionUpdate(const i2r_rlc::control::OnlineCorr
             showLegacyWarningPrompt(QStringLiteral("提示!"), message);
         }
     }
+}
+
+void UiController::showOnlineOperationStop(const robot_comm::RobotOperationStopState &state)
+{
+    if (!state.holdRequestLatched) {
+        return;
+    }
+    m_onlineOperationStopLatched = true;
+    m_onlineOperationActive = false;
+    QString status;
+    switch (state.status) {
+    case robot_comm::RobotOperationStopStatus::HoldConfirmed:
+        status = QStringLiteral("HOLD 已反馈");
+        break;
+    case robot_comm::RobotOperationStopStatus::Unconfirmed:
+        status = QStringLiteral("HOLD 无法确认");
+        break;
+    default:
+        status = QStringLiteral("HOLD 已请求，等待控制器反馈");
+        break;
+    }
+    m_view.setOnlineCorrectionStateText(
+        QStringLiteral("在线作业停止：%1\n停弧未验证；机械零速未验证；需人工处理后恢复。\n%2")
+            .arg(status, QString::fromStdString(state.message)));
 }
 
 void UiController::showTeachTrajectoryRecorderUpdate(
@@ -4320,7 +4323,7 @@ void UiController::showRuntimeTrackingResult(const i2r_rlc::ui::RuntimeTrackingR
     }
 
     if (correctionState != nullptr) {
-        // 已通过完整快照显示。相机新帧仍被接收，但不能覆盖带检测点的旧帧。
+        // 检测快照保持曝光一致；后续相机帧只刷新无叠加的实时预览。
         m_trackingOverlayActive = true;
     } else if (!result.overlayImage.isNull()) {
         i2r_rlc::camera::CameraFrame overlayFrame;
@@ -4364,6 +4367,9 @@ bool UiController::presentCorrectionFrame(const RuntimeTrackingResult& result)
     }
 
     TrackingFramePresentation presentation;
+    presentation.frameId = result.frameId;
+    presentation.exposureTimestampMs = frame.timestamp.isValid()
+        ? frame.timestamp.toMSecsSinceEpoch() : -1;
     presentation.sourceImage = frame.image.isNull() ? frame.previewImage : frame.image;
     if (presentation.sourceImage.isNull()) {
         return false;
@@ -4411,11 +4417,11 @@ bool UiController::presentCorrectionFrame(const RuntimeTrackingResult& result)
     } else if (result.pointSource == vision::OnlineSeamPointSource::GuidedEstimate) {
         pointLabel = QStringLiteral("绿色：时序锚/母材肩部辅助估计（非独立实测）");
     } else if (result.pointSource == vision::OnlineSeamPointSource::RecoveryTransition) {
-        pointLabel = QStringLiteral("黄色：重捕获恢复过渡（估计，不进入控制）");
+        pointLabel = QStringLiteral("绿色：重捕获恢复过渡（估计）");
     }
     if (presentation.detectedWeldPointEstimated) {
-        pointLabel.replace(QStringLiteral("绿色"), QStringLiteral("黄色"));
-        pointLabel += QStringLiteral("｜像素显示，无控制资格");
+        pointLabel += result.controlEligible
+            ? QStringLiteral("｜连续 KCF 跟随") : QStringLiteral("｜像素显示，无控制资格");
     }
     presentation.caption = (observation.valid
         ? QStringLiteral("检测帧 %1｜原图与参考、检测点同帧｜%2")
@@ -4427,48 +4433,16 @@ bool UiController::presentCorrectionFrame(const RuntimeTrackingResult& result)
         && result.correlation.onlineControlWindowActive
         && result.correlation.sessionId == m_onlineCorrectionSyncState.sessionId) {
         m_onlineControlDisplayFrame = result;
-        // 原图测量与 TCP 跟随位置不是同一采样位置。测量有效时保留其最终点；
-        // 缺测时只显示同一控制参考线在本曝光激光平面上的预测交点。
+        // 同帧连续 KCF 是图像标记和坐标的唯一来源，控制参考单独显示。
         if (m_onlineControlTarget.valid
             && m_onlineControlTarget.sessionId == result.correlation.sessionId) {
             const bool predicted = m_onlineControlTarget.source
                 == control::OnlineCorrectionTargetSource::PredictedReference;
-            const bool measured = presentation.detectedWeldPointVisible;
             presentation.caption += QStringLiteral("｜控制参考 %1（%2）")
                 .arg(m_onlineControlTarget.generation)
                 .arg(predicted ? QStringLiteral("预测") : QStringLiteral("图像支持"));
-            if (!measured && result.displayProjectionContext.has_value()
-                && result.displayPositionerCalibration.has_value()
-                && result.displayPositionerCalibration->valid) {
-                const auto &displayContext = *result.displayProjectionContext;
-                const auto &calibration = *result.displayPositionerCalibration;
-                const auto point = controlReferenceOnLaserPlane(
-                    m_onlineControlTarget, displayContext, calibration);
-                const auto pixel = vision::CWeldImageToSpaceProjector::projectSpacePointToImage(
-                    point, displayContext, vision::WeldProjectionTargetFrame::PositionerTcp);
-                if (pixel.valid && pixel.xPixel >= 0.0 && pixel.yPixel >= 0.0
-                    && pixel.xPixel < presentation.sourceImage.width()
-                    && pixel.yPixel < presentation.sourceImage.height()) {
-                    presentation.detectedWeldPoint = {pixel.xPixel, pixel.yPixel};
-                    presentation.detectedWeldPointVisible = true;
-                    presentation.detectedWeldPointEstimated = true;
-                    presentation.caption = QStringLiteral(
-                        "显示帧 %1｜控制参考 %2｜预测显示：参考线与激光平面交点（非实测）")
-                        .arg(result.frameId).arg(m_onlineControlTarget.generation);
-                } else {
-                    presentation.caption += QStringLiteral("｜参考线无可见交点，控制坐标保留");
-                }
-                const Eigen::Vector3d parent(point.xMm, point.yMm, point.zMm);
-                const Eigen::Vector3d robot = displayContext.robotBaseToPositionerTcp.rotation.transpose()
-                    * (parent - displayContext.robotBaseToPositionerTcp.translationMm);
-                const Eigen::Vector3d station = calibration.stationBaseInRobotBase * robot;
-                m_onlineKcfRobotPoint = {robot.x(), robot.y(), robot.z(), point.valid && robot.allFinite()};
-                m_onlineKcfStationPoint = {station.x(), station.y(), station.z(), point.valid && station.allFinite()};
-                m_onlineKcfFrameId = result.frameId;
-                m_onlineKcfLatestValid = m_onlineKcfRobotPoint.valid;
-                m_lastOnlineKcfReceivedMs = QDateTime::currentMSecsSinceEpoch();
-                renderOnlineCorrectionCoordinates();
-            }
+            // 控制参考单独显示在业务目标坐标区；缺测不能通过无限直线外推
+            // 生成检测标记，也不能覆盖 KCF 的像素和空间坐标。
         } else if (m_onlineControlTargetSegment >= 0) {
             presentation.caption += QStringLiteral("｜业务目标当前不可用");
         }
@@ -4802,6 +4776,7 @@ void UiController::handleCorrectionSyncUpdate(
         && update.sessionId != state->sessionId;
     if (replacementSession) {
         if (update.purpose == CorrectionPurpose::OnlineCorrection) {
+            m_onlineOperationActive = !m_onlineOperationStopLatched;
             m_onlineControlTarget = {};
             m_onlineControlTargetSegment = -1;
             m_onlineControlDisplayFrame.reset();
@@ -4830,6 +4805,7 @@ void UiController::handleCorrectionSyncUpdate(
     if (terminalUpdate) {
         state->terminated = true;
         if (update.purpose == CorrectionPurpose::OnlineCorrection) {
+            m_onlineOperationActive = false;
             // 终止撤销目标本身；暂停仅关闭图像接收，仍允许控制参考持续更新。
             m_onlineControlTarget.valid = false;
             m_onlineControlDisplayFrame.reset();

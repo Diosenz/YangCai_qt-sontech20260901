@@ -987,14 +987,14 @@ bool testExceptionProcessorRetriesAfterSeamChange()
     return ok;
 }
 
-bool enterOnlineCorrection(
+bool enterOnlineCorrectionWithSamples(
     i2r_rlc::control::COnlineCorrectionController *controller,
     i2r_rlc::robot_comm::RobotState *robotState,
-    const i2r_rlc::control::OnlineCorrectionPoint &initialPoint)
+    const std::vector<i2r_rlc::control::OnlineCorrectionPoint> &initialPoints)
 {
     controller->startInitialDetection();
     i2r_rlc::control::OnlineCorrectionDetectionEvent initial;
-    initial.samples.push_back({ initialPoint, std::nullopt });
+    for (const auto &point : initialPoints) { initial.samples.push_back({point, std::nullopt}); }
     initial.detectionFinished = true;
     controller->appendDetectionEvent(initial);
     robotState->onlineReverseCompleteFlag = 1;
@@ -1017,6 +1017,14 @@ bool enterOnlineCorrection(
     robotState->detflag = 1;
     update = controller->onRobotStateChanged(*robotState);
     return update.phase == i2r_rlc::control::OnlineCorrectionPhase::OnlineRunning;
+}
+
+bool enterOnlineCorrection(
+    i2r_rlc::control::COnlineCorrectionController *controller,
+    i2r_rlc::robot_comm::RobotState *robotState,
+    const i2r_rlc::control::OnlineCorrectionPoint &initialPoint)
+{
+    return enterOnlineCorrectionWithSamples(controller, robotState, {initialPoint});
 }
 
 /** @brief 参考形状只作为本会话起点修正后的控制路径，不假定圆形或正向 X。 */
@@ -1311,6 +1319,112 @@ bool testControllerPredictionFeedbackReceiptDeduplication()
         "feedback updated by a command receipt must still be compared with the last calculated control pose");
     return ok;
 }
+/** @brief 反向初扫的最后曝光在起点，不得误当全部已测覆盖的前向末端。 */
+bool testSevereLossPreservesReverseScanCoverage()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.enableOnlineIcp = false;
+    controller.configure(options, makePredictionTrajectory(0), makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState robot;
+    robot.sStart = 1;
+    bool ok = expectTrue(enterOnlineCorrectionWithSamples(&controller, &robot,
+        {{30, 0, 0, true}, {20, 0, 0, true}, {10, 0, 0, true}, {0, 0, 0, true}}),
+        "reverse scan fixture enters online through real initial samples");
+    OnlineCorrectionDetectionEvent loss;
+    loss.localizationAttempted = true;
+    loss.recoveryFailed = true;
+    ok &= expectTrue(!controller.appendDetectionEvent(loss).requestOperationStop,
+        "first lost online exposure retains the forward range actually observed in the reverse scan");
+    robot.curx_r = 20000;
+    ok &= expectTrue(!controller.onRobotStateChanged(robot).requestOperationStop,
+        "reverse scan measured coverage cannot be replaced by its last exposure at the start point");
+    robot.curx_r = 30000;
+    ok &= expectTrue(controller.onRobotStateChanged(robot).requestOperationStop,
+        "reverse scan grants only its real measured end rather than the entire corrected CAD");
+    return ok;
+}
+
+/** @brief 回折焊缝须按有序区段消费，末段切平面不能使早期支系误停。 */
+bool testSevereLossKeepsReliableFoldedCoverage()
+{
+    using namespace i2r_rlc::control;
+    auto trajectory = makePredictionTrajectory(0);
+    trajectory.segmentPathPoints = {{0, 0, 0, true}, {20, 0, 0, true},
+        {20, 20, 0, true}, {0, 20, 0, true}};
+    trajectory.allPathPoints = trajectory.segmentPathPoints;
+    trajectory.allMatchedPathPoints = trajectory.segmentPathPoints;
+    trajectory.pathSegments = {trajectory.segmentPathPoints};
+    trajectory.teachPoses.back().xMm = 0;
+    trajectory.teachPoses.back().yMm = 20;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.enableOnlineIcp = false;
+    controller.configure(options, trajectory, makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState robot;
+    robot.sStart = 1;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &robot, {0, 0, 0, true}),
+        "folded loss fixture enters the production online state");
+    for (const auto &point : std::vector<OnlineCorrectionPoint>{{10, 0, 0, true},
+             {20, 0, 0, true}, {20, 10, 0, true}, {20, 20, 0, true},
+             {10, 20, 0, true}, {0, 20, 0, true}}) {
+        OnlineCorrectionDetectionEvent event;
+        event.samples.push_back({point, std::nullopt});
+        controller.appendDetectionEvent(event);
+    }
+    OnlineCorrectionDetectionEvent loss;
+    loss.localizationAttempted = true;
+    loss.recoveryFailed = true;
+    const auto lost = controller.appendDetectionEvent(loss);
+    ok &= expectTrue(!lost.requestOperationStop && lost.phase == OnlineCorrectionPhase::OnlineRunning,
+        "an earlier path branch cannot exhaust reliable coverage at the far end of a folded seam");
+    for (const auto &point : std::vector<OnlineCorrectionPoint>{{10, 0, 0, true},
+             {20, 0, 0, true}, {20, 10, 0, true}, {20, 20, 0, true},
+             {10, 20, 0, true}}) {
+        robot.curx_r = static_cast<long>(point.xMm * 1000.0);
+        robot.cury_r = static_cast<long>(point.yMm * 1000.0);
+        ok &= expectTrue(!controller.onRobotStateChanged(robot).requestOperationStop,
+            "fresh robot feedback preserves remaining ordered reliable coverage");
+    }
+    robot.curx_r = 0;
+    robot.cury_r = 20000;
+    ok &= expectTrue(controller.onRobotStateChanged(robot).requestOperationStop,
+        "persistent localization loss stops once the same ordered reliable end is reached");
+    return ok;
+}
+
+/** @brief 新近曝光落在初扫覆盖内部时，不能缩短已取得的前视可靠范围。 */
+bool testSevereLossKeepsFurthestMeasuredCoverage()
+{
+    using namespace i2r_rlc::control;
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.enableOnlineIcp = false;
+    controller.configure(options, makePredictionTrajectory(0), makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState robot;
+    robot.sStart = 1;
+    bool ok = expectTrue(enterOnlineCorrectionWithSamples(&controller, &robot,
+        {{30, 0, 0, true}, {20, 0, 0, true}, {10, 0, 0, true}, {0, 0, 0, true}}),
+        "coverage fixture preserves the initial measured forward end");
+    OnlineCorrectionDetectionEvent current;
+    current.localizationAttempted = true;
+    current.currentImageSupported = true;
+    current.samples.push_back({{10, 0, 0, true}, std::nullopt});
+    controller.appendDetectionEvent(current);
+    OnlineCorrectionDetectionEvent loss;
+    loss.localizationAttempted = true;
+    loss.recoveryFailed = true;
+    controller.appendDetectionEvent(loss);
+    robot.curx_r = 20000;
+    ok &= expectTrue(!controller.onRobotStateChanged(robot).requestOperationStop,
+        "a nearer online measurement cannot erase reliable initial coverage at 30 mm");
+    robot.curx_r = 30000;
+    ok &= expectTrue(controller.onRobotStateChanged(robot).requestOperationStop,
+        "reliable coverage still expires at the farthest actual measured end");
+    return ok;
+}
+
 bool testControllerEstimatedSamplesContinueCommands()
 {
     using namespace i2r_rlc::control;
@@ -1448,6 +1562,34 @@ bool testControllerMeasuredReferencePreservesRawSamples()
     return ok;
 }
 
+/** @brief 连续 KCF 的估计可进入正式跟随，但不能成为 ICP 拟合输入。 */
+bool testContinuousKcfReferenceBypassesIcp()
+{
+    using namespace i2r_rlc::control;
+    const auto trajectory = makeIcpTrajectory();
+    COnlineCorrectionController controller;
+    OnlineCorrectionOptions options;
+    options.preserveMeasuredReference = true;
+    options.allowEstimatedReference = true;
+    controller.configure(options, trajectory, makePositionerCalibration());
+    i2r_rlc::robot_comm::RobotState robot;
+    bool ok = expectTrue(enterOnlineCorrection(&controller, &robot,
+        trajectory.segmentPathPoints.front()), "continuous KCF enters online flow");
+    OnlineCorrectionDetectionEvent event;
+    auto sample = makeIcpSample(trajectory.segmentPathPoints[1], -1);
+    sample.estimated = true;
+    event.samples.push_back(sample);
+    const auto update = controller.appendDetectionEvent(event);
+    ok &= expectTrue(!update.state.onlineDetectionSamples.empty()
+        && update.state.onlineDetectionSamples.back().estimated,
+        "estimated KCF reaches actual following queue with provenance");
+    ok &= expectTrue(!update.onlineIcpBatches.empty()
+        && !update.onlineIcpBatches.back().applied
+        && !update.onlineIcpBatches.back().attempted,
+        "continuous estimate bypasses ICP fitting");
+    return ok;
+}
+
 bool testControllerIcpUsesGlobalAndInitialCorrectionReference()
 {
     const auto trajectory = makeIcpTrajectory();
@@ -1519,7 +1661,7 @@ std::vector<i2r_rlc::control::OnlineCorrectionDetectionSample> makeFollowerSampl
     };
 }
 
-bool testPathFollowerRemovesRepeatedTarget()
+bool testPathFollowerConsumesOnlyPassedTarget()
 {
     i2r_rlc::control::COnlineCorrectionPathFollower follower;
     const std::vector<i2r_rlc::control::OnlineCorrectionPoint> teachTrajectory{
@@ -1540,10 +1682,13 @@ bool testPathFollowerRemovesRepeatedTarget()
     }
 
     bool ok = true;
-    ok &= expectTrue(result.message == "repeated online target point removed",
-                     "eleventh identical target should be removed");
-    ok &= expectTrue(samples.size() == 3,
-                     "duplicate target removal should consume one point");
+    ok &= expectTrue(samples.size() == 4 && samples.front().point.xMm == 10.0,
+                     "stationary updates must retain an unpassed forward target");
+    robotState.curx_r = 15000;
+    result = follower.update(robotState, i2r_rlc::control::OnlineCorrectionOptions{},
+        makePositionerCalibration(), teachTrajectory, &samples, false);
+    ok &= expectTrue(samples.size() == 3 && samples.front().point.xMm == 20.0,
+                     "actual robot progress consumes the passed target");
     return ok;
 }
 
@@ -1985,6 +2130,9 @@ int main(int argc, char *argv[])
     }
 
     bool ok = true;
+    ok &= testSevereLossKeepsReliableFoldedCoverage();
+    ok &= testSevereLossPreservesReverseScanCoverage();
+    ok &= testSevereLossKeepsFurthestMeasuredCoverage();
     ok &= testControllerReferencePredictionWithoutImages();
     ok &= testControllerPredictionRecoveryAndCommandRecomputation();
     ok &= testControllerPredictionLifecycleBoundaries();
@@ -2014,8 +2162,9 @@ int main(int argc, char *argv[])
     ok &= testControllerEstimatedSamplesContinueCommands();
     ok &= testControllerOnlineIcpSwitchAndFlush();
     ok &= testControllerMeasuredReferencePreservesRawSamples();
+    ok &= testContinuousKcfReferenceBypassesIcp();
     ok &= testControllerIcpUsesGlobalAndInitialCorrectionReference();
-    ok &= testPathFollowerRemovesRepeatedTarget();
+    ok &= testPathFollowerConsumesOnlyPassedTarget();
     ok &= testPathFollowerKeepsDirectionReversalLikeLegacyActiveCode();
     ok &= testPathFollowerKeepsForwardTeachCursor();
     ok &= testControllerUsesCorrectedOnlineDirectionReference();

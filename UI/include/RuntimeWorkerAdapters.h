@@ -109,6 +109,12 @@ public:
         std::unique_ptr<robot_comm::IRobotCommandTransport> transport,
         QObject *parent = nullptr);
 
+    /**
+     * @brief 线程安全地发布 HOLD 意图；不访问设备或非原子 worker 状态。
+     * robot 线程在同步事务边界消费；已经开始的单笔事务不能抢占或撤回。
+     */
+    void publishControlledHoldIntent() noexcept;
+
 public slots:
     void connectRobot();
     void disconnectRobot();
@@ -130,6 +136,8 @@ public slots:
      */
     bool ensureOnlineCorrectionReady();
     void setTrackingRequested(bool enabled);
+    /// @brief 锁存既有协议 HOLD 请求；事务完成不表示控制器已经保持或停弧。
+    void requestControlledHold();
     /// @brief 更新旧协议 OfflineStartCount 握手值，并由后续 N/O/P 请求携带。
     void setOfflineStartCount(int count);
     void updateDetectionStatus(const RuntimeTrackingResult &result);
@@ -150,6 +158,8 @@ signals:
         const robot_comm::RobotState &state);
     void diagnosticsReady(
         const robot_comm::RobotCommunicationDiagnostics &diagnostics);
+    /// @brief 只由请求后的真实协议事务更新，不采信外部状态注入。
+    void operationStopUpdated(const robot_comm::RobotOperationStopState &state);
     void statusChanged(const QString &message);
 
 private:
@@ -163,18 +173,29 @@ private:
     void stopPollingAfterTransportFailure(bool emitSnapshot = true);
     void scheduleReconnectAfterTransportFailure();
     void attemptReconnect();
+    /// @brief 保持锁存时拒绝运动请求并发布未发送回执，不改变传输连接状态。
+    bool rejectMotionDuringHold(robot_comm::RobotCommandType type);
+    /// @brief 反馈失效时撤销旧确认但保留 HOLD 锁存，不推导设备已经释放或停弧。
+    void markHoldUnconfirmed(robot_comm::RobotCommandError error,
+        const std::string &message);
 
     std::unique_ptr<robot_comm::IRobotCommandTransport> m_transport;
     QTimer *m_pollTimer = nullptr;
     QTimer *m_reconnectTimer = nullptr;
     robot_comm::RobotState m_state;
     robot_comm::RobotRealtimeCorrectionCommand m_latestRealtimeCommand;
+    /// @brief robot线程内单调P事务身份，断连/重配不重复使用。
+    std::uint64_t m_realtimeTransactionId = 0;
     int m_trackerEnabled = 0;
     int m_laserEnabled = 1;
     int m_filterEnabled = 0;
     int m_offlineSignal = 0;
     int m_offlineStartCount = 0;
     int m_firstDetectionSucceeded = 0;
+    /// @brief 唯一跨线程写入口；协议字段与传输仍由 robot 线程独占。
+    std::atomic<bool> m_controlledHoldIntent{false};
+    int m_holdRequested = 0;
+    robot_comm::RobotOperationStopState m_operationStopState;
     bool m_keepConnectionRequested = false;
     bool m_realtimeFlushScheduled = false;
     int m_reconnectAttemptCount = 0;
@@ -272,6 +293,10 @@ private:
     bool m_requireSynchronizedObservation = false;
     RuntimeVisionCorrelation m_activeCorrelation;
     vision::CLegacyOnlineKcfDetector m_detector;
+    /// @brief 焊前统计仅可交接到同会话、同参考版本的正式在线窗口。
+    quint64 m_responseCalibrationSessionId = 0;
+    quint64 m_responseCalibrationRevision = 0;
+    bool m_responseCalibrationPending = true;
     bool m_trackingActive = false;
     int m_currentLocalizationSegmentIndex = -1;
 };
@@ -592,6 +617,10 @@ public slots:
      * 语义保留，下一次用户启动可建立全新 runtime session。
      */
     void failSynchronization(const QString &message);
+    /// @brief 撤销控制状态和超时，保留当前记录直到 HOLD 反馈或运行时退出。
+    void stopForOperation();
+    /// @brief 在控制线程按接收顺序归档停止进度；仅新鲜 D 可确认保持。
+    void recordOperationStop(const robot_comm::RobotOperationStopState &state);
     void reset();
 
 signals:
@@ -599,6 +628,8 @@ signals:
     void robotCommandReady(const robot_comm::RobotCorrectionCommand &command);
     void realtimeCommandReady(
         const robot_comm::RobotRealtimeCorrectionCommand &command);
+    /// @brief 当前控制会话可靠前视轨迹耗尽后请求作业保持；接收方须核对会话。
+    void operationStopRequested(quint64 sessionId, const QString &reason);
     void startTrackingRequested();
     void stopTrackingRequested();
     void statusChanged(const QString &message);
@@ -611,10 +642,13 @@ private:
 
     control::COnlineCorrectionController m_controller;
     quint64 m_controlSessionId = 0;
+    /// @brief 控制线程内生成命令身份；configure/reset不清零，防止迟到回执误配。
+    std::uint64_t m_realtimeCommandId = 0;
     robot_comm::RobotState m_robotState;
     RuntimeOnlineCorrectionConfiguration m_configuration;
     vision::PositionerCalibration m_positionerCalibration;
     COnlineCorrectionRunRecorder m_runRecorder;
+    bool m_operationStopRequested = false;
     control::OnlineCorrectionPhase m_timeoutPhase =
         control::OnlineCorrectionPhase::Idle;
     quint64 m_phaseTimeoutGeneration = 0;

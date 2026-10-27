@@ -322,6 +322,8 @@ OnlineCorrectionExceptionResult COnlineCorrectionExceptionProcessor::processPend
                         }
                     }
                     sample.point = point;
+                    // 模型重采样不与某次曝光一一对应，不能把最近原始样本当来源。
+                    sample.sourceExposure.reset();
                     sample.scanLineChangePoint.reset();
                     result.samples.push_back(sample);
                 }

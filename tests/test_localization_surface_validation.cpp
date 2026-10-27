@@ -265,6 +265,56 @@ bool movingCurrentCadSupportsFiniteContinuation()
     return ok;
 }
 
+/** @brief 原始 11164 帧候选只差训练覆盖，恢复须保留完整留出和几何约束。 */
+int replayCoverageRecovery(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) { return 1; }
+    const auto data = QJsonDocument::fromJson(file.readAll()).object();
+    const auto archived = data.value(QStringLiteral("surface_validation")).toObject();
+    const auto readPoints = [](const QJsonValue &value) {
+        std::vector<Point> result;
+        for (const auto &entry : value.toArray()) {
+            const auto xyz = entry.toArray();
+            if (xyz.size() != 3) { return std::vector<Point>{}; }
+            result.push_back({xyz[0].toDouble(), xyz[1].toDouble(), xyz[2].toDouble()});
+        }
+        return result;
+    };
+    surface::Request input;
+    input.trainingReal_mm = readPoints(data.value(QStringLiteral("input_real_window_parent_mm")));
+    input.trainingVirtual_mm = readPoints(data.value(QStringLiteral("solve_virtual_parent_mm")));
+    input.holdoutReal_mm = readPoints(archived.value(QStringLiteral("holdout_real_parent_mm")));
+    input.holdoutVirtual_mm = readPoints(archived.value(QStringLiteral("holdout_virtual_parent_mm")));
+    const auto matrix = archived.value(QStringLiteral("pcl_candidate_virtual_to_real_row_major")).toArray();
+    if (matrix.size() != 16) { return 1; }
+    for (int i = 0; i < 16; ++i) { input.candidateVirtualToReal.rowMajor[i] = matrix[i].toDouble(); }
+    const auto strict = surface::evaluate(input);
+    bool ok = expect(!strict.accepted && strict.hasObservableCorrection,
+        "archived candidate must reproduce the original strict rejection");
+    input.options.allowTrainingCoverageRecovery = true;
+    const auto recovered = surface::evaluate(input);
+    ok &= expect(recovered.accepted && recovered.trainingCoverageRecoveryUsed,
+        "strongly improving archived candidate must recover from slight training coverage deficit");
+    ok &= expect(recovered.holdoutAfter.realCoverageRatio >= 0.7
+        && recovered.holdoutAfter.virtualCoverageRatio >= 0.7,
+        "recovery cannot lower the heldout coverage threshold");
+    auto insufficientGain = input;
+    insufficientGain.options.minimumImprovementRatio = 0.9;
+    ok &= expect(!surface::evaluate(insufficientGain).accepted,
+        "recovery must preserve a stricter configured improvement requirement");
+    auto wrongHoldout = input;
+    for (auto &point : wrongHoldout.holdoutReal_mm) { point.z_mm += 30.0; }
+    ok &= expect(!surface::evaluate(wrongHoldout).accepted,
+        "recovery cannot bypass heldout coverage failure");
+    input.holdoutReal_mm.clear();
+    ok &= expect(!surface::evaluate(input).accepted, "recovery cannot bypass missing holdout");
+    std::printf("coverage_recovery: strict=%d recovery=%d rank=%d train_virtual=%.6f\n",
+        strict.accepted, recovered.accepted, recovered.observableRank,
+        recovered.trainingAfter.virtualCoverageRatio);
+    return ok ? 0 : 1;
+}
+
 /** @brief 可选现场归档回放；只调用生产比较器，不重新拟合ICP或修改原始记录。 */
 int replayArchivedSurfaces(const QString &directory)
 {
@@ -404,6 +454,9 @@ int replayArchivedSurfaces(const QString &directory)
 
 int main(int argc, char **argv)
 {
+    if (argc == 3 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--recovery-fixture")) {
+        return replayCoverageRecovery(QString::fromLocal8Bit(argv[2]));
+    }
     if (argc == 3 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--replay-dir")) {
         return replayArchivedSurfaces(QString::fromLocal8Bit(argv[2]));
     }

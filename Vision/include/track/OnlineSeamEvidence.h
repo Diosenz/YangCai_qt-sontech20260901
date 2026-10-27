@@ -1,7 +1,7 @@
 ﻿/**
  * @file OnlineSeamEvidence.h
  * @brief 在线和回放共用的焊缝证据状态机。
- * @details 视觉 worker 独占；不访问设备，不授予估计点机器人运动资格。
+ * @details 视觉 worker 独占；不访问设备；连续跟随资格与独立几何资格分别输出。
  */
 #ifndef I2R_RLC_VISION_TRACK_ONLINE_SEAM_EVIDENCE_H
 #define I2R_RLC_VISION_TRACK_ONLINE_SEAM_EVIDENCE_H
@@ -17,18 +17,23 @@
 
 namespace i2r_rlc::vision {
 
-/** @brief 图像门限沿用回放候选；时间/行程预算未配置时禁止估计输出。 */
+/** @brief 图像门限沿用回放候选；连续跟随显式启用，其他入口沿用时间/行程预算。 */
 struct COnlineSeamEvidenceOptions {
     int anchorConfirmationFrames = 2;
     int recoveryConfirmationFrames = 2;
-    int identityCorridorPixel = 12;
-    double identityMinPatchScore = 0.70;
-    double identityMinBranchScore = 0.55;
-    double identityMinUniqueness = 0.04;
-    double recoveryMaxStepPixel = 3.0;
+    /// @brief 测试阶段使用 24 px 图像残差走廊；不限制经参考补偿后的总扫描位移。
+    int identityCorridorPixel = 24;
+    double identityMinPatchScore = 0.55;
+    double identityMinBranchScore = 0.40;
+    double identityMinUniqueness = 0.02;
+    double recoveryMaxStepPixel = 6.0;
     double maxPredictionMs = 0.0;
     double maxPredictionTravelMm = 0.0;
-    bool enableMotherConstraints = true;
+    bool enableMotherConstraints = false;
+    /// @brief 仅正式在线启用：建锚后逐曝光续接供跟随，不授予独立几何资格。
+    bool enableContinuousOutput = false;
+    /// @brief 续接及恢复的每曝光像素步长上限；异常参考跳变另行拒绝。
+    double maxContinuousStepPixel = 8.0;
 };
 
 /**
@@ -66,12 +71,16 @@ struct COnlineSeamEvidenceResult {
     cv::Point2d point{-1.0, -1.0};
     OnlineSeamPointSource source = OnlineSeamPointSource::Unavailable;
     std::string message;
+    /// @brief 临时逐项门禁诊断；仅归档，不参与验收或状态更新。
+    std::string debugDetail;
+    /// @brief 当帧实际门限快照，用于离线回放，不作为配置入口。
+    COnlineSeamEvidenceOptions debugOptions;
 };
 
 /**
  * @brief 可靠原图身份、母材约束、有限续接和恢复确认的单线程状态边界。
  * @details 原图候选及其空间投影先验收，返回 independentGeometry 后才允许
- *          detector 更新 KCF 模板。估计不能更新锚点、预算或独立 ICP 资格。
+ *          detector 更新 KCF 模板。估计不能更新锚点、预算或独立 ICP 资格；正式在线可显式用于连续跟随。
  */
 class COnlineSeamEvidence final {
 public:

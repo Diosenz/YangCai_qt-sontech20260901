@@ -5,6 +5,7 @@
 #include "TrackingDiagnosticImageWriter.h"
 
 #include <exception>
+#include <algorithm>
 #include <utility>
 
 #include <QBuffer>
@@ -16,7 +17,14 @@ namespace i2r_rlc::ui {
 
 CTrackingDiagnosticImageWriter::CTrackingDiagnosticImageWriter(
     const QString &directory, qint64 maxBytes)
-    : m_directory(directory), m_maxBytes(maxBytes)
+    : CTrackingDiagnosticImageWriter(directory, maxBytes, 2)
+{
+}
+
+CTrackingDiagnosticImageWriter::CTrackingDiagnosticImageWriter(
+    const QString &directory, qint64 maxBytes, std::size_t maxPendingPairs)
+    : m_directory(directory), m_maxBytes(maxBytes),
+      m_maxPendingPairs(std::max<std::size_t>(1, std::min<std::size_t>(32, maxPendingPairs)))
 {
     m_thread = std::thread([this]() { run(); });
 }
@@ -34,7 +42,7 @@ QString CTrackingDiagnosticImageWriter::submit(
     if (m_stopping) {
         return QStringLiteral("stopped");
     }
-    if (m_pending.size() >= 2U) {
+    if (m_pending.size() >= m_maxPendingPairs) {
         return QStringLiteral("queue_full");
     }
     if (bucket < 0 || bucket >= 5 || bucketByteBudget <= 0) {
@@ -119,7 +127,7 @@ void CTrackingDiagnosticImageWriter::writePair(const CImagePair &pair)
     sourceBuffer.open(QIODevice::WriteOnly);
     enhancedBuffer.open(QIODevice::WriteOnly);
     if (!pair.source.save(&sourceBuffer, "PNG")
-        || !pair.enhanced.save(&enhancedBuffer, "PNG")) {
+        || (!pair.enhanced.isNull() && !pair.enhanced.save(&enhancedBuffer, "PNG"))) {
         recordOutcome(pair.stem, QStringLiteral("encode_failed"), 0);
         return;
     }
@@ -147,7 +155,7 @@ void CTrackingDiagnosticImageWriter::writePair(const CImagePair &pair)
     };
     const bool sourceWritten = write(pair.stem + QStringLiteral("_source.png"), sourceData);
     const bool enhancedWritten = sourceWritten
-        && write(pair.stem + QStringLiteral("_enhanced.png"), enhancedData);
+        && (pair.enhanced.isNull() || write(pair.stem + QStringLiteral("_enhanced.png"), enhancedData));
     recordOutcome(pair.stem, enhancedWritten ? QStringLiteral("saved")
                                              : QStringLiteral("write_failed"), bytes);
 }

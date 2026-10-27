@@ -1,0 +1,69 @@
+{
+  "scope": "Original captured online images, not generated. Borrowed projection is pixel-only, no TCP or millimeter accuracy claim. Corner labels are manual visual approximations with 15 pixel test tolerance.",
+  "images": {
+    "20261027_122726_191_2070.png": {
+      "sha256": "0f4a9a2a3537e4c0fb70234652685a203ddab95a8378086146225a8ec38f07e1",
+      "source": "output\\online_correction\\20261027_122726_191\\vision_images\\sample_22_session_1_frame_2070_source.png"
+    },
+    "20261027_123015_913_7264.png": {
+      "sha256": "87a27a0776f153f96ea14bb8ef9271a4b9033dbcb91986464be4cf1b04ca0f63",
+      "source": "output\\online_correction\\20261027_123015_913\\vision_images\\sample_21_session_2_frame_7264_source.png"
+    },
+    "20261027_122726_191_3801.png": {
+      "sha256": "bd7597520a5cba2cb40ee4f023d984b72e3bc1866a240c3d438633f5883f62ac",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_3801_source.png"
+    },
+    "20261027_122726_191_3830.png": {
+      "sha256": "320af152bb24e7573506e28a3542d943a1e5213626f85523489cc8be858f9f85",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_3830_source.png"
+    },
+    "20261027_122726_191_3856.png": {
+      "sha256": "604e49345eb37a0815f354eeaf76f7296e5fafe851285e938da0c09d8d95c6ca",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_3856_source.png"
+    },
+    "20261027_122726_191_3884.png": {
+      "sha256": "1f3bb1d8b41cbeb56c86cd2d4d5e7b7a598aadc63173348d577e9707816cb7bf",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_3884_source.png"
+    },
+    "20261027_122726_191_3910.png": {
+      "sha256": "eb78240ef625a56b0208c6b770564bfddbdf4325d01e087674cdbf7ec80d1803",
+      "source": "output\\online_correction\\20261027_122726_191\\vision_images\\sample_89_session_1_frame_3910_source.png"
+    },
+    "20261027_122726_191_3937.png": {
+      "sha256": "8c0172f50c6e088a166836283dc50a30678160c459b4e2136af478963bca13a4",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_3937_source.png"
+    },
+    "20261027_122726_191_3969.png": {
+      "sha256": "cf4aa6d4326a7960ee6b71c79c0cf000b0a8df47095451ea2adc6fa1b35c085b",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_3969_source.png"
+    },
+    "20261027_122726_191_3999.png": {
+      "sha256": "90eb65a29d2d2a461abc26d0cc7946d32f60e2ddee138e1cab5230bb83f7367f",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_3999_source.png"
+    },
+    "20261027_122726_191_4031.png": {
+      "sha256": "ee623960c5d6a4c22f8c27d96159350988651a63d76d1a24550a684ec2d07d59",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_4031_source.png"
+    },
+    "20261027_122726_191_4061.png": {
+      "sha256": "97f646cdd3e54a730668df96d8be887f283d2633348fd91032e4bf0ecb640aad",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_4061_source.png"
+    },
+    "20261027_122726_191_4087.png": {
+      "sha256": "1e63898e1e3aa565c1201cae312fa8173f64f9551211a51468f29f35152a753a",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_4087_source.png"
+    },
+    "20261027_122726_191_4115.png": {
+      "sha256": "0fe1f834d2ef365511998fc0f5bec418345eacd1a1db0f07470c6c7274ac80c0",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_4115_source.png"
+    },
+    "20261027_122726_191_4143.png": {
+      "sha256": "b86b2b1d6f080a1c304cde8ce5f4df53a4be77eebd9a3515e51bf76051bb19e9",
+      "source": "output\\online_correction\\20261027_122726_191\\loss_window_images\\stage_1_session_1_frame_4143_source.png"
+    },
+    "20261027_122726_191_4171.png": {
+      "sha256": "1df16c9486b4a68f4e9f5c2698e86e7d5560aea4d6eb01011e4764f6bbd126bb",
+      "source": "output\\online_correction\\20261027_122726_191\\vision_images\\sample_98_session_1_frame_4171_source.png"
+    }
+  }
+}

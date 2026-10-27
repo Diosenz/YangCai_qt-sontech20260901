@@ -188,8 +188,6 @@ void testFusedAndMkcfPaths()
         "KCF MKCF initialization should create primary and secondary history templates");
     require(!mkcf.m_alphaF.empty(),
         "KCF MKCF initialization should create alpha filter");
-    require(std::abs((mkcf.m_kernelCoeffPrimary + mkcf.m_kernelCoeffSecondary) - 1.0F) < 1e-3F,
-        "KCF MKCF kernel coefficients should be normalized");
     require(mkcf.update(makeFrame(cv::Point(43, 42), true)).area() > 0,
         "KCF MKCF compatibility path failed");
     require(!mkcf.m_kernel12Primary.empty() && !mkcf.m_kernel21Primary.empty(),

@@ -28,8 +28,9 @@
  *
  ******************************************************************************/
 #include <algorithm>
+#include <array>
 #include <cmath>
-#include <deque>
+#include <complex>
 #include <limits>
 #include <memory>
 #include <vector>
@@ -106,53 +107,15 @@ cv::Mat addRealScalar(const cv::Mat &value, float scalar)
 }
 
 /**
- * @brief 处理空矩阵兼容逻辑的复数矩阵加法。
- * @param left 左矩阵。
- * @param right 右矩阵。
- * @return 两个矩阵相加后的结果；空输入按零矩阵处理。
+ * @brief 将中心表示的相关核还原到零位移原点，再计算循环核的特征值。
+ * @details 中心移位在偶数格频域引入交替符号；直接用于 MKCF 正则项会把
+ *          半正定核误当成不定矩阵。此转换只用于训练，检测仍保留中心响应。
  */
-cv::Mat complexAddition(const cv::Mat &left, const cv::Mat &right)
+cv::Mat zeroShiftSpectrum(const cv::Mat &centeredSpatial)
 {
-    if (left.empty())
-    {
-        return right.clone();
-    }
-    if (right.empty())
-    {
-        return left.clone();
-    }
-    return left + right;
-}
-
-/**
- * @brief 对复数矩阵所有通道乘以实数标量。
- * @param value 输入矩阵。
- * @param scalar 实数缩放系数。
- * @return 缩放后的矩阵。
- */
-cv::Mat complexMultiplicationScalar(const cv::Mat &value, float scalar)
-{
-    return value * scalar;
-}
-
-/**
- * @brief 统计矩阵实部之和。
- * @param value 单通道实数矩阵或双通道复数矩阵。
- * @return 实部元素求和结果。
- */
-double sumRealPart(const cv::Mat &value)
-{
-    if (value.empty())
-    {
-        return 0.0;
-    }
-    if (value.channels() == 1)
-    {
-        return cv::sum(value)[0];
-    }
-    std::vector<cv::Mat> planes;
-    cv::split(value, planes);
-    return planes.empty() ? 0.0 : cv::sum(planes[0])[0];
+    cv::Mat spatial = centeredSpatial.clone();
+    KcfFftTools::rearrange(spatial);
+    return KcfFftTools::fftd(spatial);
 }
 
 /**
@@ -218,7 +181,7 @@ void addAFast(double &accumulator, const cv::Mat &abs2Mat, const cv::Mat &kernel
             const float mIm = mPtr[col][1];
             const float pRe = pPtr[col][0];
             const float pIm = pPtr[col][1];
-            sum += static_cast<double>(absPtr[col]) * static_cast<double>(mRe * pRe - mIm * pIm);
+            sum += static_cast<double>(absPtr[col]) * static_cast<double>(mRe * pRe + mIm * pIm);
         }
     }
     accumulator += sum;
@@ -260,18 +223,6 @@ double sumConjAMulKMulB(const cv::Mat &alpha, const cv::Mat &kernel, const cv::M
 }
 
 /**
- * @brief 计算 `conj(alpha) * kernel * prob` 的实部和。
- * @param alpha 频域 alpha。
- * @param kernel kernel 响应。
- * @param prob Gaussian peak 频域响应。
- * @return 实部累计值。
- */
-double sumConjAMulKMulProb(const cv::Mat &alpha, const cv::Mat &kernel, const cv::Mat &prob)
-{
-    return sumConjAMulKMulB(alpha, kernel, prob);
-}
-
-/**
  * @brief 计算复数矩阵逐元素平方幅值。
  * @param complexMat `CV_32FC2` 复数矩阵。
  * @param abs2Mat 输出单通道平方幅值矩阵。
@@ -293,69 +244,274 @@ void computeAbs2(const cv::Mat &complexMat, cv::Mat &abs2Mat)
     }
 }
 
-/**
- * @brief 计算观测历史均值。
- * @param values 观测历史序列。
- * @return 均值；空序列返回 0。
- */
-double calcMean(const std::deque<double> &values)
+/** @brief 同一固定目标的 MKCF 核、标签和正则系数；全部频谱以零位移为原点。 */
+struct MkcfOptimizationProblem
 {
-    if (values.empty())
-    {
-        return 0.0;
-    }
-    double sum = 0.0;
-    for (double value : values)
-    {
-        sum += value;
-    }
-    return sum / static_cast<double>(values.size());
+    std::vector<std::vector<cv::Mat>> primary;
+    std::vector<std::vector<cv::Mat>> secondary;
+    cv::Mat target;
+    double lambda = 0.0;
+    double coupling = 0.0;
+    double sumPenalty = 0.0;
+};
+
+/** @brief 同次优化的非负软权重及各模板系数；不得与其他模板基底混用。 */
+struct MkcfOptimizationModel
+{
+    cv::Vec2d weights;
+    std::vector<cv::Mat> alphas;
+};
+
+/**
+ * @brief 按论文式 3-31 递推实际检测模板，随后必须用此基底重新训练 alpha。
+ * @details previous 仅来自上一已接纳模型；候选失败时不推进模板或历史状态。
+ */
+cv::Mat acceptedTemplateCandidate(const cv::Mat &observed, const cv::Mat &previous,
+    float learningRate)
+{
+    if (previous.empty() || previous.size() != observed.size()) { return observed.clone(); }
+    return (1.0F - learningRate) * previous + learningRate * observed;
 }
 
 /**
- * @brief 计算观测历史样本标准差。
- * @param values 观测历史序列。
- * @return 样本标准差；样本不足时返回大值避免过度信任观测。
+ * @brief 精确比较二维非负 QP 的原点、两轴和内部主动集。
+ * @details 最小化 .5*t'H*t-r't；和为一只通过 H/r 内的软罚项表达。
+ *          不截断无约束解，不归一化，不用任意 jitter 隐藏不定 Hessian。
  */
-double calcStdDev(const std::deque<double> &values)
+bool solveNonnegativeWeights(const cv::Vec3d &hessian, const cv::Vec2d &rhs,
+    cv::Vec2d &weights)
 {
-    if (values.size() <= 1)
-    {
-        return 1e9;
+    const double scale = std::max({std::abs(hessian[0]), std::abs(hessian[1]),
+        std::abs(hessian[2]), std::numeric_limits<double>::min()});
+    const cv::Vec3d h = hessian / scale;
+    const cv::Vec2d r = rhs / scale;
+    const double determinant = h[0] * h[2] - h[1] * h[1];
+    if (!std::isfinite(scale) || !std::isfinite(h[0]) || !std::isfinite(h[1])
+        || !std::isfinite(h[2]) || !std::isfinite(r[0]) || !std::isfinite(r[1])
+        || h[0] < -1e-12 || h[2] < -1e-12 || determinant < -1e-12) {
+        return false;
     }
-    const double mean = calcMean(values);
-    double sumSquared = 0.0;
-    for (double value : values)
-    {
-        const double diff = value - mean;
-        sumSquared += diff * diff;
+    weights = {0.0, 0.0};
+    double best = 0.0;
+    const auto consider = [&](const cv::Vec2d &candidate) {
+        if (!std::isfinite(candidate[0]) || !std::isfinite(candidate[1])
+            || candidate[0] < 0.0 || candidate[1] < 0.0) { return; }
+        const double value = 0.5 * (h[0] * candidate[0] * candidate[0]
+            + 2.0 * h[1] * candidate[0] * candidate[1]
+            + h[2] * candidate[1] * candidate[1]) - r.dot(candidate);
+        if (value < best) { best = value; weights = candidate; }
+    };
+    if (h[0] > 1e-12) { consider({std::max(0.0, r[0] / h[0]), 0.0}); }
+    if (h[2] > 1e-12) { consider({0.0, std::max(0.0, r[1] / h[2])}); }
+    if (determinant > 1e-12) {
+        consider({(h[2] * r[0] - h[1] * r[1]) / determinant,
+            (h[0] * r[1] - h[1] * r[0]) / determinant});
     }
-    return std::sqrt(sumSquared / static_cast<double>(values.size() - 1));
+    return true;
+}
+
+using MkcfComplexT = std::complex<double>;
+
+/**
+ * @brief 直接求解最多三个未知数的复数系统；病态或秩亏时由调用方回退 SVD。
+ * @details 带列主元的消元仅改变求解成本，不改变方程或给分母添加正则。
+ */
+bool solveSmallComplexSystem(const std::array<MkcfComplexT, 9> &equations,
+    const std::array<MkcfComplexT, 3> &rhs, int count,
+    std::array<MkcfComplexT, 3> &solution)
+{
+    if (count < 1 || count > 3) { return false; }
+    auto matrix = equations;
+    auto values = rhs;
+    double largest = 0.0;
+    for (const auto &value : equations) { largest = std::max(largest, std::abs(value)); }
+    const double tolerance = std::numeric_limits<double>::epsilon() * count * largest;
+    solution = {};
+    for (int column = 0; column < count; ++column) {
+        int pivot = column;
+        for (int row = column + 1; row < count; ++row) {
+            if (std::abs(matrix[3 * row + column]) > std::abs(matrix[3 * pivot + column])) {
+                pivot = row;
+            }
+        }
+        if (std::abs(matrix[3 * pivot + column]) <= tolerance) { return false; }
+        if (pivot != column) {
+            for (int j = 0; j < count; ++j) {
+                std::swap(matrix[3 * column + j], matrix[3 * pivot + j]);
+            }
+            std::swap(values[column], values[pivot]);
+        }
+        for (int row = column + 1; row < count; ++row) {
+            const auto factor = matrix[3 * row + column] / matrix[3 * column + column];
+            matrix[3 * row + column] = {};
+            for (int j = column + 1; j < count; ++j) {
+                matrix[3 * row + j] -= factor * matrix[3 * column + j];
+            }
+            values[row] -= factor * values[column];
+        }
+    }
+    for (int row = count - 1; row >= 0; --row) {
+        auto value = values[row];
+        for (int j = row + 1; j < count; ++j) { value -= matrix[3 * row + j] * solution[j]; }
+        solution[row] = value / matrix[3 * row + row];
+    }
+    return true;
+}
+
+/** @brief 以原 2n 实数等价系统的同一后向残差判据验收复数解。 */
+bool validSmallSystemResidual(const std::array<MkcfComplexT, 9> &equations,
+    const std::array<MkcfComplexT, 3> &rhs, int count,
+    const std::array<MkcfComplexT, 3> &solution)
+{
+    if (count < 1 || count > 3) { return false; }
+    double residual2 = 0.0;
+    double matrixNorm2 = 0.0;
+    double rhsNorm2 = 0.0;
+    double solutionNorm2 = 0.0;
+    for (int i = 0; i < count; ++i) {
+        auto residual = -rhs[i];
+        rhsNorm2 += std::norm(rhs[i]);
+        solutionNorm2 += std::norm(solution[i]);
+        for (int j = 0; j < count; ++j) {
+            const auto value = equations[3 * i + j];
+            residual += value * solution[j];
+            matrixNorm2 += std::norm(value);
+        }
+        residual2 += std::norm(residual);
+    }
+    const double scale = std::sqrt(2.0 * matrixNorm2 * solutionNorm2) + std::sqrt(rhsNorm2);
+    return std::isfinite(residual2) && std::isfinite(scale) && std::sqrt(residual2)
+        <= 1e-8 * std::max(scale, std::numeric_limits<double>::min());
 }
 
 /**
- * @brief 计算复数矩阵 Frobenius 范数平方。
- * @param complexMat `CV_32FC2` 复数矩阵。
- * @return 所有元素平方幅值之和。
+ * @brief 在最终权重的原始驻点方程上直接求解各模板 alpha。
+ * @details 对每个频点解最多 6x6 的实数等价系统：
+ * [kii^2+(lambda+(n-1)mu)kii]beta_i-mu*sum(kij*beta_j)=kii*g。
+ * 双精度小系统直接求解，病态/秩亏频点使用 SVD 最小范数解；
+ * 避免 kij/kii 和固定 epsilon 复除的偏置。
  */
-double calcFrobeniusNorm2(const cv::Mat &complexMat)
+bool solveMkcfAlphas(const MkcfOptimizationProblem &problem, const cv::Vec2d &weights,
+    std::vector<cv::Mat> &alphas)
 {
-    CV_Assert(complexMat.type() == CV_32FC2);
-    std::vector<cv::Mat> channels;
-    cv::split(complexMat, channels);
-    cv::Mat magnitude2 = channels[0].mul(channels[0]) + channels[1].mul(channels[1]);
-    return static_cast<double>(cv::sum(magnitude2)[0]);
+    const int count = static_cast<int>(problem.primary.size());
+    CV_Assert(count >= 1 && count <= 3);
+    std::vector<std::vector<cv::Mat>> kernels(count, std::vector<cv::Mat>(count));
+    alphas.resize(count);
+    for (int i = 0; i < count; ++i) {
+        alphas[i] = cv::Mat::zeros(problem.target.size(), CV_32FC2);
+        for (int j = 0; j < count; ++j) {
+            kernels[i][j] = problem.primary[i][j] * weights[0]
+                + problem.secondary[i][j] * weights[1];
+        }
+    }
+    const double regularizer = problem.lambda + (count - 1) * problem.coupling;
+    std::vector<unsigned char> validRows(problem.target.rows, 1);
+    // 各任务只读核矩阵、独占频率行与求解缓冲；保留原方程及残差验收。
+    cv::parallel_for_(cv::Range(0, problem.target.rows), [&](const cv::Range &range) {
+        cv::Mat equations(2 * count, 2 * count, CV_64F);
+        cv::Mat rhs(2 * count, 1, CV_64F);
+        cv::Mat solution;
+        for (int row = range.start; row < range.end; ++row) {
+            for (int col = 0; col < problem.target.cols; ++col) {
+                std::array<MkcfComplexT, 9> complexEquations{};
+                std::array<MkcfComplexT, 3> complexRhs{};
+                std::array<MkcfComplexT, 3> complexSolution{};
+                const auto target = problem.target.at<cv::Vec2f>(row, col);
+                for (int i = 0; i < count; ++i) {
+                    const double self = kernels[i][i].at<cv::Vec2f>(row, col)[0];
+                    complexRhs[i] = {self * target[0], self * target[1]};
+                    for (int j = 0; j < count; ++j) {
+                        const auto kernel = kernels[i][j].at<cv::Vec2f>(row, col);
+                        const double re = i == j ? self * (self + regularizer)
+                            : -problem.coupling * kernel[0];
+                        const double im = i == j ? 0.0 : -problem.coupling * kernel[1];
+                        complexEquations[3 * i + j] = {re, im};
+                    }
+                }
+                if (!solveSmallComplexSystem(complexEquations, complexRhs, count, complexSolution)
+                    || !validSmallSystemResidual(complexEquations, complexRhs, count, complexSolution)) {
+                    equations.setTo(0.0);
+                    rhs.setTo(0.0);
+                    for (int i = 0; i < count; ++i) {
+                        rhs.at<double>(2 * i) = complexRhs[i].real();
+                        rhs.at<double>(2 * i + 1) = complexRhs[i].imag();
+                        for (int j = 0; j < count; ++j) {
+                            const auto value = complexEquations[3 * i + j];
+                            equations.at<double>(2 * i, 2 * j) = value.real();
+                            equations.at<double>(2 * i, 2 * j + 1) = -value.imag();
+                            equations.at<double>(2 * i + 1, 2 * j) = value.imag();
+                            equations.at<double>(2 * i + 1, 2 * j + 1) = value.real();
+                        }
+                    }
+                    if (!cv::solve(equations, rhs, solution, cv::DECOMP_SVD)
+                        || !cv::checkRange(solution)) { validRows[row] = 0; return; }
+                    for (int i = 0; i < count; ++i) {
+                        complexSolution[i] = {solution.at<double>(2 * i), solution.at<double>(2 * i + 1)};
+                    }
+                }
+                if (!validSmallSystemResidual(complexEquations, complexRhs, count, complexSolution)) {
+                    validRows[row] = 0;
+                    return;
+                }
+                for (int i = 0; i < count; ++i) {
+                    alphas[i].at<cv::Vec2f>(row, col) = {
+                        static_cast<float>(complexSolution[i].real()),
+                        static_cast<float>(complexSolution[i].imag())};
+                }
+            }
+        }
+    });
+    if (std::find(validRows.begin(), validRows.end(), 0) != validRows.end()) { return false; }
+    for (const auto &alpha : alphas) {
+        if (!cv::checkRange(alpha)) { return false; }
+    }
+    return true;
 }
 
-/**
- * @brief 计算两个复数矩阵差值的 Frobenius 范数平方。
- * @param left 左矩阵。
- * @param right 右矩阵。
- * @return `(left - right)` 的平方范数。
- */
-double calcDiffFrobeniusNorm2(const cv::Mat &left, const cv::Mat &right)
+/** @brief 固定候选模板与 mu 交替求解同一论文目标；最后重解 alpha，实际模板递推由调用方完成。 */
+bool optimizeMkcf(const MkcfOptimizationProblem &problem, MkcfOptimizationModel &model)
 {
-    return calcFrobeniusNorm2(left - right);
+    const int count = static_cast<int>(problem.primary.size());
+    const double inverseCount = 1.0 / static_cast<double>(problem.target.total());
+    for (int iteration = 0; iteration < 10; ++iteration) {
+        if (!solveMkcfAlphas(problem, model.weights, model.alphas)) { return false; }
+        cv::Vec3d a(0.0, 0.0, 0.0);
+        cv::Vec2d b(0.0, 0.0);
+        cv::Vec2d u(0.0, 0.0);
+        cv::Vec2d cross(0.0, 0.0);
+        for (int i = 0; i < count; ++i) {
+            cv::Mat abs2;
+            computeAbs2(model.alphas[i], abs2);
+            const auto &primary = problem.primary[i][i];
+            const auto &secondary = problem.secondary[i][i];
+            addAFast(a[0], abs2, primary, primary);
+            addAFast(a[1], abs2, primary, secondary);
+            addAFast(a[2], abs2, secondary, secondary);
+            b[0] += sumConjAMulKMulB(problem.target, primary, model.alphas[i]);
+            b[1] += sumConjAMulKMulB(problem.target, secondary, model.alphas[i]);
+            u[0] += sumAbs2MulRealK(abs2, primary);
+            u[1] += sumAbs2MulRealK(abs2, secondary);
+            for (int j = i + 1; j < count; ++j) {
+                cross[0] += sumConjAMulKMulB(model.alphas[i], problem.primary[i][j], model.alphas[j]);
+                cross[1] += sumConjAMulKMulB(model.alphas[i], problem.secondary[i][j], model.alphas[j]);
+            }
+        }
+        // forward DFT 未缩放，Parseval 的 1/N 使软罚强度不随特征格尺寸改变。
+        a *= inverseCount;
+        b *= inverseCount;
+        u *= inverseCount;
+        cross *= inverseCount;
+        const cv::Vec2d linear = 0.5 * (problem.lambda + (count - 1) * problem.coupling) * u
+            - problem.coupling * cross;
+        cv::Vec2d next;
+        if (!solveNonnegativeWeights(a + cv::Vec3d::all(problem.sumPenalty),
+                b - linear + cv::Vec2d::all(problem.sumPenalty), next)) { return false; }
+        const double change = cv::norm(next - model.weights) / (1.0 + cv::norm(model.weights));
+        model.weights = next;
+        if (change < 1e-5) { break; }
+    }
+    return solveMkcfAlphas(problem, model.weights, model.alphas);
 }
 
 } // namespace
@@ -405,8 +561,8 @@ CKcfTracker::CKcfTracker(
     m_cell_sizeQ = m_cell_size * m_cell_size;
     m_sigmaPrimary = m_sigma;
     m_sigmaSecondary = std::max(0.2F, m_sigma * 0.5F);
-    m_kernelCoeffPrimary = 1.0F;
-    m_kernelCoeffSecondary = 0.0F;
+    m_kernelCoeffPrimary = 0.9F;
+    m_kernelCoeffSecondary = 0.1F;
     m_upsilon = 1.0F;
     if (multiscale)
     {
@@ -425,12 +581,24 @@ CKcfTracker::CKcfTracker(
         m_template_size = 1;
         m_scale_step = 1.0F;
     }
+    if (m_featureMode == KcfFeatureMode::Mkcf)
+    {
+        // 窄激光条纹缩到固定 96 像素窗后会不足一个像素，亚格响应可反向。
+        // MKCF 保留原采样尺度，仅按既有 FHOG 几何对齐 cell 边界。
+        m_template_size = 1;
+    }
 }
 
 void CKcfTracker::init(const cv::Rect &roi, cv::Mat image)
 {
     m_pendingOnlineFeatures.release();
+    m_pendingOnlineSecondaryFeatures.release();
     m_pendingOnlineImage.release();
+    m_trainedTemplateCount = 0;
+    m_detectionTmplPrimary.release();
+    m_detectionTmplSecondary.release();
+    m_histTmplPrimary.release();
+    m_histTmplSecondary.release();
     m_updateDiagnostic = {};
     m_modify_flag = false;
     m_imageCount = 1;
@@ -448,6 +616,9 @@ void CKcfTracker::init(const cv::Rect &roi, cv::Mat image)
     }
 
     m_prob = createGaussianPeak(m_sizePatch[0], m_sizePatch[1]);
+    if (m_featureMode == KcfFeatureMode::Mkcf) {
+        m_mkcfProb = zeroShiftSpectrum(KcfFftTools::real(KcfFftTools::fftd(m_prob, true)));
+    }
     m_alphaF = cv::Mat::zeros(m_sizePatch[0], m_sizePatch[1], CV_32FC2);
     if (m_featureMode == KcfFeatureMode::Mkcf)
     {
@@ -508,6 +679,7 @@ void CKcfTracker::setOnlineObservationMode(bool enabled)
     if (enabled == m_onlineObservationMode) { return; }
     m_onlineObservationMode = enabled;
     m_pendingOnlineFeatures.release();
+    m_pendingOnlineSecondaryFeatures.release();
     m_pendingOnlineImage.release();
 }
 
@@ -517,21 +689,59 @@ void CKcfTracker::commitOnlineObservationTraining(bool accepted)
     if (accepted) {
         const cv::Rect2f currentRoi = m_roi;
         m_roi = m_pendingOnlineRoi;
+        bool trained = true;
         if (m_featureMode == KcfFeatureMode::Mkcf) {
             if (m_numTmpl == 2) {
-                train2TMKCF(m_pendingOnlineImage, m_interp_factor, 0.0, 1.0);
+                trained = train2TMKCF(m_pendingOnlineImage, m_interp_factor, 1e-6, 2.0);
             } else {
-                train3TMKCF(m_pendingOnlineImage, m_interp_factor, 0.0, 1.0);
+                trained = train3TMKCF(m_pendingOnlineImage, m_interp_factor, 1e-6, 2.0);
             }
-            trainStandardReference(m_pendingOnlineFeatures, m_interp_factor);
+            if (trained) { trainStandardReference(m_pendingOnlineFeatures, m_interp_factor); }
         } else {
             train(m_pendingOnlineFeatures, m_interp_factor);
         }
         m_roi = currentRoi;
-        m_updateDiagnostic.trainingCommitted = true;
+        m_updateDiagnostic.trainingCommitted = trained;
+        m_updateDiagnostic.trainingRejected = !trained;
     }
     m_pendingOnlineFeatures.release();
+    m_pendingOnlineSecondaryFeatures.release();
     m_pendingOnlineImage.release();
+}
+
+void CKcfTracker::commitOnlineSimulationTraining()
+{
+    if (!m_onlineObservationMode || m_featureMode != KcfFeatureMode::Mkcf) { return; }
+    commitOnlineObservationTraining(false);
+    if (!hasSimulatedTemplate()) { return; }
+    const cv::Rect2f trackedRoi = m_roi;
+    m_roi = m_imageSimROI;
+    // U_i=U_i^s；不能继续把异常实拍以小学习率写入递推模板。
+    const bool trained = m_numTmpl == 2
+        ? train2TMKCF(m_imageSim, 1.0F, 1e-6, 2.0)
+        : train3TMKCF(m_imageSim, 1.0F, 1e-6, 2.0);
+    m_roi = trackedRoi;
+    m_updateDiagnostic.trainingCommitted = trained;
+    m_updateDiagnostic.trainingRejected = !trained;
+    m_updateDiagnostic.trainingFromSimulation = trained;
+}
+
+void CKcfTracker::correctOnlineObservationRoi(const cv::Rect2f &roi)
+{
+    if (!m_onlineObservationMode || m_pendingOnlineImage.empty()
+        || !std::isfinite(roi.x) || !std::isfinite(roi.y)
+        || !std::isfinite(roi.width) || !std::isfinite(roi.height)
+        || roi.width <= 0.0F || roi.height <= 0.0F) { return; }
+    m_roi = roi;
+    clampRoiToImage(m_pendingOnlineImage);
+    m_pendingOnlineRoi = m_roi;
+    if (m_featureMode == KcfFeatureMode::Mkcf) {
+        getFeatures(m_pendingOnlineImage, m_roi, 1.0F,
+            m_pendingOnlineFeatures, m_pendingOnlineSecondaryFeatures);
+    } else {
+        m_pendingOnlineFeatures = getFeatures(m_pendingOnlineImage, false, 1.0F);
+    }
+    m_updateDiagnostic.finalRoi = m_roi;
 }
 
 void CKcfTracker::setSimulatedTemplate(const cv::Mat &image, const cv::Rect &roi)
@@ -576,9 +786,16 @@ const CKcfUpdateDiagnostic &CKcfTracker::lastUpdateDiagnostic() const
 cv::Rect CKcfTracker::update(cv::Mat image)
 {
     m_pendingOnlineFeatures.release();
+    m_pendingOnlineSecondaryFeatures.release();
     m_pendingOnlineImage.release();
     m_updateDiagnostic = {};
     m_updateDiagnostic.onlineObservationMode = m_onlineObservationMode;
+    // 必须在检测和本帧延迟训练之前冻结来源，不能用新仿真输入冒充旧响应的模型。
+    if (m_featureMode == KcfFeatureMode::Mkcf) {
+        m_updateDiagnostic.responseTemplateCount = m_trainedTemplateCount;
+        m_updateDiagnostic.responseHogWeight = m_kernelCoeffPrimary;
+        m_updateDiagnostic.responseGrayWeight = m_kernelCoeffSecondary;
+    }
     m_updateDiagnostic.fusionMode = m_fusionOptions.mode;
     m_updateDiagnostic.simulationWeight = m_fusionOptions.simulationWeight;
     normalizeImage(image);
@@ -587,40 +804,10 @@ cv::Rect CKcfTracker::update(cv::Mat image)
     const cv::Point2f previousTopLeft(m_roi.x, m_roi.y);
     float peakValue = 0.0F;
 
-    cv::Mat standardSearchFeature;
-    cv::Point2f standardOffset(0.0F, 0.0F);
-    float standardPeakValue = 0.0F;
-    if (m_featureMode == KcfFeatureMode::Mkcf)
-    {
-        standardSearchFeature = getFeatures(image, false, 1.0F);
-        standardOffset = detectWithModelAlpha(
-            m_standardReferenceTmpl,
-            m_standardReferenceAlphaF,
-            standardSearchFeature,
-            standardPeakValue);
-    }
-
+    // MKCF 的联合模型直接决定相关位置，不能再强制投回标准 HOG 输出。
     cv::Point2f offset = (m_featureMode == KcfFeatureMode::Mkcf)
         ? detectMKCF(image, peakValue)
         : detect(m_tmpl, getFeatures(image, false, 1.0F), peakValue);
-
-    if (m_featureMode == KcfFeatureMode::Mkcf
-        && !m_standardReferenceTmpl.empty()
-        && !m_standardReferenceAlphaF.empty())
-    {
-        constexpr float kMaxMkcfDeviationFromStandardPixel = 0.0F;
-        const cv::Point2f delta = offset - standardOffset;
-        const float deltaPixel = std::sqrt(delta.x * delta.x + delta.y * delta.y)
-            * static_cast<float>(m_cell_size) * m_scale;
-        if (deltaPixel > kMaxMkcfDeviationFromStandardPixel)
-        {
-            const float maxDeltaCell = kMaxMkcfDeviationFromStandardPixel
-                / std::max(1e-6F, static_cast<float>(m_cell_size) * m_scale);
-            const float deltaCell = std::sqrt(delta.x * delta.x + delta.y * delta.y);
-            offset = standardOffset + delta * (maxDeltaCell / std::max(1e-6F, deltaCell));
-            peakValue = standardPeakValue;
-        }
-    }
 
     if (m_scale_step != 1.0F && m_featureMode != KcfFeatureMode::Mkcf)
     {
@@ -770,9 +957,13 @@ cv::Rect CKcfTracker::update(cv::Mat image)
         // 融合只影响业务权重；真实相关滤波不能在仿真位置继续搜索和学习。
         m_roi = m_updateDiagnostic.beforeFusionRoi;
     }
-    cv::Mat currentFeature = (m_featureMode == KcfFeatureMode::FusedHogGray)
-        ? fusedFeat(image, 1.0F)
-        : getFeatures(image, false, 1.0F);
+    cv::Mat currentFeature;
+    if (m_onlineObservationMode && m_featureMode == KcfFeatureMode::Mkcf) {
+        getFeatures(image, m_roi, 1.0F, currentFeature, m_pendingOnlineSecondaryFeatures);
+    } else {
+        currentFeature = (m_featureMode == KcfFeatureMode::FusedHogGray)
+            ? fusedFeat(image, 1.0F) : getFeatures(image, false, 1.0F);
+    }
     if (m_onlineObservationMode) {
         m_pendingOnlineFeatures = currentFeature;
         if (m_featureMode == KcfFeatureMode::Mkcf) { m_pendingOnlineImage = image; }
@@ -783,11 +974,11 @@ cv::Rect CKcfTracker::update(cv::Mat image)
     {
         if (m_numTmpl == 2)
         {
-            train2TMKCF(image, m_interp_factor, 0.0, 1.0);
+            train2TMKCF(image, m_interp_factor, 1e-6, 2.0);
         }
         else
         {
-            train3TMKCF(image, m_interp_factor, 0.0, 1.0);
+            train3TMKCF(image, m_interp_factor, 1e-6, 2.0);
         }
         trainStandardReference(currentFeature, m_interp_factor);
     }
@@ -1171,7 +1362,7 @@ cv::Mat CKcfTracker::getFeatures(const cv::Mat &image, bool initHann, float scal
 
 void CKcfTracker::getFeatures(
     const cv::Mat &image,
-    const cv::Rect &roi,
+    const cv::Rect_<float> &roi,
     float scaleAdjust,
     cv::Mat &primaryFeature,
     cv::Mat &secondaryFeature)
@@ -1214,11 +1405,15 @@ void CKcfTracker::getFeatures(
     cv::transpose(rawFeature, primaryFeature);
     freeFeatureMapObject(&featureMap);
 
+    // getGrayImage 已归一化到 [0, 1]；重复除以 255 会消除灰度辨别力。
     cv::Mat gray = KcfRectTools::getGrayImage(patch);
-    gray.convertTo(gray, CV_32F, 1.0 / 255.0);
     gray -= 0.5F;
+    // FHOG 归一化删除外围一圈 cell；双核必须以相同空间范围和格距表达位移。
+    const cv::Rect graySupport(m_cell_size, m_cell_size,
+        width * m_cell_size, height * m_cell_size);
     cv::Mat grayResized;
-    cv::resize(gray, grayResized, cv::Size(width, height), 0.0, 0.0, cv::INTER_AREA);
+    cv::resize(gray(graySupport), grayResized,
+        cv::Size(width, height), 0.0, 0.0, cv::INTER_AREA);
     secondaryFeature = grayResized.clone();
 
     createHannUnified(height, width);
@@ -1240,7 +1435,7 @@ cv::Mat CKcfTracker::fusedFeat(const cv::Mat &image, float scaleAdjust)
 {
     cv::Mat hogFeature;
     cv::Mat grayFeature;
-    getFeatures(image, toIntegerRect(m_roi), scaleAdjust, hogFeature, grayFeature);
+    getFeatures(image, m_roi, scaleAdjust, hogFeature, grayFeature);
     cv::Mat output = concatFeature(hogFeature, grayFeature);
     m_sizePatch[0] = 18;
     m_sizePatch[1] = 24;
@@ -1365,27 +1560,27 @@ float CKcfTracker::subPixelPeak(float left, float center, float right) const
 
 cv::Point2f CKcfTracker::detectMKCF(const cv::Mat &image, float &peakResponse)
 {
-    if (m_histTmplPrimary.empty() || m_histTmplSecondary.empty() || m_alphaF.empty())
+    if (m_detectionTmplPrimary.empty() || m_detectionTmplSecondary.empty() || m_alphaF.empty())
     {
-        cv::Mat feature = getFeatures(image, false, 1.0F);
-        return detect(m_tmpl, feature, peakResponse);
+        peakResponse = 0.0F;
+        return cv::Point2f(0.0F, 0.0F);
     }
 
     const int featureHeight = m_alphaF.rows;
     const int featureWidth = m_alphaF.cols;
     cv::Mat currentPrimary;
     cv::Mat currentSecondary;
-    getFeatures(image, toIntegerRect(m_roi), 1.0F, currentPrimary, currentSecondary);
+    getFeatures(image, m_roi, 1.0F, currentPrimary, currentSecondary);
 
     cv::Mat corrPrimary = gaussianCorrelation(
         currentPrimary,
-        m_histTmplPrimary,
+        m_detectionTmplPrimary,
         featureHeight,
         featureWidth,
         m_sigmaPrimary);
     cv::Mat corrSecondary = gaussianCorrelation(
         currentSecondary,
-        m_histTmplSecondary,
+        m_detectionTmplSecondary,
         featureHeight,
         featureWidth,
         m_sigmaSecondary);
@@ -1399,6 +1594,12 @@ cv::Point2f CKcfTracker::detectMKCF(const cv::Mat &image, float &peakResponse)
     double peakValue = 0.0;
     cv::minMaxLoc(response, nullptr, &peakValue, nullptr, &peakInt);
     peakResponse = static_cast<float>(peakValue);
+    // 复用Weld_Merge的全图均值/标准差定义，对应论文3-29。
+    cv::Scalar responseMean;
+    cv::Scalar responseDeviation;
+    cv::meanStdDev(response, responseMean, responseDeviation);
+    m_updateDiagnostic.responsePsr = responseDeviation[0] > 1e-9
+        ? (peakValue - responseMean[0]) / responseDeviation[0] : 0.0;
 
     cv::Point2f peak(static_cast<float>(peakInt.x), static_cast<float>(peakInt.y));
     if (peakInt.x > 0 && peakInt.x < response.cols - 1)
@@ -1420,14 +1621,18 @@ cv::Point2f CKcfTracker::detectMKCF(const cv::Mat &image, float &peakResponse)
     return peak;
 }
 
-void CKcfTracker::trainMKCF(const cv::Mat &image, float trainInterpFactor)
+bool CKcfTracker::trainMKCF(const cv::Mat &image, float trainInterpFactor)
 {
     const int featureHeight = m_alphaF.rows;
     const int featureWidth = m_alphaF.cols;
 
     cv::Mat currentPrimary;
     cv::Mat currentSecondary;
-    getFeatures(image, toIntegerRect(m_roi), 1.0F, currentPrimary, currentSecondary);
+    getFeatures(image, m_roi, 1.0F, currentPrimary, currentSecondary);
+    currentPrimary = acceptedTemplateCandidate(currentPrimary,
+        m_detectionTmplPrimary, trainInterpFactor);
+    currentSecondary = acceptedTemplateCandidate(currentSecondary,
+        m_detectionTmplSecondary, trainInterpFactor);
 
     if (m_histTmplPrimary.empty() || m_histTmplPrimary.size() != currentPrimary.size())
     {
@@ -1438,199 +1643,40 @@ void CKcfTracker::trainMKCF(const cv::Mat &image, float trainInterpFactor)
         m_histTmplSecondary = currentSecondary.clone();
     }
 
-    cv::Mat kernelPrimary = KcfFftTools::fftd(gaussianCorrelation(
+    cv::Mat kernelPrimary = zeroShiftSpectrum(gaussianCorrelation(
         currentPrimary,
         currentPrimary,
         featureHeight,
         featureWidth,
         m_sigmaPrimary));
-    cv::Mat kernelSecondary = KcfFftTools::fftd(gaussianCorrelation(
+    cv::Mat kernelSecondary = zeroShiftSpectrum(gaussianCorrelation(
         currentSecondary,
         currentSecondary,
         featureHeight,
         featureWidth,
         m_sigmaSecondary));
 
-    m_kernelCoeffPrimary = 0.9F;
-    m_kernelCoeffSecondary = 0.1F;
-
-    float previousKernelCoeffPrimary = m_kernelCoeffPrimary;
-    float previousKernelCoeffSecondary = m_kernelCoeffSecondary;
-    cv::Mat previousAlphaF = m_alphaF.clone();
-    constexpr float kConvergeThreshold = 0.03F;
-    constexpr int kMaxIterations = 1;
-
-    for (int iteration = 0; iteration < kMaxIterations; ++iteration)
-    {
-        cv::Mat kernelLinear =
-            kernelPrimary * m_kernelCoeffPrimary + kernelSecondary * m_kernelCoeffSecondary;
-
-        cv::Mat denominator = addRealScalar(kernelLinear, m_lambda);
-        denominator = addRealScalar(denominator, 1e-7F);
-
-        cv::Mat currentAlphaF = KcfFftTools::complexDivision(m_prob, denominator);
-        m_alphaF = (1.0F - trainInterpFactor) * m_alphaF + trainInterpFactor * currentAlphaF;
-
-        const cv::Mat &probability = m_prob;
-        const cv::Mat &alphaFrequency = m_alphaF;
-
-        const double bPrimary = sumRealPart(KcfFftTools::complexMultiplication(
-            KcfFftTools::complexConj(probability),
-            KcfFftTools::complexMultiplication(kernelPrimary, alphaFrequency)));
-        const double bSecondary = sumRealPart(KcfFftTools::complexMultiplication(
-            KcfFftTools::complexConj(probability),
-            KcfFftTools::complexMultiplication(kernelSecondary, alphaFrequency)));
-
-        const double vPrimary = sumRealPart(KcfFftTools::complexMultiplication(
-            KcfFftTools::complexConj(alphaFrequency),
-            KcfFftTools::complexMultiplication(kernelPrimary, alphaFrequency)));
-        const double vSecondary = sumRealPart(KcfFftTools::complexMultiplication(
-            KcfFftTools::complexConj(alphaFrequency),
-            KcfFftTools::complexMultiplication(kernelSecondary, alphaFrequency)));
-
-        const cv::Mat kernelPrimarySquare =
-            KcfFftTools::complexMultiplication(kernelPrimary, kernelPrimary);
-        const cv::Mat kernelCross =
-            KcfFftTools::complexMultiplication(kernelPrimary, kernelSecondary);
-        const cv::Mat kernelSecondarySquare =
-            KcfFftTools::complexMultiplication(kernelSecondary, kernelSecondary);
-
-        const double gPrimaryPrimary = sumRealPart(KcfFftTools::complexMultiplication(
-            KcfFftTools::complexConj(alphaFrequency),
-            KcfFftTools::complexMultiplication(kernelPrimarySquare, alphaFrequency)));
-        const double gPrimarySecondary = sumRealPart(KcfFftTools::complexMultiplication(
-            KcfFftTools::complexConj(alphaFrequency),
-            KcfFftTools::complexMultiplication(kernelCross, alphaFrequency)));
-        const double gSecondarySecondary = sumRealPart(KcfFftTools::complexMultiplication(
-            KcfFftTools::complexConj(alphaFrequency),
-            KcfFftTools::complexMultiplication(kernelSecondarySquare, alphaFrequency)));
-
-        const double penaltyCoeff = m_upsilon;
-        const double matB11 = gPrimaryPrimary + penaltyCoeff;
-        const double matB12 = gPrimarySecondary + penaltyCoeff;
-        const double matB22 = gSecondarySecondary + penaltyCoeff;
-
-        const double vecC1 = bPrimary - 0.5 * m_lambda * vPrimary + penaltyCoeff;
-        const double vecC2 = bSecondary - 0.5 * m_lambda * vSecondary + penaltyCoeff;
-
-        cv::Vec2d coeffFull(0.0, 0.0);
-        const double determinant = matB11 * matB22 - matB12 * matB12;
-        const bool fullSolutionValid = std::abs(determinant) > 1e-12;
-        if (fullSolutionValid)
-        {
-            coeffFull[0] = (matB22 * vecC1 - matB12 * vecC2) / determinant;
-            coeffFull[1] = (-matB12 * vecC1 + matB11 * vecC2) / determinant;
-        }
-
-        auto calcObjectiveFunc = [&](const cv::Vec2d &coeff) -> double {
-            const double quadraticTerm =
-                0.5 * (coeff[0] * (gPrimaryPrimary * coeff[0] + gPrimarySecondary * coeff[1])
-                    + coeff[1] * (gPrimarySecondary * coeff[0] + gSecondarySecondary * coeff[1]));
-            const double linearTerm =
-                -(bPrimary * coeff[0] + bSecondary * coeff[1])
-                + 0.5 * m_lambda * (vPrimary * coeff[0] + vSecondary * coeff[1]);
-            const double penaltyTerm =
-                0.5 * penaltyCoeff * std::pow((coeff[0] + coeff[1] - 1.0), 2);
-            return quadraticTerm + linearTerm + penaltyTerm;
-        };
-
-        cv::Vec2d bestCoeff(0.0, 0.0);
-        double bestObjectiveValue = 1e300;
-        bool hasValidSolution = false;
-
-        if (fullSolutionValid && coeffFull[0] >= 0.0 && coeffFull[1] >= 0.0)
-        {
-            bestCoeff = coeffFull;
-            bestObjectiveValue = calcObjectiveFunc(bestCoeff);
-            hasValidSolution = true;
-        }
-
-        if (matB11 > 1e-12)
-        {
-            cv::Vec2d primaryOnly(vecC1 / matB11, 0.0);
-            if (primaryOnly[0] >= 0.0)
-            {
-                const double objectiveValue = calcObjectiveFunc(primaryOnly);
-                if (!hasValidSolution || objectiveValue < bestObjectiveValue)
-                {
-                    bestCoeff = primaryOnly;
-                    bestObjectiveValue = objectiveValue;
-                    hasValidSolution = true;
-                }
-            }
-        }
-
-        if (matB22 > 1e-12)
-        {
-            cv::Vec2d secondaryOnly(0.0, vecC2 / matB22);
-            if (secondaryOnly[1] >= 0.0)
-            {
-                const double objectiveValue = calcObjectiveFunc(secondaryOnly);
-                if (!hasValidSolution || objectiveValue < bestObjectiveValue)
-                {
-                    bestCoeff = secondaryOnly;
-                    bestObjectiveValue = objectiveValue;
-                    hasValidSolution = true;
-                }
-            }
-        }
-
-        if (!hasValidSolution)
-        {
-            bestCoeff[0] = std::max(0.0, coeffFull[0]);
-            bestCoeff[1] = std::max(0.0, coeffFull[1]);
-            const double coeffSum = bestCoeff[0] + bestCoeff[1];
-            if (coeffSum <= 1e-12)
-            {
-                bestCoeff = cv::Vec2d(1.0, 0.0);
-            }
-            else
-            {
-                bestCoeff /= coeffSum;
-            }
-        }
-
-        m_kernelCoeffPrimary = static_cast<float>(
-            bestCoeff[0] * trainInterpFactor + (1.0F - trainInterpFactor) * m_kernelCoeffPrimary);
-        m_kernelCoeffSecondary = static_cast<float>(
-            bestCoeff[1] * trainInterpFactor + (1.0F - trainInterpFactor) * m_kernelCoeffSecondary);
-
-        const float coeffTotal = m_kernelCoeffPrimary + m_kernelCoeffSecondary;
-        if (coeffTotal > 1e-12F)
-        {
-            m_kernelCoeffPrimary /= coeffTotal;
-            m_kernelCoeffSecondary /= coeffTotal;
-        }
-
-        if (iteration > 1)
-        {
-            const double alphaRelativeChange =
-                cv::norm(m_alphaF - previousAlphaF) / (cv::norm(previousAlphaF) + 1e-9);
-            const float coeffDeltaPrimary =
-                std::abs(m_kernelCoeffPrimary - previousKernelCoeffPrimary);
-            const float coeffDeltaSecondary =
-                std::abs(m_kernelCoeffSecondary - previousKernelCoeffSecondary);
-            if (alphaRelativeChange <= kConvergeThreshold
-                && (coeffDeltaPrimary + coeffDeltaSecondary) <= kConvergeThreshold)
-            {
-                break;
-            }
-        }
-
-        previousAlphaF = m_alphaF.clone();
-        previousKernelCoeffPrimary = m_kernelCoeffPrimary;
-        previousKernelCoeffSecondary = m_kernelCoeffSecondary;
-    }
-
-    m_histTmplPrimary =
-        trainInterpFactor * currentPrimary + (1.0F - trainInterpFactor) * m_histTmplPrimary;
-    m_histTmplSecondary =
-        trainInterpFactor * currentSecondary + (1.0F - trainInterpFactor) * m_histTmplSecondary;
-    m_kernelCoeffPrimary = 1.0F;
-    m_kernelCoeffSecondary = 0.0F;
+    MkcfOptimizationProblem problem;
+    problem.primary = {{kernelPrimary}};
+    problem.secondary = {{kernelSecondary}};
+    problem.target = m_mkcfProb;
+    problem.lambda = m_lambda;
+    problem.sumPenalty = m_upsilon;
+    MkcfOptimizationModel model;
+    model.weights = {m_kernelCoeffPrimary, m_kernelCoeffSecondary};
+    if (!optimizeMkcf(problem, model)) { return false; }
+    m_kernelCoeffPrimary = static_cast<float>(model.weights[0]);
+    m_kernelCoeffSecondary = static_cast<float>(model.weights[1]);
+    m_alphaF = model.alphas[0].clone();
+    m_trainedTemplateCount = 1;
+    m_detectionTmplPrimary = currentPrimary.clone();
+    m_detectionTmplSecondary = currentSecondary.clone();
+    m_histTmplPrimary = currentPrimary.clone();
+    m_histTmplSecondary = currentSecondary.clone();
+    return true;
 }
 
-void CKcfTracker::train2TMKCF(
+bool CKcfTracker::train2TMKCF(
     const cv::Mat &image,
     float trainInterpFactor,
     double mu,
@@ -1638,8 +1684,7 @@ void CKcfTracker::train2TMKCF(
 {
     if (m_imageSim.empty() || m_imageSimROI.width <= 0 || m_imageSimROI.height <= 0)
     {
-        trainMKCF(image, trainInterpFactor);
-        return;
+        return trainMKCF(image, trainInterpFactor);
     }
 
     const int featureHeight = std::max(1, m_alphaF.rows);
@@ -1648,12 +1693,21 @@ void CKcfTracker::train2TMKCF(
     cv::Mat currentSecondary;
     cv::Mat simPrimary;
     cv::Mat simSecondary;
-    getFeatures(image, toIntegerRect(m_roi), 1.0F, currentPrimary, currentSecondary);
+    if (m_onlineObservationMode && image.data == m_pendingOnlineImage.data
+        && m_roi == m_pendingOnlineRoi && !m_pendingOnlineSecondaryFeatures.empty()) {
+        currentPrimary = m_pendingOnlineFeatures;
+        currentSecondary = m_pendingOnlineSecondaryFeatures;
+    } else {
+        getFeatures(image, m_roi, 1.0F, currentPrimary, currentSecondary);
+    }
+    currentPrimary = acceptedTemplateCandidate(currentPrimary,
+        m_detectionTmplPrimary, trainInterpFactor);
+    currentSecondary = acceptedTemplateCandidate(currentSecondary,
+        m_detectionTmplSecondary, trainInterpFactor);
     getFeatures(m_imageSim, m_imageSimROI, 1.0F, simPrimary, simSecondary);
     if (currentPrimary.size() != simPrimary.size() || currentSecondary.size() != simSecondary.size())
     {
-        trainMKCF(image, trainInterpFactor);
-        return;
+        return trainMKCF(image, trainInterpFactor);
     }
 
     if (m_histTmplPrimary.empty() || m_histTmplPrimary.size() != currentPrimary.size())
@@ -1675,158 +1729,32 @@ void CKcfTracker::train2TMKCF(
         m_sigmaPrimary,
         m_sigmaSecondary);
 
-    cv::Mat alphaTemplate1 = solveSingleTemplateAlpha(
-        m_kernelCoeffPrimary,
-        m_kernelCoeffSecondary,
-        m_kernel11Primary,
-        m_kernel11Secondary);
-    cv::Mat alphaTemplate2 = solveSingleTemplateAlpha(
-        m_kernelCoeffPrimary,
-        m_kernelCoeffSecondary,
-        m_kernel22Primary,
-        m_kernel22Secondary);
-
-    m_kernelCoeffPrimary = 1.0F;
-    m_kernelCoeffSecondary = 0.0F;
-    float previousPrimary = m_kernelCoeffPrimary;
-    float previousSecondary = m_kernelCoeffSecondary;
-    std::deque<double> alphaDiffHistory;
-    constexpr int kMaxIterations = 1;
-    for (int iteration = 0; iteration < kMaxIterations; ++iteration)
-    {
-        const cv::Mat kernel11 =
-            m_kernel11Primary * m_kernelCoeffPrimary + m_kernel11Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel22 =
-            m_kernel22Primary * m_kernelCoeffPrimary + m_kernel22Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel12 =
-            m_kernel12Primary * m_kernelCoeffPrimary + m_kernel12Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel21 =
-            m_kernel21Primary * m_kernelCoeffPrimary + m_kernel21Secondary * m_kernelCoeffSecondary;
-
-        cv::Mat denom1 = addRealScalar(kernel11, m_lambda + static_cast<float>(mu));
-        denom1 = addRealScalar(denom1, 1e-7F);
-        cv::Mat denom2 = addRealScalar(kernel22, m_lambda + static_cast<float>(mu));
-        denom2 = addRealScalar(denom2, 1e-7F);
-        alphaTemplate1 = KcfFftTools::complexDivision(
-            complexAddition(
-                m_prob,
-                complexMultiplicationScalar(
-                    KcfFftTools::complexMultiplication(
-                        KcfFftTools::complexDivision(kernel12, kernel11),
-                        alphaTemplate2),
-                    static_cast<float>(mu))),
-            denom1);
-        alphaTemplate2 = KcfFftTools::complexDivision(
-            complexAddition(
-                m_prob,
-                complexMultiplicationScalar(
-                    KcfFftTools::complexMultiplication(
-                        KcfFftTools::complexDivision(kernel21, kernel22),
-                        alphaTemplate1),
-                    static_cast<float>(mu))),
-            denom2);
-
-        cv::Mat alpha1Abs2;
-        cv::Mat alpha2Abs2;
-        computeAbs2(alphaTemplate1, alpha1Abs2);
-        computeAbs2(alphaTemplate2, alpha2Abs2);
-
-        const double uPrimary =
-            sumAbs2MulRealK(alpha1Abs2, m_kernel11Primary)
-            + sumAbs2MulRealK(alpha2Abs2, m_kernel22Primary);
-        const double uSecondary =
-            sumAbs2MulRealK(alpha1Abs2, m_kernel11Secondary)
-            + sumAbs2MulRealK(alpha2Abs2, m_kernel22Secondary);
-        const double cPrimary = sumConjAMulKMulB(alphaTemplate1, m_kernel12Primary, alphaTemplate2);
-        const double cSecondary = sumConjAMulKMulB(alphaTemplate1, m_kernel12Secondary, alphaTemplate2);
-        const double bPrimary =
-            sumConjAMulKMulProb(alphaTemplate1, m_kernel11Primary, m_prob)
-            + sumConjAMulKMulProb(alphaTemplate2, m_kernel22Primary, m_prob);
-        const double bSecondary =
-            sumConjAMulKMulProb(alphaTemplate1, m_kernel11Secondary, m_prob)
-            + sumConjAMulKMulProb(alphaTemplate2, m_kernel22Secondary, m_prob);
-
-        double aPP = 0.0;
-        double aPS = 0.0;
-        double aSS = 0.0;
-        addAFast(aPP, alpha1Abs2, m_kernel11Primary, m_kernel11Primary);
-        addAFast(aPS, alpha1Abs2, m_kernel11Primary, m_kernel11Secondary);
-        addAFast(aSS, alpha1Abs2, m_kernel11Secondary, m_kernel11Secondary);
-        addAFast(aPP, alpha2Abs2, m_kernel22Primary, m_kernel22Primary);
-        addAFast(aPS, alpha2Abs2, m_kernel22Primary, m_kernel22Secondary);
-        addAFast(aSS, alpha2Abs2, m_kernel22Secondary, m_kernel22Secondary);
-
-        const double linearPrimary = 0.5 * (m_lambda + mu) * uPrimary - mu * cPrimary;
-        const double linearSecondary = 0.5 * (m_lambda + mu) * uSecondary - mu * cSecondary;
-        double g11 = aPP + m_upsilon;
-        double g12 = aPS + m_upsilon;
-        double g22 = aSS + m_upsilon;
-        const double r1 = (bPrimary - linearPrimary) + m_upsilon;
-        const double r2 = (bSecondary - linearSecondary) + m_upsilon;
-        double determinant = g11 * g22 - g12 * g12;
-        cv::Vec2d coeff(previousPrimary, previousSecondary);
-        if (std::abs(determinant) < 1e-12)
-        {
-            g11 += 1e-9;
-            g22 += 1e-9;
-            determinant = g11 * g22 - g12 * g12;
-        }
-        if (std::abs(determinant) > 1e-16)
-        {
-            coeff[0] = (g22 * r1 - g12 * r2) / determinant;
-            coeff[1] = (-g12 * r1 + g11 * r2) / determinant;
-        }
-        coeff[0] = std::max(0.0, coeff[0]);
-        coeff[1] = std::max(0.0, coeff[1]);
-        const double coeffSum = coeff[0] + coeff[1];
-        if (coeffSum > 1e-12)
-        {
-            m_kernelCoeffPrimary =
-                static_cast<float>((1.0F - trainInterpFactor) * m_kernelCoeffPrimary
-                    + trainInterpFactor * static_cast<float>(coeff[0] / coeffSum));
-            m_kernelCoeffSecondary =
-                static_cast<float>((1.0F - trainInterpFactor) * m_kernelCoeffSecondary
-                    + trainInterpFactor * static_cast<float>(coeff[1] / coeffSum));
-        }
-        const float finalSum = m_kernelCoeffPrimary + m_kernelCoeffSecondary;
-        if (finalSum > 1e-12F)
-        {
-            m_kernelCoeffPrimary /= finalSum;
-            m_kernelCoeffSecondary /= finalSum;
-        }
-        else
-        {
-            m_kernelCoeffPrimary = previousPrimary;
-            m_kernelCoeffSecondary = previousSecondary;
-        }
-
-        alphaDiffHistory.push_back(calcDiffFrobeniusNorm2(alphaTemplate1, alphaTemplate2));
-        if (alphaDiffHistory.size() > 5)
-        {
-            alphaDiffHistory.pop_front();
-        }
-        if (alphaDiffHistory.size() == 5)
-        {
-            const double meanDiff = calcMean(alphaDiffHistory);
-            const double relStd = calcStdDev(alphaDiffHistory) / (meanDiff + 1e-12);
-            if (relStd < 1e-2)
-            {
-                break;
-            }
-        }
-        mu *= muInc;
-    }
-
-    m_alphaF = alphaTemplate1.clone();
-    m_histTmplPrimary =
-        trainInterpFactor * currentPrimary + (1.0F - trainInterpFactor) * m_histTmplPrimary;
-    m_histTmplSecondary =
-        trainInterpFactor * currentSecondary + (1.0F - trainInterpFactor) * m_histTmplSecondary;
-    m_kernelCoeffPrimary = 1.0F;
-    m_kernelCoeffSecondary = 0.0F;
+    // muInc 保留旧调用签名；优化过程中固定 mu，避免每轮改变目标。
+    (void)muInc;
+    MkcfOptimizationProblem problem;
+    problem.primary = {{m_kernel11Primary, m_kernel12Primary},
+        {m_kernel21Primary, m_kernel22Primary}};
+    problem.secondary = {{m_kernel11Secondary, m_kernel12Secondary},
+        {m_kernel21Secondary, m_kernel22Secondary}};
+    problem.target = m_mkcfProb;
+    problem.lambda = m_lambda;
+    problem.coupling = mu;
+    problem.sumPenalty = m_upsilon;
+    MkcfOptimizationModel model;
+    model.weights = {m_kernelCoeffPrimary, m_kernelCoeffSecondary};
+    if (!optimizeMkcf(problem, model)) { return false; }
+    m_kernelCoeffPrimary = static_cast<float>(model.weights[0]);
+    m_kernelCoeffSecondary = static_cast<float>(model.weights[1]);
+    m_alphaF = model.alphas[0].clone();
+    m_trainedTemplateCount = 2;
+    m_detectionTmplPrimary = currentPrimary.clone();
+    m_detectionTmplSecondary = currentSecondary.clone();
+    m_histTmplPrimary = currentPrimary.clone();
+    m_histTmplSecondary = currentSecondary.clone();
+    return true;
 }
 
-void CKcfTracker::train3TMKCF(
+bool CKcfTracker::train3TMKCF(
     const cv::Mat &image,
     float trainInterpFactor,
     double mu,
@@ -1834,8 +1762,7 @@ void CKcfTracker::train3TMKCF(
 {
     if (m_imageSim.empty() || m_imageSimROI.width <= 0 || m_imageSimROI.height <= 0)
     {
-        train2TMKCF(image, trainInterpFactor, mu, muInc);
-        return;
+        return train2TMKCF(image, trainInterpFactor, mu, muInc);
     }
 
     const int featureHeight = std::max(1, m_alphaF.rows);
@@ -1844,7 +1771,17 @@ void CKcfTracker::train3TMKCF(
     cv::Mat currentSecondary;
     cv::Mat simPrimary;
     cv::Mat simSecondary;
-    getFeatures(image, toIntegerRect(m_roi), 1.0F, currentPrimary, currentSecondary);
+    if (m_onlineObservationMode && image.data == m_pendingOnlineImage.data
+        && m_roi == m_pendingOnlineRoi && !m_pendingOnlineSecondaryFeatures.empty()) {
+        currentPrimary = m_pendingOnlineFeatures;
+        currentSecondary = m_pendingOnlineSecondaryFeatures;
+    } else {
+        getFeatures(image, m_roi, 1.0F, currentPrimary, currentSecondary);
+    }
+    currentPrimary = acceptedTemplateCandidate(currentPrimary,
+        m_detectionTmplPrimary, trainInterpFactor);
+    currentSecondary = acceptedTemplateCandidate(currentSecondary,
+        m_detectionTmplSecondary, trainInterpFactor);
     getFeatures(m_imageSim, m_imageSimROI, 1.0F, simPrimary, simSecondary);
     if (m_histTmplPrimary.empty() || m_histTmplPrimary.size() != currentPrimary.size())
     {
@@ -1856,8 +1793,7 @@ void CKcfTracker::train3TMKCF(
     }
     if (currentPrimary.size() != simPrimary.size() || currentSecondary.size() != simSecondary.size())
     {
-        train2TMKCF(image, trainInterpFactor, mu, muInc);
-        return;
+        return train2TMKCF(image, trainInterpFactor, mu, muInc);
     }
 
     computeKernels(
@@ -1872,221 +1808,31 @@ void CKcfTracker::train3TMKCF(
         m_sigmaPrimary,
         m_sigmaSecondary);
 
-    m_kernelCoeffPrimary = 1.0F;
-    m_kernelCoeffSecondary = 0.0F;
-    float previousPrimary = m_kernelCoeffPrimary;
-    float previousSecondary = m_kernelCoeffSecondary;
-    cv::Mat alphaTemplate1 = solveSingleTemplateAlpha(
-        m_kernelCoeffPrimary,
-        m_kernelCoeffSecondary,
-        m_kernel11Primary,
-        m_kernel11Secondary);
-    cv::Mat alphaTemplate2 = solveSingleTemplateAlpha(
-        m_kernelCoeffPrimary,
-        m_kernelCoeffSecondary,
-        m_kernel22Primary,
-        m_kernel22Secondary);
-    cv::Mat alphaTemplate3 = solveSingleTemplateAlpha(
-        m_kernelCoeffPrimary,
-        m_kernelCoeffSecondary,
-        m_kernel33Primary,
-        m_kernel33Secondary);
-
-    std::deque<double> alphaDiffHistory;
-    constexpr int kMaxOuterIterations = 1;
-    for (int outer = 0; outer < kMaxOuterIterations; ++outer)
-    {
-        const cv::Mat kernel11 =
-            m_kernel11Primary * m_kernelCoeffPrimary + m_kernel11Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel22 =
-            m_kernel22Primary * m_kernelCoeffPrimary + m_kernel22Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel33 =
-            m_kernel33Primary * m_kernelCoeffPrimary + m_kernel33Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel12 =
-            m_kernel12Primary * m_kernelCoeffPrimary + m_kernel12Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel13 =
-            m_kernel13Primary * m_kernelCoeffPrimary + m_kernel13Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel23 =
-            m_kernel23Primary * m_kernelCoeffPrimary + m_kernel23Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel21 =
-            m_kernel21Primary * m_kernelCoeffPrimary + m_kernel21Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel31 =
-            m_kernel31Primary * m_kernelCoeffPrimary + m_kernel31Secondary * m_kernelCoeffSecondary;
-        const cv::Mat kernel32 =
-            m_kernel32Primary * m_kernelCoeffPrimary + m_kernel32Secondary * m_kernelCoeffSecondary;
-
-        const float denomOffset = m_lambda + static_cast<float>(2.0 * mu);
-        cv::Mat denom1 = addRealScalar(kernel11, denomOffset);
-        cv::Mat denom2 = addRealScalar(kernel22, denomOffset);
-        cv::Mat denom3 = addRealScalar(kernel33, denomOffset);
-        alphaTemplate1 = KcfFftTools::complexDivision(
-            complexAddition(
-                m_prob,
-                complexMultiplicationScalar(
-                    complexAddition(
-                        KcfFftTools::complexMultiplication(
-                            KcfFftTools::complexDivision(kernel12, kernel11),
-                            alphaTemplate2),
-                        KcfFftTools::complexMultiplication(
-                            KcfFftTools::complexDivision(kernel13, kernel11),
-                            alphaTemplate3)),
-                    static_cast<float>(mu))),
-            denom1);
-        alphaTemplate2 = KcfFftTools::complexDivision(
-            complexAddition(
-                m_prob,
-                complexMultiplicationScalar(
-                    complexAddition(
-                        KcfFftTools::complexMultiplication(
-                            KcfFftTools::complexDivision(kernel21, kernel22),
-                            alphaTemplate1),
-                        KcfFftTools::complexMultiplication(
-                            KcfFftTools::complexDivision(kernel23, kernel22),
-                            alphaTemplate3)),
-                    static_cast<float>(mu))),
-            denom2);
-        alphaTemplate3 = KcfFftTools::complexDivision(
-            complexAddition(
-                m_prob,
-                complexMultiplicationScalar(
-                    complexAddition(
-                        KcfFftTools::complexMultiplication(
-                            KcfFftTools::complexDivision(kernel31, kernel33),
-                            alphaTemplate1),
-                        KcfFftTools::complexMultiplication(
-                            KcfFftTools::complexDivision(kernel32, kernel33),
-                            alphaTemplate2)),
-                    static_cast<float>(mu))),
-            denom3);
-
-        cv::Mat alpha1Abs2;
-        cv::Mat alpha2Abs2;
-        cv::Mat alpha3Abs2;
-        computeAbs2(alphaTemplate1, alpha1Abs2);
-        computeAbs2(alphaTemplate2, alpha2Abs2);
-        computeAbs2(alphaTemplate3, alpha3Abs2);
-        const double uPrimary =
-            sumAbs2MulRealK(alpha1Abs2, m_kernel11Primary)
-            + sumAbs2MulRealK(alpha2Abs2, m_kernel22Primary)
-            + sumAbs2MulRealK(alpha3Abs2, m_kernel33Primary);
-        const double uSecondary =
-            sumAbs2MulRealK(alpha1Abs2, m_kernel11Secondary)
-            + sumAbs2MulRealK(alpha2Abs2, m_kernel22Secondary)
-            + sumAbs2MulRealK(alpha3Abs2, m_kernel33Secondary);
-        const double cPrimary =
-            sumConjAMulKMulB(alphaTemplate1, m_kernel12Primary, alphaTemplate2)
-            + sumConjAMulKMulB(alphaTemplate1, m_kernel13Primary, alphaTemplate3)
-            + sumConjAMulKMulB(alphaTemplate2, m_kernel23Primary, alphaTemplate3);
-        const double cSecondary =
-            sumConjAMulKMulB(alphaTemplate1, m_kernel12Secondary, alphaTemplate2)
-            + sumConjAMulKMulB(alphaTemplate1, m_kernel13Secondary, alphaTemplate3)
-            + sumConjAMulKMulB(alphaTemplate2, m_kernel23Secondary, alphaTemplate3);
-        const double bPrimary =
-            sumConjAMulKMulProb(alphaTemplate1, m_kernel11Primary, m_prob)
-            + sumConjAMulKMulProb(alphaTemplate2, m_kernel22Primary, m_prob)
-            + sumConjAMulKMulProb(alphaTemplate3, m_kernel33Primary, m_prob);
-        const double bSecondary =
-            sumConjAMulKMulProb(alphaTemplate1, m_kernel11Secondary, m_prob)
-            + sumConjAMulKMulProb(alphaTemplate2, m_kernel22Secondary, m_prob)
-            + sumConjAMulKMulProb(alphaTemplate3, m_kernel33Secondary, m_prob);
-
-        double aPP = 0.0;
-        double aPS = 0.0;
-        double aSS = 0.0;
-        addAFast(aPP, alpha1Abs2, m_kernel11Primary, m_kernel11Primary);
-        addAFast(aPS, alpha1Abs2, m_kernel11Primary, m_kernel11Secondary);
-        addAFast(aSS, alpha1Abs2, m_kernel11Secondary, m_kernel11Secondary);
-        addAFast(aPP, alpha2Abs2, m_kernel22Primary, m_kernel22Primary);
-        addAFast(aPS, alpha2Abs2, m_kernel22Primary, m_kernel22Secondary);
-        addAFast(aSS, alpha2Abs2, m_kernel22Secondary, m_kernel22Secondary);
-        addAFast(aPP, alpha3Abs2, m_kernel33Primary, m_kernel33Primary);
-        addAFast(aPS, alpha3Abs2, m_kernel33Primary, m_kernel33Secondary);
-        addAFast(aSS, alpha3Abs2, m_kernel33Secondary, m_kernel33Secondary);
-
-        const double linearPrimary = 0.5 * (m_lambda + 2.0 * mu) * uPrimary - mu * cPrimary;
-        const double linearSecondary = 0.5 * (m_lambda + 2.0 * mu) * uSecondary - mu * cSecondary;
-        double g11 = aPP + m_upsilon;
-        double g12 = aPS + m_upsilon;
-        double g22 = aSS + m_upsilon;
-        const double r1 = (bPrimary - linearPrimary) + m_upsilon;
-        const double r2 = (bSecondary - linearSecondary) + m_upsilon;
-        double determinant = g11 * g22 - g12 * g12;
-        cv::Vec2d coeff(previousPrimary, previousSecondary);
-        if (std::abs(determinant) < 1e-12)
-        {
-            g11 += 1e-9;
-            g22 += 1e-9;
-            determinant = g11 * g22 - g12 * g12;
-        }
-        if (std::abs(determinant) > 1e-16)
-        {
-            coeff[0] = (g22 * r1 - g12 * r2) / determinant;
-            coeff[1] = (-g12 * r1 + g11 * r2) / determinant;
-        }
-        coeff[0] = std::max(0.0, coeff[0]);
-        coeff[1] = std::max(0.0, coeff[1]);
-        const double coeffSum = coeff[0] + coeff[1];
-        if (coeffSum > 1e-12)
-        {
-            m_kernelCoeffPrimary =
-                static_cast<float>((1.0F - trainInterpFactor) * m_kernelCoeffPrimary
-                    + trainInterpFactor * static_cast<float>(coeff[0] / coeffSum));
-            m_kernelCoeffSecondary =
-                static_cast<float>((1.0F - trainInterpFactor) * m_kernelCoeffSecondary
-                    + trainInterpFactor * static_cast<float>(coeff[1] / coeffSum));
-        }
-        const float finalSum = m_kernelCoeffPrimary + m_kernelCoeffSecondary;
-        if (finalSum > 1e-12F)
-        {
-            m_kernelCoeffPrimary /= finalSum;
-            m_kernelCoeffSecondary /= finalSum;
-        }
-        else
-        {
-            m_kernelCoeffPrimary = previousPrimary;
-            m_kernelCoeffSecondary = previousSecondary;
-        }
-
-        const double totalDiff =
-            calcDiffFrobeniusNorm2(alphaTemplate1, alphaTemplate2)
-            + calcDiffFrobeniusNorm2(alphaTemplate1, alphaTemplate3)
-            + calcDiffFrobeniusNorm2(alphaTemplate2, alphaTemplate3);
-        alphaDiffHistory.push_back(totalDiff);
-        if (alphaDiffHistory.size() > 5)
-        {
-            alphaDiffHistory.pop_front();
-        }
-        if (alphaDiffHistory.size() == 5)
-        {
-            const double meanDiff = calcMean(alphaDiffHistory);
-            const double relStd = calcStdDev(alphaDiffHistory) / (meanDiff + 1e-12);
-            if (relStd < 0.01)
-            {
-                break;
-            }
-        }
-        mu *= muInc;
-    }
-
-    m_alphaF = alphaTemplate1.clone();
-    m_histTmplPrimary =
-        trainInterpFactor * currentPrimary + (1.0F - trainInterpFactor) * m_histTmplPrimary;
-    m_histTmplSecondary =
-        trainInterpFactor * currentSecondary + (1.0F - trainInterpFactor) * m_histTmplSecondary;
-    m_kernelCoeffPrimary = 1.0F;
-    m_kernelCoeffSecondary = 0.0F;
-}
-
-cv::Mat CKcfTracker::solveSingleTemplateAlpha(
-    float primaryCoeff,
-    float secondaryCoeff,
-    const cv::Mat &primaryKernel,
-    const cv::Mat &secondaryKernel) const
-{
-    cv::Mat combinedKernel = primaryCoeff * primaryKernel + secondaryCoeff * secondaryKernel;
-    cv::Mat denominator = addRealScalar(combinedKernel, m_lambda);
-    denominator = addRealScalar(denominator, 1e-7F);
-    return KcfFftTools::complexDivision(m_prob, denominator);
+    // muInc 保留旧调用签名；三模板使用同一固定耦合目标完成交替最小化。
+    (void)muInc;
+    MkcfOptimizationProblem problem;
+    problem.primary = {{m_kernel11Primary, m_kernel12Primary, m_kernel13Primary},
+        {m_kernel21Primary, m_kernel22Primary, m_kernel23Primary},
+        {m_kernel31Primary, m_kernel32Primary, m_kernel33Primary}};
+    problem.secondary = {{m_kernel11Secondary, m_kernel12Secondary, m_kernel13Secondary},
+        {m_kernel21Secondary, m_kernel22Secondary, m_kernel23Secondary},
+        {m_kernel31Secondary, m_kernel32Secondary, m_kernel33Secondary}};
+    problem.target = m_mkcfProb;
+    problem.lambda = m_lambda;
+    problem.coupling = mu;
+    problem.sumPenalty = m_upsilon;
+    MkcfOptimizationModel model;
+    model.weights = {m_kernelCoeffPrimary, m_kernelCoeffSecondary};
+    if (!optimizeMkcf(problem, model)) { return false; }
+    m_kernelCoeffPrimary = static_cast<float>(model.weights[0]);
+    m_kernelCoeffSecondary = static_cast<float>(model.weights[1]);
+    m_alphaF = model.alphas[0].clone();
+    m_trainedTemplateCount = 3;
+    m_detectionTmplPrimary = currentPrimary.clone();
+    m_detectionTmplSecondary = currentSecondary.clone();
+    m_histTmplPrimary = currentPrimary.clone();
+    m_histTmplSecondary = currentSecondary.clone();
+    return true;
 }
 
 void CKcfTracker::computeKernels(
@@ -2099,37 +1845,37 @@ void CKcfTracker::computeKernels(
     float primarySigma,
     float secondarySigma)
 {
-    m_kernel11Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel11Primary = zeroShiftSpectrum(gaussianCorrelation(
         currentPrimary,
         currentPrimary,
         height,
         width,
         primarySigma));
-    m_kernel11Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel11Secondary = zeroShiftSpectrum(gaussianCorrelation(
         currentSecondary,
         currentSecondary,
         height,
         width,
         secondarySigma));
-    m_kernel22Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel22Primary = zeroShiftSpectrum(gaussianCorrelation(
         referencePrimary,
         referencePrimary,
         height,
         width,
         primarySigma));
-    m_kernel22Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel22Secondary = zeroShiftSpectrum(gaussianCorrelation(
         referenceSecondary,
         referenceSecondary,
         height,
         width,
         secondarySigma));
-    m_kernel12Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel12Primary = zeroShiftSpectrum(gaussianCorrelation(
         currentPrimary,
         referencePrimary,
         height,
         width,
         primarySigma));
-    m_kernel12Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel12Secondary = zeroShiftSpectrum(gaussianCorrelation(
         currentSecondary,
         referenceSecondary,
         height,
@@ -2151,73 +1897,73 @@ void CKcfTracker::computeKernels(
     float primarySigma,
     float secondarySigma)
 {
-    m_kernel11Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel11Primary = zeroShiftSpectrum(gaussianCorrelation(
         template1Primary,
         template1Primary,
         height,
         width,
         primarySigma));
-    m_kernel11Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel11Secondary = zeroShiftSpectrum(gaussianCorrelation(
         template1Secondary,
         template1Secondary,
         height,
         width,
         secondarySigma));
-    m_kernel22Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel22Primary = zeroShiftSpectrum(gaussianCorrelation(
         template2Primary,
         template2Primary,
         height,
         width,
         primarySigma));
-    m_kernel22Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel22Secondary = zeroShiftSpectrum(gaussianCorrelation(
         template2Secondary,
         template2Secondary,
         height,
         width,
         secondarySigma));
-    m_kernel33Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel33Primary = zeroShiftSpectrum(gaussianCorrelation(
         template3Primary,
         template3Primary,
         height,
         width,
         primarySigma));
-    m_kernel33Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel33Secondary = zeroShiftSpectrum(gaussianCorrelation(
         template3Secondary,
         template3Secondary,
         height,
         width,
         secondarySigma));
-    m_kernel12Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel12Primary = zeroShiftSpectrum(gaussianCorrelation(
         template1Primary,
         template2Primary,
         height,
         width,
         primarySigma));
-    m_kernel12Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel12Secondary = zeroShiftSpectrum(gaussianCorrelation(
         template1Secondary,
         template2Secondary,
         height,
         width,
         secondarySigma));
-    m_kernel13Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel13Primary = zeroShiftSpectrum(gaussianCorrelation(
         template1Primary,
         template3Primary,
         height,
         width,
         primarySigma));
-    m_kernel13Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel13Secondary = zeroShiftSpectrum(gaussianCorrelation(
         template1Secondary,
         template3Secondary,
         height,
         width,
         secondarySigma));
-    m_kernel23Primary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel23Primary = zeroShiftSpectrum(gaussianCorrelation(
         template2Primary,
         template3Primary,
         height,
         width,
         primarySigma));
-    m_kernel23Secondary = KcfFftTools::fftd(gaussianCorrelation(
+    m_kernel23Secondary = zeroShiftSpectrum(gaussianCorrelation(
         template2Secondary,
         template3Secondary,
         height,
@@ -2335,6 +2081,26 @@ cv::Mat CKcfTracker::extractPatchImage(
     cv::Rect extractedRoi;
     extractedRoi.width = std::max(2, static_cast<int>(scaleAdjust * m_scale * targetSize.width));
     extractedRoi.height = std::max(2, static_cast<int>(scaleAdjust * m_scale * targetSize.height));
+    if (m_featureMode == KcfFeatureMode::Mkcf) {
+        // 当前模板与下一帧搜索必须共用浮点原点；整数裁图残差不能随帧写回位移。
+        cv::Mat mapX(targetSize, CV_32F);
+        cv::Mat mapY(targetSize, CV_32F);
+        const double stepX = extractedRoi.width / static_cast<double>(targetSize.width);
+        const double stepY = extractedRoi.height / static_cast<double>(targetSize.height);
+        for (int row = 0; row < targetSize.height; ++row) {
+            float *x = mapX.ptr<float>(row);
+            float *y = mapY.ptr<float>(row);
+            for (int column = 0; column < targetSize.width; ++column) {
+                x[column] = static_cast<float>(cx - extractedRoi.width * 0.5
+                    + (column + 0.5) * stepX - 0.5);
+                y[column] = static_cast<float>(cy - extractedRoi.height * 0.5
+                    + (row + 0.5) * stepY - 0.5);
+            }
+        }
+        cv::Mat patch;
+        cv::remap(image, patch, mapX, mapY, cv::INTER_LINEAR, cv::BORDER_REPLICATE);
+        return patch;
+    }
     extractedRoi.x = static_cast<int>(std::round(cx - extractedRoi.width * 0.5));
     extractedRoi.y = static_cast<int>(std::round(cy - extractedRoi.height * 0.5));
 
