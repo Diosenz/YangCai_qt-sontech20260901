@@ -673,7 +673,13 @@ bool testCorrectionTrackingKeepsOnlyLatestPendingFrame(QCoreApplication &app)
             if (result.diagnostic.has_value() && result.frameContext.has_value()) {
                 ok &= expectTrue(result.diagnostic->cameraTimestampMs
                                      == result.frameContext->sourceFrame.timestamp.toMSecsSinceEpoch()
-                                 && result.diagnostic->robotStateReceivedMs > 0,
+                                 && result.diagnostic->robotStateReceivedMs > 0
+                                 && result.diagnostic->runtimeReceivedMs > 0
+                                 && result.diagnostic->runtimeReceivedMs
+                                     <= QDateTime::currentMSecsSinceEpoch()
+                                 && (result.diagnostic->processingFinishedMs < 0
+                                     || result.diagnostic->runtimeReceivedMs
+                                         >= result.diagnostic->processingFinishedMs),
                                  "diagnostic timestamps must belong to the displayed frozen frame");
                 ok &= expectTrue(result.diagnostic->sourceImage.isNull()
                                  && result.diagnostic->enhancedImage.isNull(),
@@ -3586,6 +3592,10 @@ bool testOnlineRefinedProjectionAndRecovery(QCoreApplication &app)
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+
+    if (argc > 1 && std::string_view(argv[1]) == "--performance-delivery-contract") {
+        return testCorrectionTrackingKeepsOnlyLatestPendingFrame(app) ? 0 : 1;
+    }
 
     if (argc > 1 && std::string_view(argv[1]) == "--session-new-exposure-contract") {
         return testReentrantOnlineRestartDropsOldTrackingResult(app, true) ? 0 : 1;

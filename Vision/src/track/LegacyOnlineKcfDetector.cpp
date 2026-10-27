@@ -22,6 +22,53 @@
 namespace i2r_rlc::vision {
 namespace {
 
+/** @brief 阶段切换先结算旧区间；外部快照在返回值拷贝前完成，覆盖提前退出。 */
+class CDetectorStageClock {
+public:
+    CDetectorStageClock(bool enabled, COnlineKcfPerformanceDiagnostic &performance)
+        : m_enabled(enabled), m_performance(performance),
+          m_stage(&performance.inputBookkeepingMs)
+    {
+        if (m_enabled) {
+            m_performance.available = true;
+            m_started = std::chrono::steady_clock::now();
+            m_previous = m_started;
+        }
+    }
+
+    ~CDetectorStageClock()
+    {
+        if (m_enabled) {
+            const auto finished = std::chrono::steady_clock::now();
+            accumulate(finished);
+            m_performance.totalMs = std::chrono::duration<double, std::milli>(
+                finished - m_started).count();
+        }
+    }
+
+    /** @brief 同一阶段可重复进入，初始化或恢复中的响应不会重复计入校核阶段。 */
+    void enter(double &stage)
+    {
+        if (m_enabled) {
+            accumulate(std::chrono::steady_clock::now());
+            m_stage = &stage;
+        }
+    }
+
+private:
+    void accumulate(std::chrono::steady_clock::time_point now)
+    {
+        *m_stage += std::chrono::duration<double, std::milli>(now - m_previous).count();
+        m_previous = now;
+    }
+
+    bool m_enabled;
+    COnlineKcfPerformanceDiagnostic &m_performance;
+    double *m_stage;
+    std::chrono::steady_clock::time_point m_started;
+    std::chrono::steady_clock::time_point m_previous;
+};
+
 constexpr int kRoiWidthPixel = 250;
 constexpr int kRoiHeightPixel = 200;
 constexpr int kGapRoiSizePixel = 400;
@@ -1282,8 +1329,10 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     const cv::Mat &gray8,
     const digital_twin::DigitalTwinVisionLaserObservation &observation,
     const WeldProjectionContext &projectionContext,
-    const LegacyOnlineKcfOptions &options)
+    const LegacyOnlineKcfOptions &options,
+    COnlineKcfPerformanceDiagnostic &performance)
 {
+    CDetectorStageClock stageClock(options.enablePerformanceDiagnostics, performance);
     LegacyOnlineKcfResult result;
     auto &diagnostic = result.diagnostic;
     diagnostic.imageMeasurementOutputEnabled = true;
@@ -1328,6 +1377,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     const cv::Point2d renderAnchor = m_hasImageSearchPoint ? m_lastImageSearchPoint
         : (diagnostic.simulationPositionInImage ? diagnostic.simulatedPoint
             : cv::Point2d(gray8.cols * 0.5, gray8.rows * 0.5));
+    stageClock.enter(performance.simulationMs);
     auto appearance = makePaperSimulationAppearance(observation, gray8.size(), renderAnchor);
     if (!m_initialized && !appearance.image.empty()) {
         const auto imageSearchAnchor = findPaperSimulationSearchAnchor(gray8, appearance);
@@ -1339,6 +1389,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     }
     OnlineSeamRefinementResult bootstrapGeometry;
     if (!m_initialized) {
+        stageClock.enter(performance.initializationMs);
         cv::Point2d confirmedBootstrap(-1.0, -1.0);
         const auto imageBootstrap = findPaperImageBootstrapPoint(gray8,
             appearance.image.empty() ? cv::Point2d(-1.0, -1.0) : appearance.anchor,
@@ -1376,6 +1427,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
             return result;
         }
         initializePaperTracker(gray8, bootstrapPoint);
+        stageClock.enter(performance.simulationMs);
         if (!appearance.image.empty()) {
             appearance = makePaperSimulationAppearance(observation, gray8.size(), bootstrapPoint);
         }
@@ -1387,9 +1439,12 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     diagnostic.simulationTemplatePoint = appearance.anchor;
     diagnostic.simulationTemplateRebased = diagnostic.simulationShapeAvailable
         && cv::norm(appearance.anchor - diagnostic.simulatedPoint) > 1e-6;
+    stageClock.enter(performance.simulationMs);
     if (!simulated.empty()) { m_tracker->setSimulatedTemplate(simulated, simulatedRoi); }
     else { m_tracker->clearSimulatedTemplate(); }
+    stageClock.enter(performance.trackingMs);
     result.trackedRoi = m_tracker->update(gray8);
+    stageClock.enter(performance.validationProjectionMs);
     diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
     auto coarse = weldPointFromRoi(diagnostic.tracker.beforeFusionRoi, m_templateWeldAnchor);
     diagnostic.beforeFusionPoint = coarse;
@@ -1502,13 +1557,17 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
                 coarse = recoveredPoint;
                 diagnostic.rawRefinement = recoveryGeometry;
                 diagnostic.realSearchFallbackUsed = true;
+                stageClock.enter(performance.initializationMs);
                 initializePaperTracker(gray8, coarse);
+                stageClock.enter(performance.simulationMs);
                 if (!appearance.image.empty()) {
                     appearance = makePaperSimulationAppearance(observation, gray8.size(), coarse);
                     m_tracker->setSimulatedTemplate(appearance.image, appearance.roi);
                     diagnostic.simulationTemplatePoint = appearance.anchor;
                 }
+                stageClock.enter(performance.trackingMs);
                 result.trackedRoi = m_tracker->update(gray8);
+                stageClock.enter(performance.validationProjectionMs);
                 diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
                 refreshResponseStatistics();
                 diagnostic.templateReinitialized = true;
@@ -1537,9 +1596,13 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
             coarse = recovered.point;
             diagnostic.rawRefinement = recovered;
             diagnostic.realSearchFallbackUsed = true;
+            stageClock.enter(performance.initializationMs);
             initializePaperTracker(gray8, coarse);
+            stageClock.enter(performance.simulationMs);
             if (!simulated.empty()) { m_tracker->setSimulatedTemplate(simulated, simulatedRoi); }
+            stageClock.enter(performance.trackingMs);
             result.trackedRoi = m_tracker->update(gray8);
+            stageClock.enter(performance.validationProjectionMs);
             diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
             refreshResponseStatistics();
             diagnostic.templateReinitialized = true;
@@ -1560,7 +1623,9 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
                 - previousRoi.height * m_templateWeldAnchor.y);
             m_tracker->correctOnlineObservationRoi(previousRoi);
         }
+        stageClock.enter(performance.trainingMs);
         m_tracker->commitOnlineSimulationTraining();
+        stageClock.enter(performance.inputBookkeepingMs);
         diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
         m_evidence.notifyGap();
         m_paperPosition = {};
@@ -1624,11 +1689,13 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     correctedRoi.y = static_cast<float>(currentObservation.y
         - correctedRoi.height * m_templateWeldAnchor.y);
     m_tracker->correctOnlineObservationRoi(correctedRoi);
+    stageClock.enter(performance.trainingMs);
     if (updateRealTemplate) {
         m_tracker->commitOnlineObservationTraining(true);
     } else {
         m_tracker->commitOnlineSimulationTraining();
     }
+    stageClock.enter(performance.inputBookkeepingMs);
     // 焊前可信观测可校准实际单/三模板分布，缺仿真不能令统计永久停在零。
     auto &responseStatistics = m_paperResponseStatistics[
         std::clamp(diagnostic.tracker.responseTemplateCount, 0, 3)];
@@ -1671,7 +1738,11 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::process(
     const LegacyOnlineKcfOptions &options)
 {
     if (options.enablePaperTracking) {
-        return processPaperTracking(gray8, observation, projectionContext, options);
+        COnlineKcfPerformanceDiagnostic performance;
+        auto result = processPaperTracking(
+            gray8, observation, projectionContext, options, performance);
+        result.diagnostic.performance = performance;
+        return result;
     }
     if (options.enableImageMeasurementOutput) {
         if (!m_imageMeasurementActive) {

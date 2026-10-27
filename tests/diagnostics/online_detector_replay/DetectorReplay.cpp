@@ -44,7 +44,7 @@ void validateInput(const QJsonObject &input)
         }
     }
     for (const auto *key : {"bounded_search", "enable_gap", "evidence_policy",
-             "paper_tracking", "probe_bootstrap"}) {
+             "paper_tracking", "probe_bootstrap", "performance_diagnostics"}) {
         if (input.contains(key) && !input.value(key).isBool()) {
             throw std::runtime_error(std::string("invalid boolean ") + key);
         }
@@ -208,6 +208,15 @@ QJsonObject record(const QJsonObject &input, const v::LegacyOnlineKcfResult &r)
         row["prediction_elapsed_ms"] = e.elapsedMs;
         row["prediction_travel_mm"] = e.travelMm;
     }
+    const auto &performance = d.performance;
+    row["performance"] = performance.available ? QJsonValue(QJsonObject{
+        {"total_ms", performance.totalMs},
+        {"input_bookkeeping_ms", performance.inputBookkeepingMs},
+        {"simulation_ms", performance.simulationMs},
+        {"initialization_ms", performance.initializationMs},
+        {"tracking_ms", performance.trackingMs},
+        {"validation_projection_ms", performance.validationProjectionMs},
+        {"training_ms", performance.trainingMs}}) : QJsonValue(QJsonValue::Null);
     return row;
 }
 }
@@ -290,6 +299,7 @@ int main(int argc, char **argv)
             }
             v::LegacyOnlineKcfOptions options;
             options.enablePaperTracking = input.value("paper_tracking").toBool(false);
+            options.enablePerformanceDiagnostics = input.value("performance_diagnostics").toBool(false);
             options.enableImageMeasurementOutput = true;
             options.enableSeamRefinement = true;
             options.enableSimulationGuidance = true;

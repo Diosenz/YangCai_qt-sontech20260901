@@ -303,6 +303,10 @@ struct CRuntimeTrackingDiagnostic {
     qint64 robotStateReceivedMs = -1;
     qint64 processingStartedMs = -1;
     qint64 processingFinishedMs = -1;
+    /// @brief coordinator 校验结果关联后收到结果的本机 epoch 毫秒；-1 为未知。
+    qint64 runtimeReceivedMs = -1;
+    /// @brief 本次图像复制与灰度准备的单调时钟耗时；负值表示未测量。
+    double imagePreparationMs = -1.0;
     robot_comm::RobotState robotState;
     /// @brief 只读采样桶：-1=未采样，0=启动，1~3=在线采样进度层，4=异常。
     int imageSampleBucket = -1;

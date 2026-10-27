@@ -2822,6 +2822,7 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
         return;
     }
 
+    const qint64 resultReceivedMs = QDateTime::currentMSecsSinceEpoch();
     const auto synchronizedObservation = current.synchronizedObservation;
     m_currentVisionFrame.reset();
     m_visionFrameInFlight = false;
@@ -2846,6 +2847,7 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
         routedResult.diagnostic.emplace();
     }
     if (routedResult.diagnostic.has_value()) {
+        routedResult.diagnostic->runtimeReceivedMs = resultReceivedMs;
         routedResult.diagnostic->cameraTimestampMs = current.frame.timestamp.isValid()
             ? current.frame.timestamp.toMSecsSinceEpoch() : -1;
         routedResult.diagnostic->robotState = current.robotState;

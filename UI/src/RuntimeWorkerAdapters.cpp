@@ -1519,6 +1519,8 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         result.diagnostic->processingStartedMs = QDateTime::currentMSecsSinceEpoch();
     }
 
+    QElapsedTimer imagePreparationClock;
+    if (diagnosticsEnabled) { imagePreparationClock.start(); }
     const QImage image = frame.image.isNull() ? frame.previewImage : frame.image;
     if (diagnosticsEnabled && m_options.visionDiagnostics.imagesEnabled
         && m_options.visionDiagnostics.lossWindowEnabled
@@ -1526,6 +1528,9 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         result.diagnostic->lossWindowSourceImage = image.copy();
     }
     const cv::Mat gray8 = qImageToGray8(image);
+    if (diagnosticsEnabled) {
+        result.diagnostic->imagePreparationMs = imagePreparationClock.nsecsElapsed() / 1e6;
+    }
     // 输入不可用也经过检测器的曝光单调性门禁，不把旧曝光或缺图伪装成搜索失败。
     const auto rejectUnavailableInput = [&]() {
         if (!result.imageMeasurementOutputEnabled) { return; }
@@ -1591,6 +1596,7 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         result.displayPositionerCalibration = m_options.positionerCalibration;
     }
     vision::LegacyOnlineKcfOptions detectorOptions;
+    detectorOptions.enablePerformanceDiagnostics = diagnosticsEnabled;
     detectorOptions.enableGapDetection = m_options.enableGapDetection;
     if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
         detectorOptions.enablePaperTracking = true;

@@ -578,8 +578,27 @@ bool COnlineCorrectionRunRecorder::recordTrackingResult(
             : QJsonValue(QJsonValue::Null)},
         {QStringLiteral("space_parent_tcp_mm"), sessionPoint(result.sample.point)},
         {QStringLiteral("message"), result.message}};
+    observation.insert(QStringLiteral("performance"), QJsonValue(QJsonValue::Null));
     if (result.diagnostic.has_value()) {
         const auto &diagnostic = *result.diagnostic;
+        const auto timeValue = [](qint64 value) {
+            return value >= 0 ? QJsonValue(QString::number(value)) : QJsonValue(QJsonValue::Null);
+        };
+        const auto &performance = diagnostic.algorithm.performance;
+        observation.insert(QStringLiteral("performance"), QJsonObject{
+            {QStringLiteral("processing_started_ms"), timeValue(diagnostic.processingStartedMs)},
+            {QStringLiteral("processing_finished_ms"), timeValue(diagnostic.processingFinishedMs)},
+            {QStringLiteral("runtime_received_ms"), timeValue(diagnostic.runtimeReceivedMs)},
+            {QStringLiteral("image_preparation_ms"), diagnostic.imagePreparationMs >= 0
+                ? QJsonValue(diagnostic.imagePreparationMs) : QJsonValue(QJsonValue::Null)},
+            {QStringLiteral("detector"), performance.available ? QJsonValue(QJsonObject{
+                {QStringLiteral("total_ms"), performance.totalMs},
+                {QStringLiteral("input_bookkeeping_ms"), performance.inputBookkeepingMs},
+                {QStringLiteral("simulation_ms"), performance.simulationMs},
+                {QStringLiteral("initialization_ms"), performance.initializationMs},
+                {QStringLiteral("tracking_ms"), performance.trackingMs},
+                {QStringLiteral("validation_projection_ms"), performance.validationProjectionMs},
+                {QStringLiteral("training_ms"), performance.trainingMs}}) : QJsonValue(QJsonValue::Null)}});
         observation.insert(QStringLiteral("camera_timestamp_ms"), QString::number(diagnostic.cameraTimestampMs));
         observation.insert(QStringLiteral("exposure_robot_state"), sessionRobotState(diagnostic.robotState));
         observation.insert(QStringLiteral("robot_state_received_ms"), QString::number(diagnostic.robotStateReceivedMs));

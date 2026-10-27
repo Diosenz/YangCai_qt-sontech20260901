@@ -34,6 +34,8 @@ struct LegacyOnlineKcfOptions {
     KcfFusionOptions fusion;
     /// @brief 正式在线采用仿真模板初始化和当前图像相关观测；几何仅补充独立资格。
     bool enablePaperTracking = false;
+    /// @brief 可选只读阶段计时；不参与检测、训练或控制资格判断。
+    bool enablePerformanceDiagnostics = false;
     /// @brief 正式在线与生产策略回放共用；legacy 入口保持既有行为。
     bool enableEvidencePolicy = false;
     COnlineSeamEvidenceOptions evidenceOptions;
@@ -60,9 +62,23 @@ struct LegacyOnlineKcfOptions {
 };
 
 /**
- * @brief 检测器阶段快照，随本帧结果按值传递，不拥有跟踪器状态。
+ * @brief 可选检测器耗时快照；各阶段互斥，不包含调用方图像准备和结果交付。
  */
+struct COnlineKcfPerformanceDiagnostic {
+    /// @brief false 表示未测量；各耗时均为同一调用内互斥阶段的 steady_clock 毫秒。
+    bool available = false;
+    double totalMs = 0.0;
+    double inputBookkeepingMs = 0.0;
+    double simulationMs = 0.0;
+    double initializationMs = 0.0;
+    double trackingMs = 0.0;
+    double validationProjectionMs = 0.0;
+    double trainingMs = 0.0;
+};
+
+/** @brief 单曝光检测快照；仅持有值，计时未知时不伪造零耗时。 */
 struct CLegacyOnlineKcfDiagnostic {
+    COnlineKcfPerformanceDiagnostic performance;
     /// @brief 原图搜索的曝光身份；重复/未知曝光不累计候选确认。
     std::int64_t exposureFrameId = -1;
     COnlineSeamEvidenceResult evidence;
@@ -208,7 +224,8 @@ private:
         const cv::Mat &gray8,
         const digital_twin::DigitalTwinVisionLaserObservation &observation,
         const WeldProjectionContext &projectionContext,
-        const LegacyOnlineKcfOptions &options);
+        const LegacyOnlineKcfOptions &options,
+        COnlineKcfPerformanceDiagnostic &performance);
     /** @brief 原图测量策略；不使用 CAD 模板、坐标融合或失测补点。 */
     LegacyOnlineKcfResult processImageMeasurement(
         const cv::Mat &gray8,

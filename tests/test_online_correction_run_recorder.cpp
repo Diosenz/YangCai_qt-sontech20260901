@@ -414,6 +414,10 @@ int main(int argc, char **argv)
     diagnostic.robotStateReceivedMs = 995;
     diagnostic.processingStartedMs = 1010;
     diagnostic.processingFinishedMs = 1020;
+    diagnostic.algorithm.performance.available = true;
+    diagnostic.algorithm.performance.totalMs = 8.0;
+    diagnostic.algorithm.performance.trackingMs = 5.0;
+    diagnostic.algorithm.performance.trainingMs = 3.0;
     diagnostic.robotState.curx_r = 123456;
     diagnostic.robotState.curRx_r = -25000;
     diagnostic.algorithm.attempted = true;
@@ -457,6 +461,24 @@ int main(int argc, char **argv)
     tracking.triggerAccepted = false;
     ok &= expect(recorder.recordTrackingResult(tracking, control::OnlineCorrectionPhase::OnlineRunning),
                  "record rejected frame without inventing observations");
+    bool measuredTimingFound = false;
+    bool missingTimingFound = false;
+    for (const auto &line : readRows(recorder.sessionDirectory(), "unified_session.jsonl")) {
+        const auto event = QJsonDocument::fromJson(line).object();
+        if (event.value("event") != "observation") { continue; }
+        if (event.value("frame_id") == "42") {
+            const auto timing = event.value("performance").toObject();
+            measuredTimingFound = timing.value("processing_started_ms").toString() == "1010"
+                && timing.value("processing_finished_ms").toString() == "1020"
+                && timing.value("runtime_received_ms").isNull()
+                && timing.value("detector").toObject().value("total_ms").toDouble() == 8.0
+                && timing.value("detector").toObject().value("training_ms").toDouble() == 3.0;
+        } else if (event.value("frame_id") == "43") {
+            missingTimingFound = event.contains("performance") && event.value("performance").isNull();
+        }
+    }
+    ok &= expect(measuredTimingFound && missingTimingFound,
+        "session JSON retains measured stages and null unknown delivery, without recorder-time substitution");
     tracking.frameId = 44;
     tracking.diagnostic = diagnosticSnapshot;
     tracking.valid = true;
