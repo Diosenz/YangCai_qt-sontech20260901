@@ -2,6 +2,7 @@
 
 Category: enhancement
 Status: ready-for-agent
+Execution: awaiting attribution evidence; no parameter changes
 
 **What to build:** 用归因证据选择必要的跟随局部调整或候选配置，完成离线控制/通信验证并提供现场前后对照条件。
 
@@ -17,3 +18,5 @@ Status: ready-for-agent
 ## Comments
 
 2026-10-27：用户确认拆分，任务已发布；待归因后确定具体改动。
+
+2026-10-27：当前保持11mm/s、0.0043s计算参数、0.8mm越点、PID3/0.2/7与80/60μm保护。详见 `../04-tcp-attribution-preparation.md`；缺冻结参考和发送归因，尚不能选择有证据的候选或声称平均误差改善，05不结项。

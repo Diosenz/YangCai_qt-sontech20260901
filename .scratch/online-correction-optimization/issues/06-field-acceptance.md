@@ -17,3 +17,5 @@ Status: ready-for-human
 ## Comments
 
 2026-10-27：用户确认拆分，任务已发布。ready-for-human 表示人工执行职责，依赖完成前不具备现场验收条件。
+
+2026-10-27：人工采集与固定参考要求已准备于 `../06-field-capture-guide.md`，正式Release已构建。初轮可采性能和新TCP基线，04/05及现场UI量化仍待证据；不表示联合验收完成。
