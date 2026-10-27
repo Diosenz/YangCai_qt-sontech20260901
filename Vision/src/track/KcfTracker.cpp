@@ -49,6 +49,49 @@ namespace i2r_rlc::vision {
 namespace {
 
 /**
+ * @brief 单次核矩阵构建中的频谱值快照，不跨帧、ROI、参考或会话缓存。
+ * @details 相同输入的每通道 FFT 和平方范数只计算一次；相关累加顺序保持原实现。
+ */
+struct CKernelFeatureSpectrum {
+    std::vector<cv::Mat> channels;
+    double squaredNorm = 0.0;
+};
+
+CKernelFeatureSpectrum makeKernelFeatureSpectrum(const cv::Mat &features, int height)
+{
+    cv::Mat floatFeatures;
+    features.convertTo(floatFeatures, CV_32F);
+    CKernelFeatureSpectrum result;
+    result.squaredNorm = cv::sum(floatFeatures.mul(floatFeatures))[0];
+    result.channels.reserve(static_cast<std::size_t>(floatFeatures.rows));
+    for (int channel = 0; channel < floatFeatures.rows; ++channel) {
+        result.channels.push_back(KcfFftTools::fftd(floatFeatures.row(channel).reshape(1, height)));
+    }
+    return result;
+}
+
+/** @brief 复用本调用内频谱，保持原高斯核归一化、shift、精度与通道求和顺序。 */
+cv::Mat gaussianCorrelationFromSpectra(const CKernelFeatureSpectrum &left,
+    const CKernelFeatureSpectrum &right, int height, int width, float sigma)
+{
+    cv::Mat spectrumSum = cv::Mat::zeros(height, width, CV_32FC2);
+    for (std::size_t channel = 0; channel < left.channels.size(); ++channel) {
+        cv::Mat spectrum;
+        cv::mulSpectrums(left.channels[channel], right.channels[channel], spectrum, 0, true);
+        spectrumSum += spectrum;
+    }
+    cv::Mat correlation = KcfFftTools::fftd(spectrumSum, true);
+    KcfFftTools::rearrange(correlation);
+    cv::Mat realCorrelation = KcfFftTools::real(correlation);
+    cv::Mat distance = static_cast<float>(left.squaredNorm + right.squaredNorm) - 2.0F * realCorrelation;
+    distance /= static_cast<float>(height * width * std::max(1, static_cast<int>(left.channels.size())));
+    cv::max(distance, 0.0F, distance);
+    distance /= sigma * sigma;
+    cv::exp(-distance, distance);
+    return distance;
+}
+
+/**
  * @brief 将浮点 ROI 转为 OpenCV 整数矩形。
  * @param rect 浮点 ROI，坐标单位为 pixel。
  * @return 四舍五入后的整数 ROI。
@@ -1897,78 +1940,46 @@ void CKcfTracker::computeKernels(
     float primarySigma,
     float secondarySigma)
 {
-    m_kernel11Primary = zeroShiftSpectrum(gaussianCorrelation(
-        template1Primary,
-        template1Primary,
-        height,
-        width,
-        primarySigma));
-    m_kernel11Secondary = zeroShiftSpectrum(gaussianCorrelation(
-        template1Secondary,
-        template1Secondary,
-        height,
-        width,
-        secondarySigma));
-    m_kernel22Primary = zeroShiftSpectrum(gaussianCorrelation(
-        template2Primary,
-        template2Primary,
-        height,
-        width,
-        primarySigma));
-    m_kernel22Secondary = zeroShiftSpectrum(gaussianCorrelation(
-        template2Secondary,
-        template2Secondary,
-        height,
-        width,
-        secondarySigma));
-    m_kernel33Primary = zeroShiftSpectrum(gaussianCorrelation(
-        template3Primary,
-        template3Primary,
-        height,
-        width,
-        primarySigma));
-    m_kernel33Secondary = zeroShiftSpectrum(gaussianCorrelation(
-        template3Secondary,
-        template3Secondary,
-        height,
-        width,
-        secondarySigma));
-    m_kernel12Primary = zeroShiftSpectrum(gaussianCorrelation(
-        template1Primary,
-        template2Primary,
-        height,
-        width,
-        primarySigma));
-    m_kernel12Secondary = zeroShiftSpectrum(gaussianCorrelation(
-        template1Secondary,
-        template2Secondary,
-        height,
-        width,
-        secondarySigma));
-    m_kernel13Primary = zeroShiftSpectrum(gaussianCorrelation(
-        template1Primary,
-        template3Primary,
-        height,
-        width,
-        primarySigma));
-    m_kernel13Secondary = zeroShiftSpectrum(gaussianCorrelation(
-        template1Secondary,
-        template3Secondary,
-        height,
-        width,
-        secondarySigma));
-    m_kernel23Primary = zeroShiftSpectrum(gaussianCorrelation(
-        template2Primary,
-        template3Primary,
-        height,
-        width,
-        primarySigma));
-    m_kernel23Secondary = zeroShiftSpectrum(gaussianCorrelation(
-        template2Secondary,
-        template3Secondary,
-        height,
-        width,
-        secondarySigma));
+    // 一次训练内六个特征各做一次正变换；所有状态随本调用结束释放。
+    // 只有生产已确认尺寸一致的特征采用复用；异常输入沿用原核函数的检查。
+    const bool canReuse = !template1Primary.empty() && !template1Secondary.empty()
+        && template1Primary.cols == height * width && template1Secondary.cols == height * width
+        && template1Primary.size() == template2Primary.size()
+        && template1Primary.size() == template3Primary.size()
+        && template1Secondary.size() == template2Secondary.size()
+        && template1Secondary.size() == template3Secondary.size();
+    std::array<CKernelFeatureSpectrum, 3> primarySpectra;
+    std::array<CKernelFeatureSpectrum, 3> secondarySpectra;
+    if (canReuse) {
+        primarySpectra = {makeKernelFeatureSpectrum(template1Primary, height),
+            makeKernelFeatureSpectrum(template2Primary, height),
+            makeKernelFeatureSpectrum(template3Primary, height)};
+        secondarySpectra = {makeKernelFeatureSpectrum(template1Secondary, height),
+            makeKernelFeatureSpectrum(template2Secondary, height),
+            makeKernelFeatureSpectrum(template3Secondary, height)};
+    }
+    const std::array<cv::Mat, 3> primary = {template1Primary, template2Primary, template3Primary};
+    const std::array<cv::Mat, 3> secondary = {template1Secondary, template2Secondary, template3Secondary};
+    const auto kernel = [&](bool isPrimary, int left, int right) {
+        const auto sigma = isPrimary ? primarySigma : secondarySigma;
+        const auto &spectra = isPrimary ? primarySpectra : secondarySpectra;
+        const auto &features = isPrimary ? primary : secondary;
+        return zeroShiftSpectrum(canReuse
+            ? gaussianCorrelationFromSpectra(spectra[left], spectra[right], height, width, sigma)
+            : gaussianCorrelation(features[left], features[right], height, width, sigma));
+    };
+    m_kernel11Primary = kernel(true, 0, 0);
+    m_kernel11Secondary = kernel(false, 0, 0);
+    m_kernel22Primary = kernel(true, 1, 1);
+    m_kernel22Secondary = kernel(false, 1, 1);
+    m_kernel33Primary = kernel(true, 2, 2);
+    m_kernel33Secondary = kernel(false, 2, 2);
+    m_kernel12Primary = kernel(true, 0, 1);
+    m_kernel12Secondary = kernel(false, 0, 1);
+    m_kernel13Primary = kernel(true, 0, 2);
+    m_kernel13Secondary = kernel(false, 0, 2);
+    m_kernel23Primary = kernel(true, 1, 2);
+    m_kernel23Secondary = kernel(false, 1, 2);
     m_kernel21Primary = KcfFftTools::complexConj(m_kernel12Primary);
     m_kernel21Secondary = KcfFftTools::complexConj(m_kernel12Secondary);
     m_kernel31Primary = KcfFftTools::complexConj(m_kernel13Primary);
