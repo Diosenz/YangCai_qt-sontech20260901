@@ -237,13 +237,15 @@ bool testFirstLossWindow(const QString &root)
     ui::RuntimeOnlineCorrectionConfiguration configuration;
     QString error;
     bool ok = expect(recorder.beginSession(root, configuration, &error), "begin loss window session");
+    bool visibleEstimate = false;
     const auto submit = [&](int id, bool valid, control::OnlineCorrectionPhase phase) {
         ui::RuntimeTrackingResult result;
         result.frameId = result.correlation.frameId = id;
         result.correlation.sessionId = 19;
         result.correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
         result.triggerAccepted = true;
-        result.valid = result.controlEligible = valid;
+        result.valid = result.kcfPixelAvailable = valid || visibleEstimate;
+        result.controlEligible = valid;
         result.evidencePolicyEnabled = true;
         result.diagnostic.emplace();
         result.diagnostic->cameraTimestampMs = 1000 + id;
@@ -297,6 +299,36 @@ bool testFirstLossWindow(const QString &root)
     const auto neverRows = readRows(neverAcquired, "loss_window_index.tsv");
     ok &= expect(neverRows.size() == 8 && neverRows.back().split('\t').value(3) == "trigger",
         "eight consecutive rejected exposures capture startup failure without duplicating frame eight");
+    ok &= recorder.beginSession(root, configuration, &error);
+    for (int id = 1; id <= 33; ++id) {
+        visibleEstimate = id == 9;
+        ok &= submit(id, id != 9 && id != 25,
+            control::OnlineCorrectionPhase::OnlineRunning);
+    }
+    visibleEstimate = false;
+    const QString laterUnavailable = recorder.sessionDirectory();
+    ok &= recorder.finishSession("completed", "later pixel loss after earlier ineligible estimate");
+    const auto laterContexts = readRows(laterUnavailable, "loss_window_context.jsonl");
+    bool savedLaterUnavailable = false;
+    for (const auto &row : laterContexts) {
+        const auto context = QJsonDocument::fromJson(row).object();
+        savedLaterUnavailable |= context["frame_id"].toInt() == 25;
+    }
+    ok &= expect(laterContexts.size() == 30 && savedLaterUnavailable,
+        "earlier visible ineligible estimate cannot consume the only later pixel-loss capture");
+    ok &= recorder.beginSession(root, configuration, &error);
+    for (int id = 1; id <= 25; ++id) {
+        visibleEstimate = id == 9;
+        ok &= submit(id, id != 9 && id != 17,
+            control::OnlineCorrectionPhase::OnlineRunning);
+    }
+    visibleEstimate = false;
+    const QString overlappingLoss = recorder.sessionDirectory();
+    ok &= recorder.finishSession("completed", "pixel loss at the last after-frame");
+    const auto overlappingContexts = readRows(overlappingLoss, "loss_window_context.jsonl");
+    ok &= expect(overlappingContexts.size() == 23
+        && QJsonDocument::fromJson(overlappingContexts.back()).object()["frame_id"].toInt() == 25,
+        "pixel loss on the last post-frame retains eight later recovery exposures without duplicates");
     configuration.visionDiagnostics.lossWindowEnabled = false;
     ok &= recorder.beginSession(root, configuration, &error);
     ok &= expect(!QFile::exists(QDir(recorder.sessionDirectory()).filePath("loss_window_index.tsv")),

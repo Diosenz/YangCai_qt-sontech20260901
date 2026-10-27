@@ -51,7 +51,7 @@ namespace i2r_rlc::ui {
 
 namespace {
 
-/** @brief 仅在主图实际 paintEvent 返回后报告新曝光；重绘同帧不累计，指标不参与业务。 */
+/** @brief 仅在实时原图实际 paintEvent 返回后报告新曝光；重绘同帧不累计，指标不参与业务。 */
 class CMeasuredImageLabel final : public QLabel {
 public:
     CMeasuredImageLabel(QWidget *parent, std::function<void(qint64, qint64, qint64)> onPainted)
@@ -79,13 +79,6 @@ protected:
 private:
     std::function<void(qint64, qint64, qint64)> m_onPainted;
 };
-
-QString exposureAgeText(qint64 exposureMs)
-{
-    if (exposureMs < 0) { return QStringLiteral("未知"); }
-    const auto age = QDateTime::currentMSecsSinceEpoch() - exposureMs;
-    return age >= 0 ? QStringLiteral("%1 ms").arg(age) : QStringLiteral("时间异常");
-}
 
 constexpr int kMainWindowWidth = 1340;
 constexpr int kMainWindowHeight = 930;
@@ -261,32 +254,17 @@ MainWidget::MainWidget(QWidget* parent)
     m_imagePlaceholder->setStyleSheet(QStringLiteral(
         "QLabel { border: 1px solid #777; background: #101010; color: #f1f3f4; }"));
     imageLayout->addWidget(m_imagePlaceholder);
-    m_detectionSnapshotImage = new QLabel(m_imagePlaceholder);
-    m_detectionSnapshotImage->setObjectName(QStringLiteral("detectionSnapshotImage"));
-    m_detectionSnapshotImage->setAlignment(Qt::AlignCenter);
-    m_detectionSnapshotImage->setGeometry(kImageCanvasWidth - 308, 140, 300, 224);
-    m_detectionSnapshotImage->setStyleSheet(QStringLiteral(
+    m_livePreviewImage = new CMeasuredImageLabel(m_imagePlaceholder,
+        [this](qint64 frameId, qint64 exposureMs, qint64 paintedAtMs) {
+            emit liveFramePainted(frameId, exposureMs, paintedAtMs);
+        });
+    m_livePreviewImage->setObjectName(QStringLiteral("livePreviewImage"));
+    m_livePreviewImage->setAlignment(Qt::AlignCenter);
+    m_livePreviewImage->setGeometry(kImageCanvasWidth - 308, 8, 300, 224);
+    m_livePreviewImage->setStyleSheet(QStringLiteral(
         "QLabel { border: 1px solid #777; background: #101010; }"));
-    m_detectionSnapshotCaption = new QLabel(m_imagePlaceholder);
-    m_detectionSnapshotCaption->setObjectName(QStringLiteral("detectionSnapshotCaption"));
-    m_detectionSnapshotCaption->setGeometry(kImageCanvasWidth - 308, 8, 300, 132);
-    m_detectionSnapshotCaption->setWordWrap(true);
-    m_detectionSnapshotCaption->setStyleSheet(QStringLiteral(
-        "QLabel { background: #101010; color: #f1f3f4; padding: 2px; }"));
-    m_detectionSnapshotImage->hide();
-    m_detectionSnapshotCaption->hide();
-    m_liveFrameCaption = new QLabel(m_imagePlaceholder);
-    m_liveFrameCaption->setObjectName(QStringLiteral("liveFrameCaption"));
-    m_liveFrameCaption->setGeometry(8, 8, kImageCanvasWidth - 324, 36);
-    m_liveFrameCaption->setStyleSheet(QStringLiteral(
-        "QLabel { background: #101010; color: #f1f3f4; padding: 2px; }"));
-    m_liveFrameCaption->hide();
-    auto *ageTimer = new QTimer(this);
-    ageTimer->setInterval(100);
-    connect(ageTimer, &QTimer::timeout, this, [this]() {
-        if (m_liveFrameCaption->isVisible()) { updateLivePreviewCaption(); }
-    });
-    ageTimer->start();
+    m_livePreviewImage->setToolTip(tr("实时相机原图"));
+    m_livePreviewImage->hide();
     topLayout->addWidget(imageGroup);
 
     auto* rightLayout = new QVBoxLayout();
@@ -1176,22 +1154,21 @@ void MainWidget::showFrame(const i2r_rlc::camera::CameraFrame& frame)
         m_realLaserOverlayPoints.clear();
     }
     m_trackingDisplayActive = false;
-    m_detectionSnapshotImage->hide();
-    m_detectionSnapshotCaption->hide();
+    m_livePreviewImage->hide();
     m_trackingFrameCaption.clear();
     m_liveFrameId = frame.frameId;
     m_liveExposureMs = frame.timestamp.isValid() ? frame.timestamp.toMSecsSinceEpoch() : -1;
     m_imagePlaceholder->setProperty("previewFrameId", m_liveFrameId);
     m_imagePlaceholder->setProperty("exposureTimestampMs", m_liveExposureMs);
     m_currentImage = frame.image.isNull() ? frame.previewImage : frame.image;
+    m_liveImage = m_currentImage;
     if (m_currentImage.isNull()) {
         setImagePlaceholderText(tr("未加载图像"));
         return;
     }
 
     updateDisplayedImage();
-    updateLivePreviewCaption();
-    m_liveFrameCaption->show();
+    updateImageAttribution();
 }
 
 void MainWidget::showLivePreview(const i2r_rlc::camera::CameraFrame& frame)
@@ -1200,24 +1177,20 @@ void MainWidget::showLivePreview(const i2r_rlc::camera::CameraFrame& frame)
     if (source.isNull()) { return; }
     m_liveFrameId = frame.frameId;
     m_liveExposureMs = frame.timestamp.isValid() ? frame.timestamp.toMSecsSinceEpoch() : -1;
-    m_imagePlaceholder->setPixmap(QPixmap::fromImage(source).scaled(
-        m_imagePlaceholder->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    m_imagePlaceholder->setProperty("previewFrameId", m_liveFrameId);
-    m_imagePlaceholder->setProperty("exposureTimestampMs", m_liveExposureMs);
-    updateLivePreviewCaption();
-    m_liveFrameCaption->show();
+    m_liveImage = source;
+    auto *target = m_trackingDisplayActive ? m_livePreviewImage : m_imagePlaceholder;
+    target->setPixmap(QPixmap::fromImage(source).scaled(
+        target->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    target->setProperty("previewFrameId", m_liveFrameId);
+    target->setProperty("exposureTimestampMs", m_liveExposureMs);
+    if (m_trackingDisplayActive) { m_livePreviewImage->show(); }
 }
 
-void MainWidget::updateLivePreviewCaption()
+void MainWidget::updateImageAttribution()
 {
-    m_detectionSnapshotImage->setProperty("detectionFrameId", m_detectionFrameId);
-    m_liveFrameCaption->setText(QStringLiteral("实时原图 %1 · 曝光年龄 %2")
-        .arg(m_liveFrameId).arg(exposureAgeText(m_liveExposureMs)));
-    m_detectionSnapshotCaption->setText(QStringLiteral(
-        "检测快照 %1 · 曝光年龄 %2\n%3")
-        .arg(m_detectionFrameId).arg(exposureAgeText(m_detectionExposureMs))
-        .arg(m_trackingFrameCaption.section(QStringLiteral("｜"), 1)));
-    m_detectionSnapshotCaption->setToolTip(m_trackingFrameCaption);
+    m_imagePlaceholder->setProperty("detectionFrameId", m_detectionFrameId);
+    // 曝光身份保留在属性与日志，来源/控制资格保留悬浮说明，不覆盖检测画面。
+    m_imagePlaceholder->setToolTip(m_trackingFrameCaption);
 }
 
 void MainWidget::setVirtualLaserOverlay(const QVector<QPointF>& imagePoints)
@@ -1271,17 +1244,20 @@ void MainWidget::setRealLaserOverlay(const QVector<QPointF>& imagePoints)
 
 void MainWidget::showTrackingFrame(const TrackingFramePresentation& presentation)
 {
-    if (m_liveFrameId < presentation.frameId || m_imagePlaceholder->pixmap().isNull()) {
-        camera::CameraFrame frame;
-        frame.frameId = presentation.frameId;
-        frame.image = presentation.sourceImage;
-        frame.timestamp = {};
-        if (presentation.exposureTimestampMs >= 0) {
-            frame.timestamp = QDateTime::fromMSecsSinceEpoch(presentation.exposureTimestampMs);
-        }
-        showLivePreview(frame);
-    }
     m_trackingDisplayActive = true;
+    m_imagePlaceholder->setProperty("previewFrameId", -1LL);
+    camera::CameraFrame liveFrame;
+    const bool hasNewerLiveFrame = m_liveFrameId >= presentation.frameId && !m_liveImage.isNull();
+    liveFrame.frameId = hasNewerLiveFrame ? m_liveFrameId : presentation.frameId;
+    liveFrame.image = hasNewerLiveFrame ? m_liveImage : presentation.sourceImage;
+    const qint64 exposureMs = hasNewerLiveFrame ? m_liveExposureMs : presentation.exposureTimestampMs;
+    liveFrame.timestamp = {};
+    if (exposureMs >= 0) { liveFrame.timestamp = QDateTime::fromMSecsSinceEpoch(exposureMs); }
+    if (m_livePreviewImage->property("previewFrameId").toLongLong() != liveFrame.frameId
+        || m_livePreviewImage->pixmap().isNull()) {
+        showLivePreview(liveFrame);
+    }
+    m_imagePlaceholder->setProperty("exposureTimestampMs", presentation.exposureTimestampMs);
     m_detectionFrameId = presentation.frameId;
     m_detectionExposureMs = presentation.exposureTimestampMs;
     m_currentImage = presentation.sourceImage;
@@ -1294,18 +1270,14 @@ void MainWidget::showTrackingFrame(const TrackingFramePresentation& presentation
     m_realLaserOverlayPoints.clear();
     m_trackingFrameCaption = presentation.caption;
     updateDisplayedImage();
-    updateLivePreviewCaption();
-    m_detectionSnapshotImage->show();
-    m_detectionSnapshotCaption->show();
-    m_detectionSnapshotImage->raise();
-    m_detectionSnapshotCaption->raise();
+    updateImageAttribution();
+    m_livePreviewImage->show();
+    m_livePreviewImage->raise();
 }
 
 void MainWidget::setImagePlaceholderText(const QString& text)
 {
-    m_detectionSnapshotImage->hide();
-    m_detectionSnapshotCaption->hide();
-    m_liveFrameCaption->hide();
+    m_livePreviewImage->hide();
     m_trackingDisplayActive = false;
     m_detectionFrameId = -1;
     m_detectionExposureMs = -1;
@@ -1314,7 +1286,12 @@ void MainWidget::setImagePlaceholderText(const QString& text)
     m_imagePlaceholder->setProperty("previewFrameId", -1LL);
     m_imagePlaceholder->setProperty("lastPaintedFrameId", -1LL);
     m_imagePlaceholder->setProperty("paintedFrameCount", 0LL);
+    m_livePreviewImage->setProperty("previewFrameId", -1LL);
+    m_livePreviewImage->setProperty("lastPaintedFrameId", -1LL);
+    m_livePreviewImage->setProperty("paintedFrameCount", 0LL);
+    m_imagePlaceholder->setToolTip({});
     m_currentImage = {};
+    m_liveImage = {};
     m_trackingFrameCaption.clear();
     m_imagePlaceholder->setPixmap(QPixmap());
     m_imagePlaceholder->setText(text);
@@ -1905,7 +1882,7 @@ void MainWidget::updateDisplayedImage()
         return;
     }
 
-    auto *target = m_trackingDisplayActive ? m_detectionSnapshotImage : m_imagePlaceholder;
+    auto *target = m_imagePlaceholder;
     QPixmap pixmap = QPixmap::fromImage(m_currentImage)
                          .scaled(
                              target->size(),

@@ -46,7 +46,7 @@ public:
     explicit MainWidget(QWidget* parent = nullptr);
 
 signals:
-    /** @brief 主图新曝光完成 QWidget 绘制；本机 epoch 毫秒，不代表显示器物理呈现。 */
+    /** @brief 实时原图新曝光完成 QWidget 绘制；本机 epoch 毫秒，不代表显示器物理呈现。 */
     void liveFramePainted(qint64 frameId, qint64 exposureMs, qint64 paintedAtMs);
 
     /// @brief 用户请求设置相机曝光时间，单位 us。
@@ -198,7 +198,7 @@ public slots:
     /// @brief 在固定图像区域内按比例显示相机帧。
     void showFrame(const i2r_rlc::camera::CameraFrame& frame);
 
-    /** @brief 实时原图独立刷新主图；同曝光检测与叠加保留在小窗，仅 UI 线程调用。 */
+    /** @brief 检测期间实时原图独立刷新小窗；主图保留同曝光检测与叠加，仅 UI 线程调用。 */
     void showLivePreview(const i2r_rlc::camera::CameraFrame& frame);
 
     /// @brief 设置叠加在实时相机图像上的仿真激光参考线。
@@ -374,13 +374,11 @@ private:
     void emitExclusiveFeatureClosed(int index);
     void updateDisplayedImage();
     /** @brief UI 线程同步预览与检测曝光归属，不移动检测叠加到新预览图。 */
-    void updateLivePreviewCaption();
+    void updateImageAttribution();
     void updateCalibrationPlacementImage();
 
     QLabel* m_imagePlaceholder = nullptr;
-    QLabel* m_detectionSnapshotImage = nullptr;
-    QLabel* m_detectionSnapshotCaption = nullptr;
-    QLabel* m_liveFrameCaption = nullptr;
+    QLabel* m_livePreviewImage = nullptr;
     QLabel* m_robotStateLabel = nullptr;
     QLabel* m_modeStatusLabel = nullptr;
     QLabel* m_servoStatusLabel = nullptr;
@@ -466,6 +464,7 @@ private:
     QPointer<QPlainTextEdit> m_logView;
     QStringList m_logLines;
     QImage m_currentImage;
+    QImage m_liveImage;
     qint64 m_detectionFrameId = -1;
     qint64 m_detectionExposureMs = -1;
     qint64 m_liveFrameId = -1;

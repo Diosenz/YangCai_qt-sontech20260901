@@ -90,7 +90,7 @@ public:
     QString lastError() const;
 
 private:
-    /** @brief 临时诊断环；每阶段一次首丢，最多六帧且原图合计不超过 16 MiB。 */
+    /** @brief 临时诊断环；每阶段首拒绝及首像素丢失各有窗口，最多六帧、16 MiB。 */
     struct CLossFrame {
         qint64 frameId = -1;
         QString stem;
@@ -105,6 +105,7 @@ private:
     std::unique_ptr<CTrackingDiagnosticImageWriter> m_lossImageWriter;
     std::deque<CLossFrame> m_lossHistory;
     std::array<bool, 2> m_lossTriggered{};
+    std::array<bool, 2> m_lossUnavailableTriggered{};
     std::array<bool, 2> m_lossSeenValid{};
     int m_lossStage = -1;
     int m_lossRejected = 0;

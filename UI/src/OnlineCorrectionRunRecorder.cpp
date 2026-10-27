@@ -196,6 +196,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
     m_lossImageWriter.reset();
     m_lossHistory.clear();
     m_lossTriggered = {};
+    m_lossUnavailableTriggered = {};
     m_lossSeenValid = {};
     m_lossStage = -1;
     m_lossRejected = m_lossPostRemaining = 0;
@@ -403,7 +404,7 @@ bool COnlineCorrectionRunRecorder::beginSession(
         appendSummary(QStringLiteral("session_state"), QStringLiteral("running"))
         && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("9"))
         && appendSummary(QStringLiteral("debug_kcf_20261026_loss_window"),
-            m_lossImageWriter ? QStringLiteral("pre=6;post=8;once_per_initial_and_online_stage;never_acquired_after_8_rejections;raw_history=16MiB;disk=64MiB;queue=32;processed_exposures_only;control_snapshot_at_result_receipt") : QStringLiteral("disabled"))
+            m_lossImageWriter ? QStringLiteral("pre=6;post=8;first_rejection_and_first_pixel_unavailable_per_stage;never_acquired_after_8_rejections;raw_history=16MiB;disk=64MiB;queue=32;processed_exposures_only;control_snapshot_at_result_receipt") : QStringLiteral("disabled"))
         && appendSummary(QStringLiteral("kcf_policy"), QStringLiteral("production_cpp_evidence_v2; online_continuous_kcf; measured_or_estimated_following; independent_geometry_only_icp"))
         && appendSummary(QStringLiteral("preserve_measured_reference"), boolText(configuration.options.preserveMeasuredReference))
         && appendSummary(QStringLiteral("vision_diagnostics_enabled"), boolText(m_visionDiagnosticOptions.enabled))
@@ -664,7 +665,8 @@ bool COnlineCorrectionRunRecorder::recordLossWindow(
         m_lossRejected = m_lossPostRemaining = 0;
         m_lossLastFrame = -1;
     }
-    if (m_lossTriggered[stage] && m_lossPostRemaining == 0) { return true; }
+    if (m_lossTriggered[stage] && m_lossUnavailableTriggered[stage]
+        && m_lossPostRemaining == 0) { return true; }
     // 重复/乱序结果保留在数值日志中，不能伪装成窗口里的新增曝光。
     if (result.frameId < 0 || result.frameId <= m_lossLastFrame) { return true; }
     m_lossLastFrame = result.frameId;
@@ -755,10 +757,17 @@ bool COnlineCorrectionRunRecorder::recordLossWindow(
     const bool accepted = result.valid && (!result.evidencePolicyEnabled || result.controlEligible);
     m_lossSeenValid[stage] = m_lossSeenValid[stage] || accepted;
     m_lossRejected = accepted ? 0 : m_lossRejected + 1;
+    const bool pixelUnavailable = !(result.evidencePolicyEnabled ? result.kcfPixelAvailable : result.valid);
+    const bool firstRejection = !m_lossTriggered[stage] && !accepted
+        && (m_lossSeenValid[stage] || m_lossRejected >= 8);
+    // 可见估计失去控制资格可能先触发首拒绝；仍为随后真正的像素消失保留一次窗口。
+    // 两类共用16MiB历史及64MiB写盘预算，不改变检测和控制判据。
+    const bool firstUnavailable = !m_lossUnavailableTriggered[stage] && pixelUnavailable
+        && (m_lossSeenValid[stage] || m_lossRejected >= 8);
     bool written = true;
-    if (!m_lossTriggered[stage] && !accepted
-        && (m_lossSeenValid[stage] || m_lossRejected >= 8)) {
+    if (firstRejection || (firstUnavailable && m_lossPostRemaining == 0)) {
         m_lossTriggered[stage] = true;
+        m_lossUnavailableTriggered[stage] = m_lossUnavailableTriggered[stage] || pixelUnavailable;
         m_lossTriggerFrame = result.frameId;
         for (const auto &previous : m_lossHistory) {
             written = submitLossFrame(previous, m_lossTriggerFrame, QStringLiteral("before")) && written;
@@ -767,9 +776,12 @@ bool COnlineCorrectionRunRecorder::recordLossWindow(
         m_lossPostRemaining = 8;
         m_lossHistory.clear();
     } else if (m_lossPostRemaining > 0) {
+        const bool startsUnavailableWindow = !m_lossUnavailableTriggered[stage] && pixelUnavailable;
+        m_lossUnavailableTriggered[stage] = m_lossUnavailableTriggered[stage] || pixelUnavailable;
         written = submitLossFrame(frame, m_lossTriggerFrame, QStringLiteral("after")) && written;
-        --m_lossPostRemaining;
-    } else if (!m_lossTriggered[stage]) {
+        // 两窗口重叠时不重复写当前帧，但仍保留首次像素消失之后的八帧恢复证据。
+        m_lossPostRemaining = startsUnavailableWindow ? 8 : m_lossPostRemaining - 1;
+    } else if (!m_lossTriggered[stage] || !m_lossUnavailableTriggered[stage]) {
         m_lossHistory.push_back(std::move(frame));
         qint64 bytes = 0;
         for (const auto &previous : m_lossHistory) { bytes += previous.source.sizeInBytes(); }

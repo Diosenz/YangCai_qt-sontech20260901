@@ -1,0 +1,12 @@
+{
+  "source_session": "20261027_200039_905",
+  "source_context_sha256": "2655cce3bc7123e017e9056fc1def918497f31971ab46a84590fdfe9d4795d71",
+  "files": {
+    "frame_8154.png": "363d313a8455beec16b4d25e4d008c8ce3f71f72c55af9177cbd66a1ef7171df",
+    "frame_8157.png": "7a87e96dac3108a350c255b5225719e0de3f2416497e851a66c71255bf87176c",
+    "frame_8160.png": "bb379c338d35025195b70037cdecc596e5255685372d5830045af2ef14f75a6e",
+    "input.jsonl": "e4e20b006c582558c44b8d7d965db213dfbb5d0b89c7a8c79f3227b0eb313155"
+  },
+  "scope": "Captured tack onset; no complete simulated polyline or historical tracker state; local continuity only, not independent seam truth.",
+  "text_hash_normalization": "JSONL: CRLF to LF; PNG: exact bytes"
+}

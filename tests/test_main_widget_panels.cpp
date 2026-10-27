@@ -1283,9 +1283,9 @@ bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
     result.frameContext->observation = ready.observation;
     ok &= expectTrue(QMetaObject::invokeMethod(&controller, "showRuntimeTrackingResult", Qt::DirectConnection,
         Q_ARG(i2r_rlc::ui::RuntimeTrackingResult, result)), "runtime result boundary invoked");
-    auto *live = findLabel(widget, "detectionSnapshotImage");
+    auto *live = findLabel(widget, "livePreviewImage");
     auto *mainImage = live == nullptr ? nullptr : qobject_cast<QLabel *>(live->parentWidget());
-    const QImage snapshot = live == nullptr ? QImage() : live->pixmap().toImage();
+    const QImage snapshot = mainImage == nullptr ? QImage() : mainImage->pixmap().toImage();
     camera::CameraFrame frame;
     frame.frameId = 3969;
     frame.image = preview;
@@ -1303,19 +1303,18 @@ bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
     ok &= expectTrue(live != nullptr && !live->isHidden() && !live->pixmap().isNull(),
                      "fresh camera image remains visible during delayed detection");
     if (live != nullptr) {
-        ok &= expectTrue(mainImage->property("previewFrameId").toLongLong() == 3969
-            && live->property("detectionFrameId").toLongLong() == 3937,
+        ok &= expectTrue(live->property("previewFrameId").toLongLong() == 3969
+            && mainImage->property("detectionFrameId").toLongLong() == 3937,
             "preview and detection retain distinct exposure identities");
-        const auto shown = mainImage->pixmap().toImage();
+        const auto shown = live->pixmap().toImage();
         const auto expected = preview.scaled(shown.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ok &= expectTrue(shown.pixelColor(shown.width() / 2, shown.height() / 2)
             == expected.pixelColor(expected.width() / 2, expected.height() / 2),
             "new preview pixels are not old snapshot pixels or stale overlay");
-        ok &= expectTrue(!snapshot.isNull() && live->pixmap().toImage() == snapshot,
-            "live main image cannot replace the exposure supporting snapshot overlays");
-        ok &= expectTrue(caption != nullptr && caption->text().contains(QStringLiteral("检测快照 3937"))
-            && caption->text().contains(QStringLiteral("ms")),
-            "detection snapshot reports its own frame identity and exposure age");
+        ok &= expectTrue(!snapshot.isNull() && mainImage->pixmap().toImage() == snapshot,
+            "live inset cannot replace the detection main image or its overlays");
+        ok &= expectTrue(caption == nullptr && findLabel(widget, "liveFrameCaption") == nullptr,
+            "frame IDs and exposure ages are not drawn over either image");
     }
     ready.frameId = 3969;
     ready.observation.frameId = 3969;
@@ -1332,8 +1331,7 @@ bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
     result.frameContext->observation.frameId = 3969;
     ok &= expectTrue(QMetaObject::invokeMethod(&controller, "showRuntimeTrackingResult", Qt::DirectConnection,
         Q_ARG(i2r_rlc::ui::RuntimeTrackingResult, result)), "next runtime result boundary invoked");
-    ok &= expectTrue(live != nullptr && live->property("detectionFrameId").toLongLong() == 3969
-        && caption != nullptr && caption->text().contains(QStringLiteral("检测快照 3969")),
+    ok &= expectTrue(mainImage != nullptr && mainImage->property("detectionFrameId").toLongLong() == 3969,
         "a new detection updates preview attribution even without another camera callback");
     result.frameContext->observation.valid = false;
     result.pointSource = vision::OnlineSeamPointSource::GuidedEstimate;
@@ -1341,23 +1339,24 @@ bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
     result.controlEligible = false;
     QMetaObject::invokeMethod(&controller, "showRuntimeTrackingResult", Qt::DirectConnection,
         Q_ARG(i2r_rlc::ui::RuntimeTrackingResult, result));
-    ok &= expectTrue(caption != nullptr
-        && caption->text().contains(QStringLiteral("同帧参考缺失"))
-        && caption->text().contains(QStringLiteral("无控制资格")),
-        "missing reference and ineligible estimate must remain visible in the snapshot caption");
+    ok &= expectTrue(mainImage != nullptr
+        && mainImage->toolTip().contains(QStringLiteral("同帧参考缺失"))
+        && mainImage->toolTip().contains(QStringLiteral("无控制资格")),
+        "detection provenance and eligibility remain available in its tooltip");
     const auto snapshotPath = qEnvironmentVariable("I2R_UI_REPLAY_SNAPSHOT");
     if (!snapshotPath.isEmpty() && mainImage != nullptr) {
         ok &= expectTrue(mainImage->grab().save(snapshotPath), "offline UI snapshot saved");
     }
     widget.show();
     QCoreApplication::processEvents();
-    const auto painted = mainImage->property("paintedFrameCount").toLongLong();
-    mainImage->repaint();
-    ok &= expectTrue(painted > 0 && mainImage->property("paintedFrameCount").toLongLong() == painted,
+    if (live == nullptr) { controller.shutdown(); return false; }
+    const auto painted = live->property("paintedFrameCount").toLongLong();
+    live->repaint();
+    ok &= expectTrue(painted > 0 && live->property("paintedFrameCount").toLongLong() == painted,
         "repainting an existing exposure cannot increase distinct-frame paint count");
     ok &= benchmarkLiveDisplay(widget, controller, preview);
     widget.showFrame(frame);
-    ok &= expectTrue(live != nullptr && live->isHidden() && caption->isHidden(),
+    ok &= expectTrue(live != nullptr && live->isHidden() && caption == nullptr,
         "returning to camera-only display clears delayed detection preview state");
     controller.shutdown();
     return ok;

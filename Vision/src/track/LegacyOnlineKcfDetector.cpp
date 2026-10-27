@@ -1479,6 +1479,15 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
         ++diagnostic.imageRefinementCallCount;
     }
     diagnostic.refinementAttempted = diagnostic.imageRefinementCallCount > 0;
+    // 局部双线拟合可能锁定预焊凸起的边缘；valid 只说明拟合成立，不能替代目标身份。
+    // 与当前响应明显分离且原身份条纹不获支持时，交回肩部/恢复路径核对，不能训练该分支。
+    if (diagnostic.rawRefinement.valid && m_hasImageSearchPoint
+        && cv::norm(diagnostic.rawRefinement.point - diagnostic.responsePoint)
+            > options.seamRefinement.maxPositionUncertaintyPixel
+        && !imageIdentityStripeSupported(gray8, diagnostic.rawRefinement.point, m_imageIdentityPatch)) {
+        diagnostic.rawRefinement.valid = false;
+        diagnostic.rawRefinement.status = OnlineSeamRefinementStatus::InconsistentGeometry;
+    }
     if (diagnostic.rawRefinement.valid) {
         coarse = diagnostic.rawRefinement.point;
         observed = true;
