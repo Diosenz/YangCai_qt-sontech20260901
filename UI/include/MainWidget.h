@@ -46,6 +46,9 @@ public:
     explicit MainWidget(QWidget* parent = nullptr);
 
 signals:
+    /** @brief 主图新曝光完成 QWidget 绘制；本机 epoch 毫秒，不代表显示器物理呈现。 */
+    void liveFramePainted(qint64 frameId, qint64 exposureMs, qint64 paintedAtMs);
+
     /// @brief 用户请求设置相机曝光时间，单位 us。
     void cameraExposureRequested(int exposureUs);
 
@@ -195,7 +198,7 @@ public slots:
     /// @brief 在固定图像区域内按比例显示相机帧。
     void showFrame(const i2r_rlc::camera::CameraFrame& frame);
 
-    /** @brief 检测快照保留同帧叠加，实时预览独立刷新且不绘制旧检测点；仅 UI 线程调用。 */
+    /** @brief 实时原图独立刷新主图；同曝光检测与叠加保留在小窗，仅 UI 线程调用。 */
     void showLivePreview(const i2r_rlc::camera::CameraFrame& frame);
 
     /// @brief 设置叠加在实时相机图像上的仿真激光参考线。
@@ -375,8 +378,9 @@ private:
     void updateCalibrationPlacementImage();
 
     QLabel* m_imagePlaceholder = nullptr;
-    QLabel* m_runtimePreviewImage = nullptr;
-    QLabel* m_runtimePreviewCaption = nullptr;
+    QLabel* m_detectionSnapshotImage = nullptr;
+    QLabel* m_detectionSnapshotCaption = nullptr;
+    QLabel* m_liveFrameCaption = nullptr;
     QLabel* m_robotStateLabel = nullptr;
     QLabel* m_modeStatusLabel = nullptr;
     QLabel* m_servoStatusLabel = nullptr;
@@ -464,6 +468,9 @@ private:
     QImage m_currentImage;
     qint64 m_detectionFrameId = -1;
     qint64 m_detectionExposureMs = -1;
+    qint64 m_liveFrameId = -1;
+    qint64 m_liveExposureMs = -1;
+    bool m_trackingDisplayActive = false;
     QVector<QPointF> m_virtualLaserOverlayPoints;
     QPointF m_virtualWeldPointOverlay;
     bool m_virtualWeldPointOverlayVisible = false;

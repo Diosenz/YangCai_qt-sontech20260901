@@ -7,6 +7,8 @@
  ******************************************************************************/
 #include <algorithm>
 #include <cmath>
+#include <functional>
+#include <utility>
 
 #include <QCheckBox>
 #include <QColor>
@@ -39,6 +41,7 @@
 #include <QStackedWidget>
 #include <QStringList>
 #include <QThread>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include "MainWidget.h"
@@ -47,6 +50,42 @@
 namespace i2r_rlc::ui {
 
 namespace {
+
+/** @brief 仅在主图实际 paintEvent 返回后报告新曝光；重绘同帧不累计，指标不参与业务。 */
+class CMeasuredImageLabel final : public QLabel {
+public:
+    CMeasuredImageLabel(QWidget *parent, std::function<void(qint64, qint64, qint64)> onPainted)
+        : QLabel(parent), m_onPainted(std::move(onPainted))
+    {
+        setProperty("previewFrameId", -1LL);
+        setProperty("lastPaintedFrameId", -1LL);
+        setProperty("paintedFrameCount", 0LL);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *event) override
+    {
+        QLabel::paintEvent(event);
+        const auto frameId = property("previewFrameId").toLongLong();
+        if (pixmap().isNull() || frameId < 0
+            || frameId <= property("lastPaintedFrameId").toLongLong()) { return; }
+        const auto exposureMs = property("exposureTimestampMs").toLongLong();
+        const auto finishedMs = QDateTime::currentMSecsSinceEpoch();
+        setProperty("lastPaintedFrameId", frameId);
+        setProperty("paintedFrameCount", property("paintedFrameCount").toLongLong() + 1);
+        m_onPainted(frameId, exposureMs, finishedMs);
+    }
+
+private:
+    std::function<void(qint64, qint64, qint64)> m_onPainted;
+};
+
+QString exposureAgeText(qint64 exposureMs)
+{
+    if (exposureMs < 0) { return QStringLiteral("未知"); }
+    const auto age = QDateTime::currentMSecsSinceEpoch() - exposureMs;
+    return age >= 0 ? QStringLiteral("%1 ms").arg(age) : QStringLiteral("时间异常");
+}
 
 constexpr int kMainWindowWidth = 1340;
 constexpr int kMainWindowHeight = 930;
@@ -211,26 +250,43 @@ MainWidget::MainWidget(QWidget* parent)
     setFixedPanelSize(imageGroup, kImageViewWidth, kImageViewHeight);
     auto* imageLayout = new QVBoxLayout(imageGroup);
     imageLayout->setContentsMargins(8, 20, 8, 8);
-    m_imagePlaceholder = new QLabel(tr("实时相机尚未启动"), imageGroup);
+    m_imagePlaceholder = new CMeasuredImageLabel(imageGroup,
+        [this](qint64 frameId, qint64 exposureMs, qint64 paintedAtMs) {
+            emit liveFramePainted(frameId, exposureMs, paintedAtMs);
+        });
+    m_imagePlaceholder->setObjectName(QStringLiteral("liveImageCanvas"));
+    m_imagePlaceholder->setText(tr("实时相机尚未启动"));
     m_imagePlaceholder->setAlignment(Qt::AlignCenter);
     m_imagePlaceholder->setFixedSize(kImageCanvasWidth, kImageCanvasHeight);
     m_imagePlaceholder->setStyleSheet(QStringLiteral(
         "QLabel { border: 1px solid #777; background: #101010; color: #f1f3f4; }"));
     imageLayout->addWidget(m_imagePlaceholder);
-    m_runtimePreviewImage = new QLabel(m_imagePlaceholder);
-    m_runtimePreviewImage->setObjectName(QStringLiteral("runtimePreviewImage"));
-    m_runtimePreviewImage->setAlignment(Qt::AlignCenter);
-    m_runtimePreviewImage->setGeometry(kImageCanvasWidth - 228, 52, 220, 164);
-    m_runtimePreviewImage->setStyleSheet(QStringLiteral(
+    m_detectionSnapshotImage = new QLabel(m_imagePlaceholder);
+    m_detectionSnapshotImage->setObjectName(QStringLiteral("detectionSnapshotImage"));
+    m_detectionSnapshotImage->setAlignment(Qt::AlignCenter);
+    m_detectionSnapshotImage->setGeometry(kImageCanvasWidth - 308, 140, 300, 224);
+    m_detectionSnapshotImage->setStyleSheet(QStringLiteral(
         "QLabel { border: 1px solid #777; background: #101010; }"));
-    m_runtimePreviewCaption = new QLabel(m_imagePlaceholder);
-    m_runtimePreviewCaption->setObjectName(QStringLiteral("runtimePreviewCaption"));
-    m_runtimePreviewCaption->setGeometry(kImageCanvasWidth - 228, 8, 220, 44);
-    m_runtimePreviewCaption->setWordWrap(true);
-    m_runtimePreviewCaption->setStyleSheet(QStringLiteral(
+    m_detectionSnapshotCaption = new QLabel(m_imagePlaceholder);
+    m_detectionSnapshotCaption->setObjectName(QStringLiteral("detectionSnapshotCaption"));
+    m_detectionSnapshotCaption->setGeometry(kImageCanvasWidth - 308, 8, 300, 132);
+    m_detectionSnapshotCaption->setWordWrap(true);
+    m_detectionSnapshotCaption->setStyleSheet(QStringLiteral(
         "QLabel { background: #101010; color: #f1f3f4; padding: 2px; }"));
-    m_runtimePreviewImage->hide();
-    m_runtimePreviewCaption->hide();
+    m_detectionSnapshotImage->hide();
+    m_detectionSnapshotCaption->hide();
+    m_liveFrameCaption = new QLabel(m_imagePlaceholder);
+    m_liveFrameCaption->setObjectName(QStringLiteral("liveFrameCaption"));
+    m_liveFrameCaption->setGeometry(8, 8, kImageCanvasWidth - 324, 36);
+    m_liveFrameCaption->setStyleSheet(QStringLiteral(
+        "QLabel { background: #101010; color: #f1f3f4; padding: 2px; }"));
+    m_liveFrameCaption->hide();
+    auto *ageTimer = new QTimer(this);
+    ageTimer->setInterval(100);
+    connect(ageTimer, &QTimer::timeout, this, [this]() {
+        if (m_liveFrameCaption->isVisible()) { updateLivePreviewCaption(); }
+    });
+    ageTimer->start();
     topLayout->addWidget(imageGroup);
 
     auto* rightLayout = new QVBoxLayout();
@@ -1113,9 +1169,20 @@ void MainWidget::setTeachTrajectoryStateText(const QString& text)
 
 void MainWidget::showFrame(const i2r_rlc::camera::CameraFrame& frame)
 {
-    m_runtimePreviewImage->hide();
-    m_runtimePreviewCaption->hide();
+    if (m_trackingDisplayActive) {
+        m_virtualLaserOverlayPoints.clear();
+        m_virtualWeldPointOverlayVisible = false;
+        m_detectedWeldPointOverlayVisible = false;
+        m_realLaserOverlayPoints.clear();
+    }
+    m_trackingDisplayActive = false;
+    m_detectionSnapshotImage->hide();
+    m_detectionSnapshotCaption->hide();
     m_trackingFrameCaption.clear();
+    m_liveFrameId = frame.frameId;
+    m_liveExposureMs = frame.timestamp.isValid() ? frame.timestamp.toMSecsSinceEpoch() : -1;
+    m_imagePlaceholder->setProperty("previewFrameId", m_liveFrameId);
+    m_imagePlaceholder->setProperty("exposureTimestampMs", m_liveExposureMs);
     m_currentImage = frame.image.isNull() ? frame.previewImage : frame.image;
     if (m_currentImage.isNull()) {
         setImagePlaceholderText(tr("未加载图像"));
@@ -1123,32 +1190,34 @@ void MainWidget::showFrame(const i2r_rlc::camera::CameraFrame& frame)
     }
 
     updateDisplayedImage();
+    updateLivePreviewCaption();
+    m_liveFrameCaption->show();
 }
 
 void MainWidget::showLivePreview(const i2r_rlc::camera::CameraFrame& frame)
 {
     const auto source = frame.image.isNull() ? frame.previewImage : frame.image;
     if (source.isNull()) { return; }
-    m_runtimePreviewImage->setPixmap(QPixmap::fromImage(source).scaled(
-        m_runtimePreviewImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    m_runtimePreviewImage->setProperty("previewFrameId", frame.frameId);
+    m_liveFrameId = frame.frameId;
+    m_liveExposureMs = frame.timestamp.isValid() ? frame.timestamp.toMSecsSinceEpoch() : -1;
+    m_imagePlaceholder->setPixmap(QPixmap::fromImage(source).scaled(
+        m_imagePlaceholder->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    m_imagePlaceholder->setProperty("previewFrameId", m_liveFrameId);
+    m_imagePlaceholder->setProperty("exposureTimestampMs", m_liveExposureMs);
     updateLivePreviewCaption();
-    m_runtimePreviewImage->show();
-    m_runtimePreviewCaption->show();
-    m_runtimePreviewImage->raise();
-    m_runtimePreviewCaption->raise();
+    m_liveFrameCaption->show();
 }
 
 void MainWidget::updateLivePreviewCaption()
 {
-    m_runtimePreviewImage->setProperty("detectionFrameId", m_detectionFrameId);
-    const auto age = m_detectionExposureMs > 0
-        ? QStringLiteral(" · %1 ms").arg(std::max<qint64>(0,
-            QDateTime::currentMSecsSinceEpoch() - m_detectionExposureMs)) : QString();
-    m_runtimePreviewCaption->setText(QStringLiteral(
-        "实时预览 %1（无检测叠加）\n主图：检测快照 %2%3")
-        .arg(m_runtimePreviewImage->property("previewFrameId").toLongLong())
-        .arg(m_detectionFrameId).arg(age));
+    m_detectionSnapshotImage->setProperty("detectionFrameId", m_detectionFrameId);
+    m_liveFrameCaption->setText(QStringLiteral("实时原图 %1 · 曝光年龄 %2")
+        .arg(m_liveFrameId).arg(exposureAgeText(m_liveExposureMs)));
+    m_detectionSnapshotCaption->setText(QStringLiteral(
+        "检测快照 %1 · 曝光年龄 %2\n%3")
+        .arg(m_detectionFrameId).arg(exposureAgeText(m_detectionExposureMs))
+        .arg(m_trackingFrameCaption.section(QStringLiteral("｜"), 1)));
+    m_detectionSnapshotCaption->setToolTip(m_trackingFrameCaption);
 }
 
 void MainWidget::setVirtualLaserOverlay(const QVector<QPointF>& imagePoints)
@@ -1202,9 +1271,19 @@ void MainWidget::setRealLaserOverlay(const QVector<QPointF>& imagePoints)
 
 void MainWidget::showTrackingFrame(const TrackingFramePresentation& presentation)
 {
+    if (m_liveFrameId < presentation.frameId || m_imagePlaceholder->pixmap().isNull()) {
+        camera::CameraFrame frame;
+        frame.frameId = presentation.frameId;
+        frame.image = presentation.sourceImage;
+        frame.timestamp = {};
+        if (presentation.exposureTimestampMs >= 0) {
+            frame.timestamp = QDateTime::fromMSecsSinceEpoch(presentation.exposureTimestampMs);
+        }
+        showLivePreview(frame);
+    }
+    m_trackingDisplayActive = true;
     m_detectionFrameId = presentation.frameId;
     m_detectionExposureMs = presentation.exposureTimestampMs;
-    if (!m_runtimePreviewImage->isHidden()) { updateLivePreviewCaption(); }
     m_currentImage = presentation.sourceImage;
     m_virtualLaserOverlayPoints = presentation.virtualLaserPoints;
     m_virtualWeldPointOverlay = presentation.virtualWeldPoint;
@@ -1215,12 +1294,26 @@ void MainWidget::showTrackingFrame(const TrackingFramePresentation& presentation
     m_realLaserOverlayPoints.clear();
     m_trackingFrameCaption = presentation.caption;
     updateDisplayedImage();
+    updateLivePreviewCaption();
+    m_detectionSnapshotImage->show();
+    m_detectionSnapshotCaption->show();
+    m_detectionSnapshotImage->raise();
+    m_detectionSnapshotCaption->raise();
 }
 
 void MainWidget::setImagePlaceholderText(const QString& text)
 {
-    m_runtimePreviewImage->hide();
-    m_runtimePreviewCaption->hide();
+    m_detectionSnapshotImage->hide();
+    m_detectionSnapshotCaption->hide();
+    m_liveFrameCaption->hide();
+    m_trackingDisplayActive = false;
+    m_detectionFrameId = -1;
+    m_detectionExposureMs = -1;
+    m_liveFrameId = -1;
+    m_liveExposureMs = -1;
+    m_imagePlaceholder->setProperty("previewFrameId", -1LL);
+    m_imagePlaceholder->setProperty("lastPaintedFrameId", -1LL);
+    m_imagePlaceholder->setProperty("paintedFrameCount", 0LL);
     m_currentImage = {};
     m_trackingFrameCaption.clear();
     m_imagePlaceholder->setPixmap(QPixmap());
@@ -1812,9 +1905,10 @@ void MainWidget::updateDisplayedImage()
         return;
     }
 
+    auto *target = m_trackingDisplayActive ? m_detectionSnapshotImage : m_imagePlaceholder;
     QPixmap pixmap = QPixmap::fromImage(m_currentImage)
                          .scaled(
-                             m_imagePlaceholder->size(),
+                             target->size(),
                              Qt::KeepAspectRatio,
                              Qt::SmoothTransformation);
     if ((m_virtualLaserOverlayPoints.size() >= 2
@@ -1831,7 +1925,7 @@ void MainWidget::updateDisplayedImage()
         QPainter painter(&pixmap);
         painter.setRenderHint(QPainter::Antialiasing, true);//开始
 
-        if (!m_trackingFrameCaption.isEmpty()) {
+        if (!m_trackingDisplayActive && !m_trackingFrameCaption.isEmpty()) {
             painter.setPen(QPen(Qt::white, 1.0));
             painter.drawText(QPointF(10.0, 40.0), m_trackingFrameCaption);
         }
@@ -1856,9 +1950,9 @@ void MainWidget::updateDisplayedImage()
             }
 
             painter.setPen(QPen(QColor(255, 215, 0), 1.0));
-            painter.drawText(
+            if (!m_trackingDisplayActive) { painter.drawText(
                 QPointF(10.0, 20.0),
-                tr("黄色：仿真激光参考线"));
+                tr("黄色：仿真激光参考线")); }
         }
 
         if (m_virtualWeldPointOverlayVisible) {
@@ -1876,9 +1970,9 @@ void MainWidget::updateDisplayedImage()
                 displayedPoint + QPointF(0.0, -9.0),
                 displayedPoint + QPointF(0.0, 9.0));
             painter.setPen(QPen(QColor(255, 64, 64), 1.0));
-            painter.drawText(
+            if (!m_trackingDisplayActive) { painter.drawText(
                 QPointF(10.0, 60.0),
-                tr("红色：RobotSim仿真焊缝点"));
+                tr("红色：RobotSim仿真焊缝点")); }
         }
         if (m_detectedWeldPointOverlayVisible) {
             const QPointF displayedPoint(
@@ -1916,8 +2010,8 @@ void MainWidget::updateDisplayedImage()
                 tr("青色：Steger真实激光中心线"));
         }
     }
-    m_imagePlaceholder->setText({});
-    m_imagePlaceholder->setPixmap(pixmap);
+    target->setText({});
+    target->setPixmap(pixmap);
 }
 
 void MainWidget::updateCalibrationPlacementImage()

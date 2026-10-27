@@ -4822,7 +4822,8 @@ void UiController::handleCorrectionSyncUpdate(
         clearCorrectionFrameDisplay();
         if (update.purpose != CorrectionPurpose::OfflineCorrection) {
             m_trackingOverlayActive = true;
-            m_view.setImagePlaceholderText(QStringLiteral("等待首个完整检测帧"));
+            m_view.setImagePlaceholderText(QStringLiteral("等待实时相机帧与检测快照"));
+            if (m_hasLatestFrame) { m_view.showLivePreview(m_latestFrame); }
         }
         m_view.setDigitalTwinStateText(
             QStringLiteral("仿真：等待纠偏检测窗口\n端口：%1\n尚无本轮同帧参考")

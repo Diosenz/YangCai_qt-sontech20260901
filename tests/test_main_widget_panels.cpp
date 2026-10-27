@@ -6,6 +6,7 @@
  * @details     验证对应模块的迁移行为和关键边界，测试断言保持原有语义。
  ******************************************************************************/
 #include <cstdlib>
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -14,6 +15,14 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QCoreApplication>
+#include <QDateTime>
+#include <QElapsedTimer>
+#include <QEventLoop>
+#include <QFile>
+#include <QFontDatabase>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QDir>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
@@ -24,6 +33,7 @@
 #include <QScrollBar>
 #include <QStackedWidget>
 #include <QStringList>
+#include <QTimer>
 
 #include "MainWidget.h"
 #include "OnlineCorrectionTypes.h"
@@ -1165,6 +1175,73 @@ bool testOnlineCompletedSessionStopIsOrdinary()
     return ok;
 }
 
+/** @brief 受控30Hz注入测真实paint完成和事件队列响应；重复实拍图不冒充连续现场曝光。 */
+bool benchmarkLiveDisplay(i2r_rlc::ui::MainWidget &widget,
+                          i2r_rlc::ui::UiController &controller, const QImage &source)
+{
+    const auto output = qEnvironmentVariable("I2R_UI_DISPLAY_REPORT");
+    if (output.isEmpty()) { return true; }
+    widget.show();
+    QCoreApplication::processEvents();
+    QJsonArray samples;
+    QList<double> latencies;
+    QList<double> interactionDelays;
+    int generated = 0;
+    QEventLoop loop;
+    QElapsedTimer elapsed;
+    elapsed.start();
+    const auto connection = QObject::connect(&widget, &i2r_rlc::ui::MainWidget::liveFramePainted,
+        &loop, [&](qint64 id, qint64 exposure, qint64 painted) {
+            samples.append(QJsonObject{{"frame_id", id}, {"injected_at_ms", exposure},
+                                        {"painted_at_ms", painted}, {"elapsed_ms", elapsed.elapsed()}});
+            if (painted >= exposure) { latencies.append(painted-exposure); }
+        });
+    QTimer generator;
+    generator.setTimerType(Qt::PreciseTimer);
+    generator.setInterval(33);
+    QObject::connect(&generator, &QTimer::timeout, &loop, [&]() {
+        i2r_rlc::camera::CameraFrame frame;
+        frame.frameId = 4000 + generated++;
+        frame.timestamp = QDateTime::currentDateTime();
+        frame.image = source;
+        QMetaObject::invokeMethod(&controller, "handleRuntimeFrameReady", Qt::DirectConnection,
+            Q_ARG(i2r_rlc::camera::CameraFrame, frame));
+        if (generated % 10 == 0) {
+            const auto posted = elapsed.nsecsElapsed();
+            QMetaObject::invokeMethod(&loop, [&, posted]() {
+                widget.setFocus();
+                interactionDelays.append((elapsed.nsecsElapsed()-posted)/1e6);
+            }, Qt::QueuedConnection);
+        }
+    });
+    generator.start();
+    QTimer::singleShot(10000, Qt::PreciseTimer, &loop, &QEventLoop::quit);
+    loop.exec();
+    generator.stop();
+    QObject::disconnect(connection);
+    const auto duration = elapsed.elapsed();
+    const auto distribution = [](QList<double> values) {
+        std::sort(values.begin(), values.end());
+        return QJsonObject{{"count", values.size()},
+            {"p95", values.isEmpty() ? QJsonValue(QJsonValue::Null)
+                : QJsonValue(values[static_cast<qsizetype>(std::ceil(values.size()*0.95))-1])},
+            {"max", values.isEmpty() ? QJsonValue(QJsonValue::Null) : QJsonValue(values.last())}};
+    };
+    const double rate = samples.size()*1000.0/duration;
+    const auto latency = distribution(latencies);
+    const QJsonObject report{{"scope", "Offscreen Qt paint; repeated captured image with synthetic frame IDs. No device or physical display acceptance."},
+        {"duration_ms", duration}, {"injected_frames", generated}, {"painted_distinct_ids", samples.size()},
+        {"paint_hz", rate}, {"injection_to_paint_ms", latency},
+        {"queued_focus_response_ms", distribution(interactionDelays)}, {"samples", samples}};
+    QFile file(output);
+    bool ok = expectTrue(file.open(QIODevice::WriteOnly), "open controlled UI display report");
+    if (ok) { file.write(QJsonDocument(report).toJson(QJsonDocument::Indented)); }
+    ok &= expectTrue(rate >= 25 && latency.value("p95").toDouble(10000) <= 150
+        && interactionDelays.size() >= 20, "controlled display sustains paint and interaction workload");
+    std::cout << "CONTROLLED_UI_REPORT " << output.toStdString() << " paint_hz=" << rate << '\n';
+    return ok;
+}
+
 bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
 {
     using namespace i2r_rlc;
@@ -1202,18 +1279,20 @@ bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
     result.frameContext.emplace();
     result.frameContext->sourceFrame.frameId = 3937;
     result.frameContext->sourceFrame.image = detected;
+    result.frameContext->sourceFrame.timestamp = QDateTime::currentDateTime().addMSecs(-60);
     result.frameContext->observation = ready.observation;
     ok &= expectTrue(QMetaObject::invokeMethod(&controller, "showRuntimeTrackingResult", Qt::DirectConnection,
         Q_ARG(i2r_rlc::ui::RuntimeTrackingResult, result)), "runtime result boundary invoked");
-    auto *live = findLabel(widget, "runtimePreviewImage");
+    auto *live = findLabel(widget, "detectionSnapshotImage");
     auto *mainImage = live == nullptr ? nullptr : qobject_cast<QLabel *>(live->parentWidget());
-    const QImage snapshot = mainImage == nullptr ? QImage() : mainImage->pixmap().toImage();
+    const QImage snapshot = live == nullptr ? QImage() : live->pixmap().toImage();
     camera::CameraFrame frame;
     frame.frameId = 3969;
     frame.image = preview;
+    frame.timestamp = QDateTime::currentDateTime().addMSecs(-25);
     ok &= expectTrue(QMetaObject::invokeMethod(&controller, "handleRuntimeFrameReady", Qt::DirectConnection,
         Q_ARG(i2r_rlc::camera::CameraFrame, frame)), "runtime preview boundary invoked");
-    auto *caption = findLabel(widget, "runtimePreviewCaption");
+    auto *caption = findLabel(widget, "detectionSnapshotCaption");
     auto *consumed = findLabel(widget, "onlineCorrectionConsumedFrameLabel");
     if (live != nullptr && live->isHidden()) {
         std::cerr << "preview diagnostic: consumed="
@@ -1224,16 +1303,19 @@ bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
     ok &= expectTrue(live != nullptr && !live->isHidden() && !live->pixmap().isNull(),
                      "fresh camera image remains visible during delayed detection");
     if (live != nullptr) {
-        ok &= expectTrue(live->property("previewFrameId").toLongLong() == 3969
+        ok &= expectTrue(mainImage->property("previewFrameId").toLongLong() == 3969
             && live->property("detectionFrameId").toLongLong() == 3937,
             "preview and detection retain distinct exposure identities");
-        const auto shown = live->pixmap().toImage();
+        const auto shown = mainImage->pixmap().toImage();
         const auto expected = preview.scaled(shown.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ok &= expectTrue(shown.pixelColor(shown.width() / 2, shown.height() / 2)
             == expected.pixelColor(expected.width() / 2, expected.height() / 2),
             "new preview pixels are not old snapshot pixels or stale overlay");
-        ok &= expectTrue(!snapshot.isNull() && mainImage->pixmap().toImage() == snapshot,
-            "live camera frames cannot replace the exposure supporting main-image overlays");
+        ok &= expectTrue(!snapshot.isNull() && live->pixmap().toImage() == snapshot,
+            "live main image cannot replace the exposure supporting snapshot overlays");
+        ok &= expectTrue(caption != nullptr && caption->text().contains(QStringLiteral("检测快照 3937"))
+            && caption->text().contains(QStringLiteral("ms")),
+            "detection snapshot reports its own frame identity and exposure age");
     }
     ready.frameId = 3969;
     ready.observation.frameId = 3969;
@@ -1253,10 +1335,27 @@ bool testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed()
     ok &= expectTrue(live != nullptr && live->property("detectionFrameId").toLongLong() == 3969
         && caption != nullptr && caption->text().contains(QStringLiteral("检测快照 3969")),
         "a new detection updates preview attribution even without another camera callback");
+    result.frameContext->observation.valid = false;
+    result.pointSource = vision::OnlineSeamPointSource::GuidedEstimate;
+    result.sample.estimated = true;
+    result.controlEligible = false;
+    QMetaObject::invokeMethod(&controller, "showRuntimeTrackingResult", Qt::DirectConnection,
+        Q_ARG(i2r_rlc::ui::RuntimeTrackingResult, result));
+    ok &= expectTrue(caption != nullptr
+        && caption->text().contains(QStringLiteral("同帧参考缺失"))
+        && caption->text().contains(QStringLiteral("无控制资格")),
+        "missing reference and ineligible estimate must remain visible in the snapshot caption");
     const auto snapshotPath = qEnvironmentVariable("I2R_UI_REPLAY_SNAPSHOT");
     if (!snapshotPath.isEmpty() && mainImage != nullptr) {
         ok &= expectTrue(mainImage->grab().save(snapshotPath), "offline UI snapshot saved");
     }
+    widget.show();
+    QCoreApplication::processEvents();
+    const auto painted = mainImage->property("paintedFrameCount").toLongLong();
+    mainImage->repaint();
+    ok &= expectTrue(painted > 0 && mainImage->property("paintedFrameCount").toLongLong() == painted,
+        "repainting an existing exposure cannot increase distinct-frame paint count");
+    ok &= benchmarkLiveDisplay(widget, controller, preview);
     widget.showFrame(frame);
     ok &= expectTrue(live != nullptr && live->isHidden() && caption->isHidden(),
         "returning to camera-only display clears delayed detection preview state");
@@ -1421,6 +1520,13 @@ int main(int argc, char **argv)
     setenv("I2R_RLC_DISABLE_AUTO_DEVICE_START", "1", 1);
 #endif
     QApplication app(argc, argv);
+#ifdef _WIN32
+    // offscreen平台没有桌面字体回退；离线截图显式加载系统中文字体。
+    const auto fontId = QFontDatabase::addApplicationFont(
+        QDir(qEnvironmentVariable("WINDIR")).filePath(QStringLiteral("Fonts/msyh.ttc")));
+    const auto families = QFontDatabase::applicationFontFamilies(fontId);
+    if (!families.isEmpty()) { app.setFont(QFont(families.front(), 9)); }
+#endif
     if (app.arguments().contains(QStringLiteral("--live-preview-contract"))) {
         return testLivePreviewContinuesWhileDetectionSnapshotIsDisplayed() ? 0 : 1;
     }
