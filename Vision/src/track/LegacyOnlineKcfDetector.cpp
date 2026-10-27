@@ -73,6 +73,7 @@ constexpr int kRoiWidthPixel = 250;
 constexpr int kRoiHeightPixel = 200;
 constexpr int kGapRoiSizePixel = 400;
 constexpr int kTemplateLineWidthPixel = 10;
+constexpr int kShoulderSearchRadiusPixel = 12;
 constexpr int kReinitializeIntervalFrame = 50;
 
 MyLaserImagePoint toMyLaserImagePoint(
@@ -449,7 +450,7 @@ ShoulderMatch matchImageShoulders(const cv::Mat &gray8, const cv::Point2d &coars
         || !insideImage(gray8, coarse)) { return result; }
     const int halfWidth = identity.cols / 2;
     const int halfHeight = identity.rows / 2;
-    constexpr int searchRadius = 12;
+    constexpr int searchRadius = kShoulderSearchRadiusPixel;
     const cv::Rect search(static_cast<int>(std::lround(coarse.x)) - halfWidth - searchRadius,
         static_cast<int>(std::lround(coarse.y)) - halfHeight - searchRadius,
         identity.cols + searchRadius * 2, identity.rows + searchRadius * 2);
@@ -702,7 +703,8 @@ void CLegacyOnlineKcfDetector::reset()
     m_paperPosition = {};
     m_tracker.reset();
     m_paperImagePoint = {-1.0, -1.0};
-    m_paperImageVelocity = {};
+    m_paperImageVelocityPerMs = {};
+    m_paperImageTimestampMs = -1;
     m_hasPaperImageMotion = false;
     m_paperResponseStatistics = {};
     m_paperMotionHasGeometry = false;
@@ -741,7 +743,8 @@ void CLegacyOnlineKcfDetector::restartTracking()
 
 void CLegacyOnlineKcfDetector::notifyImageObservationGap()
 {
-    m_paperImageVelocity = {};
+    m_paperImageVelocityPerMs = {};
+    m_paperImageTimestampMs = -1;
     m_hasPaperImageMotion = false;
     m_paperPosition = {};
     m_evidence.notifyGap();
@@ -1319,7 +1322,8 @@ void CLegacyOnlineKcfDetector::initializePaperTracker(
     m_tracker->init(roi, gray8);
     m_templateWeldAnchor = {(point.x - roi.x) / roi.width, (point.y - roi.y) / roi.height};
     m_imageIdentityPatch = imageIdentityPatch(gray8, point);
-    m_paperImageVelocity = {};
+    m_paperImageVelocityPerMs = {};
+    m_paperImageTimestampMs = -1;
     m_hasPaperImageMotion = false;
     m_paperPosition = {};
     m_initialized = true;
@@ -1501,9 +1505,20 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
         && diagnostic.tracker.completed && diagnostic.tracker.hasResponse
         && !diagnostic.tracker.correlationJumpRejected) {
         // 完整响应优先；反光破坏外观时才复用相邻同来源运动，不能沿用几何校正差分。
-        const bool hasAppearanceMotion = m_hasPaperImageMotion && !m_paperMotionHasGeometry;
-        const cv::Point2d imagePrediction = hasAppearanceMotion
-            ? m_paperImagePoint + m_paperImageVelocity : coarse;
+        const auto exposureMs = options.evidenceContext.timestampMs;
+        const bool hasAppearanceMotion = m_hasPaperImageMotion && !m_paperMotionHasGeometry
+            && m_paperImageTimestampMs >= 0 && exposureMs > m_paperImageTimestampMs;
+        cv::Point2d imagePrediction = coarse;
+        if (hasAppearanceMotion) {
+            cv::Point2d displacement = m_paperImageVelocityPerMs
+                * static_cast<double>(exposureMs - m_paperImageTimestampMs);
+            // 长时间未确认的运动只能辅助局部候选排序，不能把搜索中心无限推走。
+            const double travel = cv::norm(displacement);
+            if (travel > kShoulderSearchRadiusPixel) {
+                displacement *= kShoulderSearchRadiusPixel / travel;
+            }
+            imagePrediction = m_paperImagePoint + displacement;
+        }
         const cv::Point2d shoulderSearchCenter = !coarseAppearanceComplete && hasAppearanceMotion
             ? imagePrediction : coarse;
         auto shoulder = matchImageShoulders(gray8, shoulderSearchCenter,
@@ -1527,10 +1542,12 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
             diagnostic.shoulderEstimateUsed = partialObservation;
             observed = true;
             diagnostic.coarseObservationQuality = shoulder.quality;
-            cv::Rect2f correctedRoi = m_tracker->m_roi;
-            correctedRoi.x = static_cast<float>(coarse.x - correctedRoi.width * m_templateWeldAnchor.x);
-            correctedRoi.y = static_cast<float>(coarse.y - correctedRoi.height * m_templateWeldAnchor.y);
-            m_tracker->correctOnlineObservationRoi(correctedRoi);
+            if (!contradictoryLocalCorrection) {
+                cv::Rect2f correctedRoi = m_tracker->m_roi;
+                correctedRoi.x = static_cast<float>(coarse.x - correctedRoi.width * m_templateWeldAnchor.x);
+                correctedRoi.y = static_cast<float>(coarse.y - correctedRoi.height * m_templateWeldAnchor.y);
+                m_tracker->correctOnlineObservationRoi(correctedRoi);
+            }
         }
     }
     // 局部校正与当前响应冲突时，用原图另起提案；历史/参考只核对身份，不替代测量。
@@ -1638,7 +1655,8 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
         diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
         m_evidence.notifyGap();
         m_paperPosition = {};
-        m_paperImageVelocity = {};
+        m_paperImageVelocityPerMs = {};
+        m_paperImageTimestampMs = -1;
         m_hasPaperImageMotion = false;
         result.message = "当前图像相关观测尚未确认目标。";
         return result;
@@ -1691,11 +1709,14 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     const bool updateRealTemplate = result.valid && !partialObservation
         && (diagnostic.responseStatisticsReady ? diagnostic.responseNormal
             : diagnostic.completeAppearanceSupported);
-    // 业务位置、训练ROI和身份取样保持同一锚点；仿真替代训练也不丢失原图校正。
+    const bool supportedTrackingObservation = result.valid && !contradictoryLocalCorrection;
+    // 无目标条纹支持的显示估计不得移动搜索锚；双肩约束估计仍可跟随实际运动。
+    const auto trackingAnchor = !supportedTrackingObservation && m_hasImageSearchPoint
+        ? m_lastImageSearchPoint : currentObservation;
     cv::Rect2f correctedRoi = m_tracker->m_roi;
-    correctedRoi.x = static_cast<float>(currentObservation.x
+    correctedRoi.x = static_cast<float>(trackingAnchor.x
         - correctedRoi.width * m_templateWeldAnchor.x);
-    correctedRoi.y = static_cast<float>(currentObservation.y
+    correctedRoi.y = static_cast<float>(trackingAnchor.y
         - correctedRoi.height * m_templateWeldAnchor.y);
     m_tracker->correctOnlineObservationRoi(correctedRoi);
     stageClock.enter(performance.trainingMs);
@@ -1717,16 +1738,20 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
         responseStatistics.secondMoment += delta * (psr - responseStatistics.mean);
     }
     diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
-    if (result.valid && !contradictoryLocalCorrection) {
+    if (supportedTrackingObservation) {
         if (updateRealTemplate) {
             m_imageIdentityPatch = imageIdentityPatch(gray8, currentObservation);
         }
-        if (m_hasPaperImageMotion
+        const auto observationMs = options.evidenceContext.timestampMs;
+        if (m_hasPaperImageMotion && m_paperImageTimestampMs >= 0
+            && observationMs > m_paperImageTimestampMs
             && m_paperMotionHasGeometry == diagnostic.refinement.valid) {
-            m_paperImageVelocity = currentObservation - m_paperImagePoint;
+            m_paperImageVelocityPerMs = (currentObservation - m_paperImagePoint)
+                / static_cast<double>(observationMs - m_paperImageTimestampMs);
         } else {
-            m_paperImageVelocity = {};
+            m_paperImageVelocityPerMs = {};
         }
+        m_paperImageTimestampMs = observationMs;
         m_paperImagePoint = currentObservation;
         m_hasPaperImageMotion = true;
         m_paperMotionHasGeometry = diagnostic.refinement.valid;

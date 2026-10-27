@@ -283,7 +283,9 @@ private:
     bool m_onlineObservationActive = false;
     /// @brief 最近图像约束位置与同来源位移，只用于局部搜索及候选消歧，不提供独立几何。
     cv::Point2d m_paperImagePoint{-1.0, -1.0};
-    cv::Point2d m_paperImageVelocity;
+    /// @brief 已接纳同来源观测之间的像素/毫秒速度；缺时钟时不外推。
+    cv::Point2d m_paperImageVelocityPerMs;
+    std::int64_t m_paperImageTimestampMs = -1;
     bool m_hasPaperImageMotion = false;
     /// @brief 运动差分两端必须属于同一种定位来源，几何校正不能充当目标运动。
     bool m_paperMotionHasGeometry = false;

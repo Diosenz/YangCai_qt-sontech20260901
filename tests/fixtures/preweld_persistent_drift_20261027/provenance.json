@@ -1,0 +1,30 @@
+{
+  "source_session": "20261027_204524_125",
+  "scope": "Controlled sequence of captured real images: 32 repeated warmup inputs, captured tack onset, then 8 repeated clear inputs. Simulated V polyline and 100ms timing are constructed inputs, not captured simulation/exposure history or field throughput.",
+  "text_hash_normalization": "JSONL CRLF to LF; PNG exact bytes",
+  "files": {
+    "stage_1_session_1_frame_3497_source.png": "303a782e2117a9e8526f6ddaa0d61649b535f0f591b15e96e440a116fdc080b5",
+    "stage_1_session_1_frame_3500_source.png": "179856e76102e04a77830a2eea2488ec6b762bb3ea7b0201c722eb77e9384c25",
+    "stage_1_session_1_frame_3503_source.png": "73e1f9a4f46fbd6d686e9cbf35334357c0fb6a75545e03f79a5712a1e75d87f1",
+    "stage_1_session_1_frame_3507_source.png": "a2b2600845d1c9d81b6494fca8cb0d58b9a772955a7fbc5c202bd1c6bf8802e9",
+    "stage_1_session_1_frame_3511_source.png": "695beed72b8d03e5be0afdc372f644dfb76b8ba58403b48b3222ad4b10404bca",
+    "stage_1_session_1_frame_3515_source.png": "63fc2b2cd307eb9374ae018c7fd1066a88491bceeae4f17b93d29b64afabd79a",
+    "stage_1_session_1_frame_3519_source.png": "b7998a44ce4531277301d1cee939aa949865800196b488c7da917a3a7feb7a3e",
+    "stage_1_session_1_frame_3526_source.png": "fbdcd57a9836bf69822b658901b374ac70955ab54bede025f08c85c00c429fa0",
+    "stage_1_session_1_frame_3530_source.png": "7dea1d849ea830431c12c5c5cc72e4ac7c8b268893ce95190affd6c0a1eb859f",
+    "stage_1_session_1_frame_3533_source.png": "046eacea8e8cdcf6f4f81eddc6832693aaad2630137e60680b93cc747b5d024d",
+    "stage_1_session_1_frame_3537_source.png": "22af48328f5468b2655327ff7bd7d66b200a6481a99befe2e888b0f55c5eb682",
+    "stage_1_session_1_frame_3542_source.png": "b7b26086ff83a38782558a354abec8a28ee12e01da3ea12663d40bac2f49a969",
+    "stage_1_session_1_frame_3545_source.png": "bdff309cbc9b6ef4af4ca10cd1582771f0e8f515a510178ae556aea0f02e1ceb",
+    "stage_1_session_1_frame_3548_source.png": "b4d3ef5b20ede428df480a1da959f2cf6aeb978464831557916f3d542dbdc0a6",
+    "stage_1_session_1_frame_3552_source.png": "a996b4ca3bdbe701909cea13cd3112a93988e03234e6cfe8f10b4b864223e692",
+    "stage_1_session_1_frame_4138_source.png": "31b7aa305c6d49e0696bf9e0cc2d7fc4b10fb148c4d81dbce8935878549f2877",
+    "controlled-sequence.jsonl": "4249c44ceae4ec0c3458c22c98a5e7d723a717c7c2331161681482ac28d1df75"
+  },
+  "clear_corner_manual_px": [
+    489,
+    600
+  ],
+  "tolerance_px": 15,
+  "clear_inputs": 8
+}

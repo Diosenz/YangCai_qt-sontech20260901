@@ -1,0 +1,89 @@
+{
+  "base_commit": "72c30bbf0feccd9b0178bba4ca3b96fdaab33595",
+  "created_at": "2026-10-27T21:25:27.474830+08:00",
+  "python": {
+    "total": 109,
+    "passed": 96,
+    "failed": 7,
+    "errors": 6,
+    "blocked_by_existing_surface_source_pin": 13,
+    "utf8_mode": true
+  },
+  "runtime": {
+    "entries": 21,
+    "passed": 21
+  },
+  "ui_and_recorder": {
+    "entries": 2,
+    "passed": 2
+  },
+  "build": {
+    "vs_developer_environment": true,
+    "vcpkg_manifest_install": false,
+    "qt_release_success": true,
+    "vs_release_success": true,
+    "device_application_launched": false
+  },
+  "blocked_tests": [
+    "ERROR: test_duplicate_exposure_and_unaccepted_raw_geometry_do_not_prove_candidate (test_validation_replay.ValidationReplayTests.test_duplicate_exposure_and_unaccepted_raw_geometry_do_not_prove_candidate)",
+    "ERROR: test_equal_geometry_different_source_changes_weld_verdict_but_not_surface_path (test_validation_replay.ValidationReplayTests.test_equal_geometry_different_source_changes_weld_verdict_but_not_surface_path)",
+    "ERROR: test_real_detector_evidence_is_consumed_by_validation_entry (test_validation_replay.ValidationReplayTests.test_real_detector_evidence_is_consumed_by_validation_entry)",
+    "ERROR: test_same_image_geometry_with_unknown_space_has_no_independent_spatial_qualification (test_validation_replay.ValidationReplayTests.test_same_image_geometry_with_unknown_space_has_no_independent_spatial_qualification)",
+    "ERROR: test_surface_residual_improves_but_coverage_prevents_posterior_promotion (test_validation_replay.ValidationReplayTests.test_surface_residual_improves_but_coverage_prevents_posterior_promotion)",
+    "ERROR: test_valid_measured_geometry_can_accept_while_all_estimate_families_are_excluded (test_validation_replay.ValidationReplayTests.test_valid_measured_geometry_can_accept_while_all_estimate_families_are_excluded)",
+    "FAIL: test_different_path_revision_or_tcp_kind_cannot_be_paired (test_integrated_replay.IntegratedReplayTests.test_different_path_revision_or_tcp_kind_cannot_be_paired)",
+    "FAIL: test_missing_material_position_stays_unknown_and_truth_cannot_change_decisions (test_integrated_replay.IntegratedReplayTests.test_missing_material_position_stays_unknown_and_truth_cannot_change_decisions)",
+    "FAIL: test_real_nominal_projection_cannot_gain_synthetic_control_or_validation (test_integrated_replay.IntegratedReplayTests.test_real_nominal_projection_cannot_gain_synthetic_control_or_validation)",
+    "FAIL: test_same_material_later_tcp_is_compared_without_nearest_or_same_time_matching (test_integrated_replay.IntegratedReplayTests.test_same_material_later_tcp_is_compared_without_nearest_or_same_time_matching)",
+    "FAIL: test_single_combined_sequence_preserves_hard_frames_and_provenance (test_integrated_replay.IntegratedReplayTests.test_single_combined_sequence_preserves_hard_frames_and_provenance)",
+    "FAIL: test_unidentified_truth_does_not_produce_accuracy_score (test_integrated_replay.IntegratedReplayTests.test_unidentified_truth_does_not_produce_accuracy_score)",
+    "FAIL: test_unknown_real_space_is_reported_without_issuing_control_reference (test_integrated_replay.IntegratedReplayTests.test_unknown_real_space_is_reported_without_issuing_control_reference)"
+  ],
+  "files": {
+    "Vision/include/track/LegacyOnlineKcfDetector.h": {
+      "sha256": "d9aa3708d8d47589f32dec7e8fb4990bedc99d60894c7a8492798130426db469",
+      "bytes": 15625,
+      "modified_at": "2026-10-27T21:04:58.684346+08:00"
+    },
+    "Vision/src/track/LegacyOnlineKcfDetector.cpp": {
+      "sha256": "05f493f26a2fcdbdb1bc212b1599128c7a678aa4fc62a2a69d7f57b21913d61d",
+      "bytes": 119223,
+      "modified_at": "2026-10-27T21:12:56.368952+08:00"
+    },
+    "tests/diagnostics/online_detector_replay/test_preweld_persistent_drift.py": {
+      "sha256": "7f9ef15486787c0816c7326450e8b75ac3f72243affd429a6fffa09ae849641c",
+      "bytes": 4290,
+      "modified_at": "2026-10-27T21:19:32.637708+08:00"
+    },
+    "tests/fixtures/preweld_persistent_drift_20261027/provenance.json": {
+      "sha256": "981e3afd3b6b85764388364109d5c690fc652cd6f274c6bb1981b4648a9c0488",
+      "bytes": 2456,
+      "modified_at": "2026-10-27T21:03:19.004658+08:00"
+    },
+    "out/build/release/UI/i2r_rlc.exe": {
+      "sha256": "304aa786001eb5abf257a266dc562a35002d2bef27a4c98ba5f94b7fed6b590e",
+      "bytes": 2962432,
+      "modified_at": "2026-10-27T21:24:47.748557+08:00"
+    },
+    "out/build/qt-release/UI/i2r_rlc.exe": {
+      "sha256": "1531f328f27b3d299ff475976471dd5786c1e0b78e28411e502b03890029112e",
+      "bytes": 2962432,
+      "modified_at": "2026-10-27T21:13:35.522984+08:00"
+    },
+    "output/analysis/preweld_drift_tdd_20261027/full-final-utf8-regression.log": {
+      "sha256": "1194d5f7126b7d953581f7d66faa6d8f25766c858d5df7375f7801cbff3092f9",
+      "bytes": 53001,
+      "modified_at": "2026-10-27T21:24:00.432949+08:00"
+    },
+    "output/analysis/preweld_drift_tdd_20261027/runtime-final-regression.json": {
+      "sha256": "c13db75b6919ea8b091055d190f4e3d1759b1b5bc5ca55f2ffc98be1c610382e",
+      "bytes": 224627,
+      "modified_at": "2026-10-27T21:23:32.054818+08:00"
+    },
+    "output/analysis/preweld_drift_tdd_20261027/vs-release-final-build.log": {
+      "sha256": "559faf8f3364b5fc5a8f31fa1cc44ff8f7d61715953902036b804b08ddcea4fa",
+      "bytes": 18336,
+      "modified_at": "2026-10-27T21:24:49.504030+08:00"
+    }
+  }
+}
