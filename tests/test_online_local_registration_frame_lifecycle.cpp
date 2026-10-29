@@ -362,6 +362,38 @@ struct CRuntimeCoordinatorHistoryTestAccess {
         return ok;
     }
 
+    /** @brief 开关只影响追加更新；通过内存场景实际 GET/SET 核对已写位姿持续保留。 */
+    static bool testToggleRetainsWrittenScene()
+    {
+        Fixture fixture;
+        const auto fusion = fixture.runtime.onlineFusionOptions();
+        fixture.runtime.updateOnlineProcessingOptions(false, fusion);
+        QCoreApplication::processEvents();
+        bool ok = expect(fixture.scene->writes == 0
+                && std::abs(fixture.scene->pose.at(0).toDouble() - 20.0) < 1e-6,
+            "disabling ICP before a write preserves the initial workpiece scene");
+        fixture.runtime.updateOnlineProcessingOptions(true, fusion);
+        if (!expect(fixture.beginCandidate(false) && fixture.completeWithFreshFrames(),
+                "enabled ICP writes and verifies a correction through the real coordinator")) {
+            return false;
+        }
+        fixture.runtime.updateOnlineProcessingOptions(false, fusion);
+        QCoreApplication::processEvents();
+        ok &= expect(fixture.scene->writes == 1
+                && std::abs(fixture.scene->pose.at(0).toDouble() - 21.0) < 1e-6,
+            "disabling ICP retains the updated workpiece instead of silently restoring its initial pose");
+        fixture.runtime.updateOnlineProcessingOptions(true, fusion);
+        ok &= expect(fixture.beginCandidate(false) && fixture.scene->writes == 2
+                && std::abs(fixture.scene->pose.at(0).toDouble() - 22.0) < 1e-6,
+            "reenabled ICP applies the next correction to the retained current scene");
+        fixture.runtime.updateOnlineProcessingOptions(false, fusion);
+        QCoreApplication::processEvents();
+        ok &= expect(fixture.scene->writes == 2
+                && std::abs(fixture.scene->pose.at(0).toDouble() - 22.0) < 1e-6,
+            "disabling during postverification does not issue an implicit rollback SET");
+        return ok;
+    }
+
     static bool testSafetyPrecedenceAndOldEpoch()
     {
         bool ok = true;
@@ -403,5 +435,6 @@ int main(int argc, char **argv)
     const bool ordinary = Access::testOrdinarySlowFrame();
     const bool surface = Access::testSurfaceTimeoutRetention();
     const bool safety = Access::testSafetyPrecedenceAndOldEpoch();
-    return ordinary && surface && safety ? 0 : 1;
+    const bool toggle = Access::testToggleRetainsWrittenScene();
+    return ordinary && surface && safety && toggle ? 0 : 1;
 }

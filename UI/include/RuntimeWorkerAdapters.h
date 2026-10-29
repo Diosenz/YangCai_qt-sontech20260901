@@ -297,6 +297,8 @@ private:
     quint64 m_responseCalibrationSessionId = 0;
     quint64 m_responseCalibrationRevision = 0;
     bool m_responseCalibrationPending = true;
+    /// @brief 只记录生命周期操作；重复 gap 合并，下一次实际检测时转移到诊断快照。
+    QStringList m_replayPendingActions;
     bool m_trackingActive = false;
     int m_currentLocalizationSegmentIndex = -1;
 };
@@ -594,6 +596,9 @@ class COnlineCorrectionWorkerAdapter final : public QObject {
 
 public:
     explicit COnlineCorrectionWorkerAdapter(QObject *parent = nullptr);
+    /// @brief 注入文件系统追加边界；所有权随 worker，不能访问 widgets。
+    COnlineCorrectionWorkerAdapter(COnlineCorrectionRunRecorder::TextAppendFunction append,
+        QObject *parent);
 
 public slots:
     /// @brief 协调器在开始会话时按队列设置；只为目标发布附加会话身份。

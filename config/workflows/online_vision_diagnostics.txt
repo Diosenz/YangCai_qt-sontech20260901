@@ -12,3 +12,10 @@ max_image_pairs=30
 max_image_bytes=33554432
 # 后台队列最多两对；磁盘可用空间低于 512 MiB 时跳过图像。
 # 实际保存结果以 vision_images/image_manifest.tsv 为准。
+
+# 本轮预焊诊断：从会话初始检测起连续归档已处理曝光；不改变检测算法。
+# 上限2048曝光/1GiB，后台队列8帧；达到上限或队列满均留显式缺口。
+# replay_index.tsv 的 queued 需结合 replay_images/image_manifest.tsv 的 saved 核查。
+replay_capture_enabled=true
+replay_max_frames=2048
+replay_max_bytes=1073741824

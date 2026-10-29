@@ -1,0 +1,21 @@
+{
+  "session": "20261028_162612_662",
+  "scope": "Captured grayscale pixels and exposure contexts, preceded by 32 explicitly constructed warmup exposures reusing frame3182; not a full captured detector history.",
+  "baseline_max_step_px": 46.38907568470304,
+  "images": {
+    "stage_1_session_1_frame_3182_source.png": "1a8e1e35890398dfddcc3ac9a16107c670cdfe0b1eeda1c5abfc4e4b2167196d",
+    "stage_1_session_1_frame_3185_source.png": "bd6b7852ac27c6abf993c836be2c941362e3cad5c72829338ddcbd6eb4226638",
+    "stage_1_session_1_frame_3190_source.png": "8f12b440c6e6592850a299f04923c16626d47020ad0fc1831ab9923f4a71bf63",
+    "stage_1_session_1_frame_3195_source.png": "2140c617834bddcc796e7ed690056dbc9a7f2dae134c57a74133b4f06d0a909d",
+    "stage_1_session_1_frame_3199_source.png": "e4f7e656caa8d33fd63f629e11fab83c41d8a0c0b5932f290af92fcb32d31f04",
+    "stage_1_session_1_frame_3204_source.png": "f33d14bb6f889a9e3d593635532395e8bca768df89f12b4c82143027b4147817",
+    "stage_1_session_1_frame_3209_source.png": "4cf83812cb80187eacff1c3a5b8c796b50a5a8430ef7792a10cb7cfaccdd90ae",
+    "stage_1_session_1_frame_3214_source.png": "4d0f8c089f03f837c94ed34b8045603de15a43e9c4d53f5c1cf2f59141dcef89",
+    "stage_1_session_1_frame_3218_source.png": "d8ef4f6bf08ce727b8c947baf6229a42d4b444e0ed26715b471eed6c3098b29f",
+    "stage_1_session_1_frame_3222_source.png": "b683701bc8ca61314b82e1b1e1119a46fba4ad30b4939802ecbd275ba4a2f421",
+    "stage_1_session_1_frame_3226_source.png": "f32f0efaf810f2932677703e6571e773896e1112b9128e34a23c2aed55cab387",
+    "stage_1_session_1_frame_3230_source.png": "d28e131d8804f858f1a9c577e0bd0f7c19438d7eac5e04c36e597b95d358c916",
+    "stage_1_session_1_frame_3233_source.png": "be2d8e24a9099e70e6e9a7e380d809598a68368bd5458b65d4901471e1f8708e",
+    "stage_1_session_1_frame_3237_source.png": "4b60834497aa4b00541e3c341856865c39298cff0c2784982bc365fbdf9cbf36"
+  }
+}

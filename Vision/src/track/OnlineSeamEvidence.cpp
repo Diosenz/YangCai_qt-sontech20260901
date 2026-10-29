@@ -40,6 +40,7 @@ struct CIdentity {
     bool geometry = false;
     bool appearance = false;
     double score = 0.0;
+    bool unique = false;
     cv::Point2d matched{-1, -1};
     std::string debug = "patch_or_expected_missing";
 };
@@ -76,6 +77,7 @@ CIdentity inspectIdentity(const cv::Mat &gray, const cv::Mat &patch,
     cv::minMaxLoc(scores, nullptr, &second);
     const bool unique = second < options.identityMinPatchScore
         || result.score - second >= options.identityMinUniqueness;
+    result.unique = unique;
     const bool visible = std::isfinite(result.score)
         && result.score >= options.identityMinPatchScore && unique;
     result.debug = "score=" + std::to_string(result.score)
@@ -385,8 +387,13 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
     }
     // 走廊约束补偿后的图像残差，不约束扫描总位移。只有跨出身份模板覆盖的
     // 参考跳变才撤销参考续接；它仍不能否决历史走廊中已被原图确认的目标。
+    const bool rawGeometry = geometry.valid && geometryProjected && inside(geometry.point, gray);
     const bool referenceProposalSupported = aligned && inside(proposal, gray)
         && (identityRect(proposal) & identityRect(state.identityPoint)).area() > 0;
+    // 非相邻曝光的参考运动可以超出旧图像块。只允许当前原图几何在关联走廊内
+    // 触发身份重验；不因此恢复预测预算，且重新建立身份仍需多曝光确认。
+    const bool displacedGeometryProposal = rawGeometry && aligned && inside(proposal, gray)
+        && cv::norm(geometry.point - proposal) <= options.identityCorridorPixel;
     if (aligned) {
         state.estimate = proposal;
         state.reference = *context.referencePixel;
@@ -395,9 +402,12 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
             state.referenceConflict = true;
         }
     }
-    if (!referenceProposalSupported) { proposal = state.identityPoint; }
+    if (!referenceProposalSupported && !displacedGeometryProposal) { proposal = state.identityPoint; }
+    if (displacedGeometryProposal && !referenceProposalSupported && !state.recovery) {
+        state.recovery = true;
+        state.pending = 0;
+    }
     // 独立原图验收只围绕实测锚/曝光参考关联，不能让续接输出反向移动身份走廊。
-    const bool rawGeometry = geometry.valid && geometryProjected && inside(geometry.point, gray);
     if (state.identityPatch.empty() && rawGeometry) { proposal = geometry.point; }
     auto identity = inspectIdentity(gray, state.identityPatch, proposal,
         geometry.point, coarse, coarseUsable, options);
@@ -416,6 +426,7 @@ COnlineSeamEvidenceResult COnlineSeamEvidence::evaluate(const cv::Mat &gray,
     // 走廊且有最低外观支持时，可由两份新曝光重建身份；估计点从不参与确认。
     const bool structuralIdentity = rawGeometry && !identity.geometry
         && state.anchorFrameId >= 0 && state.hasIdentityDirections && geometry.hasBranchDirections
+        && identity.unique
         && identity.score >= options.identityMinBranchScore
         && cv::norm(geometry.point - proposal) <= options.identityCorridorPixel
         && std::abs(geometry.leftSlope - state.identityLeftSlope) <= 0.25

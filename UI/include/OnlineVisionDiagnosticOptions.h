@@ -25,6 +25,10 @@ struct COnlineVisionDiagnosticOptions {
     qint64 maxImageBytes = 32LL * 1024 * 1024;
     /// @brief 临时首丢窗口：独立原图预算，关闭诊断或图像时也关闭。
     bool lossWindowEnabled = true;
+    /// @brief 显式诊断模式：从会话首帧连续归档，队列满/预算不足均记录缺口。
+    bool replayCaptureEnabled = false;
+    int replayMaxFrames = 2048;
+    qint64 replayMaxBytes = 1024LL * 1024 * 1024;
 };
 
 /**

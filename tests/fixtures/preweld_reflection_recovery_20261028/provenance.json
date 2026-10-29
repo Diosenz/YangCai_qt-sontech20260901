@@ -1,0 +1,26 @@
+{
+  "scope": "Two unaltered captured images; controlled simulation V and time/identity. Not complete field replay or spatial/TCP accuracy. One repeated clear follow-up exposure verifies template repopulation after recovery.",
+  "source_session": "20261027_154619_878",
+  "original_frame_ids": [
+    1251,
+    2152
+  ],
+  "files": {
+    "stage_0_session_1_frame_1251_source.png": {
+      "sha256": "99e0012af817afa609c533461a88b6c565d8263361bd5b73ef8b4a1284426727",
+      "source": "output\\online_correction\\20261027_154619_878\\loss_window_images\\stage_0_session_1_frame_1251_source.png"
+    },
+    "stage_1_session_1_frame_2152_source.png": {
+      "sha256": "eb327afb3d0a826c3258afaaf082f6443e957cf2b32203b2c31103a5c2c0596d",
+      "source": "output\\online_correction\\20261027_154619_878\\loss_window_images\\stage_1_session_1_frame_2152_source.png"
+    }
+  },
+  "expected_visible_corner_pixel": [
+    469,
+    596
+  ],
+  "tolerance_pixel": 15,
+  "annotation": "Independent visual inspection of the visible narrow-stripe junction, not old detector or simulation position.",
+  "controlled_bootstrap_exposures": 2,
+  "controlled_clear_exposures": 3
+}

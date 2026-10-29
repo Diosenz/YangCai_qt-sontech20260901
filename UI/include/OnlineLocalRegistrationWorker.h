@@ -108,6 +108,8 @@ public:
         quint64 workpiecePoseRevision = 0;
         /// @brief 仅用于排除局部预焊凸起邻域，不作为真实焊点证据。
         double seamImageXPixel = -1.0;
+        /// @brief 当前点仅受图像约束估计时，中央未测预焊区域不得作为母材面。
+        bool seamPointIsImageEstimate = false;
     };
 
     /** @brief 工件父级系下的小幅虚拟到真实修正；accepted 才允许提交场景写回。 */

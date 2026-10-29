@@ -253,6 +253,105 @@ bool insideImage(const cv::Mat &gray8, const cv::Point2d &point)
         && point.y >= 0.0 && point.y < gray8.rows;
 }
 
+/** @brief 近期母材方向附近的真实窄峰拟合，不使用仿真像素或中心遮挡区。 */
+struct MotherBranchFit {
+    cv::Vec2d line{};
+    bool valid = false;
+};
+
+double branchMedian(std::vector<double> values)
+{
+    std::sort(values.begin(), values.end());
+    const auto middle = values.size() / 2;
+    return (values.size() % 2) ? values[middle]
+        : (values[middle - 1] + values[middle]) * 0.5;
+}
+
+/** @brief 以列中心化最小二乘拟合，避免大图像横坐标造成截距消减误差。 */
+cv::Vec2d fitMotherLine(const std::vector<cv::Point2d> &points)
+{
+    cv::Point2d mean;
+    for (const auto &point : points) { mean += point; }
+    mean *= 1.0 / points.size();
+    double xx = 0.0, xy = 0.0;
+    for (const auto &point : points) {
+        xx += (point.x - mean.x) * (point.x - mean.x);
+        xy += (point.x - mean.x) * (point.y - mean.y);
+    }
+    const double slope = xx > 1e-6 ? xy / xx : 0.0;
+    return {slope, mean.y - slope * mean.x};
+}
+
+/**
+ * @brief 排除宽反光、竞争窄峰和离群列后拟合外围支系；缺乏支持则返回无效。
+ * @details 固定支撑带来自可靠种子，不能随待验收的肩部候选移动以自证。
+ */
+MotherBranchFit fitMotherBranch(const cv::Mat &gray8,
+    const cv::Vec2d &seed, const cv::Vec2i &range)
+{
+    std::vector<cv::Point2d> points;
+    const int required = std::max(16, static_cast<int>((range[1] - range[0]) * 0.6));
+    for (int x = std::max(0, range[0]); x < std::min(gray8.cols, range[1]); ++x) {
+        const double expected = seed[0] * x + seed[1];
+        const int low = std::max(0, static_cast<int>(expected - 12));
+        const int high = std::min(gray8.rows, static_cast<int>(expected + 13));
+        if (high - low < 8) { continue; }
+        double minimum = 255.0, maximum = 0.0;
+        int peak = low;
+        for (int y = low; y < high; ++y) {
+            const double value = gray8.at<unsigned char>(y, x);
+            minimum = std::min(minimum, value);
+            if (value > maximum) { maximum = value; peak = y; }
+        }
+        if (maximum - minimum < 40.0) { continue; }
+        const double half = minimum + (maximum - minimum) * 0.5;
+        int top = peak, bottom = peak;
+        while (top > low && gray8.at<unsigned char>(top - 1, x) > half) { --top; }
+        while (bottom + 1 < high && gray8.at<unsigned char>(bottom + 1, x) > half) { ++bottom; }
+        if (bottom - top + 1 > 12) { continue; }
+        bool competing = false;
+        for (int y = low + 1; y + 1 < high; ++y) {
+            const double value = gray8.at<unsigned char>(y, x);
+            if (std::abs(y - peak) >= 8 && value - minimum >= (maximum - minimum) * 0.8
+                && value >= gray8.at<unsigned char>(y - 1, x)
+                && value >= gray8.at<unsigned char>(y + 1, x)) { competing = true; break; }
+        }
+        if (competing) { continue; }
+        double total = 0.0, weightedY = 0.0;
+        for (int y = std::max(low, peak - 4); y < std::min(high, peak + 5); ++y) {
+            const double weight = std::max(0.0,
+                gray8.at<unsigned char>(y, x) - std::max(minimum, maximum * 0.35));
+            total += weight;
+            weightedY += weight * y;
+        }
+        if (total > 0.0) { points.emplace_back(x, weightedY / total); }
+    }
+    if (points.size() < static_cast<std::size_t>(required)) { return {}; }
+    for (int pass = 0; pass < 4; ++pass) {
+        const auto line = fitMotherLine(points);
+        std::vector<double> residuals;
+        for (const auto &point : points) { residuals.push_back(point.y - line[0] * point.x - line[1]); }
+        const double median = branchMedian(residuals);
+        std::vector<double> deviations;
+        for (double residual : residuals) { deviations.push_back(std::abs(residual - median)); }
+        const double limit = std::max(0.8, 3.0 * 1.4826 * branchMedian(deviations));
+        std::vector<cv::Point2d> inliers;
+        for (std::size_t i = 0; i < points.size(); ++i) {
+            if (std::abs(residuals[i] - median) <= limit) { inliers.push_back(points[i]); }
+        }
+        if (inliers.size() < static_cast<std::size_t>(required)) { return {}; }
+        if (inliers.size() == points.size()) { break; }
+        points = std::move(inliers);
+    }
+    const auto line = fitMotherLine(points);
+    double squared = 0.0;
+    for (const auto &point : points) {
+        const double residual = point.y - line[0] * point.x - line[1];
+        squared += residual * residual;
+    }
+    return {line, squared / points.size() <= 1.0};
+}
+
 /** @brief 仿真局部外观及其取样坐标；渲染锚点不是当前图像测得的位置。 */
 struct PaperSimulationAppearance {
     cv::Mat image;
@@ -701,6 +800,8 @@ CLegacyOnlineKcfDetector::CLegacyOnlineKcfDetector()
 void CLegacyOnlineKcfDetector::reset()
 {
     m_paperPosition = {};
+    m_paperGeometryReference = {};
+    m_paperMotherBranches = {};
     m_tracker.reset();
     m_paperImagePoint = {-1.0, -1.0};
     m_paperImageVelocityPerMs = {};
@@ -728,6 +829,7 @@ void CLegacyOnlineKcfDetector::reset()
     m_imageLastObservationFrameId = -1;
     m_boundedImageSearch = {};
     m_boundedImageSearchAmbiguous = false;
+    m_paperLocalRefinementTurn = false;
 }
 
 void CLegacyOnlineKcfDetector::restartTracking()
@@ -747,11 +849,14 @@ void CLegacyOnlineKcfDetector::notifyImageObservationGap()
     m_paperImageTimestampMs = -1;
     m_hasPaperImageMotion = false;
     m_paperPosition = {};
+    m_paperGeometryReference = {};
+    m_paperMotherBranches = {};
     m_evidence.notifyGap();
     m_imageReacquisitionPoint = {-1.0, -1.0};
     m_imageReacquisitionFrames = 0;
     m_boundedImageSearch = {};
     m_boundedImageSearchAmbiguous = false;
+    m_paperLocalRefinementTurn = false;
     if (m_tracker) {
         m_tracker->commitOnlineObservationTraining(false);
     }
@@ -1245,7 +1350,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processImageMeasurement(
 }
 
 cv::Point2d CLegacyOnlineKcfDetector::fusePaperPosition(
-    const cv::Point2d &observedPoint, bool reliableObservation,
+    const cv::Point2d &observedPoint, bool reliableObservation, bool constrainedObservation,
     const LegacyOnlineKcfOptions &options, CLegacyOnlineKcfDiagnostic &diagnostic)
 {
     diagnostic.positionObservationPoint = observedPoint;
@@ -1259,12 +1364,21 @@ cv::Point2d CLegacyOnlineKcfDetector::fusePaperPosition(
     }
     if (!consecutiveReference) { m_paperPosition = {}; }
     cv::Point2d result = observedPoint;
-    if (reliableObservation && m_paperPosition.hasBias) {
+    // 时间关联未知时不延续新的时序状态或降权：保留既有图像主导行为，
+    // 不能把无法确定间隔的旧位置作为强平滑先验，延迟清晰接缝的重新接纳。
+    const bool timingAvailable = options.evidenceContext.timestampMs >= 0;
+    const bool partialUpdate = timingAvailable
+        && options.paperFusePartialObservations && constrainedObservation;
+    const bool keepPartialState = timingAvailable && constrainedObservation
+        && (options.paperFusePartialObservations || options.paperKeepPartialState);
+    if ((reliableObservation || partialUpdate) && m_paperPosition.hasBias) {
         const cv::Point2d prior = diagnostic.simulatedPoint + m_paperPosition.localBias;
         // 既有局部像素不确定度只撤销先验；再大图像创新也不拒绝可靠观测。
         const double uncertainty = options.seamRefinement.maxPositionUncertaintyPixel;
-        if (std::isfinite(uncertainty) && uncertainty > 0.0
-            && cv::norm(observedPoint - prior) <= uncertainty) {
+        // 双肩约束退化时仍以最后可靠偏差形成先验，不因弱观测创新大而直接绕过滤波。
+        // 已确认几何/完整观测保持原有大创新接纳行为，避免平滑拖慢真实恢复。
+        if (partialUpdate || (std::isfinite(uncertainty) && uncertainty > 0.0
+            && cv::norm(observedPoint - prior) <= uncertainty)) {
             auto &filter = *m_paperPosition.filter;
             double priorState[2] = {prior.x, prior.y};
             double measurement[2] = {observedPoint.x, observedPoint.y};
@@ -1273,8 +1387,17 @@ cv::Point2d CLegacyOnlineKcfDetector::fusePaperPosition(
             filter.m_Y = RMatrix::Matrix(2, 1, measurement);
             filter.m_u = RMatrix::Matrix(2, 1, control);
             const double quality = std::clamp(diagnostic.coarseObservationQuality, 0.0, 1.0);
-            filter.m_cR = filter.m_cRMaximum
-                - quality * (filter.m_cRMaximum - filter.m_cRMinimum);
+            filter.m_cQ = options.paperProcessNoise;
+            const double minimumNoise = timingAvailable
+                ? options.paperObservationNoiseMinimum : filter.m_cRMinimum;
+            const double maximumNoise = timingAvailable
+                ? options.paperObservationNoiseMaximum : filter.m_cRMaximum;
+            filter.m_cR = maximumNoise - quality * (maximumNoise - minimumNoise);
+            if (timingAvailable && diagnostic.responseStatisticsReady && !diagnostic.responseNormal
+                && !diagnostic.evidence.independentGeometry) {
+                filter.m_cR *= options.paperAbnormalNoiseMultiplier;
+            }
+            if (partialUpdate) { filter.m_cR *= options.paperPartialNoiseMultiplier; }
             filter.Kalfilter();
             const cv::Point2d fused(filter.m_X.val[0][0], filter.m_X.val[1][0]);
             if (std::isfinite(fused.x) && std::isfinite(fused.y)) {
@@ -1303,7 +1426,7 @@ cv::Point2d CLegacyOnlineKcfDetector::fusePaperPosition(
         m_paperPosition.referenceRevision = options.referenceRevision;
         m_paperPosition.seamIndex = m_continuitySeamIndex;
         m_paperPosition.hasBias = true;
-    } else {
+    } else if (!keepPartialState) {
         m_paperPosition = {};
     }
     return result;
@@ -1327,6 +1450,74 @@ void CLegacyOnlineKcfDetector::initializePaperTracker(
     m_hasPaperImageMotion = false;
     m_paperPosition = {};
     m_initialized = true;
+}
+
+bool CLegacyOnlineKcfDetector::seedPaperMotherBranches(const cv::Mat &gray8,
+    const OnlineSeamRefinementResult &geometry, const LegacyOnlineKcfOptions &options,
+    bool currentMotherSupported)
+{
+    const auto now = options.evidenceContext.timestampMs;
+    if (!options.paperUseMotherBranches || now < 0 || !geometry.valid
+        || !geometry.hasBranchDirections) { return false; }
+    PaperMotherBranches seed;
+    // 连续重测得到的外围线允许移动，目标身份不能被中央预焊轮廓逐帧改写。
+    // 旧模型本帧不获双侧支持时，已验收的新几何才建立新的原始身份。
+    seed.identityPatch = currentMotherSupported
+        ? m_paperMotherBranches.identityPatch : imageIdentityPatch(gray8, geometry.point);
+    if (seed.identityPatch.empty()) { return false; }
+    const int x = static_cast<int>(std::lround(geometry.point.x));
+    seed.ranges = {cv::Vec2i(x - 260, x - 100), cv::Vec2i(x + 130, x + 330)};
+    const std::array<double, 2> slopes{geometry.leftSlope, geometry.rightSlope};
+    const std::array<double, 2> ys{geometry.leftEndpoint.y, geometry.rightEndpoint.y};
+    for (int side = 0; side < 2; ++side) {
+        const cv::Vec2d proposal(slopes[side], ys[side] - slopes[side] * geometry.point.x);
+        const auto fitted = fitMotherBranch(gray8, proposal, seed.ranges[side]);
+        if (!fitted.valid) { return false; }
+        seed.lines[side] = fitted.line;
+        seed.seedSlopes[side] = fitted.line[0];
+        // 持续可见的母材给出独立位置依据；不能用正待校核的局部折点
+        // 递推改写接缝到母材的偏置，否则预焊轮廓也会逐帧校准自身。
+        seed.offsets[side] = currentMotherSupported ? m_paperMotherBranches.offsets[side]
+            : (geometry.point.y - fitted.line[0] * geometry.point.x
+                - fitted.line[1]) / std::hypot(1.0, fitted.line[0]);
+    }
+    if (std::abs(seed.lines[0][0] - seed.lines[1][0]) < 0.1) { return false; }
+    seed.seededMs = now;
+    seed.observedMs = now;
+    seed.valid = true;
+    m_paperMotherBranches = seed;
+    return true;
+}
+
+cv::Point2d CLegacyOnlineKcfDetector::observePaperMotherBranches(
+    const cv::Mat &gray8, const LegacyOnlineKcfOptions &options)
+{
+    auto &model = m_paperMotherBranches;
+    const auto now = options.evidenceContext.timestampMs;
+    // 这里只保存真实像素线及真实接缝到线的偏置，不含 CAD 坐标或虚实位置差。
+    // 工件刷新仍使位置融合/几何参考失效，但不撤销当前原图重新测得的母材支撑。
+    if (!options.paperUseMotherBranches || !model.valid || now < model.observedMs
+        || now < 0 || now - model.seededMs > 12000) {
+        model = {};
+        return {-1.0, -1.0};
+    }
+    std::array<cv::Vec2d, 2> lines;
+    std::array<double, 2> intercepts;
+    for (int side = 0; side < 2; ++side) {
+        const auto fitted = fitMotherBranch(gray8, model.lines[side], model.ranges[side]);
+        if (!fitted.valid || std::abs(std::atan(fitted.line[0])
+                - std::atan(model.seedSlopes[side])) > 0.12) { return {-1.0, -1.0}; }
+        lines[side] = fitted.line;
+        intercepts[side] = fitted.line[1] + model.offsets[side] * std::hypot(1.0, fitted.line[0]);
+    }
+    const double separation = lines[0][0] - lines[1][0];
+    if (std::abs(separation) < 0.1) { return {-1.0, -1.0}; }
+    const double x = (intercepts[1] - intercepts[0]) / separation;
+    const cv::Point2d point(x, lines[0][0] * x + intercepts[0]);
+    if (!insideImage(gray8, point)) { return {-1.0, -1.0}; }
+    model.lines = lines;
+    model.observedMs = now;
+    return point;
 }
 
 LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
@@ -1376,6 +1567,10 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
         && std::isfinite(diagnostic.simulatedPoint.x) && std::isfinite(diagnostic.simulatedPoint.y);
     diagnostic.simulationPositionInImage = diagnostic.simulatedPointAvailable
         && insideImage(gray8, diagnostic.simulatedPoint);
+    if (!diagnostic.simulatedPointAvailable
+        || m_paperGeometryReference.referenceRevision != options.referenceRevision) {
+        m_paperGeometryReference = {};
+    }
     // 已接纳图像点只提供本次外观采样锚点；初次无有效绝对位置时从图像中心搜索。
     // 渲染点不作为实测输出，且不会写回工件仿真位姿。
     const cv::Point2d renderAnchor = m_hasImageSearchPoint ? m_lastImageSearchPoint
@@ -1458,7 +1653,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
         && !diagnostic.tracker.correlationJumpRejected && insideImage(gray8, coarse)
         && std::isfinite(diagnostic.tracker.responsePeak)
         && diagnostic.tracker.responsePeak > 0.1 && diagnostic.coarseObservationQuality > 0.0;
-    const auto refreshResponseStatistics = [this, &diagnostic]() {
+    const auto refreshResponseStatistics = [this, &diagnostic, &options]() {
         const auto &statistics = m_paperResponseStatistics[
             std::clamp(diagnostic.tracker.responseTemplateCount, 0, 3)];
         diagnostic.normalResponseSamples = statistics.samples;
@@ -1471,14 +1666,23 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
         const double psr = diagnostic.tracker.responsePsr;
         const double spread = std::max(1e-6, diagnostic.normalResponseStd);
         diagnostic.responseNormal = !diagnostic.responseStatisticsReady
-            || (std::isfinite(psr) && psr >= statistics.mean - 3.0 * spread
-                && psr <= statistics.mean + 3.0 * spread);
+            || (std::isfinite(psr) && psr >= statistics.mean - options.paperPsrSigma * spread
+                && psr <= statistics.mean + options.paperPsrSigma * spread);
     };
     refreshResponseStatistics();
+    const auto motherPoint = observePaperMotherBranches(gray8, options);
+    diagnostic.motherBranchesSupported = insideImage(gray8, motherPoint);
+    diagnostic.motherBranchPoint = motherPoint;
+    // 搜索游标不能永久封锁当前相关位置的几何校核；隔帧保留完整恢复预算，
+    // 其余帧复核当前原图，避免相关续接成功后游标不再推进而母材模型无法重建。
+    const bool localRefinementTurn = m_boundedImageSearch.generationStage == 0
+        || m_paperLocalRefinementTurn;
+    m_paperLocalRefinementTurn = !m_paperLocalRefinementTurn;
     if (bootstrapGeometry.valid) {
         diagnostic.rawRefinement = bootstrapGeometry;
     } else if (insideImage(gray8, coarse)
-        && (!options.enableBoundedImageSearch || diagnostic.imageRefinementCallCount < 2)) {
+        && (!options.enableBoundedImageSearch
+            || (localRefinementTurn && diagnostic.imageRefinementCallCount < 2))) {
         diagnostic.rawRefinement = COnlineSeamRefiner::refine(gray8, coarse, options.seamRefinement);
         ++diagnostic.imageRefinementCallCount;
     }
@@ -1492,12 +1696,21 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
         diagnostic.rawRefinement.valid = false;
         diagnostic.rawRefinement.status = OnlineSeamRefinementStatus::InconsistentGeometry;
     }
+    // 中心预焊表面也可能形成有效局部折点；与外围母材冲突且缺完整身份时拒绝。
+    if (diagnostic.rawRefinement.valid && diagnostic.motherBranchesSupported
+        && cv::norm(diagnostic.rawRefinement.point - motherPoint)
+            > options.seamRefinement.maxPositionUncertaintyPixel
+        && !completeImageAppearance(gray8, diagnostic.rawRefinement.point, m_imageIdentityPatch)) {
+        diagnostic.rawRefinement.valid = false;
+        diagnostic.rawRefinement.status = OnlineSeamRefinementStatus::InconsistentGeometry;
+    }
     if (diagnostic.rawRefinement.valid) {
         coarse = diagnostic.rawRefinement.point;
         observed = true;
     }
     bool partialObservation = false;
     bool contradictoryLocalCorrection = false;
+    bool reinitializeAfterValidation = false;
     const bool coarseAppearanceComplete = completeImageAppearance(gray8, coarse, m_imageIdentityPatch);
     if (!diagnostic.rawRefinement.valid && m_hasImageSearchPoint
         && (!observed || !diagnostic.responseStatisticsReady
@@ -1550,9 +1763,47 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
             }
         }
     }
+    // 肩部的高相关不保证仍在接缝转折处。外观不完整且局部几何缺失时，
+    // 用最近已确认几何的虚实偏差寻找当前截面；不使用逐帧相关点更新的偏差，
+    // 避免错误续测把搜索参考一同拖走。该位置仅为提案，仍须当前原图精定位。
+    bool referenceRecoveryCandidate = false;
+    const bool needsReferenceRecovery = !diagnostic.rawRefinement.valid
+        && !coarseAppearanceComplete && m_paperGeometryReference.valid;
+    // 固定参考只占搜索周期的第一次机会；失效后必须让扩大搜索继续推进。
+    if (needsReferenceRecovery && m_boundedImageSearch.generationStage == 0
+        && diagnostic.imageRefinementCallCount < 2) {
+        const auto hint = diagnostic.simulatedPoint + m_paperGeometryReference.localBias;
+        const auto recovered = insideImage(gray8, hint)
+            ? COnlineSeamRefiner::refine(gray8, hint, options.seamRefinement)
+            : OnlineSeamRefinementResult{};
+        if (insideImage(gray8, hint)) { ++diagnostic.imageRefinementCallCount; }
+        // 拟合平台宽度是测量不确定度，不是虚实偏差的最大创新量。
+        // 身份用两侧方向分别校核，不能以离先验仅数像素代替当前图像证据。
+        const auto branchAgreement = [](double first, double second) {
+            return (1.0 + first * second)
+                / std::sqrt((1.0 + first * first) * (1.0 + second * second));
+        };
+        if (recovered.valid && recovered.hasBranchDirections
+            && branchAgreement(recovered.leftSlope, m_paperGeometryReference.leftSlope)
+                >= options.evidenceOptions.identityMinBranchScore
+            && branchAgreement(recovered.rightSlope, m_paperGeometryReference.rightSlope)
+                >= options.evidenceOptions.identityMinBranchScore) {
+            diagnostic.realSearchFallbackUsed = true;
+            diagnostic.rawRefinement = recovered;
+            referenceRecoveryCandidate = true;
+            coarse = recovered.point;
+            observed = true;
+            // 当前几何成立不等于目标身份确认；先保留估计属性，不破坏旧模板。
+            partialObservation = true;
+            contradictoryLocalCorrection = false;
+            m_boundedImageSearch = {};
+        }
+    }
+    const bool unresolvedReference = needsReferenceRecovery && !diagnostic.rawRefinement.valid;
     // 局部校正与当前响应冲突时，用原图另起提案；历史/参考只核对身份，不替代测量。
     // 首轮之后让出分帧搜索预算，避免每帧重做提案而饿死恢复游标。
-    if ((!observed || contradictoryLocalCorrection) && diagnostic.imageRefinementCallCount < 2
+    if ((!observed || contradictoryLocalCorrection || unresolvedReference)
+        && diagnostic.imageRefinementCallCount < 2
         && m_boundedImageSearch.generationStage == 0) {
         cv::Point2d confirmedRecovery(-1.0, -1.0);
         const auto proposal = findPaperImageBootstrapPoint(gray8, coarse, true,
@@ -1583,20 +1834,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
                 coarse = recoveredPoint;
                 diagnostic.rawRefinement = recoveryGeometry;
                 diagnostic.realSearchFallbackUsed = true;
-                stageClock.enter(performance.initializationMs);
-                initializePaperTracker(gray8, coarse);
-                stageClock.enter(performance.simulationMs);
-                if (!appearance.image.empty()) {
-                    appearance = makePaperSimulationAppearance(observation, gray8.size(), coarse);
-                    m_tracker->setSimulatedTemplate(appearance.image, appearance.roi);
-                    diagnostic.simulationTemplatePoint = appearance.anchor;
-                }
-                stageClock.enter(performance.trackingMs);
-                result.trackedRoi = m_tracker->update(gray8);
-                stageClock.enter(performance.validationProjectionMs);
-                diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
-                refreshResponseStatistics();
-                diagnostic.templateReinitialized = true;
+                reinitializeAfterValidation = true;
                 observed = true;
                 partialObservation = false;
                 contradictoryLocalCorrection = false;
@@ -1604,7 +1842,7 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
             }
         }
     }
-    if (!observed || contradictoryLocalCorrection) {
+    if (!observed || contradictoryLocalCorrection || unresolvedReference) {
         std::vector<cv::Point2d> hints;
         if (insideImage(gray8, coarse)) { hints.push_back(coarse); }
         if (m_hasImageSearchPoint) { hints.push_back(m_lastImageSearchPoint); }
@@ -1622,20 +1860,54 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
             coarse = recovered.point;
             diagnostic.rawRefinement = recovered;
             diagnostic.realSearchFallbackUsed = true;
-            stageClock.enter(performance.initializationMs);
-            initializePaperTracker(gray8, coarse);
-            stageClock.enter(performance.simulationMs);
-            if (!simulated.empty()) { m_tracker->setSimulatedTemplate(simulated, simulatedRoi); }
-            stageClock.enter(performance.trackingMs);
-            result.trackedRoi = m_tracker->update(gray8);
-            stageClock.enter(performance.validationProjectionMs);
-            diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
-            refreshResponseStatistics();
-            diagnostic.templateReinitialized = true;
+            reinitializeAfterValidation = true;
             observed = true;
             partialObservation = false;
             contradictoryLocalCorrection = false;
         }
+    }
+    // 完整当前外观与可信响应不要求每曝光都有局部双线几何；母材仅辅助退化定位。
+    const bool completeTrackingObservation = observed && !partialObservation
+        && !contradictoryLocalCorrection
+        && completeImageAppearance(gray8, coarse, m_imageIdentityPatch)
+        && (!diagnostic.responseStatisticsReady || diagnostic.responseNormal);
+    // 递推模板可能每帧都接受一点预焊变形；当前双侧母材仍成立时，
+    // 完整身份还须符合最初可靠接缝，不能用已经漂移的实拍块自证。
+    const bool completeMotherAppearance = !diagnostic.motherBranchesSupported
+        || (completeImageAppearance(gray8, coarse, m_paperMotherBranches.identityPatch)
+            && completeImageAppearance(gray8, motherPoint, m_paperMotherBranches.identityPatch));
+    // 所有候选均用旧实拍身份验收。恢复重建延迟到此判断之后，避免新身份自匹配。
+    if (diagnostic.motherBranchesSupported
+        && (!completeMotherAppearance
+            || (!diagnostic.rawRefinement.valid && !completeTrackingObservation)
+            || (diagnostic.rawRefinement.valid
+                && cv::norm(diagnostic.rawRefinement.point - motherPoint)
+                    > options.seamRefinement.maxPositionUncertaintyPixel
+                && !completeImageAppearance(gray8, diagnostic.rawRefinement.point, m_imageIdentityPatch)))) {
+        coarse = motherPoint;
+        diagnostic.rawRefinement.valid = false;
+        diagnostic.rawRefinement.status = OnlineSeamRefinementStatus::InconsistentGeometry;
+        diagnostic.motherBranchEstimateUsed = true;
+        observed = true;
+        partialObservation = true;
+        contradictoryLocalCorrection = false;
+        referenceRecoveryCandidate = false;
+    }
+    if (reinitializeAfterValidation && !diagnostic.motherBranchEstimateUsed) {
+        stageClock.enter(performance.initializationMs);
+        initializePaperTracker(gray8, coarse);
+        stageClock.enter(performance.simulationMs);
+        if (!appearance.image.empty()) {
+            appearance = makePaperSimulationAppearance(observation, gray8.size(), coarse);
+            m_tracker->setSimulatedTemplate(appearance.image, appearance.roi);
+            diagnostic.simulationTemplatePoint = appearance.anchor;
+        }
+        stageClock.enter(performance.trackingMs);
+        result.trackedRoi = m_tracker->update(gray8);
+        stageClock.enter(performance.validationProjectionMs);
+        diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
+        refreshResponseStatistics();
+        diagnostic.templateReinitialized = true;
     }
     if (!observed) {
         // 被拒绝的响应不能把下帧搜索窗口继续拖向干扰分支。
@@ -1669,13 +1941,59 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     diagnostic.evidence = m_evidence.evaluate(gray8, observation.frameId, options.referenceRevision,
         options.evidenceContext, diagnostic.refinement,
         independent.valid && independent.spacePoint.valid, coarse, true, options.evidenceOptions);
-    const bool geometryAccepted = diagnostic.evidence.independentGeometry;
+    // 证据层确认的是原始几何身份；连续显示的步长限制不能把已确认原图位置拖回旧点。
+    const bool confirmedReferenceRecovery = referenceRecoveryCandidate && diagnostic.evidence.anchorRefreshed;
+    const bool unconfirmedReferenceRecovery = referenceRecoveryCandidate && !confirmedReferenceRecovery;
+    const bool geometryAccepted = diagnostic.evidence.independentGeometry || confirmedReferenceRecovery;
+    if (confirmedReferenceRecovery) {
+        if (cv::norm(coarse - diagnostic.responsePoint)
+                > options.seamRefinement.maxPositionUncertaintyPixel) {
+            stageClock.enter(performance.initializationMs);
+            initializePaperTracker(gray8, coarse);
+            stageClock.enter(performance.simulationMs);
+            if (!appearance.image.empty()) {
+                appearance = makePaperSimulationAppearance(observation, gray8.size(), coarse);
+                m_tracker->setSimulatedTemplate(appearance.image, appearance.roi);
+                diagnostic.simulationTemplatePoint = appearance.anchor;
+            }
+            stageClock.enter(performance.trackingMs);
+            result.trackedRoi = m_tracker->update(gray8);
+            stageClock.enter(performance.validationProjectionMs);
+            diagnostic.tracker = m_tracker->lastUpdateDiagnostic();
+            refreshResponseStatistics();
+            diagnostic.templateReinitialized = true;
+        }
+        partialObservation = false;
+    }
+    if (diagnostic.simulatedPointAvailable && diagnostic.refinement.valid
+        && diagnostic.refinement.hasBranchDirections
+        && (geometryAccepted || bootstrapGeometry.valid)) {
+        m_paperGeometryReference.localBias = diagnostic.refinement.point - diagnostic.simulatedPoint;
+        m_paperGeometryReference.leftSlope = diagnostic.refinement.leftSlope;
+        m_paperGeometryReference.rightSlope = diagnostic.refinement.rightSlope;
+        m_paperGeometryReference.referenceRevision = options.referenceRevision;
+        m_paperGeometryReference.valid = true;
+    }
+    if (!partialObservation && diagnostic.refinement.valid
+        && (geometryAccepted || completeImageAppearance(
+            gray8, diagnostic.refinement.point, m_imageIdentityPatch))
+        && (geometryAccepted || cv::norm(diagnostic.refinement.point - diagnostic.responsePoint)
+            <= options.seamRefinement.maxPositionUncertaintyPixel)) {
+        // 已通过旧身份验收的当前几何结束旧恢复周期；模型拟合失败仍不授予结构资格。
+        m_boundedImageSearch = {};
+        diagnostic.motherBranchesSeeded = seedPaperMotherBranches(
+            gray8, diagnostic.refinement, options, diagnostic.motherBranchesSupported);
+    }
     const cv::Point2d currentObservation = diagnostic.refinement.valid ? diagnostic.refinement.point : coarse;
     diagnostic.coarseFinalPoint = coarse;
     const auto observationProjection = CWeldImageToSpaceProjector::projectCvPoint(currentObservation,
         projectionContext, WeldProjectionTargetFrame::PositionerTcp);
     result.weldPointPixel = fusePaperPosition(currentObservation,
-        observationProjection.valid && observationProjection.spacePoint.valid && (geometryAccepted || !partialObservation), options, diagnostic);
+        observationProjection.valid && observationProjection.spacePoint.valid && (geometryAccepted || !partialObservation),
+        observationProjection.valid && observationProjection.spacePoint.valid && partialObservation
+            && (diagnostic.shoulderObservationAccepted || diagnostic.motherBranchEstimateUsed)
+            && !contradictoryLocalCorrection,
+        options, diagnostic);
     diagnostic.continuity.source = geometryAccepted ? OnlineSeamPointSource::Geometry
         : (partialObservation ? OnlineSeamPointSource::GuidedEstimate
             : OnlineSeamPointSource::CorrectedKcf);
@@ -1685,7 +2003,8 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     result.localizationEvidence.currentImageSupported = diagnostic.imageObservationAccepted;
     result.localizationEvidence.imageConstrainedEstimate = partialObservation
         && !contradictoryLocalCorrection;
-    result.localizationEvidence.recoveryAttempted |= diagnostic.shoulderObservationAccepted;
+    result.localizationEvidence.recoveryAttempted |= diagnostic.shoulderObservationAccepted
+        || referenceRecoveryCandidate;
     result.localizationEvidence.recoveryFailed = contradictoryLocalCorrection
         && !diagnostic.imageSearchCyclePending;
     diagnostic.coarseObservationUsed = !geometryAccepted;
@@ -1700,7 +2019,8 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     result.valid = projection.valid && projection.spacePoint.valid;
     // 图像定位可以成功但射线/激光面无法形成空间点；保留图像证据，撤销空间控制资格。
     result.localizationEvidence.inputUnavailable = !result.valid;
-    diagnostic.evidence.controlEligible = result.valid && !contradictoryLocalCorrection;
+    diagnostic.evidence.controlEligible = result.valid && !contradictoryLocalCorrection
+        && !unconfirmedReferenceRecovery;
     diagnostic.completeAppearanceSupported = !partialObservation
         && (diagnostic.refinement.valid || !m_hasImageSearchPoint
             || completeImageAppearance(gray8, currentObservation, m_imageIdentityPatch));
@@ -1709,7 +2029,8 @@ LegacyOnlineKcfResult CLegacyOnlineKcfDetector::processPaperTracking(
     const bool updateRealTemplate = result.valid && !partialObservation
         && (diagnostic.responseStatisticsReady ? diagnostic.responseNormal
             : diagnostic.completeAppearanceSupported);
-    const bool supportedTrackingObservation = result.valid && !contradictoryLocalCorrection;
+    const bool supportedTrackingObservation = result.valid && !contradictoryLocalCorrection
+        && !unconfirmedReferenceRecovery;
     // 无目标条纹支持的显示估计不得移动搜索锚；双肩约束估计仍可跟随实际运动。
     const auto trackingAnchor = !supportedTrackingObservation && m_hasImageSearchPoint
         ? m_lastImageSearchPoint : currentObservation;

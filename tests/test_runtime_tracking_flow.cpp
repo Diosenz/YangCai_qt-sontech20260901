@@ -12,6 +12,7 @@
 #include <condition_variable>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -30,6 +31,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QTimer>
+#include <QThread>
 #include <QUuid>
 
 #include <Eigen/Geometry>
@@ -167,6 +169,11 @@ i2r_rlc::vision::WeldProjectionContext makeProjectionContext()
 
 struct FakeTransportState {
     std::atomic<int> reverseCompleteReply{-1};
+    /// @brief 外部传输边界可控背压，只在测试工作线程中调用。
+    std::function<void()> beforeRealtimeReply;
+    /// @brief 完整启动夹具只在收到 J 后推进运行反馈，预检期间保持停止状态。
+    bool startJobOnCommand = false;
+    std::atomic<bool> jobStarted{false};
     bool blockFirstTeachPoint = false;
     std::atomic<bool> firstTeachPointEntered{false};
     std::mutex teachPointMutex;
@@ -230,6 +237,8 @@ public:
         receipt.message = "fake robot response";
         m_record->types.push_back(type);
         m_record->requests.push_back(request);
+        if (type == i2r_rlc::robot_comm::RobotCommandType::RealtimeCorrection
+            && m_record->beforeRealtimeReply) { m_record->beforeRealtimeReply(); }
         if (m_record->operationError.load()
             != i2r_rlc::robot_comm::RobotCommandError::None) {
             receipt.responseReceived = false;
@@ -249,6 +258,15 @@ public:
         if (state != nullptr) {
             const auto before = *state;
             *state = m_record->replayPollState.value_or(makeReadyRobotState());
+            if (m_record->startJobOnCommand) {
+                if (type == i2r_rlc::robot_comm::RobotCommandType::JobStart) {
+                    m_record->jobStarted = true;
+                }
+                if (m_record->jobStarted.load()) {
+                    state->sStart = state->traflag = 1;
+                    state->usJobLine = 7;
+                }
+            }
             if (m_record->replayCorrectionFlags.load() >= 0) {
                 state->corflag = state->detflag = m_record->replayCorrectionFlags.load();
             }
@@ -455,6 +473,169 @@ bool connectCorrectionRobotSim(
     setupTimeout.stop();
     QObject::disconnect(connection);
     return synchronized;
+}
+
+/** @brief 从正式作业启动入口验收采集，包含启动事务清理后的 Vision 重新配置。 */
+bool testStartupReplayCapture(QCoreApplication &app)
+{
+    Q_UNUSED(app);
+    using namespace i2r_rlc;
+    auto record = std::make_shared<FakeTransportState>();
+    auto feedback = makeRobotSimReachableState();
+    feedback.sStart = feedback.traflag = 0;
+    feedback.sServoPower = 1;
+    feedback.corflag = feedback.detflag = 1;
+    record->replayPollState = feedback;
+    record->startJobOnCommand = true;
+    record->reverseCompleteReply = 0;
+    auto simulation = std::make_shared<FakeRobotSimTransportState>();
+    simulation->centeredObservation = true;
+    ui::CRuntimeCoordinator runtime(std::make_unique<CFakeRobotTransport>(record),
+        std::make_unique<CFakeRobotSimTransport>(simulation));
+    ui::RuntimeOnlineCorrectionConfiguration configuration;
+    makeOnlineConfigurationFiles(&configuration);
+    const QString root = QDir::temp().filePath(QStringLiteral("i2r_startup_capture_%1")
+        .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
+    configuration.diagnosticOutputDirectory = root.toStdString();
+    const bool diagnosticsEnabled = !QCoreApplication::arguments().contains(
+        QStringLiteral("--diagnostics-disabled"));
+    const bool captureEnabled = !QCoreApplication::arguments().contains(
+        QStringLiteral("--capture-disabled"));
+    configuration.visionDiagnostics.enabled = diagnosticsEnabled;
+    configuration.visionDiagnostics.replayCaptureEnabled = captureEnabled;
+    ui::RuntimeTrackingOptions options;
+    options.sensorCalibration.valid = true;
+    options.sensorCalibration.focalLengthM = 0.01;
+    options.sensorCalibration.sxM = options.sensorCalibration.syM = 0.00001;
+    options.sensorCalibration.cxPixel = 160.0;
+    options.sensorCalibration.cyPixel = 120.0;
+    options.sensorCalibration.laserPlaneC = -1.0;
+    options.sensorCalibration.cameraZInToolM = -1.0;
+    options.sensorCalibration.cameraXInToolM = 0.01;
+    options.positionerCalibration.valid = true;
+    QEventLoop loop;
+    bool started = false;
+    int delivered = 0;
+    const auto arguments = QCoreApplication::arguments();
+    const int imageArgument = arguments.indexOf(QStringLiteral("--capture-image"));
+    const QImage capturedInput = imageArgument >= 0 && imageArgument + 1 < arguments.size()
+        ? QImage(arguments[imageArgument + 1]).convertToFormat(QImage::Format_Grayscale8) : QImage();
+    const int requiredFrames = capturedInput.isNull() ? 4 : 32;
+    bool uiPayloadTrimmed = true;
+    QString failure;
+    QObject::connect(&runtime, &ui::CRuntimeCoordinator::onlineCorrectionStartSucceeded,
+        &loop, [&]() { started = true; });
+    QObject::connect(&runtime, &ui::CRuntimeCoordinator::onlineCorrectionStartFailed,
+        &loop, [&](const QString &message) { failure = message; loop.quit(); });
+    QObject::connect(&runtime, &ui::CRuntimeCoordinator::trackingResultReady,
+        &loop, [&](const ui::RuntimeTrackingResult &result) {
+            if (!started || !result.triggerAccepted) { return; }
+            ++delivered;
+            uiPayloadTrimmed &= result.diagnostic.has_value() == diagnosticsEnabled;
+            if (result.diagnostic.has_value()) {
+                uiPayloadTrimmed &= result.diagnostic->replaySourceImage.isNull()
+                    && !result.diagnostic->replayObservation.has_value();
+            }
+            if (delivered >= requiredFrames) { loop.quit(); }
+        });
+    runtime.start();
+    runtime.configureTracking(options, makeProjectionContext());
+    runtime.publishRobotState(feedback);
+    const bool synchronized = connectCorrectionRobotSim(runtime, loop);
+    runtime.connectRobot();
+    runtime.publishRobotState(feedback);
+    runtime.startOnlineCorrectionJob(configuration, "CAPTURE_TEST");
+    QTimer exposures;
+    qint64 frameId = 0;
+    QObject::connect(&exposures, &QTimer::timeout, &loop, [&]() {
+        auto frame = makeOnlineSeamFrame();
+        if (!capturedInput.isNull()) {
+            frame.image = capturedInput;
+            frame.previewImage = capturedInput;
+        }
+        frame.frameId = ++frameId;
+        frame.timestamp = QDateTime::currentDateTime();
+        runtime.publishCameraFrame(frame);
+    });
+    exposures.start(100);
+    QTimer timeout;
+    timeout.setSingleShot(true);
+    QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
+    timeout.start(capturedInput.isNull() ? 8000 : 20000);
+    loop.exec();
+    timeout.stop();
+    exposures.stop();
+    runtime.stop();
+    bool ok = expectTrue(synchronized && started && delivered >= requiredFrames && failure.isEmpty(),
+        "formal online startup reaches fresh processed exposures after J/D and detection-window confirmation");
+    if (!failure.isEmpty()) { std::cerr << failure.toStdString() << '\n'; }
+    ok &= expectTrue(uiPayloadTrimmed, "UI receives a trimmed diagnostic without recorder-owned input snapshots");
+    const auto directories = QDir(root).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    if (!expectTrue(directories.size() == 1, "formal startup creates one capture session")) { return false; }
+    const QString directory = QDir(root).filePath(directories.front());
+    QFile contexts(QDir(directory).filePath(QStringLiteral("replay_context.jsonl")));
+    if (!diagnosticsEnabled || !captureEnabled) {
+        return expectTrue(!contexts.exists(),
+            "formal startup preserves explicitly disabled diagnostics/capture") && ok;
+    }
+    bool complete = contexts.open(QIODevice::ReadOnly);
+    int captured = 0;
+    while (contexts.isOpen() && !contexts.atEnd()) {
+        const auto input = QJsonDocument::fromJson(contexts.readLine()).object();
+        ++captured;
+        const QImage image(QDir(directory).filePath(input["image"].toString()));
+        complete &= input["detector_input_complete"].toBool()
+            && input["simulation_frame_id"].toInteger() == input["frame_id"].toInteger()
+            && input["sim_line"].toArray().size() == 3
+            && input.contains("enable_gap") && !image.isNull()
+            && image.size() == (capturedInput.isNull() ? QSize(320, 240) : capturedInput.size())
+            && input["paper_options"].toObject()["branch_constraints"].toBool()
+            && (capturedInput.isNull() || image.convertToFormat(QImage::Format_Grayscale8) == capturedInput);
+    }
+    std::cout << "Startup replay capture report: " << directory.toStdString()
+        << "; delivered=" << delivered << "; captured=" << captured << std::endl;
+    return expectTrue(complete && captured >= delivered,
+        "formal startup retains actual grayscale pixels and simulation/options after clearing its startup transaction") && ok;
+}
+
+/** @brief 几何暂缺不能降级完整当前外观；经公开 process 入口检查辅助模型的职责边界。 */
+bool testPaperMotherKeepsCompleteAppearance()
+{
+    using namespace i2r_rlc;
+    cv::Mat image(964, 1292, CV_8UC1);
+    for (int y = 0; y < image.rows; ++y) {
+        for (int x = 0; x < image.cols; ++x) {
+            const double expected = 590.0 + (x < 500 ? 0.4 : -0.27) * (x - 500);
+            image.at<unsigned char>(y, x) = std::abs(y - expected) <= 2.0 ? 225 : 14;
+        }
+    }
+    digital_twin::DigitalTwinVisionLaserObservation observation;
+    observation.valid = observation.hasWeldPointImage_px = true;
+    observation.frameId = 1;
+    observation.weldPointImage_px = {500.0, 590.0};
+    observation.laserLineImagePoints_px = {{240.0, 486.0}, {500.0, 590.0}, {830.0, 500.9}};
+    vision::LegacyOnlineKcfOptions options;
+    options.enablePaperTracking = true;
+    options.paperUseMotherBranches = true;
+    options.evidenceContext.timestampMs = 1000;
+    vision::CLegacyOnlineKcfDetector detector;
+    const auto first = detector.process(image, observation, makeProjectionContext(), options);
+    bool ok = expectTrue(first.valid && first.diagnostic.motherBranchesSeeded,
+        "visible synthetic seam must establish a calibrated mother model");
+    // 精定位的支撑要求暂时高于窗口容量；当前原图、完整身份及相关响应均不改变。
+    options.seamRefinement.minSideSupportColumns = 120;
+    options.evidenceContext.timestampMs = 1100;
+    observation.frameId = 2;
+    const auto second = detector.process(image, observation, makeProjectionContext(), options);
+    ok &= expectTrue(second.diagnostic.motherBranchesSupported
+            && !second.diagnostic.rawRefinement.valid,
+        "missing local geometry must coexist with current two-sided mother support");
+    ok &= expectTrue(second.valid && second.diagnostic.imageObservationAccepted
+            && second.diagnostic.completeAppearanceSupported
+            && !second.diagnostic.motherBranchEstimateUsed
+            && !second.diagnostic.tracker.trainingFromSimulation,
+        "complete current correlation keeps observation and real training when local geometry is unavailable");
+    return ok;
 }
 
 bool testInjectedRobotSimTransportIsUsed(QCoreApplication &app)
@@ -1371,6 +1552,214 @@ bool testLatestRealtimeCommandWins(QCoreApplication &app)
     return ok;
 }
 
+/** @brief 外部事务被阻塞时，积压命令合并为最新值且保留最终结束标志与身份。 */
+bool testRealtimeTransportBackpressure()
+{
+    using namespace i2r_rlc;
+    std::mutex mutex;
+    std::condition_variable condition;
+    bool entered = false;
+    bool released = false;
+    int calls = 0;
+    std::vector<robot_comm::RobotCommandReceipt> receipts;
+    auto record = std::make_shared<FakeTransportState>();
+    record->beforeRealtimeReply = [&]() {
+        std::unique_lock<std::mutex> lock(mutex);
+        if (++calls == 1) {
+            entered = true;
+            condition.notify_all();
+            condition.wait(lock, [&]() { return released; });
+        }
+    };
+    auto *robot = new ui::CRobotCommWorkerAdapter(std::make_unique<CFakeRobotTransport>(record));
+    QThread thread;
+    robot->moveToThread(&thread);
+    QObject::connect(&thread, &QThread::finished, robot, &QObject::deleteLater);
+    QObject::connect(robot, &ui::CRobotCommWorkerAdapter::commandReceiptReady,
+        robot, [&](const robot_comm::RobotCommandReceipt &receipt, const robot_comm::RobotState &) {
+            if (receipt.type != robot_comm::RobotCommandType::RealtimeCorrection) { return; }
+            std::lock_guard<std::mutex> lock(mutex);
+            receipts.push_back(receipt);
+            condition.notify_all();
+        });
+    thread.start();
+    QMetaObject::invokeMethod(robot, [robot]() {
+        robot->connectRobot();
+        robot_comm::RobotRealtimeCorrectionCommand command;
+        command.valid = true;
+        command.dxUm = 10;
+        command.localTrace = robot_comm::RobotLocalCommandTrace{999, 1, 10};
+        robot->sendRealtimeCorrectionCommand(command);
+    }, Qt::QueuedConnection);
+    bool ok;
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        ok = expectTrue(condition.wait_for(lock, std::chrono::seconds(2), [&]() { return entered; }),
+            "first actual P reaches a blocked external transport");
+    }
+    QMetaObject::invokeMethod(robot, [robot]() {
+        robot_comm::RobotRealtimeCorrectionCommand command;
+        command.valid = true;
+        command.dxUm = 20;
+        command.localTrace = robot_comm::RobotLocalCommandTrace{999, 2, 20};
+        robot->sendRealtimeCorrectionCommand(command);
+        command.dxUm = 30;
+        command.onlineEndFlag = 1;
+        command.localTrace = robot_comm::RobotLocalCommandTrace{999, 3, 30};
+        robot->sendRealtimeCorrectionCommand(command);
+    }, Qt::QueuedConnection);
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        released = true;
+    }
+    condition.notify_all();
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        ok &= expectTrue(condition.wait_for(lock, std::chrono::seconds(2), [&]() { return receipts.size() == 2; }),
+            "backpressure release completes the in-flight and newest pending P");
+    }
+    QMetaObject::invokeMethod(robot, [robot]() { robot->disconnectRobot(); }, Qt::BlockingQueuedConnection);
+    thread.quit();
+    thread.wait();
+    ok &= expectTrue(receipts.size() == 2 && receipts[0].localTrace.has_value()
+        && receipts[1].localTrace.has_value() && receipts[0].localTrace->commandId == 1
+        && receipts[1].localTrace->commandId == 3 && receipts[1].localTrace->targetGeneration == 30,
+        "coalescing drops the superseded P identity and preserves the actual selected one");
+    if (receipts.size() == 2) {
+        const auto fields = QString::fromStdString(receipts[1].request).mid(2).split(',');
+        ok &= expectTrue(fields.size() == 17 && fields[8] == "1" && fields[9] == "30",
+            "selected pending command keeps the final segment-end flag and newest increment");
+    }
+    std::cout << (ok ? "PASS" : "FAIL") << ": realtime transport backpressure contract\n";
+    return ok;
+}
+
+/** @brief 文件系统被阻塞时，生产在线 worker 仍须发布当前反馈对应的 P。 */
+bool testSlowRecordingDoesNotBlockControl(QCoreApplication &app)
+{
+    using namespace i2r_rlc;
+    struct CWriteGate {
+        std::mutex mutex;
+        std::condition_variable condition;
+        bool armed = false;
+        bool entered = false;
+        bool released = false;
+        int commandCount = 0;
+        double currentX = 0.0;
+    };
+    auto gate = std::make_shared<CWriteGate>();
+    auto append = [gate](const QString &path, const QByteArray &data, QString *error) {
+        {
+            std::unique_lock<std::mutex> lock(gate->mutex);
+            if (gate->armed && !gate->entered) {
+                gate->entered = true;
+                gate->condition.notify_all();
+                gate->condition.wait(lock, [&]() { return gate->released; });
+            }
+        }
+        QFile file(path);
+        const bool ok = file.open(QIODevice::WriteOnly | QIODevice::Append)
+            && file.write(data) == data.size();
+        if (!ok) { *error = file.errorString(); }
+        return ok;
+    };
+    auto transport = std::make_shared<FakeTransportState>();
+    auto *robot = new ui::CRobotCommWorkerAdapter(std::make_unique<CFakeRobotTransport>(transport));
+    auto *control = new ui::COnlineCorrectionWorkerAdapter(append, nullptr);
+    ui::RuntimeOnlineCorrectionConfiguration configuration;
+    makeOnlineConfigurationFiles(&configuration);
+    configuration.options.enableOnlineIcp = false;
+    configuration.visionDiagnostics.imagesEnabled = false;
+    configuration.diagnosticOutputDirectory = QDir::temp().filePath(QStringLiteral("i2r_slow_text_%1")
+        .arg(QUuid::createUuid().toString(QUuid::WithoutBraces))).toStdString();
+    QObject::connect(control, &ui::COnlineCorrectionWorkerAdapter::robotCommandReady,
+        robot, &ui::CRobotCommWorkerAdapter::sendCorrectionCommand);
+    QObject::connect(robot, &ui::CRobotCommWorkerAdapter::robotStateReady,
+        control, &ui::COnlineCorrectionWorkerAdapter::updateRobotState);
+    QObject::connect(robot, &ui::CRobotCommWorkerAdapter::commandReceiptReady,
+        control, &ui::COnlineCorrectionWorkerAdapter::handleRobotCommandReceipt);
+    QObject::connect(control, &ui::COnlineCorrectionWorkerAdapter::realtimeCommandReady,
+        control, [gate](const robot_comm::RobotRealtimeCorrectionCommand &) {
+            std::lock_guard<std::mutex> lock(gate->mutex);
+            if (gate->armed) { ++gate->commandCount; gate->condition.notify_all(); }
+        });
+    QThread worker;
+    control->moveToThread(&worker);
+    robot->moveToThread(&worker);
+    QObject::connect(&worker, &QThread::finished, control, &QObject::deleteLater);
+    QObject::connect(&worker, &QThread::finished, robot, &QObject::deleteLater);
+    worker.start();
+    std::atomic<bool> online{false};
+    QObject::connect(control, &ui::COnlineCorrectionWorkerAdapter::onlineCorrectionUpdated,
+        control, [&online, gate](const control::OnlineCorrectionUpdate &u) {
+            online = u.phase == control::OnlineCorrectionPhase::OnlineRunning;
+            if (u.followDiagnostic.valid) {
+                std::lock_guard<std::mutex> lock(gate->mutex);
+                gate->currentX = u.followDiagnostic.current.xMm;
+            }
+        });
+    QMetaObject::invokeMethod(control, [&]() {
+        robot->connectRobot();
+        control->configureForStart(configuration);
+        control->startInitialDetection();
+        ui::RuntimeTrackingResult initial;
+        initial.valid = true;
+        initial.sample.point = {10.0, 0.0, 0.0, true};
+        control->appendTrackingResult(initial);
+        auto state = makeReadyRobotState();
+        state.onlineReverseCompleteFlag = 1;
+        robot->updateState(state);
+        state.corflag = state.detflag = 2;
+        robot->updateState(state);
+        state.corflag = state.detflag = 1;
+        robot->updateState(state);
+    }, Qt::BlockingQueuedConnection);
+    bool ok = expectTrue(online, "slow recording fixture reaches real STARTCOR control phase");
+    {
+        std::lock_guard<std::mutex> lock(gate->mutex);
+        gate->armed = true;
+    }
+    QMetaObject::invokeMethod(control, [control]() {
+        auto state = makeReadyRobotState();
+        state.corflag = state.detflag = 1;
+        state.curx_r = 20000;
+        state.cury_r = 1000;
+        control->updateRobotState(state);
+    }, Qt::QueuedConnection);
+    {
+        std::unique_lock<std::mutex> lock(gate->mutex);
+        ok &= expectTrue(gate->condition.wait_for(lock, std::chrono::seconds(2),
+            [&]() { return gate->entered; }), "slow filesystem append was actually exercised");
+        const bool published = gate->condition.wait_for(lock, std::chrono::milliseconds(300),
+            [&]() { return gate->commandCount >= 1; });
+        ok &= expectTrue(published,
+            "P must be published while the filesystem is still blocked, before releasing the write gate");
+        lock.unlock();
+        QMetaObject::invokeMethod(control, [control]() {
+            auto state = makeReadyRobotState();
+            state.corflag = state.detflag = 1;
+            state.curx_r = 30000;
+            state.cury_r = 1000;
+            control->updateRobotState(state);
+        }, Qt::QueuedConnection);
+        lock.lock();
+        ok &= expectTrue(gate->condition.wait_for(lock, std::chrono::milliseconds(300),
+                [&]() { return gate->commandCount >= 2 && std::abs(gate->currentX - 30.0) < 1.0e-6; }),
+            "a newer feedback state must reach a new P without waiting for the old text write");
+        gate->released = true;
+        gate->condition.notify_all();
+    }
+    QMetaObject::invokeMethod(control, [&]() {
+        robot->disconnectRobot();
+        control->reset();
+    }, Qt::BlockingQueuedConnection);
+    worker.quit();
+    worker.wait();
+    Q_UNUSED(app);
+    std::cout << (ok ? "PASS" : "FAIL") << ": slow recording preserves P publication and fresh feedback\n";
+    return ok;
+}
+
 bool testWorkerClosedLoop(QCoreApplication &app)
 {
     using i2r_rlc::control::OnlineCorrectionPhase;
@@ -1810,7 +2199,10 @@ bool testNormalSessionReplay(QCoreApplication &app, bool concaveMoving, bool sim
     ui::RuntimeOnlineCorrectionConfiguration configuration;
     configuration.diagnosticOutputDirectory = root.toStdString();
     configuration.visionDiagnostics.enabled = true;
-    configuration.visionDiagnostics.imagesEnabled = false;
+    const bool captureReplay = QCoreApplication::arguments().contains(QStringLiteral("--capture-replay"));
+    bool capturePixelsMatch = true;
+    configuration.visionDiagnostics.imagesEnabled = captureReplay;
+    configuration.visionDiagnostics.replayCaptureEnabled = captureReplay;
     configuration.options.enableOnlineIcp = true;
     configuration.options.preserveMeasuredReference = true;
     configuration.rbcalibFile = (root + QStringLiteral("/RBCALIB.DAT")).toStdString();
@@ -2067,9 +2459,20 @@ bool testNormalSessionReplay(QCoreApplication &app, bool concaveMoving, bool sim
                 savedFrame, savedState, -1, expiredObservation, savedCorrelation);
             replayingExposure = false;
         }
+        if (captureReplay && QCoreApplication::arguments().contains(QStringLiteral("--capture-color"))) {
+            frame.image = frame.image.convertToFormat(QImage::Format_ARGB32);
+            frame.image.setPixel(0, 0, qRgb(200, 20, 20));
+            frame.previewImage = frame.image;
+        }
         inputFrameIds.push_back(frame.frameId);
         inputReferenceRevisions.push_back(correlation.workpiecePoseRevision);
         vision.submitFrameWithRobotStateObservationAndCorrelation(frame, state, -1, observation, correlation);
+        if (captureReplay && !observations.empty()) {
+            capturePixelsMatch &= expectTrue(observations.back().diagnostic.has_value()
+                && observations.back().diagnostic->replaySourceImage
+                    == frame.image.convertToFormat(QImage::Format_Grayscale8),
+                "captured detector input exactly matches production grayscale conversion including color input");
+        }
         if ((priorScenario != 0 || interference || referenceRevisionSwitch)
             && !observations.empty() && observations.back().diagnostic.has_value()) {
             const auto &result = observations.back();
@@ -2150,6 +2553,19 @@ bool testNormalSessionReplay(QCoreApplication &app, bool concaveMoving, bool sim
     if (stationaryQueueWindow) {
         ok &= expectTrue(stationaryFront.has_value() && stationaryReferencePreserved,
             "fresh exposures at a stationary robot cannot consume an unpassed forward reference");
+    }
+    if (captureReplay) {
+        bool sameExposureSnapshots = capturePixelsMatch && observations.size() == expectedExposureCount;
+        for (const auto &result : observations) {
+            sameExposureSnapshots &= result.diagnostic.has_value()
+                && result.diagnostic->replayOptions.has_value()
+                && result.diagnostic->replayOptions->enablePaperTracking
+                && result.diagnostic->replayObservation.has_value()
+                && result.diagnostic->replayObservation->frameId == result.frameId
+                && !result.diagnostic->replayObservation->laserLineImagePoints_px.empty()
+                && !result.diagnostic->replaySourceImage.isNull();
+        }
+        ok &= expectTrue(sameExposureSnapshots, "continuous capture carries the actual same-exposure detector inputs");
     }
     // 真值只存在于测试夹具：保留每次输入，包括无输出/估计/遮挡，不以成功子集冒充全程。
     QJsonArray scoredExposures;
@@ -3593,6 +4009,13 @@ int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
+    if (argc > 1 && std::string_view(argv[1]) == "--mother-complete-appearance-contract") {
+        return testPaperMotherKeepsCompleteAppearance() ? 0 : 1;
+    }
+    if (argc > 1 && std::string_view(argv[1]) == "--startup-replay-capture-contract") {
+        return testStartupReplayCapture(app) ? 0 : 1;
+    }
+
     if (argc > 1 && std::string_view(argv[1]) == "--performance-delivery-contract") {
         return testCorrectionTrackingKeepsOnlyLatestPendingFrame(app) ? 0 : 1;
     }
@@ -3699,6 +4122,12 @@ int main(int argc, char **argv)
     if (argc > 1 && std::string_view(argv[1]) == "--seam-refinement-contract") {
         return testSpacePointInverseProjection() && testOnlineTrainingRequiresConsistentRawRoi()
             && testOnlineRefinedProjectionAndRecovery(app) ? 0 : 1;
+    }
+    if (argc > 1 && std::string_view(argv[1]) == "--realtime-backpressure-contract") {
+        return testRealtimeTransportBackpressure() && testLatestRealtimeCommandWins(app) ? 0 : 1;
+    }
+    if (argc > 1 && std::string_view(argv[1]) == "--slow-recording-control-contract") {
+        return testSlowRecordingDoesNotBlockControl(app) ? 0 : 1;
     }
     if (argc > 1 && std::string_view(argv[1]) == "--worker-closed-loop-contract") {
         return testWorkerClosedLoop(app) ? 0 : 1;

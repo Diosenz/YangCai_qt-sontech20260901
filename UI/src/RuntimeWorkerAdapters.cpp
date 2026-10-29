@@ -1301,6 +1301,7 @@ void CVisionTrackingWorkerAdapter::configure(
     m_options.method = RuntimeTrackingMethod::Kcf;
     m_projectionContext = projectionContext;
     m_detector.restartTracking();
+    m_replayPendingActions.append(QStringLiteral("restart"));
     m_responseCalibrationPending = true;
     emit statusChanged(QStringLiteral("vision tracking configured"));
 }
@@ -1344,6 +1345,7 @@ void CVisionTrackingWorkerAdapter::stopTracking()
     m_trackingActive = false;
     m_currentLocalizationSegmentIndex = -1;
     m_detector.restartTracking();
+    m_replayPendingActions.append(QStringLiteral("restart"));
     m_responseCalibrationPending = true;
     m_latestDigitalTwinObservation.reset();
     m_requireSynchronizedObservation = false;
@@ -1366,6 +1368,7 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
             && m_activeCorrelation.workpiecePoseRevision == m_responseCalibrationRevision;
         if (!sameOnlineContinuation) {
             m_detector.reset();
+            m_replayPendingActions.append(QStringLiteral("reset"));
         }
         m_responseCalibrationPending = false;
     }
@@ -1384,6 +1387,9 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
     if (!decision.shouldStartTracking) {
         if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
             m_detector.notifyImageObservationGap();
+            if (m_replayPendingActions.isEmpty() || m_replayPendingActions.back() != QStringLiteral("gap")) {
+                m_replayPendingActions.append(QStringLiteral("gap"));
+            }
         }
         RuntimeTrackingResult result;
         result.imageMeasurementOutputEnabled =
@@ -1404,6 +1410,9 @@ void CVisionTrackingWorkerAdapter::submitFrame(const camera::CameraFrame &frame)
     if (m_options.detType != 2) {
         if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
             m_detector.notifyImageObservationGap();
+            if (m_replayPendingActions.isEmpty() || m_replayPendingActions.back() != QStringLiteral("gap")) {
+                m_replayPendingActions.append(QStringLiteral("gap"));
+            }
         }
         result.imageMeasurementOutputEnabled =
             m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection;
@@ -1517,7 +1526,9 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         result.diagnostic->cameraTimestampMs = frame.timestamp.isValid()
             ? frame.timestamp.toMSecsSinceEpoch() : -1;
         result.diagnostic->processingStartedMs = QDateTime::currentMSecsSinceEpoch();
+        result.diagnostic->replayDetectorActions = m_replayPendingActions;
     }
+    m_replayPendingActions.clear();
 
     QElapsedTimer imagePreparationClock;
     if (diagnosticsEnabled) { imagePreparationClock.start(); }
@@ -1528,6 +1539,12 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         result.diagnostic->lossWindowSourceImage = image.copy();
     }
     const cv::Mat gray8 = qImageToGray8(image);
+    if (diagnosticsEnabled && m_options.visionDiagnostics.imagesEnabled
+        && m_options.visionDiagnostics.replayCaptureEnabled && !gray8.empty()
+        && gray8.total() <= 16U * 1024 * 1024) {
+        result.diagnostic->replaySourceImage = QImage(gray8.data, gray8.cols, gray8.rows,
+            static_cast<int>(gray8.step), QImage::Format_Grayscale8).copy();
+    }
     if (diagnosticsEnabled) {
         result.diagnostic->imagePreparationMs = imagePreparationClock.nsecsElapsed() / 1e6;
     }
@@ -1600,6 +1617,7 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
     detectorOptions.enableGapDetection = m_options.enableGapDetection;
     if (m_activeCorrelation.purpose == CorrectionPurpose::OnlineCorrection) {
         detectorOptions.enablePaperTracking = true;
+        detectorOptions.paperUseMotherBranches = true;
         detectorOptions.fusion = m_options.fusion;
         detectorOptions.enableSeamRefinement = true;
         detectorOptions.enableSimulationGuidance = true;
@@ -1624,6 +1642,10 @@ RuntimeTrackingResult CVisionTrackingWorkerAdapter::processDetType2(
         detectorOptions.referenceRevision = m_activeCorrelation.workpiecePoseRevision;
         // 用户明确选择实际接缝间隙中部；只对在线纠偏启用，不影响离线扫描。
         detectorOptions.seamRefinement.heightPolicy = vision::OnlineSeamHeightPolicy::GapCenter;
+    }
+    if (diagnosticsEnabled && m_options.visionDiagnostics.replayCaptureEnabled) {
+        result.diagnostic->replayObservation = observation;
+        result.diagnostic->replayOptions = detectorOptions;
     }
     const auto detected = m_detector.process(
         gray8, observation, projectionContext, detectorOptions);
@@ -3112,6 +3134,12 @@ void CGlobalLocalizationWorkerAdapter::apply(
 
 COnlineCorrectionWorkerAdapter::COnlineCorrectionWorkerAdapter(QObject *parent)
     : QObject(parent)
+{
+}
+
+COnlineCorrectionWorkerAdapter::COnlineCorrectionWorkerAdapter(
+    COnlineCorrectionRunRecorder::TextAppendFunction append, QObject *parent)
+    : QObject(parent), m_runRecorder(std::move(append))
 {
 }
 

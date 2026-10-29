@@ -44,7 +44,8 @@ void validateInput(const QJsonObject &input)
         }
     }
     for (const auto *key : {"bounded_search", "enable_gap", "evidence_policy",
-             "paper_tracking", "probe_bootstrap", "performance_diagnostics"}) {
+             "paper_tracking", "probe_bootstrap", "performance_diagnostics",
+             "simulation_valid", "has_weld_point"}) {
         if (input.contains(key) && !input.value(key).isBool()) {
             throw std::runtime_error(std::string("invalid boolean ") + key);
         }
@@ -137,8 +138,17 @@ QJsonObject record(const QJsonObject &input, const v::LegacyOnlineKcfResult &r)
     row["detector_pixel"] = pixel(r.weldPointPixel, r.valid);
     row["paper_tracking"] = input.value("paper_tracking").toBool(false);
     row["response_template_count"] = d.tracker.responseTemplateCount;
+    row["position_fusion"] = QJsonObject{
+        {"applied", d.positionFusionApplied},
+        {"gain_x", d.positionGainX}, {"gain_y", d.positionGainY},
+        {"observation", pixel(d.positionObservationPoint, d.positionFusionApplied)},
+        {"prior", pixel(d.positionPriorPoint, d.positionFusionApplied)}};
     row["simulation_shape_available"] = d.simulationShapeAvailable;
     row["paper_diagnostics"] = QJsonObject{
+        {"mother_supported", d.motherBranchesSupported},
+        {"mother_seeded", d.motherBranchesSeeded},
+        {"mother_used", d.motherBranchEstimateUsed},
+        {"mother_point", pixel(d.motherBranchPoint, d.motherBranchesSupported)},
         {"identity_quality", d.coarseObservationQuality},
         {"shoulder_accepted", d.shoulderObservationAccepted},
         {"shoulder_quality", d.shoulderObservationQuality},
@@ -147,7 +157,11 @@ QJsonObject record(const QJsonObject &input, const v::LegacyOnlineKcfResult &r)
         {"response_statistics_ready", d.responseStatisticsReady},
         {"response_normal", d.responseNormal},
         {"normal_response_samples", d.normalResponseSamples},
-        {"response_psr", d.tracker.responsePsr}};
+        {"response_psr", d.tracker.responsePsr},
+        {"normal_response_mean", d.normalResponseMean},
+        {"normal_response_std", d.normalResponseStd},
+        {"training_from_simulation", d.tracker.trainingFromSimulation},
+        {"training_rejected", d.tracker.trainingRejected}};
     row["image_observation_accepted"] = d.imageObservationAccepted;
     row["source"] = r.valid ? source : "unavailable";
     row["image_source"] = source;
@@ -280,6 +294,17 @@ int main(int argc, char **argv)
                 && input.value("kind") != "synthetic") {
                 throw std::runtime_error("synthetic calibration cannot be used for real images");
             }
+            if (input.contains("detector_actions")) {
+                if (!input.value("detector_actions").isArray()) {
+                    throw std::runtime_error("detector_actions must be an array");
+                }
+                for (const auto &action : input.value("detector_actions").toArray()) {
+                    if (action == QJsonValue("reset")) { detector.reset(); }
+                    else if (action == QJsonValue("restart")) { detector.restartTracking(); }
+                    else if (action == QJsonValue("gap")) { detector.notifyImageObservationGap(); }
+                    else { throw std::runtime_error("unknown detector lifecycle action"); }
+                }
+            }
             dt::DigitalTwinVisionLaserObservation observation;
             observation.frameId = input.value("frame_id").isDouble()
                 ? input.value("frame_id").toInteger() : -1;
@@ -288,6 +313,8 @@ int main(int argc, char **argv)
                 observation.valid = observation.hasWeldPointImage_px = true;
                 observation.weldPointImage_px = {sim[0].toDouble(), sim[1].toDouble()};
             }
+            observation.valid = input.value("simulation_valid").toBool(observation.valid);
+            observation.hasWeldPointImage_px = input.value("has_weld_point").toBool(observation.hasWeldPointImage_px);
             observation.seamIndex = input.value("seam_index").toInt(-1);
             for (const auto &value : input.value("sim_line").toArray()) {
                 const auto point = value.toArray();
@@ -299,6 +326,40 @@ int main(int argc, char **argv)
             }
             v::LegacyOnlineKcfOptions options;
             options.enablePaperTracking = input.value("paper_tracking").toBool(false);
+            // 离线比较使用生产选项，拒绝拼错键和非物理噪声，不能静默回退默认值。
+            if (input.contains("paper_options") && !input.value("paper_options").isObject()) {
+                throw std::runtime_error("paper_options must be an object");
+            }
+            const auto tuning = input.value("paper_options").toObject();
+            for (auto it = tuning.begin(); it != tuning.end(); ++it) {
+                if (it.key() == "fuse_partial" && it.value().isBool()) {
+                    options.paperFusePartialObservations = it.value().toBool();
+                    continue;
+                }
+                if (it.key() == "branch_constraints" && it.value().isBool()) {
+                    options.paperUseMotherBranches = it.value().toBool();
+                    continue;
+                }
+                if (it.key() == "keep_partial_state" && it.value().isBool()) {
+                    options.paperKeepPartialState = it.value().toBool();
+                    continue;
+                }
+                if (!it.value().isDouble() || !std::isfinite(it.value().toDouble())
+                    || it.value().toDouble() <= 0.0) {
+                    throw std::runtime_error("paper option must be finite and positive");
+                }
+                const double value = it.value().toDouble();
+                if (it.key() == "psr_sigma") { options.paperPsrSigma = value; }
+                else if (it.key() == "process_noise") { options.paperProcessNoise = value; }
+                else if (it.key() == "noise_minimum") { options.paperObservationNoiseMinimum = value; }
+                else if (it.key() == "noise_maximum") { options.paperObservationNoiseMaximum = value; }
+                else if (it.key() == "abnormal_multiplier") { options.paperAbnormalNoiseMultiplier = value; }
+                else if (it.key() == "partial_multiplier") { options.paperPartialNoiseMultiplier = value; }
+                else { throw std::runtime_error("unknown paper option"); }
+            }
+            if (options.paperObservationNoiseMinimum > options.paperObservationNoiseMaximum) {
+                throw std::runtime_error("paper observation noise bounds reversed");
+            }
             options.enablePerformanceDiagnostics = input.value("performance_diagnostics").toBool(false);
             options.enableImageMeasurementOutput = true;
             options.enableSeamRefinement = true;

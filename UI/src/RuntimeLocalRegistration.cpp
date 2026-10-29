@@ -562,6 +562,7 @@ void CRuntimeCoordinator::submitOnlineLocalRegistration(const FrozenVisionFrameC
     input.workpiecePoseRevision = context.workpiecePoseRevision;
     input.seamImageXPixel = trackingResult.valid
         ? trackingResult.imageXPixel : observation.weldPointImage_px.x_px;
+    input.seamPointIsImageEstimate = trackingResult.localizationEvidence.imageConstrainedEstimate;
     input.independentObservation.valid = independentValid;
     input.independentObservation.frameId = context.frame.frameId;
     input.independentObservation.realWeldPointInParent_mm = localPoint(trackingResult.independentWeldPointInParent_mm);
@@ -757,6 +758,7 @@ void CRuntimeCoordinator::submitOnlineLocalSurfaceVerification(
     input.workpiecePoseRevision = context.workpiecePoseRevision;
     input.seamImageXPixel = trackingResult.valid ? trackingResult.imageXPixel
         : input.observation.weldPointImage_px.x_px;
+    input.seamPointIsImageEstimate = trackingResult.localizationEvidence.imageConstrainedEstimate;
     verification.lastObservedFrameId = context.frame.frameId;
     m_lastLocalRegistrationSampleMs = now;
     m_localRegistrationBusy = true;

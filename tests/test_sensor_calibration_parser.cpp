@@ -402,15 +402,20 @@ bool testOnlineIcpSwitchConfiguration()
     const QString diagnosticPath = paths.workflowsDir().filePath("online_vision_diagnostics.txt");
     ok &= writeTextFile(diagnosticPath, QStringLiteral(
         "enabled=false\nimages_enabled=false\nimage_sample_every_n=2\n"
-        "max_image_pairs=3\nmax_image_bytes=1000\n"));
+        "max_image_pairs=3\nmax_image_bytes=1000\nreplay_capture_enabled=true\n"
+        "replay_max_frames=123\nreplay_max_bytes=45678\n"));
     ok &= expectTrue(repository.loadOnlineVisionDiagnostics(diagnostic, &errorMessage)
                      && !diagnostic.enabled && !diagnostic.imagesEnabled
                      && diagnostic.imageSampleEveryN == 2 && diagnostic.maxImagePairs == 3
-                     && diagnostic.maxImageBytes == 1000, "all diagnostic options must load");
+                     && diagnostic.maxImageBytes == 1000 && diagnostic.replayCaptureEnabled
+                     && diagnostic.replayMaxFrames == 123 && diagnostic.replayMaxBytes == 45678,
+                     "all diagnostic options must load");
     for (const QString &invalid : {QStringLiteral("enabled=TRUE\n"),
              QStringLiteral("enabled=true\nenabled=false\n"),
              QStringLiteral("image_sample_every_n=0\n"), QStringLiteral("max_image_pairs=-1\n"),
-             QStringLiteral("max_image_bytes=999999999999999\n"), QStringLiteral("unknown=1\n")}) {
+             QStringLiteral("max_image_bytes=999999999999999\n"), QStringLiteral("unknown=1\n"),
+             QStringLiteral("replay_capture_enabled=1\n"), QStringLiteral("replay_max_frames=0\n"),
+             QStringLiteral("replay_max_bytes=1073741825\n")}) {
         ok &= writeTextFile(diagnosticPath, invalid);
         ok &= expectTrue(!repository.loadOnlineVisionDiagnostics(diagnostic, &errorMessage)
                          && !diagnostic.enabled && diagnostic.maxImagePairs == 3,

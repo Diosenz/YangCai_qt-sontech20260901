@@ -3,14 +3,22 @@
  * @brief 验证批次矩阵、目标点及跟随几何的实际文件记录和会话隔离。
  */
 #include <array>
+#include <chrono>
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <stdexcept>
 #include <iostream>
+#include <thread>
 
 #include <QCoreApplication>
+#include <QBuffer>
 #include <QDir>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QImageWriter>
 #include <QUuid>
 
 #include "OnlineCorrectionRunRecorder.h"
@@ -202,6 +210,7 @@ bool testImageMeasurementProvenance(const QString &root)
     result.diagnostic->algorithm.simulatedPoint = {999.0, 888.0};
     result.diagnostic->algorithm.finalPoint = {101.5, 202.25};
     ok &= recorder.recordTrackingResult(result, control::OnlineCorrectionPhase::OnlineRunning);
+    ok &= expect(recorder.flush(), "drain accepted text before offline readback");
     const auto rows = readRows(recorder.sessionDirectory(), "vision_diagnostics.tsv");
     ok &= expect(rows.size() == 4, "KCF stages and a missing CAD hint retain numeric provenance");
     if (rows.size() == 4) {
@@ -336,11 +345,305 @@ bool testFirstLossWindow(const QString &root)
     ok &= recorder.finishSession("completed", "disabled window");
     return ok;
 }
+/** @brief 正常有效曝光也必须完整归档，不能等到控制拒绝后才开始留图。 */
+bool testContinuousReplayCapture(const QString &root)
+{
+    using namespace i2r_rlc;
+    ui::RuntimeOnlineCorrectionConfiguration configuration;
+    configuration.visionDiagnostics.replayCaptureEnabled = true;
+    configuration.visionDiagnostics.replayMaxFrames = 3;
+    configuration.visionDiagnostics.lossWindowEnabled = false;
+    ui::COnlineCorrectionRunRecorder recorder;
+    QString error;
+    bool ok = expect(recorder.beginSession(root, configuration, &error), "begin continuous replay");
+    for (int id = 1; id <= 4; ++id) {
+        ui::RuntimeTrackingResult result;
+        result.frameId = result.correlation.frameId = id;
+        result.correlation.sessionId = 19;
+        result.correlation.purpose = ui::CorrectionPurpose::OnlineCorrection;
+        result.triggerAccepted = result.valid = result.controlEligible = true;
+        result.diagnostic.emplace();
+        result.diagnostic->cameraTimestampMs = 1000 + id;
+        result.diagnostic->lossWindowSourceImage = QImage(32, 24, QImage::Format_Grayscale8);
+        result.diagnostic->lossWindowSourceImage.fill(id);
+        result.diagnostic->replaySourceImage = result.diagnostic->lossWindowSourceImage;
+        result.diagnostic->algorithm.tracker.trainingFromSimulation = id == 2;
+        result.diagnostic->algorithm.normalResponseSamples = 32;
+        result.diagnostic->replayOptions.emplace();
+        result.diagnostic->replayOptions->enablePaperTracking = true;
+        result.diagnostic->replayOptions->paperUseMotherBranches = true;
+        result.diagnostic->replayOptions->paperPsrSigma = 2.5;
+        result.diagnostic->replayObservation.emplace();
+        auto &reference = *result.diagnostic->replayObservation;
+        reference.frameId = id;
+        reference.valid = reference.hasWeldPointImage_px = true;
+        reference.seamIndex = 7;
+        reference.weldPointImage_px = {12.0, 13.0};
+        reference.laserLineImagePoints_px = {{1.0, 2.0}, {3.0, 4.0}};
+        result.displayProjectionContext.emplace();
+        result.displayProjectionContext->valid = true;
+        ok &= recorder.recordTrackingResult(result, control::OnlineCorrectionPhase::OnlineRunning);
+        if (id == 2) {
+            ok &= recorder.recordTrackingResult(result, control::OnlineCorrectionPhase::OnlineRunning);
+        }
+    }
+    const QString directory = recorder.sessionDirectory();
+    ok &= recorder.finishSession("completed", "continuous replay");
+    const auto events = readRows(directory, "unified_session.jsonl");
+    bool recordedSimulationTraining = false;
+    for (const auto &line : events) {
+        const auto event = QJsonDocument::fromJson(line).object();
+        const auto paper = event["paper_tracking"].toObject();
+        recordedSimulationTraining |= event["frame_id"].toString() == "2"
+            && paper["training_from_simulation"].toBool()
+            && paper["normal_samples"].toInt() == 32;
+    }
+    ok &= expect(recordedSimulationTraining, "PSR calibration and actual simulation training are recorded independently");
+    const auto index = readRows(directory, "replay_index.tsv");
+    const auto contexts = readRows(directory, "replay_context.jsonl");
+    const auto manifest = readRows(directory, "replay_images/image_manifest.tsv");
+    ok &= expect(index.size() == 5 && contexts.size() == 4 && manifest.size() == 4,
+        "valid frames captured from the start, duplicate omitted and frame cap explicitly indexed");
+    if (contexts.size() == 4 && index.size() == 5) {
+        const auto first = QJsonDocument::fromJson(contexts.front()).object();
+        ok &= expect(first["sim_line"].toArray().size() == 2
+            && first["simulation_frame_id"].toInt() == 1
+            && first["seam_index"].toInt() == 7 && first["detector_input_complete"].toBool()
+            && first["paper_options"].toObject()["branch_constraints"].toBool()
+            && first["paper_options"].toObject()["psr_sigma"].toDouble() == 2.5,
+            "same exposure simulation shape and projection survive serialization");
+        const QImage image(QDir(directory).filePath(first["image"].toString()));
+        ok &= expect(!image.isNull() && image.pixelColor(0, 0).red() == 1,
+            "first accepted exposure preserved without waiting for failure");
+        ok &= expect(index.back().split('\t').value(2) == "frame_limit",
+            "frame budget omission is visible instead of silently truncating the replay");
+    }
+    return ok;
+}
+/** @brief 在现场分辨率和曝光节奏下验收公开写入器；不把缺图归档算作完整采集。 */
+bool testContinuousWriterThroughput(const QString &root, const QString &inputPath)
+{
+    using namespace i2r_rlc::ui;
+    const QImage source = QImage(inputPath).convertToFormat(QImage::Format_Grayscale8);
+    if (!expect(!source.isNull(), "load captured full-size grayscale source")) { return false; }
+    const QString directory = QDir(root).filePath(QStringLiteral("continuous_writer"));
+    QDir().mkpath(directory);
+    constexpr int frameCount = 32;
+    constexpr qint64 budget = 128LL * 1024 * 1024;
+    CTrackingDiagnosticImageWriter writer(directory, budget, 8);
+    const auto start = std::chrono::steady_clock::now();
+    int queued = 0;
+    for (int index = 0; index < frameCount; ++index) {
+        std::this_thread::sleep_until(start + std::chrono::milliseconds(index * 100));
+        queued += writer.submit(QString::number(index), source, QImage(), 0, budget)
+            == QStringLiteral("queued") ? 1 : 0;
+    }
+    writer.stop();
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start).count();
+    int saved = 0;
+    bool pixelsEqual = true;
+    for (const auto &row : readRows(directory, QStringLiteral("image_manifest.tsv"))) {
+        const auto fields = row.split('\t');
+        if (fields.size() >= 2 && fields[1] == "saved") {
+            ++saved;
+            const QImage restored(QDir(directory).filePath(
+                QString::fromUtf8(fields[0]) + QStringLiteral("_source.png")));
+            pixelsEqual &= restored == source;
+        }
+    }
+    std::cout << "Writer throughput report: " << directory.toStdString()
+        << "; size=" << source.width() << 'x' << source.height()
+        << "; queued=" << queued << "; saved=" << saved
+        << "; elapsed_ms=" << elapsed << std::endl;
+    return expect(queued == frameCount && saved == frameCount && pixelsEqual,
+        "full-size 10 Hz replay input capture must save every submitted exposure losslessly");
+}
+
+/** @brief 比较 Qt PNG 编码代价，区分图像压缩和后台队列容量问题。 */
+bool benchmarkPngEncoding(const QString &inputPath)
+{
+    const QImage source = QImage(inputPath).convertToFormat(QImage::Format_Grayscale8);
+    if (!expect(!source.isNull(), "PNG benchmark requires a readable image")) { return false; }
+    for (const int compression : {-1, 0, 20}) {
+        const auto start = std::chrono::steady_clock::now();
+        qint64 totalBytes = 0;
+        for (int index = 0; index < 8; ++index) {
+            QByteArray encoded;
+            QBuffer buffer(&encoded);
+            buffer.open(QIODevice::WriteOnly);
+            QImageWriter writer(&buffer, "PNG");
+            if (compression >= 0) { writer.setCompression(compression); }
+            if (!expect(writer.write(source), "encode PNG benchmark input")) { return false; }
+            totalBytes += encoded.size();
+        }
+        std::cout << "PNG benchmark compression=" << compression
+            << "; average_ms=" << std::chrono::duration<double, std::milli>(
+                std::chrono::steady_clock::now() - start).count() / 8.0
+            << "; average_bytes=" << totalBytes / 8 << std::endl;
+    }
+    return true;
+}
+/** @brief 在途字节计入容量；满队列后仍排空已接纳前缀，不能无限等待慢盘。 */
+bool testBoundedTextWriter(qsizetype maxBytes, std::size_t maxChunks)
+{
+    using i2r_rlc::ui::COnlineCorrectionTextWriter;
+    std::mutex mutex;
+    std::condition_variable condition;
+    bool entered = false;
+    bool released = false;
+    QByteArray output;
+    const auto caller = std::this_thread::get_id();
+    bool background = true;
+    COnlineCorrectionTextWriter writer([&](const QString &, const QByteArray &data, QString *) {
+        std::unique_lock<std::mutex> lock(mutex);
+        background &= std::this_thread::get_id() != caller;
+        entered = true;
+        condition.notify_all();
+        condition.wait(lock, [&]() { return released; });
+        output += data;
+        return true;
+    }, maxBytes, maxChunks);
+    writer.start();
+    bool ok = expect(writer.submit("fixture", "AAAA"), "first text chunk admitted");
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        ok &= expect(condition.wait_for(lock, std::chrono::seconds(2), [&]() { return entered; }),
+            "filesystem boundary is blocked before checking capacity");
+    }
+    ok &= expect(writer.submit("fixture", "BBBB") && !writer.submit("fixture", "C")
+        && !writer.submit("fixture", "D"), "capacity includes blocked in-flight data and rejects immediately");
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        released = true;
+    }
+    condition.notify_all();
+    writer.stop();
+    writer.stop();
+    ok &= expect(output == "AAAABBBB" && background && writer.rejectedChunks() == 2
+        && !writer.lastError().isEmpty() && !writer.flush(),
+        "stop drains accepted chunks once, in order, and preserves incomplete status");
+    return ok;
+}
+
+/** @brief 队列拒绝必须写入最终摘要，不能仅保留正常结束标记。 */
+bool testTextOverflowSummary(const QString &root)
+{
+    using namespace i2r_rlc;
+    ui::COnlineCorrectionRunRecorder recorder;
+    ui::RuntimeOnlineCorrectionConfiguration configuration;
+    configuration.visionDiagnostics.imagesEnabled = false;
+    QString error;
+    if (!expect(recorder.beginSession(root, configuration, &error) && recorder.flush(),
+            "prepare overflow recorder")) { return false; }
+    control::OnlineCorrectionUpdate update;
+    update.message.assign(9 * 1024 * 1024, 'x');
+    bool ok = expect(!recorder.recordUpdate(update, {}), "oversized text is rejected at the bounded queue");
+    ok &= expect(!recorder.finishSession("completed", "overflow fixture"),
+        "overflow is reported by session completion");
+    const auto rows = readRows(recorder.sessionDirectory(), "session_summary.txt");
+    ok &= expect(rows.contains("text_recording_complete\t0")
+        && !rows.contains("text_recording_complete\t1") && !recorder.lastError().isEmpty(),
+        "summary cannot claim text completeness after rejection");
+    return ok;
+}
+
+/** @brief 文件系统报告刷新失败时，即使数据可读也不能宣称完整；重启会话可恢复。 */
+bool testTextFlushFailure(const QString &root)
+{
+    using namespace i2r_rlc;
+    std::atomic<bool> failFlush{false};
+    ui::COnlineCorrectionRunRecorder recorder([&](const QString &path, const QByteArray &data, QString *error) {
+        QFile file(path);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Append) || file.write(data) != data.size()) {
+            *error = file.errorString();
+            return false;
+        }
+        if (failFlush.load() && path.endsWith("actual_robot_path.txt")) {
+            *error = QStringLiteral("injected flush failure after write");
+            return false;
+        }
+        const bool flushed = file.flush();
+        if (!flushed) { *error = file.errorString(); }
+        return flushed;
+    });
+    ui::RuntimeOnlineCorrectionConfiguration configuration;
+    configuration.visionDiagnostics.imagesEnabled = false;
+    QString error;
+    if (!expect(recorder.beginSession(root, configuration, &error) && recorder.flush(),
+            "prepare delayed flush failure fixture")) { return false; }
+    failFlush = true;
+    recorder.recordRobotState({}, control::OnlineCorrectionPhase::OnlineRunning);
+    bool ok = expect(!recorder.flush() && !recorder.finishSession("completed", "flush failure"),
+        "flush failure remains a failed completion even after write accepted bytes");
+    const auto failed = readRows(recorder.sessionDirectory(), "session_summary.txt");
+    ok &= expect(!failed.contains("text_recording_complete\t1")
+        && recorder.lastError().contains("injected flush failure"), "visible data cannot override a flush error");
+    failFlush = false;
+    ok &= expect(recorder.beginSession(root, configuration, &error)
+        && recorder.recordRobotState({}, control::OnlineCorrectionPhase::OnlineRunning)
+        && recorder.finishSession("completed", "fresh session"), "new session can recover from old recording error");
+    ok &= expect(readRows(recorder.sessionDirectory(), "session_summary.txt").contains("text_recording_complete\t1"),
+        "new session completeness is independent of prior failed writer");
+    return ok;
+}
+
+/** @brief 文件系统抛错时，结束会话也必须返回失败而不是让异常逃出 worker。 */
+bool testTextFailureFinalization(const QString &root)
+{
+    using namespace i2r_rlc;
+    std::atomic<bool> fail{false};
+    ui::COnlineCorrectionRunRecorder recorder([&](const QString &path, const QByteArray &data, QString *error) {
+        if (fail.load()) { throw std::runtime_error("injected filesystem failure"); }
+        QFile file(path);
+        const bool ok = file.open(QIODevice::WriteOnly | QIODevice::Append)
+            && file.write(data) == data.size();
+        if (!ok) { *error = file.errorString(); }
+        return ok;
+    });
+    ui::RuntimeOnlineCorrectionConfiguration configuration;
+    configuration.visionDiagnostics.imagesEnabled = false;
+    QString error;
+    if (!expect(recorder.beginSession(root, configuration, &error) && recorder.flush(),
+            "prepare failing filesystem")) { return false; }
+    fail = true;
+    recorder.recordRobotState({}, control::OnlineCorrectionPhase::OnlineRunning);
+    bool ok = expect(!recorder.flush() && !recorder.lastError().isEmpty(),
+        "background filesystem exception becomes a visible recording failure");
+    try {
+        ok &= expect(!recorder.finishSession("completed", "write failure"),
+            "failed filesystem cannot produce a successful finalization");
+    } catch (...) {
+        ok &= expect(false, "filesystem exception must not escape session finalization");
+    }
+    fail = false;
+    recorder.finishSession("error", "cleanup after injected failure");
+    return ok;
+}
 } // namespace
 
 int main(int argc, char **argv)
 {
     QCoreApplication application(argc, argv);
+    if (argc == 3 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--continuous-writer-contract")) {
+        const QString root = QDir::current().filePath(QStringLiteral(".scratch/preweld-structural-continuity-20261028/writer_%1")
+            .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
+        return testContinuousWriterThroughput(root, QString::fromLocal8Bit(argv[2])) ? 0 : 1;
+    }
+    if (argc == 3 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--png-encoding-benchmark")) {
+        return benchmarkPngEncoding(QString::fromLocal8Bit(argv[2])) ? 0 : 1;
+    }
+    if (argc > 1 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--text-writer-contract")) {
+        const QString root = QDir::temp().filePath(QStringLiteral("i2r_text_contract_%1")
+            .arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
+        bool ok = testBoundedTextWriter(8, 4);
+        ok &= testBoundedTextWriter(16, 2);
+        ok &= testTextFlushFailure(root);
+        ok &= testTextOverflowSummary(root);
+        ok &= testTextFailureFinalization(root);
+        std::cout << (ok ? "PASS" : "FAIL") << ": bounded text recording contracts\n";
+        return ok ? 0 : 1;
+    }
     using namespace i2r_rlc;
     ui::COnlineCorrectionRunRecorder recorder;
     ui::RuntimeOnlineCorrectionConfiguration configuration;
@@ -354,6 +657,7 @@ int main(int argc, char **argv)
     }
     if (!testImageMeasurementProvenance(root)) { return 1; }
     if (!testFirstLossWindow(root)) { return 1; }
+    if (!testContinuousReplayCapture(root)) { return 1; }
     control::OnlineCorrectionUpdate update;
     update.onlineIcpUpdated = true;
     update.phase = control::OnlineCorrectionPhase::OnlineRunning;
@@ -396,6 +700,7 @@ int main(int argc, char **argv)
     update.onlineIcpUpdated = false;
     update.realtimeCommand.valid = false;
     ok &= expect(recorder.recordUpdate(update, calibration), "ordinary status update");
+    ok &= expect(recorder.flush(), "drain accepted text before offline readback");
     const auto batches = readRows(recorder.sessionDirectory(), "online_icp_batches.txt");
     const auto points = readRows(recorder.sessionDirectory(), "online_icp_points.txt");
     const auto targets = readRows(recorder.sessionDirectory(), "online_follow_targets.txt");
@@ -495,6 +800,7 @@ int main(int argc, char **argv)
                  "record rejected frame without inventing observations");
     bool measuredTimingFound = false;
     bool missingTimingFound = false;
+    ok &= expect(recorder.flush(), "drain accepted text before offline readback");
     for (const auto &line : readRows(recorder.sessionDirectory(), "unified_session.jsonl")) {
         const auto event = QJsonDocument::fromJson(line).object();
         if (event.value("event") != "observation") { continue; }
@@ -521,6 +827,7 @@ int main(int argc, char **argv)
     tracking.diagnostic->algorithm.refinement.valid = false;
     ok &= expect(recorder.recordTrackingResult(tracking, control::OnlineCorrectionPhase::OnlineRunning),
                  "image pair cap must preserve numeric records");
+    ok &= expect(recorder.flush(), "drain accepted text before offline readback");
     const auto diagnosticRows = readRows(recorder.sessionDirectory(), "vision_diagnostics.tsv");
     ok &= expect(diagnosticRows.size() == 4, "all three result rows must persist");
     if (diagnosticRows.size() == 4) {
@@ -613,6 +920,7 @@ int main(int argc, char **argv)
     fusionDiagnostic.coarseObservationUsed = false;
     ok &= expect(recorder.recordTrackingResult(tracking, control::OnlineCorrectionPhase::OnlineRunning),
                  "record guided estimate even if caller forgot estimated provenance");
+    ok &= expect(recorder.flush(), "drain accepted text before offline readback");
     const auto guidedRows = readRows(recorder.sessionDirectory(), "vision_diagnostics.tsv");
     ok &= expect(guidedRows.size() == 5, "guided diagnostic numeric record must persist");
     if (guidedRows.size() == 5) {
@@ -690,6 +998,7 @@ int main(int argc, char **argv)
                  "disabled diagnostics must create neither diagnostic file nor images");
     ok &= expect(recorder.recordTrackingResult(tracking, control::OnlineCorrectionPhase::OnlineRunning),
                  "legacy recording must remain available when diagnostics are disabled");
+    ok &= expect(recorder.flush(), "drain accepted text before offline readback");
     const auto sourceRows = readRows(recorder.sessionDirectory(), "realtime_correction.txt");
     const auto sourceHeader = sourceRows.front().split('\t');
     const auto sourceRow = sourceRows.back().split('\t');

@@ -40,6 +40,12 @@ i2r_rlc_add_replay(i2r_rlc_kcf_detector_replay DetectorReplay
     "${replay_dir}/DetectorReplay.cpp" "${replay_dir}/GapDisabledAdapter.cpp"
     "${vision_dir}/third_party/libicp/matrix.cpp" ${detector_sources})
 target_link_libraries(i2r_rlc_kcf_detector_replay PRIVATE tinysplinecxx::tinysplinecxx)
+set(shoulder_sources ${detector_sources})
+list(REMOVE_ITEM shoulder_sources "${vision_dir}/src/track/LegacyOnlineKcfDetector.cpp")
+i2r_rlc_add_replay(i2r_rlc_kcf_shoulder_replay ShoulderReplay
+    "${replay_dir}/ShoulderReplay.cpp" "${replay_dir}/GapDisabledAdapter.cpp"
+    "${vision_dir}/third_party/libicp/matrix.cpp" ${shoulder_sources})
+target_link_libraries(i2r_rlc_kcf_shoulder_replay PRIVATE tinysplinecxx::tinysplinecxx)
 i2r_rlc_add_replay(i2r_rlc_kcf_identity_evidence IdentityEvidence "${replay_dir}/IdentityEvidence.cpp")
 i2r_rlc_add_replay(i2r_rlc_kcf_mother_observation MotherObservation "${replay_dir}/MotherObservation.cpp")
 i2r_rlc_add_replay(i2r_rlc_kcf_refiner_replay RefinerReplay
@@ -61,7 +67,7 @@ i2r_rlc_add_replay(i2r_rlc_kcf_control_replay ControlReplay
 # libicp 的公开头直接使用 Boost；独立回放不能借生产库间接获得头文件路径。
 find_package(Boost REQUIRED)
 target_link_libraries(i2r_rlc_kcf_control_replay PRIVATE Boost::headers)
-set(image_targets i2r_rlc_kcf_detector_replay i2r_rlc_kcf_identity_evidence
+set(image_targets i2r_rlc_kcf_detector_replay i2r_rlc_kcf_shoulder_replay i2r_rlc_kcf_identity_evidence
     i2r_rlc_kcf_mother_observation i2r_rlc_kcf_refiner_replay)
 foreach(target_name IN LISTS image_targets)
     target_include_directories(${target_name} PRIVATE ${OpenCV_INCLUDE_DIRS})

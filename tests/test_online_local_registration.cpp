@@ -1026,6 +1026,151 @@ bool testImageSurfaceSupportAndFrozenProjection()
     return ok;
 }
 
+/** @brief 仅估计接缝时排除未测中央区域，真实外围窄峰仍可形成母材云。 */
+bool testEstimatedSeamExcludesUnmeasuredTackSurface()
+{
+    ui::COnlineLocalRegistrationWorker worker(nullptr);
+    auto options = cloudOptions();
+    options.surfaceAssistedUpdatesEnabled = true;
+    worker.configure(options);
+    auto input = makeSurfaceInput(2101, 100);
+    input.frame.image = QImage(1292, 240, QImage::Format_Grayscale8);
+    input.frame.image.fill(0);
+    for (int y = 97; y <= 103; ++y) {
+        for (int x = 60; x <= 1200; ++x) {
+            input.frame.image.scanLine(y)[x] = static_cast<uchar>(255 - 35 * std::abs(y - 100));
+        }
+    }
+    input.observation.laserLineImagePoints_px.clear();
+    input.observation.laserLinePoints_mm.clear();
+    for (int x = 60; x <= 1200; x += 10) {
+        input.observation.laserLineImagePoints_px.push_back({static_cast<double>(x), 100.0});
+        input.observation.laserLinePoints_mm.push_back({0.5 * (x - 160), -10.0, 768.75});
+    }
+    input.seamImageXPixel = 490.0;
+    input.seamPointIsImageEstimate = true;
+    input.independentObservation.valid = false;
+    const auto estimated = worker.measureSurface(input);
+    bool ok = expect(estimated.valid && estimated.realPoints_mm.size() >= 24U,
+        "an image-constrained seam must retain available outside mother pixels");
+    bool hasLeft = false;
+    bool hasRight = false;
+    for (const auto &entry : estimated.evidenceContext
+        .value(QStringLiteral("raw_supported_surface_image_px")).toArray()) {
+        const double x = entry.toArray().at(0).toDouble();
+        hasLeft |= x < 390.0;
+        hasRight |= x > 620.0;
+        ok &= expect(x < 390.0 || x > 620.0,
+            "unmeasured central tack surface cannot become ICP mother evidence");
+    }
+    ok &= expect(hasLeft && hasRight, "both measured outer sides remain usable");
+    input.seamPointIsImageEstimate = false;
+    const auto measured = worker.measureSurface(input);
+    bool containsCentralOutsideNarrowMask = false;
+    for (const auto &entry : measured.evidenceContext
+        .value(QStringLiteral("raw_supported_surface_image_px")).toArray()) {
+        const double x = entry.toArray().at(0).toDouble();
+        containsCentralOutsideNarrowMask |= x >= 390.0 && x < 466.0;
+    }
+    ok &= expect(measured.valid && containsCentralOutsideNarrowMask,
+        "complete observed seams retain the existing narrow-mask sampling behavior");
+    return ok;
+}
+
+/**
+ * @brief 命令行诊断复用公开原图表面入口，导出指定排除中心下的实际取点。
+ * @details 输入为冻结曝光投影及原图；不求解、不写场景，不将估计点晋升独立焊点。
+ */
+bool replaySurfaceMasks(const QString &manifestPath, const QString &outputPath)
+{
+    QFile manifest(manifestPath);
+    QFile output(outputPath);
+    if (!manifest.open(QIODevice::ReadOnly) || !output.open(QIODevice::WriteOnly)) { return false; }
+    ui::COnlineLocalRegistrationWorker worker(nullptr);
+    auto options = cloudOptions();
+    options.surfaceAssistedUpdatesEnabled = true;
+    worker.configure(options);
+    while (!manifest.atEnd()) {
+        const auto row = QJsonDocument::fromJson(manifest.readLine()).object();
+        if (row.isEmpty()) { return false; }
+        const auto frameId = static_cast<qint64>(row.value(QStringLiteral("frame_id")).toDouble());
+        auto input = makeSurfaceInput(frameId, 100);
+        input.frame.image = QImage(row.value(QStringLiteral("image")).toString());
+        if (input.frame.image.isNull()) { return false; }
+        input.seamImageXPixel = row.value(QStringLiteral("seam_x")).toDouble();
+        input.seamPointIsImageEstimate = row.value(QStringLiteral("image_estimate")).toBool();
+        input.independentObservation.valid = false;
+        const auto projection = row.value(QStringLiteral("projection")).toObject();
+        const auto calibration = projection.value(QStringLiteral("calibration")).toObject();
+        auto &sensor = input.trackingOptions.sensorCalibration;
+        sensor.focalLengthM = calibration.value(QStringLiteral("focal_length_m")).toDouble();
+        sensor.kappa = calibration.value(QStringLiteral("kappa")).toDouble();
+        sensor.sxM = calibration.value(QStringLiteral("sx_m")).toDouble();
+        sensor.syM = calibration.value(QStringLiteral("sy_m")).toDouble();
+        sensor.cxPixel = calibration.value(QStringLiteral("cx_pixel")).toDouble();
+        sensor.cyPixel = calibration.value(QStringLiteral("cy_pixel")).toDouble();
+        sensor.laserPlaneA = calibration.value(QStringLiteral("laser_plane_a")).toDouble();
+        sensor.laserPlaneB = calibration.value(QStringLiteral("laser_plane_b")).toDouble();
+        sensor.laserPlaneC = calibration.value(QStringLiteral("laser_plane_c")).toDouble();
+        const auto transform = [&projection](const char *key, Eigen::Affine3d &result) {
+            const auto values = projection.value(QLatin1String(key)).toArray();
+            if (values.size() != 12) { return false; }
+            for (const auto &value : values) {
+                if (!value.isDouble() || !std::isfinite(value.toDouble())) { return false; }
+            }
+            result = Eigen::Affine3d::Identity();
+            for (int index = 0; index < 9; ++index) {
+                result.linear()(index / 3, index % 3) = values[index].toDouble();
+            }
+            for (int index = 0; index < 3; ++index) {
+                result.translation()(index) = values[index + 9].toDouble();
+            }
+            return true;
+        };
+        Eigen::Affine3d camera;
+        Eigen::Affine3d tool;
+        Eigen::Affine3d positioner;
+        // 冻结投影损坏时必须失败，不能用单位矩阵伪造有效空间上下文。
+        if (!transform("camera_in_tool", camera)
+            || !transform("tool_in_robot_base", tool)
+            || !transform("robot_base_to_positioner_tcp", positioner)) { return false; }
+        constexpr double radiansToDegrees = 180.0 / 3.14159265358979323846;
+        const Eigen::Vector3d cameraAngles = camera.linear().eulerAngles(2, 1, 0) * radiansToDegrees;
+        sensor.cameraXInToolM = camera.translation().x() / 1000.0;
+        sensor.cameraYInToolM = camera.translation().y() / 1000.0;
+        sensor.cameraZInToolM = camera.translation().z() / 1000.0;
+        sensor.cameraRxInToolDeg = cameraAngles.z();
+        sensor.cameraRyInToolDeg = cameraAngles.y();
+        sensor.cameraRzInToolDeg = cameraAngles.x();
+        const Eigen::Vector3d toolAngles = tool.linear().eulerAngles(2, 1, 0) * radiansToDegrees;
+        input.robotState.curx_r = static_cast<long>(std::lround(tool.translation().x() * 1000.0));
+        input.robotState.cury_r = static_cast<long>(std::lround(tool.translation().y() * 1000.0));
+        input.robotState.curz_r = static_cast<long>(std::lround(tool.translation().z() * 1000.0));
+        input.robotState.curRx_r = static_cast<long>(std::lround(toolAngles.z() * 10000.0));
+        input.robotState.curRy_r = static_cast<long>(std::lround(toolAngles.y() * 10000.0));
+        input.robotState.curRz_r = static_cast<long>(std::lround(toolAngles.x() * 10000.0));
+        // 冻结矩阵已包含当时轴角/TCP偏置，诊断等价表示不再重复施加。
+        input.trackingOptions.positionerCalibration.stationBaseInRobotBase = positioner;
+        input.trackingOptions.positionerCalibration.toolTcpInLastLinkMm.setZero();
+        input.observation.laserLineImagePoints_px.clear();
+        for (const auto &point : row.value(QStringLiteral("sim_line")).toArray()) {
+            const auto xy = point.toArray();
+            input.observation.laserLineImagePoints_px.push_back({xy.at(0).toDouble(), xy.at(1).toDouble()});
+        }
+        const auto measured = worker.measureSurface(input);
+        const QJsonObject result{
+            {QStringLiteral("frame_id"), static_cast<double>(frameId)},
+            {QStringLiteral("label"), row.value(QStringLiteral("label"))},
+            {QStringLiteral("valid"), measured.valid},
+            {QStringLiteral("message"), measured.message},
+            {QStringLiteral("real_count"), static_cast<int>(measured.realPoints_mm.size())},
+            {QStringLiteral("evidence"), measured.evidenceContext}};
+        const auto bytes = QJsonDocument(result).toJson(QJsonDocument::Compact) + '\n';
+        if (output.write(bytes) != bytes.size()) { return false; }
+    }
+    return output.flush();
+}
+
 /** @brief 生产图像入口缺少独立同帧原始焊点或归档时必须拒绝，并丢弃半窗。 */
 bool testImageIndependentObservationFaults()
 {
@@ -1175,6 +1320,9 @@ bool testArchivedSurfaceRecovery(const QString &directory)
 int main(int argc, char **argv)
 {
     QCoreApplication application(argc, argv);
+    if (argc == 4 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--surface-mask-replay")) {
+        return replaySurfaceMasks(QString::fromLocal8Bit(argv[2]), QString::fromLocal8Bit(argv[3])) ? 0 : 1;
+    }
     if (argc == 3 && QString::fromLocal8Bit(argv[1]) == QStringLiteral("--recovery-fixtures")) {
         return testArchivedSurfaceRecovery(QString::fromLocal8Bit(argv[2])) ? 0 : 1;
     }
@@ -1217,6 +1365,7 @@ int main(int argc, char **argv)
     std::cerr << "RUN: testImageIndependentObservationFaults\n";
     ok &= testImageIndependentObservationFaults();
     ok &= testImageSurfaceSupportAndFrozenProjection();
+    ok &= testEstimatedSeamExcludesUnmeasuredTackSurface();
     if (ok) {
         std::cout << "PASS: online local registration tests\n";
     }

@@ -366,6 +366,10 @@ COnlineLocalRegistrationWorker::measureSurface(const Input &input) const
         const QImage rawImage = (input.frame.image.isNull()
             ? input.frame.previewImage : input.frame.image)
             .convertToFormat(QImage::Format_Grayscale8);
+        // 受图像约束估计不能证明中央预焊表面是母材；沿用检测器外围
+        // 支撑带的中央边界，只有完整接缝观测才使用原有窄排除带。
+        const double exclusionLeft = input.seamPointIsImageEstimate ? 100.0 : 24.0;
+        const double exclusionRight = input.seamPointIsImageEstimate ? 130.0 : 24.0;
         int rawCandidates = 0;
         int rawSupported = 0;
         int rawWideRejected = 0;
@@ -376,7 +380,8 @@ COnlineLocalRegistrationWorker::measureSurface(const Input &input) const
         for (std::size_t index = 0; index < extracted.realLaserLineImagePoints_px.size(); index += 5U) {
             if (!m_options.surfaceAssistedUpdatesEnabled) { break; }
             const auto &pixel = extracted.realLaserLineImagePoints_px[index];
-            if (std::abs(pixel.x_px - seamX) <= 24.0) { continue; }
+            if (pixel.x_px >= seamX - exclusionLeft
+                && pixel.x_px <= seamX + exclusionRight) { continue; }
             ++rawCandidates;
             bool widePeak = false;
             if (!rawSurfaceSupport(rawImage, pixel.x_px, pixel.y_px, widePeak)) {
@@ -448,7 +453,11 @@ COnlineLocalRegistrationWorker::measureSurface(const Input &input) const
             {QStringLiteral("raw_surface_minimum_support_ratio"), 0.6},
             {QStringLiteral("raw_surface_support_gate_enabled"), m_options.surfaceAssistedUpdatesEnabled},
             {QStringLiteral("surface_seam_exclusion_half_width_px"),
-                m_options.surfaceAssistedUpdatesEnabled ? 24 : 0},
+                m_options.surfaceAssistedUpdatesEnabled
+                    ? std::max(exclusionLeft, exclusionRight) : 0.0},
+            {QStringLiteral("surface_seam_exclusion_left_px"), exclusionLeft},
+            {QStringLiteral("surface_seam_exclusion_right_px"), exclusionRight},
+            {QStringLiteral("surface_seam_image_estimate"), input.seamPointIsImageEstimate},
             {QStringLiteral("real_seam_exclusion_center_x_px"), seamX},
             {QStringLiteral("virtual_pixel_point_pairing_available"),
                 virtualPixels.size() == input.observation.laserLinePoints_mm.size()},

@@ -1,4 +1,4 @@
-﻿find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(cppzmq CONFIG REQUIRED)
 find_package(PCL CONFIG REQUIRED COMPONENTS
@@ -1243,3 +1243,13 @@ add_test(NAME i2r_rlc_online_local_registration_recovery_replay_tests
     COMMAND i2r_rlc_online_local_registration_tests --recovery-fixtures
         "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/local_registration_recovery_20261026")
 i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_online_local_registration_recovery_replay_tests)
+
+add_test(NAME i2r_rlc_slow_recording_control_contract_tests
+    COMMAND i2r_rlc_runtime_tracking_flow_tests --slow-recording-control-contract)
+i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_slow_recording_control_contract_tests)
+add_test(NAME i2r_rlc_realtime_backpressure_contract_tests
+    COMMAND i2r_rlc_runtime_tracking_flow_tests --realtime-backpressure-contract)
+i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_realtime_backpressure_contract_tests)
+add_test(NAME i2r_rlc_text_writer_contract_tests
+    COMMAND i2r_rlc_online_correction_run_recorder_tests --text-writer-contract)
+i2r_rlc_apply_opencv_test_runtime_path(i2r_rlc_text_writer_contract_tests)

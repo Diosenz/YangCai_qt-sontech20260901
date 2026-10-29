@@ -653,6 +653,8 @@ private:
     RuntimeTrackingOptions m_trackingOptions;
     /// @brief 与在线 Control 配置同源的标定快照，包含无效配置的拒绝语义。
     std::optional<vision::PositionerCalibration> m_onlinePositionerCalibration;
+    /// @brief 与在线记录器同源的诊断策略，持续整个会话，不随启动事务清理。
+    COnlineVisionDiagnosticOptions m_onlineVisionDiagnosticOptions;
     vision::WeldProjectionContext m_trackingProjectionContext;
     RuntimeTrackingPurpose m_trackingPurpose = RuntimeTrackingPurpose::None;
     CorrectionRunSession m_correctionSession;

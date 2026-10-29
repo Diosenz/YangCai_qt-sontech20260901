@@ -315,12 +315,15 @@ bool ConfigRepository::loadOnlineVisionDiagnostics(
         const QString value = line.mid(separator + 1).trimmed();
         valid = valid && separator > 0 && !keys.contains(key);
         keys.insert(key);
-        if (key == QStringLiteral("enabled") || key == QStringLiteral("images_enabled")) {
+        if (key == QStringLiteral("enabled") || key == QStringLiteral("images_enabled")
+            || key == QStringLiteral("replay_capture_enabled")) {
             valid = valid && (value == QStringLiteral("true") || value == QStringLiteral("false"));
             if (key == QStringLiteral("enabled")) {
                 parsed.enabled = value == QStringLiteral("true");
-            } else {
+            } else if (key == QStringLiteral("images_enabled")) {
                 parsed.imagesEnabled = value == QStringLiteral("true");
+            } else {
+                parsed.replayCaptureEnabled = value == QStringLiteral("true");
             }
         } else {
             bool converted = false;
@@ -336,6 +339,12 @@ bool ConfigRepository::loadOnlineVisionDiagnostics(
                 if (valid) {
                     parsed.maxImagePairs = static_cast<int>(number);
                 }
+            } else if (key == QStringLiteral("replay_max_frames")) {
+                valid = valid && number >= 1 && number <= 10000;
+                if (valid) { parsed.replayMaxFrames = static_cast<int>(number); }
+            } else if (key == QStringLiteral("replay_max_bytes")) {
+                valid = valid && number >= 1 && number <= 1024LL * 1024 * 1024;
+                if (valid) { parsed.replayMaxBytes = number; }
             } else if (key == QStringLiteral("max_image_bytes")) {
                 valid = valid && number >= 0 && number <= 1024LL * 1024 * 1024;
                 if (valid) {

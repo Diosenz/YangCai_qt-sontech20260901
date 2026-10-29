@@ -38,6 +38,7 @@
 #include <QImage>
 #include <QMetaType>
 #include <QString>
+#include <QStringList>
 
 #include "CameraFrame.h"
 #include "OnlineVisionDiagnosticOptions.h"
@@ -314,6 +315,13 @@ struct CRuntimeTrackingDiagnostic {
     QImage enhancedImage;
     /// @brief 临时首丢窗口的自持有原图；在线 recorder 仅保留有界历史。
     QImage lossWindowSourceImage;
+    /// @brief 连续回放专用：冻结实际传入检测器的参考/参数，不从 UI 最新状态补造。
+    std::optional<digital_twin::DigitalTwinVisionLaserObservation> replayObservation;
+    std::optional<vision::LegacyOnlineKcfOptions> replayOptions;
+    /// @brief 实际送入 process 的 CV_8UC1 像素快照，避免 Qt/OpenCV 彩色转灰差异。
+    QImage replaySourceImage;
+    /// @brief 自上一次 process 以来实际发生的 reset/restart/gap，按调用顺序保存。
+    QStringList replayDetectorActions;
 };
 
 /**

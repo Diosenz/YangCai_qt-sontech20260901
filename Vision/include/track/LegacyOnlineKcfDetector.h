@@ -34,6 +34,23 @@ struct LegacyOnlineKcfOptions {
     KcfFusionOptions fusion;
     /// @brief 正式在线采用仿真模板初始化和当前图像相关观测；几何仅补充独立资格。
     bool enablePaperTracking = false;
+    /// @brief 正常响应区间倍数；用于实拍更新及异常观测降权，不替代目标身份。
+    double paperPsrSigma = 3.0;
+    /// @brief 二维位置融合的过程噪声；单位为像素平方。
+    double paperProcessNoise = 0.03;
+    /// @brief 观测噪声上下界；按当前图像质量插值，单位为像素平方。
+    double paperObservationNoiseMinimum = 0.0015;
+    double paperObservationNoiseMaximum = 0.3;
+    /// @brief 成熟PSR异常时的观测噪声倍数；不撤销已确认的原图几何。
+    double paperAbnormalNoiseMultiplier = 10.0;
+    /// @brief 离线对照：双肩部分观测参与位置融合并保留状态，默认关闭。
+    bool paperFusePartialObservations = false;
+    /// @brief 双肩仍有支持时仅保留状态，不改写部分观测位置或可靠虚实偏差。
+    bool paperKeepPartialState = true;
+    /// @brief 外围母材条纹辅助遮挡估计；不授予独立几何，不采用仿真绝对位置。
+    bool paperUseMotherBranches = false;
+    /// @brief 部分图像约束的噪声倍数；部分观测不改写可靠虚实偏差。
+    double paperPartialNoiseMultiplier = 10.0;
     /// @brief 可选只读阶段计时；不参与检测、训练或控制资格判断。
     bool enablePerformanceDiagnostics = false;
     /// @brief 正式在线与生产策略回放共用；legacy 入口保持既有行为。
@@ -153,6 +170,11 @@ struct CLegacyOnlineKcfDiagnostic {
     double centerObservationQuality = 0.0;
     /// @brief 实拍训练要求当前完整外观得到支持；统计不足时不把未校准PSR当正常证明。
     bool completeAppearanceSupported = false;
+    /// @brief 当帧双侧外围条纹通过窄峰、支撑及方向验收；估计不能刷新可靠种子。
+    bool motherBranchesSupported = false;
+    bool motherBranchesSeeded = false;
+    bool motherBranchEstimateUsed = false;
+    cv::Point2d motherBranchPoint{-1.0, -1.0};
     CKcfUpdateDiagnostic tracker;
 };
 
@@ -247,7 +269,7 @@ private:
      * @details 在视觉线程调用，参考缺失/跳变/版本切换即废弃偏差；不更新工件位姿。
      */
     cv::Point2d fusePaperPosition(const cv::Point2d &observedPoint,
-        bool reliableObservation, const LegacyOnlineKcfOptions &options,
+        bool reliableObservation, bool constrainedObservation, const LegacyOnlineKcfOptions &options,
         CLegacyOnlineKcfDiagnostic &diagnostic);
 
     /// @brief 仅供当前焊缝局部相邻曝光使用；不能当作永久虚实标定。
@@ -260,6 +282,44 @@ private:
         bool hasBias = false;
     };
     PaperPositionState m_paperPosition;
+    /**
+     * @brief 已确认接缝几何与仿真点的局部差，仅用于当前原图重捕获提案。
+     * @details 与逐帧相关位置融合分开，局部外观续测不能递推移动此基准；
+     * 参考版本、焊缝、图像尺寸或会话变化时撤销，不直接产生输出或控制资格。
+     */
+    struct PaperGeometryReference {
+        cv::Point2d localBias;
+        double leftSlope = 0.0;
+        double rightSlope = 0.0;
+        std::uint64_t referenceRevision = 0;
+        bool valid = false;
+    };
+    PaperGeometryReference m_paperGeometryReference;
+    /**
+     * @brief 同一视觉线程内的近期外围条纹模型，与独立几何锚和位置滤波偏差分离。
+     * @details 法向偏差只由完整可见接缝和同帧原图校准；后续仅移动有实拍支持的线，
+     * 不能用估计点递推校准。时间、尺寸、焊缝或会话失效时废弃；
+     * 虚拟工件位姿刷新不移动实拍像素，仍须逐曝光通过当前双侧条纹校核。
+     */
+    struct PaperMotherBranches {
+        /// @brief 原始可靠接缝外观；双侧持续可见期间不随递推实拍模板改写身份。
+        cv::Mat identityPatch;
+        std::array<cv::Vec2d, 2> lines{};
+        std::array<cv::Vec2i, 2> ranges{};
+        std::array<double, 2> offsets{};
+        std::array<double, 2> seedSlopes{};
+        std::int64_t seededMs = -1;
+        std::int64_t observedMs = -1;
+        bool valid = false;
+    };
+    PaperMotherBranches m_paperMotherBranches;
+    /** @brief 从当前原图外围重测两侧条纹；不足时不产生二维位置或延长种子寿命。 */
+    cv::Point2d observePaperMotherBranches(const cv::Mat &gray8,
+        const LegacyOnlineKcfOptions &options);
+    /** @brief 完整接缝建立模型；当前双侧仍支持旧模型时保留其身份和法向偏置。 */
+    bool seedPaperMotherBranches(const cv::Mat &gray8,
+        const OnlineSeamRefinementResult &geometry,
+        const LegacyOnlineKcfOptions &options, bool currentMotherSupported);
     std::unique_ptr<CKcfTracker> m_tracker;
     COnlineSeamContinuity m_continuity;
     COnlineSeamEvidence m_evidence;
@@ -314,6 +374,8 @@ private:
     };
     BoundedImageSearchState m_boundedImageSearch;
     bool m_boundedImageSearchAmbiguous = false;
+    /// @brief 扩大搜索期间轮转保留当前图像的局部几何机会，避免清晰恢复后饿死校核。
+    bool m_paperLocalRefinementTurn = false;
 };
 
 } // namespace i2r_rlc::vision

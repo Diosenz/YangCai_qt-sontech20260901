@@ -182,6 +182,36 @@ QString pointValue(
 
 } // namespace
 
+COnlineCorrectionRunRecorder::COnlineCorrectionRunRecorder()
+    : COnlineCorrectionRunRecorder([](const QString &path, const QByteArray &data, QString *error) {
+        QFile file(path);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Append)
+            || file.write(data) != data.size() || !file.flush()) {
+            *error = file.errorString();
+            return false;
+        }
+        return true;
+    })
+{
+}
+
+COnlineCorrectionRunRecorder::~COnlineCorrectionRunRecorder()
+{
+    if (m_active) { finishSession(QStringLiteral("interrupted"), QStringLiteral("记录器回收。")); }
+}
+
+bool COnlineCorrectionRunRecorder::flush()
+{
+    const bool written = !m_textWriter || m_textWriter->flush();
+    if (!written) { m_lastError = m_textWriter->lastError(); }
+    return written;
+}
+
+COnlineCorrectionRunRecorder::COnlineCorrectionRunRecorder(TextAppendFunction append)
+    : m_textAppend(std::move(append))
+{
+}
+
 bool COnlineCorrectionRunRecorder::beginSession(
     const QString &outputRootDirectory,
     const RuntimeOnlineCorrectionConfiguration &configuration,
@@ -194,6 +224,8 @@ bool COnlineCorrectionRunRecorder::beginSession(
     }
     m_imageWriter.reset();
     m_lossImageWriter.reset();
+    m_replayImageWriter.reset();
+    m_replaySequence = 0;
     m_lossHistory.clear();
     m_lossTriggered = {};
     m_lossUnavailableTriggered = {};
@@ -399,10 +431,44 @@ bool COnlineCorrectionRunRecorder::beginSession(
             }
         }
     }
+    if (m_visionDiagnosticOptions.enabled && m_visionDiagnosticOptions.imagesEnabled
+        && m_visionDiagnosticOptions.replayCaptureEnabled) {
+        const QString replayDirectory = QDir(m_sessionDirectory).filePath(QStringLiteral("replay_images"));
+        if (!QDir().mkpath(replayDirectory)
+            || !createSessionFile(QStringLiteral("replay_images/image_manifest.tsv"),
+                QStringLiteral("stem\tstatus\tencoded_bytes\n"))
+            || !createSessionFile(QStringLiteral("replay_context.jsonl"), {})
+            || !createSessionFile(QStringLiteral("replay_index.tsv"),
+                QStringLiteral("sequence\tframe_id\trequest_status\tsource_image\n"))) {
+            if (errorMessage != nullptr) { *errorMessage = m_lastError; }
+            return false;
+        }
+        try {
+            m_replayImageWriter = std::make_unique<CTrackingDiagnosticImageWriter>(
+                replayDirectory, m_visionDiagnosticOptions.replayMaxBytes, 8);
+        } catch (const std::exception &exception) {
+            m_lastError = QStringLiteral("无法启动连续回放写入线程：%1").arg(QString::fromUtf8(exception.what()));
+            if (errorMessage != nullptr) { *errorMessage = m_lastError; }
+            return false;
+        }
+    }
+    try {
+        m_textWriter = std::make_unique<COnlineCorrectionTextWriter>(m_textAppend, 8 * 1024 * 1024, 4096);
+        m_textWriter->start();
+    } catch (const std::exception &exception) {
+        m_lastError = QStringLiteral("无法启动文本记录线程：%1").arg(QString::fromUtf8(exception.what()));
+        if (errorMessage != nullptr) { *errorMessage = m_lastError; }
+        return false;
+    }
     m_active = true;
     const bool summaryWritten =
-        appendSummary(QStringLiteral("session_state"), QStringLiteral("running"))
+        appendSummary(QStringLiteral("text_recording_complete"), QStringLiteral("0"))
+        && appendSummary(QStringLiteral("session_state"), QStringLiteral("running"))
         && appendSummary(QStringLiteral("vision_diagnostics_schema"), QStringLiteral("9"))
+        && appendSummary(QStringLiteral("replay_capture_schema"), QStringLiteral("1"))
+        && appendSummary(QStringLiteral("replay_capture_enabled"), boolText(m_replayImageWriter != nullptr))
+        && appendSummary(QStringLiteral("replay_max_frames"), QString::number(m_visionDiagnosticOptions.replayMaxFrames))
+        && appendSummary(QStringLiteral("replay_max_bytes"), QString::number(m_visionDiagnosticOptions.replayMaxBytes))
         && appendSummary(QStringLiteral("debug_kcf_20261026_loss_window"),
             m_lossImageWriter ? QStringLiteral("pre=6;post=8;first_rejection_and_first_pixel_unavailable_per_stage;never_acquired_after_8_rejections;raw_history=16MiB;disk=64MiB;queue=32;processed_exposures_only;control_snapshot_at_result_receipt") : QStringLiteral("disabled"))
         && appendSummary(QStringLiteral("kcf_policy"), QStringLiteral("production_cpp_evidence_v2; online_continuous_kcf; measured_or_estimated_following; independent_geometry_only_icp"))
@@ -579,6 +645,7 @@ bool COnlineCorrectionRunRecorder::recordTrackingResult(
             : QJsonValue(QJsonValue::Null)},
         {QStringLiteral("space_parent_tcp_mm"), sessionPoint(result.sample.point)},
         {QStringLiteral("message"), result.message}};
+    observation.insert(QStringLiteral("trigger_accepted"), result.triggerAccepted);
     observation.insert(QStringLiteral("performance"), QJsonValue(QJsonValue::Null));
     if (result.diagnostic.has_value()) {
         const auto &diagnostic = *result.diagnostic;
@@ -604,6 +671,27 @@ bool COnlineCorrectionRunRecorder::recordTrackingResult(
         observation.insert(QStringLiteral("exposure_robot_state"), sessionRobotState(diagnostic.robotState));
         observation.insert(QStringLiteral("robot_state_received_ms"), QString::number(diagnostic.robotStateReceivedMs));
         const auto &algorithm = diagnostic.algorithm;
+        observation.insert(QStringLiteral("paper_tracking"), QJsonObject{
+            {"response_psr", algorithm.tracker.responsePsr},
+            {"response_template_count", algorithm.tracker.responseTemplateCount},
+            {"statistics_ready", algorithm.responseStatisticsReady},
+            {"normal_samples", algorithm.normalResponseSamples},
+            {"normal_mean", algorithm.normalResponseMean},
+            {"normal_std", algorithm.normalResponseStd},
+            {"response_normal", algorithm.responseNormal},
+            {"training_committed", algorithm.tracker.trainingCommitted},
+            {"training_rejected", algorithm.tracker.trainingRejected},
+            {"training_from_simulation", algorithm.tracker.trainingFromSimulation},
+            {"complete_appearance", algorithm.completeAppearanceSupported},
+            {"mother_supported", algorithm.motherBranchesSupported},
+            {"mother_seeded", algorithm.motherBranchesSeeded},
+            {"mother_used", algorithm.motherBranchEstimateUsed},
+            {"mother_point", algorithm.motherBranchesSupported
+                ? QJsonValue(QJsonArray{algorithm.motherBranchPoint.x, algorithm.motherBranchPoint.y})
+                : QJsonValue(QJsonValue::Null)},
+            {"shoulder_accepted", algorithm.shoulderObservationAccepted},
+            {"shoulder_quality", algorithm.shoulderObservationQuality},
+            {"center_quality", algorithm.centerObservationQuality}});
         // 原始已验收图像观测与融合先验单列；未执行融合时不补造先验或增益。
         observation.insert(QStringLiteral("position_fusion"), QJsonObject{
             {QStringLiteral("applied"), algorithm.positionFusionApplied},
@@ -648,11 +736,36 @@ bool COnlineCorrectionRunRecorder::submitLossFrame(
     return indexed && contextWritten;
 }
 
+bool COnlineCorrectionRunRecorder::recordReplayFrame(const CLossFrame &frame, QJsonObject context)
+{
+    if (!m_replayImageWriter) { return true; }
+    ++m_replaySequence;
+    const QString path = QStringLiteral("replay_images/%1_source.png").arg(frame.stem);
+    context["image"] = path;
+    context["image_availability"] = QStringLiteral("consult replay_index.tsv and replay_images/image_manifest.tsv; queued is not saved");
+    context["capture_sequence"] = static_cast<qint64>(m_replaySequence);
+    context["input_image_kind"] = QStringLiteral("detector_gray8");
+    context["image_size"] = QJsonArray{frame.source.width(), frame.source.height()};
+    QString status;
+    if (m_replaySequence > static_cast<quint64>(m_visionDiagnosticOptions.replayMaxFrames)) {
+        status = QStringLiteral("frame_limit");
+    } else if (frame.source.isNull()) {
+        status = QStringLiteral("source_missing_or_oversize");
+    } else {
+        status = m_replayImageWriter->submit(frame.stem, frame.source, QImage(), 0,
+            m_visionDiagnosticOptions.replayMaxBytes);
+    }
+    const bool indexed = appendFields(QStringLiteral("replay_index.tsv"), {
+        QString::number(m_replaySequence), QString::number(frame.frameId), status, path});
+    return appendData(QStringLiteral("replay_context.jsonl"),
+        QJsonDocument(context).toJson(QJsonDocument::Compact) + '\n') && indexed;
+}
+
 bool COnlineCorrectionRunRecorder::recordLossWindow(
     const RuntimeTrackingResult &result, control::OnlineCorrectionPhase phase,
     const control::OnlineCorrectionTargetSnapshot &target)
 {
-    if (!m_lossImageWriter || !result.diagnostic.has_value() || !result.triggerAccepted
+    if ((!m_lossImageWriter && !m_replayImageWriter) || !result.diagnostic.has_value() || !result.triggerAccepted
         || result.correlation.purpose != CorrectionPurpose::OnlineCorrection) {
         return true;
     }
@@ -665,8 +778,6 @@ bool COnlineCorrectionRunRecorder::recordLossWindow(
         m_lossRejected = m_lossPostRemaining = 0;
         m_lossLastFrame = -1;
     }
-    if (m_lossTriggered[stage] && m_lossUnavailableTriggered[stage]
-        && m_lossPostRemaining == 0) { return true; }
     // 重复/乱序结果保留在数值日志中，不能伪装成窗口里的新增曝光。
     if (result.frameId < 0 || result.frameId <= m_lossLastFrame) { return true; }
     m_lossLastFrame = result.frameId;
@@ -696,7 +807,8 @@ bool COnlineCorrectionRunRecorder::recordLossWindow(
     context["valid"] = result.valid;
     context["control_eligible"] = result.controlEligible;
     context["gate_detail"] = QString::fromStdString(evidence.debugDetail);
-    const auto &options = evidence.debugOptions;
+    const auto &options = diagnostic.replayOptions.has_value()
+        ? diagnostic.replayOptions->evidenceOptions : evidence.debugOptions;
     context["evidence_options"] = QJsonObject{
         {"enable_mother_constraints", options.enableMotherConstraints},
         {"enable_continuous_output", options.enableContinuousOutput},
@@ -753,6 +865,56 @@ bool COnlineCorrectionRunRecorder::recordLossWindow(
         const auto &offset = result.displayPositionerCalibration->toolTcpInLastLinkMm;
         context["positioner_tool_tcp_offset_mm"] = QJsonArray{offset.x(), offset.y(), offset.z()};
     }
+    context["paper_tracking"] = true;
+    context["image_size"] = QJsonArray{frame.source.width(), frame.source.height()};
+    context["detector_actions"] = QJsonArray::fromStringList(diagnostic.replayDetectorActions);
+    context["detector_input_complete"] = diagnostic.replayObservation.has_value()
+        && diagnostic.replayOptions.has_value() && context.contains("projection");
+    context["simulation_valid"] = false;
+    context["has_weld_point"] = false;
+    context["sim_line"] = QJsonArray{};
+    context["seam_index"] = -1;
+    if (diagnostic.replayObservation.has_value()) {
+        const auto &reference = *diagnostic.replayObservation;
+        context["simulation_frame_id"] = reference.frameId;
+        context["simulation_valid"] = reference.valid;
+        context["has_weld_point"] = reference.hasWeldPointImage_px;
+        context["seam_index"] = reference.seamIndex;
+        if (reference.valid && reference.hasWeldPointImage_px) {
+            context["sim_point"] = QJsonArray{reference.weldPointImage_px.x_px, reference.weldPointImage_px.y_px};
+        }
+        QJsonArray line;
+        for (const auto &pixel : reference.laserLineImagePoints_px) {
+            line.append(QJsonArray{pixel.x_px, pixel.y_px});
+        }
+        context["sim_line"] = line;
+    }
+    if (diagnostic.replayOptions.has_value()) {
+        context["evidence_policy"] = diagnostic.replayOptions->enableEvidencePolicy;
+        context["enable_gap"] = diagnostic.replayOptions->enableGapDetection;
+        context["bounded_search"] = diagnostic.replayOptions->enableBoundedImageSearch;
+        context["paper_tracking"] = diagnostic.replayOptions->enablePaperTracking;
+        const auto &paper = *diagnostic.replayOptions;
+        context["paper_options"] = QJsonObject{
+            {"psr_sigma", paper.paperPsrSigma},
+            {"process_noise", paper.paperProcessNoise},
+            {"noise_minimum", paper.paperObservationNoiseMinimum},
+            {"noise_maximum", paper.paperObservationNoiseMaximum},
+            {"abnormal_multiplier", paper.paperAbnormalNoiseMultiplier},
+            {"fuse_partial", paper.paperFusePartialObservations},
+            {"keep_partial_state", paper.paperKeepPartialState},
+            {"partial_multiplier", paper.paperPartialNoiseMultiplier},
+            {"branch_constraints", paper.paperUseMotherBranches}};
+        const auto &inputContext = diagnostic.replayOptions->evidenceContext;
+        context["reference_point_at_exposure"] = inputContext.referencePixel.has_value()
+            ? QJsonValue(QJsonArray{inputContext.referencePixel->x, inputContext.referencePixel->y}) : QJsonValue();
+        context["reference_exposure_frame_id"] = inputContext.referenceExposureFrameId;
+    }
+    CLossFrame replayFrame = frame;
+    replayFrame.source = diagnostic.replaySourceImage;
+    const bool replayWritten = recordReplayFrame(replayFrame, context);
+    if (!m_lossImageWriter || (m_lossTriggered[stage] && m_lossUnavailableTriggered[stage]
+        && m_lossPostRemaining == 0)) { return replayWritten; }
     frame.context = QJsonDocument(context).toJson(QJsonDocument::Compact) + '\n';
     const bool accepted = result.valid && (!result.evidencePolicyEnabled || result.controlEligible);
     m_lossSeenValid[stage] = m_lossSeenValid[stage] || accepted;
@@ -764,7 +926,7 @@ bool COnlineCorrectionRunRecorder::recordLossWindow(
     // 两类共用16MiB历史及64MiB写盘预算，不改变检测和控制判据。
     const bool firstUnavailable = !m_lossUnavailableTriggered[stage] && pixelUnavailable
         && (m_lossSeenValid[stage] || m_lossRejected >= 8);
-    bool written = true;
+    bool written = replayWritten;
     if (firstRejection || (firstUnavailable && m_lossPostRemaining == 0)) {
         m_lossTriggered[stage] = true;
         m_lossUnavailableTriggered[stage] = m_lossUnavailableTriggered[stage] || pixelUnavailable;
@@ -1351,8 +1513,15 @@ bool COnlineCorrectionRunRecorder::finishSession(
         m_lossImageWriter->stop();
         m_lossHistory.clear();
     }
+    if (m_replayImageWriter) { m_replayImageWriter->stop(); }
     const qint64 finishedAtMs = QDateTime::currentMSecsSinceEpoch();
     bool written = true;
+    if (m_replayImageWriter && !m_replayImageWriter->lastError().isEmpty()) {
+        m_lastError = m_replayImageWriter->lastError();
+        appendSummary(QStringLiteral("replay_image_error"), m_lastError);
+        written = false;
+    }
+    written = appendSummary(QStringLiteral("replay_exposure_count"), QString::number(m_replaySequence)) && written;
     if (m_lossImageWriter && !m_lossImageWriter->lastError().isEmpty()) {
         m_lastError = m_lossImageWriter->lastError();
         written = appendSummary(QStringLiteral("debug_kcf_20261026_loss_image_error"), m_lastError);
@@ -1390,6 +1559,27 @@ bool COnlineCorrectionRunRecorder::finishSession(
     written = appendSessionEvent(QJsonObject{
         {QStringLiteral("event"), QStringLiteral("session_end")},
         {QStringLiteral("result"), resultText}, {QStringLiteral("message"), message}}) && written;
+    // 终态才允许等待慢盘；完整标记必须在已接纳队列排空后直接落盘。
+    m_textWriter->stop();
+    const QString textError = m_textWriter->lastError();
+    if (!textError.isEmpty()) { m_lastError = textError; written = false; }
+    const QByteArray footer = QStringLiteral("text_recording_complete\t%1\ntext_recording_rejected_chunks\t%2\ntext_recording_error\t%3\n")
+        .arg(textError.isEmpty() ? 1 : 0).arg(m_textWriter->rejectedChunks())
+        .arg(sanitizeField(textError)).toUtf8();
+    QString footerError;
+    bool footerWritten = false;
+    try {
+        footerWritten = m_textAppend(
+            QDir(m_sessionDirectory).filePath(QString::fromLatin1(kSummaryFileName)), footer, &footerError);
+    } catch (const std::exception &exception) {
+        footerError = QString::fromUtf8(exception.what());
+    } catch (...) {
+        footerError = QStringLiteral("写入最终摘要时出现未知异常。");
+    }
+    if (!footerWritten) {
+        m_lastError = footerError;
+        written = false;
+    }
     m_active = false;
     return written;
 }
@@ -1490,7 +1680,8 @@ QString COnlineCorrectionRunRecorder::sessionDirectory() const
 
 QString COnlineCorrectionRunRecorder::lastError() const
 {
-    return m_lastError;
+    const QString backgroundError = m_textWriter ? m_textWriter->lastError() : QString();
+    return backgroundError.isEmpty() ? m_lastError : backgroundError;
 }
 
 bool COnlineCorrectionRunRecorder::createSessionFile(
@@ -1503,7 +1694,7 @@ bool COnlineCorrectionRunRecorder::createSessionFile(
         setFileError(QStringLiteral("创建"), path);
         return false;
     }
-    if (file.write(header.toUtf8()) != header.toUtf8().size()) {
+    if (file.write(header.toUtf8()) != header.toUtf8().size() || !file.flush()) {
         setFileError(QStringLiteral("写入表头"), path);
         return false;
     }
@@ -1527,17 +1718,13 @@ bool COnlineCorrectionRunRecorder::appendData(
     const QString &fileName,
     const QByteArray &data)
 {
-    const QString path = QDir(m_sessionDirectory).filePath(fileName);
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-        setFileError(QStringLiteral("追加"), path);
-        return false;
+    const bool accepted = m_textWriter
+        && m_textWriter->submit(QDir(m_sessionDirectory).filePath(fileName), data);
+    if (!accepted) {
+        m_lastError = m_textWriter ? m_textWriter->lastError()
+                                  : QStringLiteral("文本记录线程尚未启动。");
     }
-    if (file.write(data) != data.size()) {
-        setFileError(QStringLiteral("写入"), path);
-        return false;
-    }
-    return true;
+    return accepted;
 }
 
 bool COnlineCorrectionRunRecorder::appendSummary(

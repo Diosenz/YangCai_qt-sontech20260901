@@ -11,6 +11,7 @@
 #include <QBuffer>
 #include <QDir>
 #include <QFile>
+#include <QImageWriter>
 #include <QStorageInfo>
 
 namespace i2r_rlc::ui {
@@ -126,8 +127,15 @@ void CTrackingDiagnosticImageWriter::writePair(const CImagePair &pair)
     QBuffer enhancedBuffer(&enhancedData);
     sourceBuffer.open(QIODevice::WriteOnly);
     enhancedBuffer.open(QIODevice::WriteOnly);
-    if (!pair.source.save(&sourceBuffer, "PNG")
-        || (!pair.enhanced.isNull() && !pair.enhanced.save(&enhancedBuffer, "PNG"))) {
+    const auto encodePng = [](const QImage &image, QIODevice *device) {
+        QImageWriter writer(device, "PNG");
+        // Qt 的 0~100 压缩量映射到 zlib 0~9；20 使用快速无损压缩。
+        // 默认压缩在现场噪声原图上慢于曝光周期，会耗尽有界队列。
+        writer.setCompression(20);
+        return writer.write(image);
+    };
+    if (!encodePng(pair.source, &sourceBuffer)
+        || (!pair.enhanced.isNull() && !encodePng(pair.enhanced, &enhancedBuffer))) {
         recordOutcome(pair.stem, QStringLiteral("encode_failed"), 0);
         return;
     }

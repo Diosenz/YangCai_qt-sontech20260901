@@ -18,6 +18,7 @@
 #include <QStringList>
 
 #include "RuntimeTrackingTypes.h"
+#include "OnlineCorrectionTextWriter.h"
 #include "TrackingDiagnosticImageWriter.h"
 
 namespace i2r_rlc::ui {
@@ -25,11 +26,24 @@ namespace i2r_rlc::ui {
 /**
  * @brief 在线纠偏会话级文本记录器。
  *
- * 本类仅由在线纠偏 worker 线程调用。每次写入均立即打开、追加并关闭文件，
- * 确保算法失败或用户中止时，已产生的数据仍保留在本轮会话目录中。
+ * 本类仅由在线纠偏 worker 线程调用；记录时间在入队前冻结，文件追加在后台执行。
+ * 每会话最多8 MiB/4096块未完成文本，队列满或写失败明确报告不完整，不阻塞控制。
+ * 正常会话结束排空并回收线程；进程崩溃可能丢失尚未落盘的有界队列。
  */
 class COnlineCorrectionRunRecorder final {
 public:
+    /**
+     * @brief 文件系统追加边界；成功须包含刷新检查，失败须填写错误说明。
+     * @details 运行期在后台调用；终态排空后在所有者线程写最终摘要。
+     * 回调由记录器持有，不能访问 widgets 或要求固定线程绑定资源。
+     */
+    using TextAppendFunction = COnlineCorrectionTextWriter::AppendFunction;
+    COnlineCorrectionRunRecorder();
+    explicit COnlineCorrectionRunRecorder(TextAppendFunction append);
+    ~COnlineCorrectionRunRecorder();
+    /// @brief 离线读取活动记录前显式排空；不得在在线控制周期调用。
+    bool flush();
+
     /**
      * @brief 创建新的在线纠偏记录目录和带表头的文本文件。
      * @param outputRootDirectory `output/online_correction` 根目录。
@@ -102,6 +116,10 @@ private:
         control::OnlineCorrectionPhase phase,
         const control::OnlineCorrectionTargetSnapshot &target);
     bool submitLossFrame(const CLossFrame &frame, qint64 triggerFrame, const QString &role);
+    /// @brief 独立连续采集预算；从初始化开始，不以控制拒绝作为触发条件。
+    bool recordReplayFrame(const CLossFrame &frame, QJsonObject context);
+    std::unique_ptr<CTrackingDiagnosticImageWriter> m_replayImageWriter;
+    quint64 m_replaySequence = 0;
     std::unique_ptr<CTrackingDiagnosticImageWriter> m_lossImageWriter;
     std::deque<CLossFrame> m_lossHistory;
     std::array<bool, 2> m_lossTriggered{};
@@ -134,6 +152,8 @@ private:
     bool recordSessionUpdate(const control::OnlineCorrectionUpdate &update);
     void setFileError(const QString &operation, const QString &path);
 
+    TextAppendFunction m_textAppend;
+    std::unique_ptr<COnlineCorrectionTextWriter> m_textWriter;
     QString m_sessionDirectory;
     QString m_lastError;
     qint64 m_startedAtMs = 0;

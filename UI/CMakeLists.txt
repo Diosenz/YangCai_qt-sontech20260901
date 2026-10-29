@@ -1,4 +1,4 @@
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+﻿find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Widgets)
 
 add_library(i2r_rlc_ui STATIC
@@ -11,6 +11,7 @@ add_library(i2r_rlc_ui STATIC
     src/MainWidget.cpp
     src/OnlineCorrectionP001Presentation.cpp
     src/TrackingDiagnosticImageWriter.cpp
+    src/OnlineCorrectionTextWriter.cpp
     src/OnlineCorrectionRunRecorder.cpp
     src/OnlineCorrectionWorkflow.cpp
     src/RobotSimVirtualReferenceCache.cpp
@@ -31,6 +32,7 @@ add_library(i2r_rlc_ui STATIC
     include/OnlineCorrectionP001Presentation.h
     include/OnlineVisionDiagnosticOptions.h
     include/TrackingDiagnosticImageWriter.h
+    include/OnlineCorrectionTextWriter.h
     include/OnlineCorrectionRunRecorder.h
     include/OnlineCorrectionWorkflow.h
     include/RobotSimVirtualReferenceCache.h

@@ -315,6 +315,7 @@ void CRuntimeCoordinator::configureOnlineCorrection(
             vision::CPositionerCalibrationParser::parseFile(resolved.rbcalibFile);
     }
     m_onlinePositionerCalibration = resolved.positionerCalibrationSnapshot;
+    m_onlineVisionDiagnosticOptions = resolved.visionDiagnostics;
     resetOnlineLocalRegistration();
     if (m_onlineCorrectionWorker == nullptr) {
         return;
@@ -329,7 +330,7 @@ void CRuntimeCoordinator::configureOnlineCorrection(
 RuntimeTrackingOptions CRuntimeCoordinator::onlineTrackingOptions() const
 {
     RuntimeTrackingOptions options = m_trackingOptions;
-    options.visionDiagnostics = m_pendingOnlineCorrectionConfiguration.visionDiagnostics;
+    options.visionDiagnostics = m_onlineVisionDiagnosticOptions;
     if (m_onlinePositionerCalibration.has_value()) {
         options.positionerCalibration = *m_onlinePositionerCalibration;
     }
@@ -775,6 +776,8 @@ void CRuntimeCoordinator::beginOnlineCorrectionArm()
     const RuntimeOnlineCorrectionConfiguration configuration =
         m_pendingOnlineCorrectionConfiguration;
     m_onlinePositionerCalibration = configuration.positionerCalibrationSnapshot;
+    // 启动完成会清理 pending；Vision 随后的阶段重配置仍须使用同一会话策略。
+    m_onlineVisionDiagnosticOptions = configuration.visionDiagnostics;
     const quint64 sessionId = m_onlineCorrectionStartSessionId;
     const QPointer<CRuntimeCoordinator> coordinator(this);
     QMetaObject::invokeMethod(
@@ -2842,7 +2845,7 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
 
     RuntimeTrackingResult routedResult = result;
     if (current.purpose == RuntimeTrackingPurpose::OnlineCorrection
-        && m_pendingOnlineCorrectionConfiguration.visionDiagnostics.enabled
+        && m_onlineVisionDiagnosticOptions.enabled
         && !routedResult.diagnostic.has_value()) {
         routedResult.diagnostic.emplace();
     }
@@ -2858,6 +2861,11 @@ void CRuntimeCoordinator::routeTrackingResult(const RuntimeTrackingResult &resul
     if (displayResult.diagnostic.has_value()) {
         displayResult.diagnostic->sourceImage = {};
         displayResult.diagnostic->enhancedImage = {};
+        displayResult.diagnostic->lossWindowSourceImage = {};
+        displayResult.diagnostic->replayObservation.reset();
+        displayResult.diagnostic->replayOptions.reset();
+        displayResult.diagnostic->replaySourceImage = {};
+        displayResult.diagnostic->replayDetectorActions.clear();
     }
     if (isCorrection && synchronizedObservation.has_value()) {
         displayResult.frameContext = RuntimeTrackingFrameContext{
